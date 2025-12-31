@@ -145,18 +145,15 @@ export function ExerciseDetailModal({ exercise, topProducts, onClose, onFeedback
         
         if (Array.isArray(data) && data.length > 0) {
           const match = data[0] // Pega o primeiro resultado
-          const gifUrl = match.gifUrl
-
-          setExerciseGif(gifUrl)
-          localStorage.setItem(cacheKey, gifUrl)
-        } else {
-          const fallback = getFallbackGif(exercise.name)
-          if (fallback) setExerciseGif(fallback)
+          
+          // Validação simples: garante que temos uma URL
+          if (match.gifUrl) {
+            setExerciseGif(match.gifUrl)
+            localStorage.setItem(cacheKey, match.gifUrl)
+          }
         }
       } catch (error) {
         console.error("Erro ao carregar GIF:", error)
-        const fallback = getFallbackGif(exercise.name)
-        if (fallback) setExerciseGif(fallback)
       } finally {
         setIsLoadingGif(false)
       }
@@ -197,10 +194,10 @@ export function ExerciseDetailModal({ exercise, topProducts, onClose, onFeedback
 
   return (
     <Dialog open={true} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-2xl p-0 gap-0 bg-[#121212] border-orange-500/30 text-white overflow-hidden max-h-[90vh] flex flex-col">
+      <DialogContent aria-describedby="exercise-description" className="max-w-2xl p-0 gap-0 bg-[#121212] border-orange-500/30 text-white overflow-hidden max-h-[90vh] flex flex-col">
         <DialogHeader className="sr-only">
           <DialogTitle>{exercise.name}</DialogTitle>
-          <DialogDescription>Detalhes e execução do exercício {exercise.name}</DialogDescription>
+          <DialogDescription id="exercise-description">Detalhes e execução do exercício {exercise.name}</DialogDescription>
         </DialogHeader>
 
         <div className="relative flex-1 overflow-y-auto">
