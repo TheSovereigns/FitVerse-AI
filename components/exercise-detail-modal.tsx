@@ -75,11 +75,11 @@ export function ExerciseDetailModal({ exercise, topProducts, onClose, onFeedback
     return () => clearInterval(interval)
   }, [isResting, timer])
 
-  // Mapeamento de Segurança (Fallback)
-  const FIXED_EXERCISES: Record<string, string> = {
+  // Mapeamento de Segurança (Fallback) / Mapeamento Técnico Fixo (Hardcoded)
+  const TECH_VIDEOS: Record<string, string> = {
     "agachamento livre": "https://media.giphy.com/media/1iTH1WIUjM0VATSw/giphy.gif",
     "agachamento": "https://media.giphy.com/media/1iTH1WIUjM0VATSw/giphy.gif",
-    "agachamento com halteres": "https://media.giphy.com/media/3o7qDEq2bMbcbPRQ2c/giphy.gif", // Goblet Squat
+    "agachamento com halteres (goblet squat)": "https://media.giphy.com/media/3o7qDEq2bMbcbPRQ2c/giphy.gif",
     "flexão de braço": "https://media.giphy.com/media/3o6Zt481isNVuQI1l6/giphy.gif",
     "flexão": "https://media.giphy.com/media/3o6Zt481isNVuQI1l6/giphy.gif",
     "polichinelos": "https://media.giphy.com/media/5t9IcRmvr9vgQ/giphy.gif",
@@ -88,6 +88,7 @@ export function ExerciseDetailModal({ exercise, topProducts, onClose, onFeedback
     "supino": "https://media.giphy.com/media/4BJUu68A2yJq/giphy.gif",
     "supino reto": "https://media.giphy.com/media/4BJUu68A2yJq/giphy.gif",
     "abdominal supra": "https://media.giphy.com/media/3o7TKMt1VVNkHVyPaE/giphy.gif",
+    "burpee": "https://media.giphy.com/media/23hPPMRp2I7y3/giphy.gif",
   }
 
   // --- Fetch GIF Demonstrativo (ExerciseDB) ---
@@ -109,7 +110,7 @@ export function ExerciseDetailModal({ exercise, topProducts, onClose, onFeedback
         .trim()
       
       // 1. Verifica Mapeamento Fixo (Prioridade)
-      for (const [key, url] of Object.entries(FIXED_EXERCISES)) {
+      for (const [key, url] of Object.entries(TECH_VIDEOS)) {
         if (cleanName.includes(key)) {
           setExerciseGif(url)
           setIsLoadingGif(false)
@@ -187,12 +188,6 @@ export function ExerciseDetailModal({ exercise, topProducts, onClose, onFeedback
     fetchGif()
   }, [exercise.name])
 
-  useEffect(() => {
-    // Reset state when exercise changes to prevent showing old media
-    setExerciseGif(null);
-    setIsLoadingGif(true);
-  }, [exercise.name]);
-
   const handleStartRest = () => {
     if (currentSet < sets) {
       setIsResting(true)
@@ -234,8 +229,8 @@ export function ExerciseDetailModal({ exercise, topProducts, onClose, onFeedback
         <DialogHeader className="sr-only">
           <DialogTitle>{exercise.name}</DialogTitle>
           {/* Correção de Acessibilidade */}
-          <DialogDescription>
-            Demonstração técnica da execução do exercício {exercise.name}.
+          <DialogDescription className="sr-only">
+            Visualização técnica do exercício
           </DialogDescription>
         </DialogHeader>
 
@@ -249,7 +244,7 @@ export function ExerciseDetailModal({ exercise, topProducts, onClose, onFeedback
                   <Loader2 className="w-10 h-10 text-[#FF8C00] animate-spin" />
                   <span className="text-xs text-slate-500 animate-pulse">Buscando demonstração técnica...</span>
                 </div>
-              ) : exerciseGif && exerciseGif !== 'undefined' ? (
+              ) : exerciseGif && !exerciseGif.includes('undefined') ? (
                 <img 
                   src={exerciseGif} 
                   alt={exercise.name} 
