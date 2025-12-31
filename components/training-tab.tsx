@@ -280,7 +280,6 @@ function WorkoutCard({ workout }: { workout: any }) {
 
         <Button 
           className="w-full bg-gradient-to-r from-[#FF8C00] to-[#FF4500] hover:shadow-orange-500/40 text-white font-bold transition-all duration-300 ease-in-out"
-          // Adicionando a função de clique. Você pode customizar esta ação.
           onClick={() => {
             toast.success(`Treino Iniciado: ${workout.name}`, {
               description: "Prepare-se! O cronômetro foi ativado.",
@@ -288,7 +287,7 @@ function WorkoutCard({ workout }: { workout: any }) {
             })
           }}
         >
-          <Play className="h-4 w-4 mr-2 fill-black" /> Iniciar Treino
+          <Play className="h-4 w-4 mr-2 fill-white" /> Iniciar Treino
         </Button>
       </CardContent>
     </Card>
