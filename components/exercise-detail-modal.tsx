@@ -78,7 +78,7 @@ export function ExerciseDetailModal({ exercise, topProducts, onClose, onFeedback
   const getFallbackGif = (name: string) => {
     const normalized = name.toLowerCase()
     if (normalized.includes("polichinelo")) return "https://media.giphy.com/media/3o7qDEq2bMbcbPRQ2c/giphy.gif"
-    if (normalized.includes("agachamento")) return "https://media.giphy.com/media/1iTH1WIUjM0VATSw/giphy.gif"
+    if (normalized.includes("agachamento")) return "https://media.giphy.com/media/l41Yy4J96X8ehz8xG/giphy.gif"
     if (normalized.includes("flexão") || normalized.includes("flexao")) return "https://media.giphy.com/media/3o6Zt481isNVuQI1l6/giphy.gif"
     return null
   }
@@ -90,8 +90,37 @@ export function ExerciseDetailModal({ exercise, topProducts, onClose, onFeedback
       
       const cleanName = exercise.name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z\s]/g, "").trim()
       
-      // Cache Key baseada no nome do exercício
-      const cacheKey = `gif_cache_${cleanName}`
+      // Tradução simples PT -> EN para melhorar busca na API
+      const termMap: Record<string, string> = {
+        "agachamento": "squat",
+        "flexão": "push up",
+        "flexao": "push up",
+        "abdominal": "crunch",
+        "supino": "bench press",
+        "remada": "row",
+        "desenvolvimento": "shoulder press",
+        "rosca": "curl",
+        "polichinelo": "jumping jack",
+        "prancha": "plank",
+        "puxada": "pull down",
+        "elevação": "raise",
+        "elevacao": "raise",
+        "afundo": "lunge",
+        "leg press": "leg press",
+        "extensora": "extension",
+        "flexora": "curl"
+      }
+      
+      let searchTerm = cleanName
+      for (const [pt, en] of Object.entries(termMap)) {
+        if (cleanName.includes(pt)) {
+          searchTerm = en
+          break
+        }
+      }
+      
+      // Cache Key baseada no termo de busca
+      const cacheKey = `gif_cache_${searchTerm.replace(/\s/g, '_')}`
       
       // 1. Verifica Cache Local (Performance)
       const cached = localStorage.getItem(cacheKey)
@@ -105,7 +134,7 @@ export function ExerciseDetailModal({ exercise, topProducts, onClose, onFeedback
 
       try {
         // Chamada à API ExerciseDB
-        const response = await fetch(`https://exercisedb.p.rapidapi.com/exercises/name/${encodeURIComponent(cleanName)}`, {
+        const response = await fetch(`https://exercisedb.p.rapidapi.com/exercises/name/${encodeURIComponent(searchTerm)}`, {
           headers: {
             'X-RapidAPI-Key': process.env.NEXT_PUBLIC_RAPIDAPI_KEY || '',
             'X-RapidAPI-Host': 'exercisedb.p.rapidapi.com'

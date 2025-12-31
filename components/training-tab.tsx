@@ -46,7 +46,10 @@ export function TrainingTab({ metabolicPlan, scanHistory, userGoal }: TrainingTa
         }),
       })
 
-      if (!response.ok) throw new Error("Failed to generate workouts")
+      if (!response.ok) {
+        const errorText = await response.text().catch(() => "Unknown error")
+        throw new Error(`Failed to generate workouts: ${response.status} - ${errorText}`)
+      }
 
       const data = await response.json()
       // Adiciona o critério de geração a cada treino para uma filtragem robusta
@@ -57,7 +60,44 @@ export function TrainingTab({ metabolicPlan, scanHistory, userGoal }: TrainingTa
       setGeneratedWorkouts(workoutsWithCriteria)
     } catch (error) {
       console.error("Error generating workouts:", error)
-      // Aqui você poderia adicionar um toast de erro
+      toast.error("Erro ao conectar com a IA. Gerando treino offline.")
+
+      // Fallback: Gerar treino mockado para não quebrar a experiência
+      const isHomeNoEquip = criteria.location === "Casa (Sem Equipamento)"
+      const isHomeDumbbells = criteria.location === "Casa (Halteres)"
+      
+      const mockExercises = isHomeNoEquip ? [
+        { name: "Polichinelos", sets: "3", reps: "50", rest: "30s" },
+        { name: "Agachamento Livre", sets: "4", reps: "20", rest: "45s" },
+        { name: "Flexão de Braço", sets: "3", reps: "12", rest: "60s" },
+        { name: "Abdominal Supra", sets: "3", reps: "20", rest: "45s" },
+        { name: "Prancha Isométrica", sets: "3", reps: "45s", rest: "45s" }
+      ] : isHomeDumbbells ? [
+        { name: "Agachamento Goblet", sets: "4", reps: "12", rest: "60s" },
+        { name: "Desenvolvimento com Halteres", sets: "3", reps: "12", rest: "60s" },
+        { name: "Remada Unilateral", sets: "3", reps: "12", rest: "60s" },
+        { name: "Supino Reto com Halteres", sets: "3", reps: "12", rest: "60s" },
+        { name: "Rosca Martelo", sets: "3", reps: "15", rest: "45s" }
+      ] : [
+        { name: "Supino Reto", sets: "4", reps: "10", rest: "90s" },
+        { name: "Agachamento Livre", sets: "4", reps: "10", rest: "90s" },
+        { name: "Puxada Alta", sets: "3", reps: "12", rest: "60s" },
+        { name: "Leg Press 45", sets: "3", reps: "12", rest: "60s" },
+        { name: "Elevação Lateral", sets: "3", reps: "15", rest: "45s" }
+      ]
+
+      const mockWorkout = {
+        name: `Treino ${criteria.focus} (${criteria.location})`,
+        category: criteria.focus,
+        duration: criteria.duration,
+        calories: "350",
+        difficulty: criteria.level,
+        aiVerdict: "Plano gerado em modo offline. Foco na consistência e execução perfeita.",
+        exercises: mockExercises,
+        criteria: criteria
+      }
+
+      setGeneratedWorkouts([mockWorkout])
     } finally {
       setIsGenerating(false)
     }
