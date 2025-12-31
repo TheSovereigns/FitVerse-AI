@@ -75,18 +75,17 @@ export function ExerciseDetailModal({ exercise, topProducts, onClose, onFeedback
     return () => clearInterval(interval)
   }, [isResting, timer])
 
-  // --- Mapeamento Estático de Mídia (Prioridade) ---
-  const EXERCISE_GIFS: Record<string, string> = {
-    "agachamento": "https://media.giphy.com/media/1iTH1WIUjM0VATSw/giphy.gif",
+  // --- Mapeamento Técnico Fixo (Hardcoded) ---
+  const FIXED_EXERCISES: Record<string, string> = {
     "agachamento livre": "https://media.giphy.com/media/1iTH1WIUjM0VATSw/giphy.gif",
-    "agachamento com barra": "https://media.giphy.com/media/1iTH1WIUjM0VATSw/giphy.gif",
+    "agachamento": "https://media.giphy.com/media/1iTH1WIUjM0VATSw/giphy.gif",
+    "flexão de braço": "https://media.giphy.com/media/3o6Zt481isNVuQI1l6/giphy.gif",
     "flexão": "https://media.giphy.com/media/3o6Zt481isNVuQI1l6/giphy.gif",
-    "flexao de braco": "https://media.giphy.com/media/3o6Zt481isNVuQI1l6/giphy.gif",
-    "polichinelo": "https://media.giphy.com/media/5t9IcRmvr9vgQ/giphy.gif",
     "polichinelos": "https://media.giphy.com/media/5t9IcRmvr9vgQ/giphy.gif",
+    "polichinelo": "https://media.giphy.com/media/5t9IcRmvr9vgQ/giphy.gif",
+    "remada invertida": "https://media.giphy.com/media/3o6Zt481isNVuQI1l6/giphy.gif",
     "supino": "https://media.giphy.com/media/4BJUu68A2yJq/giphy.gif",
-    "abdominal": "https://media.giphy.com/media/3o7TKMt1VVNkHVyPaE/giphy.gif",
-    "remada invertida": "https://media.giphy.com/media/3o6Zt481isNVuQI1l6/giphy.gif", // Placeholder técnico
+    "abdominal supra": "https://media.giphy.com/media/3o7TKMt1VVNkHVyPaE/giphy.gif",
   }
 
   // --- Fetch GIF Demonstrativo (ExerciseDB) ---
@@ -96,8 +95,9 @@ export function ExerciseDetailModal({ exercise, topProducts, onClose, onFeedback
       
       setIsLoadingGif(true)
       setExerciseGif(null)
+      setShowFallback(false)
 
-      // Limpeza de prefixos e caracteres especiais (Filtro de Nome)
+      // Sanitização de Busca: Remove prefixos e limpa string
       const cleanName = exercise.name
         .replace(/^(Aquecimento|Circuito|Série|Treino)[:\s]+/i, "")
         .toLowerCase()
@@ -105,8 +105,8 @@ export function ExerciseDetailModal({ exercise, topProducts, onClose, onFeedback
         .replace(/[^a-z\s]/g, "")
         .trim()
       
-      // 1. Verifica Mapeamento Estático (Prioridade)
-      for (const [key, url] of Object.entries(EXERCISE_GIFS)) {
+      // 1. Verifica Mapeamento Fixo (Prioridade)
+      for (const [key, url] of Object.entries(FIXED_EXERCISES)) {
         if (cleanName.includes(key)) {
           setExerciseGif(url)
           setIsLoadingGif(false)
@@ -214,13 +214,18 @@ export function ExerciseDetailModal({ exercise, topProducts, onClose, onFeedback
     return "bg-orange-500/20 text-orange-400 border-orange-500/40"
   }
 
+  const handleMediaError = () => {
+    setExerciseGif(null)
+    setShowFallback(true)
+  }
+
   return (
     <Dialog open={true} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="max-w-2xl p-0 gap-0 bg-[#121212] border-orange-500/30 text-white overflow-hidden max-h-[90vh] flex flex-col">
         <DialogHeader className="sr-only">
           <DialogTitle>{exercise.name}</DialogTitle>
-          <DialogDescription>
-            Visualização detalhada e instruções técnicas para o exercício {exercise.name}
+          <DialogDescription className="sr-only">
+            Demonstração técnica da execução do exercício
           </DialogDescription>
         </DialogHeader>
 
@@ -239,10 +244,8 @@ export function ExerciseDetailModal({ exercise, topProducts, onClose, onFeedback
                   src={exerciseGif} 
                   alt={exercise.name} 
                   className="w-full h-full object-cover"
-                  onError={() => {
-                    setExerciseGif(null)
-                    setShowFallback(true)
-                  }}
+                  loading="lazy"
+                  onError={handleMediaError}
                 />
               ) : (
                 <div className="absolute inset-0 flex flex-col items-center justify-center text-slate-600 bg-[#121212]">
