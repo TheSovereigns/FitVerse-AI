@@ -9,6 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Dumbbell, Flame, Clock, Trophy, Zap, Play, Settings2, Home, Building2, User } from "lucide-react"
 import { WorkoutGenerator } from "@/components/workout-generator"
+import { ActiveWorkoutSession } from "@/components/active-workout-session"
 import { toast } from "sonner"
 
 interface TrainingTabProps {
@@ -22,6 +23,7 @@ export function TrainingTab({ metabolicPlan, scanHistory, userGoal }: TrainingTa
   const [generatedWorkouts, setGeneratedWorkouts] = useState<any[]>([])
   const [activeFilter, setActiveFilter] = useState("all")
   const [showGeneratorModal, setShowGeneratorModal] = useState(false)
+  const [activeSessionWorkout, setActiveSessionWorkout] = useState<any>(null)
 
   const handleGenerateWorkouts = async (criteria: any) => {
     setIsGenerating(true)
@@ -45,7 +47,12 @@ export function TrainingTab({ metabolicPlan, scanHistory, userGoal }: TrainingTa
       if (!response.ok) throw new Error("Failed to generate workouts")
 
       const data = await response.json()
-      setGeneratedWorkouts(data.workouts)
+      // Adiciona o critério de geração a cada treino para uma filtragem robusta
+      const workoutsWithCriteria = data.workouts.map((w: any) => ({
+        ...w,
+        criteria: criteria,
+      }))
+      setGeneratedWorkouts(workoutsWithCriteria)
     } catch (error) {
       console.error("Error generating workouts:", error)
       // Aqui você poderia adicionar um toast de erro
@@ -66,15 +73,20 @@ export function TrainingTab({ metabolicPlan, scanHistory, userGoal }: TrainingTa
   const filteredWorkouts = generatedWorkouts.filter((workout) => {
     if (activeFilter === "all") return true
     
-    // Busca flexível nos dados do treino (nome, categoria, etc)
-    const searchStr = JSON.stringify(workout).toLowerCase()
+    const location = (workout.criteria?.location || "").toLowerCase()
     
-    if (activeFilter === "gym") return searchStr.includes("academia") || searchStr.includes("gym")
-    if (activeFilter === "home") return searchStr.includes("casa") || searchStr.includes("home") || searchStr.includes("halteres") || searchStr.includes("dumbbells") || searchStr.includes("sem equipamento") || searchStr.includes("bodyweight") || searchStr.includes("calistenia")
-    if (activeFilter === "dumbbells") return searchStr.includes("halteres") || searchStr.includes("dumbbells")
-    if (activeFilter === "bodyweight") return searchStr.includes("sem equipamento") || searchStr.includes("calistenia") || searchStr.includes("bodyweight")
-    
-    return true
+    switch (activeFilter) {
+      case "gym":
+        return location === "academia"
+      case "home":
+        return location.includes("casa") // Pega "casa (halteres)" e "casa (sem equipamento)"
+      case "dumbbells":
+        return location === "casa (halteres)"
+      case "bodyweight":
+        return location === "casa (sem equipamento)"
+      default:
+        return false
+    }
   })
 
   return (
@@ -182,17 +194,26 @@ export function TrainingTab({ metabolicPlan, scanHistory, userGoal }: TrainingTa
 
           <div className="grid gap-6">
             {filteredWorkouts.map((workout, index) => (
-              <WorkoutCard key={index} workout={workout} />
+              <WorkoutCard key={index} workout={workout} onStart={setActiveSessionWorkout} />
             ))}
           </div>
         </div>
+      )}
+
+      {/* Modo de Treino Ativo (Overlay) */}
+      {activeSessionWorkout && (
+        <ActiveWorkoutSession 
+          workout={activeSessionWorkout} 
+          onClose={() => setActiveSessionWorkout(null)}
+          onComplete={() => setActiveSessionWorkout(null)}
+        />
       )}
     </div>
   )
 }
 
-function WorkoutCard({ workout }: { workout: any }) {
-  const [isStarted, setIsStarted] = useState(false)
+function WorkoutCard({ workout, onStart }: { workout: any, onStart: (workout: any) => void }) {
+  // Estado local removido em favor do controle global da sessão
 
   return (
     <Card className="bg-[#121212] border-[#1F1F1F] overflow-hidden hover:border-[#FF8C00]/50 transition-all duration-300 ease-in-out group shadow-lg rounded-2xl">
@@ -268,20 +289,17 @@ function WorkoutCard({ workout }: { workout: any }) {
 
         <Button 
           className={`w-full font-bold transition-all duration-300 ease-in-out ${
-            isStarted 
-              ? "bg-green-600 hover:bg-green-700 text-white shadow-none" 
-              : "bg-gradient-to-r from-[#FF8C00] to-[#FF4500] hover:shadow-orange-500/40 text-white"
+            "bg-gradient-to-r from-[#FF8C00] to-[#FF4500] hover:shadow-orange-500/40 text-white"
           }`}
           onClick={() => {
-            setIsStarted(true)
+            onStart(workout)
             toast.success(`Treino Iniciado: ${workout.name}`, {
-              description: "Prepare-se! O cronômetro foi ativado.",
-              duration: 3000,
+              description: "Modo de foco ativado.",
+              duration: 2000,
             })
           }}
-          disabled={isStarted}
         >
-          {isStarted ? "Treino em Andamento..." : <><Play className="h-4 w-4 mr-2 fill-white" /> Iniciar Treino</>}
+          <Play className="h-4 w-4 mr-2 fill-white" /> Iniciar Treino
         </Button>
       </CardContent>
     </Card>
