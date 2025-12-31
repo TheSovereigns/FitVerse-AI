@@ -10,6 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Dumbbell, Flame, Clock, Trophy, Zap, Play, Settings2, Home, Building2, User } from "lucide-react"
 import { WorkoutGenerator } from "@/components/workout-generator"
 import { ActiveWorkoutSession } from "@/components/active-workout-session"
+import { ExerciseDetailModal } from "@/components/exercise-detail-modal"
 import { toast } from "sonner"
 
 interface TrainingTabProps {
@@ -24,6 +25,7 @@ export function TrainingTab({ metabolicPlan, scanHistory, userGoal }: TrainingTa
   const [activeFilter, setActiveFilter] = useState("all")
   const [showGeneratorModal, setShowGeneratorModal] = useState(false)
   const [activeSessionWorkout, setActiveSessionWorkout] = useState<any>(null)
+  const [selectedExerciseDetail, setSelectedExerciseDetail] = useState<any>(null)
 
   const handleGenerateWorkouts = async (criteria: any) => {
     setIsGenerating(true)
@@ -194,7 +196,12 @@ export function TrainingTab({ metabolicPlan, scanHistory, userGoal }: TrainingTa
 
           <div className="grid gap-6">
             {filteredWorkouts.map((workout, index) => (
-              <WorkoutCard key={index} workout={workout} onStart={setActiveSessionWorkout} />
+              <WorkoutCard 
+                key={index} 
+                workout={workout} 
+                onStart={setActiveSessionWorkout} 
+                onExerciseClick={setSelectedExerciseDetail}
+              />
             ))}
           </div>
         </div>
@@ -208,11 +215,28 @@ export function TrainingTab({ metabolicPlan, scanHistory, userGoal }: TrainingTa
           onComplete={() => setActiveSessionWorkout(null)}
         />
       )}
+
+      {/* Modal de Detalhes do Exercício (Preview) */}
+      {selectedExerciseDetail && (
+        <ExerciseDetailModal
+          exercise={{
+            ...selectedExerciseDetail,
+            id: selectedExerciseDetail.name, // Fallback ID
+            stepByStepImages: [], // Fallback
+            safetyTips: ["Mantenha a postura correta", "Respire adequadamente"], // Fallback
+            commonMistakes: ["Exagerar na carga", "Movimento incompleto"], // Fallback
+            aiInsight: "Exercício excelente para seu objetivo.", // Fallback
+          }}
+          topProducts={scanHistory ? scanHistory.filter(i => i.score >= 70).slice(0, 3) : []}
+          onClose={() => setSelectedExerciseDetail(null)}
+          onFeedback={() => {}}
+        />
+      )}
     </div>
   )
 }
 
-function WorkoutCard({ workout, onStart }: { workout: any, onStart: (workout: any) => void }) {
+function WorkoutCard({ workout, onStart, onExerciseClick }: { workout: any, onStart: (workout: any) => void, onExerciseClick: (ex: any) => void }) {
   // Estado local removido em favor do controle global da sessão
 
   return (
@@ -264,7 +288,11 @@ function WorkoutCard({ workout, onStart }: { workout: any, onStart: (workout: an
           
           <div className="space-y-3">
             {workout.exercises.slice(0, 3).map((exercise: any, idx: number) => (
-              <div key={idx} className="flex items-start gap-3 p-2 rounded-lg hover:bg-[#1A1A1A] transition-colors">
+              <div 
+                key={idx} 
+                className="flex items-start gap-3 p-2 rounded-lg hover:bg-[#1A1A1A] transition-colors cursor-pointer group/item"
+                onClick={() => onExerciseClick(exercise)}
+              >
                 <div className="h-10 w-10 rounded-lg bg-[#1F1F1F] flex-shrink-0 overflow-hidden">
                   {/* Placeholder para imagem do exercício */}
                   <div className="w-full h-full flex items-center justify-center text-xs font-bold text-slate-600">
@@ -272,7 +300,7 @@ function WorkoutCard({ workout, onStart }: { workout: any, onStart: (workout: an
                   </div>
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-white truncate">{exercise.name}</p>
+                  <p className="text-sm font-medium text-white truncate group-hover/item:text-[#FF8C00] transition-colors">{exercise.name}</p>
                   <p className="text-xs text-slate-500">
                     {exercise.sets} x {exercise.reps} • {exercise.rest} descanso
                   </p>

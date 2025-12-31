@@ -17,6 +17,7 @@ import {
   CheckCircle2,
   X,
   ImageIcon,
+  Loader2,
 } from "lucide-react"
 
 interface Exercise {
@@ -52,6 +53,8 @@ export function ExerciseDetailModal({ exercise, topProducts, onClose, onFeedback
   const [timer, setTimer] = useState(0)
   const [showFeedback, setShowFeedback] = useState(false)
   const [selectedDifficulty, setSelectedDifficulty] = useState<number | null>(null)
+  const [exerciseGif, setExerciseGif] = useState<string | null>(null)
+  const [isLoadingGif, setIsLoadingGif] = useState(false)
 
   useEffect(() => {
     let interval: NodeJS.Timeout
@@ -68,6 +71,52 @@ export function ExerciseDetailModal({ exercise, topProducts, onClose, onFeedback
     }
     return () => clearInterval(interval)
   }, [isResting, timer])
+
+  // --- Fetch GIF Demonstrativo (ExerciseDB) ---
+  useEffect(() => {
+    const fetchGif = async () => {
+      if (!exercise?.name) return
+      
+      // Cache Key baseada no nome do exercício
+      const cacheKey = `gif_cache_${exercise.name}`
+      
+      // 1. Verifica Cache Local (Performance)
+      const cached = localStorage.getItem(cacheKey)
+      if (cached) {
+        setExerciseGif(cached)
+        return
+      }
+
+      setIsLoadingGif(true)
+      setExerciseGif(null)
+
+      try {
+        // Chamada à API ExerciseDB
+        const response = await fetch(`https://exercisedb.p.rapidapi.com/exercises/name/${encodeURIComponent(exercise.name)}`, {
+          headers: {
+            'X-RapidAPI-Key': process.env.NEXT_PUBLIC_RAPIDAPI_KEY || '',
+            'X-RapidAPI-Host': 'exercisedb.p.rapidapi.com'
+          }
+        })
+
+        const data = await response.json()
+        
+        if (Array.isArray(data) && data.length > 0) {
+          const match = data[0] // Pega o primeiro resultado
+          const gifUrl = match.gifUrl
+
+          setExerciseGif(gifUrl)
+          localStorage.setItem(cacheKey, gifUrl)
+        }
+      } catch (error) {
+        console.error("Erro ao carregar GIF:", error)
+      } finally {
+        setIsLoadingGif(false)
+      }
+    }
+
+    fetchGif()
+  }, [exercise.name])
 
   const handleStartRest = () => {
     if (currentSet < sets) {
@@ -121,18 +170,26 @@ export function ExerciseDetailModal({ exercise, topProducts, onClose, onFeedback
 
             {/* Video Player Section */}
             <div className="relative aspect-video bg-slate-950 rounded-t-lg overflow-hidden border-b border-orange-500/30">
-              <video
-                className="w-full h-full object-cover"
-                loop
-                muted
-                playsInline
-                onPlay={() => setIsPlaying(true)}
-                onPause={() => setIsPlaying(false)}
-                poster={`/placeholder.svg?height=400&width=600&query=${encodeURIComponent(exercise.name + " exercise demonstration")}`}
-              >
-                <source src={exercise.videoUrl || "#"} type="video/mp4" />
-              </video>
+              {isLoadingGif ? (
+                <div className="absolute inset-0 flex items-center justify-center bg-[#121212]">
+                  <Loader2 className="w-10 h-10 text-[#FF8C00] animate-spin" />
+                </div>
+              ) : exerciseGif ? (
+                <img 
+                  src={exerciseGif} 
+                  alt={exercise.name} 
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="absolute inset-0 flex flex-col items-center justify-center text-slate-600 bg-[#121212]">
+                  <ImageIcon className="w-16 h-16 mb-3 opacity-20" />
+                  <span className="text-sm uppercase tracking-widest font-medium opacity-50">
+                    Demonstração indisponível
+                  </span>
+                </div>
+              )}
 
+              {/* Controls Overlay (Only if using video tag, kept for compatibility if needed) */}
               {/* Video Controls Overlay */}
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent flex items-end justify-center pb-4 opacity-0 hover:opacity-100 transition-opacity">
                 <Button
@@ -153,12 +210,14 @@ export function ExerciseDetailModal({ exercise, topProducts, onClose, onFeedback
               </div>
 
               {/* Loading Placeholder */}
-              <div className="absolute top-4 left-4 bg-slate-900/80 backdrop-blur-sm px-3 py-1.5 rounded-full border border-orange-500/30">
-                <p className="text-xs text-orange-400 font-medium flex items-center gap-2">
-                  <div className="w-2 h-2 bg-orange-500 rounded-full animate-pulse" />
-                  Execução em Loop
-                </p>
-              </div>
+              {exerciseGif && (
+                <div className="absolute top-4 left-4 bg-slate-900/80 backdrop-blur-sm px-3 py-1.5 rounded-full border border-orange-500/30">
+                  <p className="text-xs text-orange-400 font-medium flex items-center gap-2">
+                    <div className="w-2 h-2 bg-orange-500 rounded-full animate-pulse" />
+                    GIF Demonstrativo
+                  </p>
+                </div>
+              )}
             </div>
 
             <div className="p-6 space-y-6">
