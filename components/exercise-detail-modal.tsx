@@ -4,6 +4,8 @@ import { useState, useEffect } from "react"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
+import { Skeleton } from "@/components/ui/skeleton"
 import {
   Sparkles,
   Apple,
@@ -72,13 +74,24 @@ export function ExerciseDetailModal({ exercise, topProducts, onClose, onFeedback
     return () => clearInterval(interval)
   }, [isResting, timer])
 
+  // --- Dicionário de Fallback ---
+  const getFallbackGif = (name: string) => {
+    const normalized = name.toLowerCase()
+    if (normalized.includes("polichinelo")) return "https://media.giphy.com/media/3o7qDEq2bMbcbPRQ2c/giphy.gif"
+    if (normalized.includes("agachamento")) return "https://media.giphy.com/media/1iTH1WIUjM0VATSw/giphy.gif"
+    if (normalized.includes("flexão") || normalized.includes("flexao")) return "https://media.giphy.com/media/3o6Zt481isNVuQI1l6/giphy.gif"
+    return null
+  }
+
   // --- Fetch GIF Demonstrativo (ExerciseDB) ---
   useEffect(() => {
     const fetchGif = async () => {
       if (!exercise?.name) return
       
+      const cleanName = exercise.name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z\s]/g, "").trim()
+      
       // Cache Key baseada no nome do exercício
-      const cacheKey = `gif_cache_${exercise.name}`
+      const cacheKey = `gif_cache_${cleanName}`
       
       // 1. Verifica Cache Local (Performance)
       const cached = localStorage.getItem(cacheKey)
@@ -92,7 +105,7 @@ export function ExerciseDetailModal({ exercise, topProducts, onClose, onFeedback
 
       try {
         // Chamada à API ExerciseDB
-        const response = await fetch(`https://exercisedb.p.rapidapi.com/exercises/name/${encodeURIComponent(exercise.name)}`, {
+        const response = await fetch(`https://exercisedb.p.rapidapi.com/exercises/name/${encodeURIComponent(cleanName)}`, {
           headers: {
             'X-RapidAPI-Key': process.env.NEXT_PUBLIC_RAPIDAPI_KEY || '',
             'X-RapidAPI-Host': 'exercisedb.p.rapidapi.com'
@@ -107,9 +120,14 @@ export function ExerciseDetailModal({ exercise, topProducts, onClose, onFeedback
 
           setExerciseGif(gifUrl)
           localStorage.setItem(cacheKey, gifUrl)
+        } else {
+          const fallback = getFallbackGif(exercise.name)
+          if (fallback) setExerciseGif(fallback)
         }
       } catch (error) {
         console.error("Erro ao carregar GIF:", error)
+        const fallback = getFallbackGif(exercise.name)
+        if (fallback) setExerciseGif(fallback)
       } finally {
         setIsLoadingGif(false)
       }
@@ -149,31 +167,20 @@ export function ExerciseDetailModal({ exercise, topProducts, onClose, onFeedback
   }
 
   return (
-    <div
-      className="fixed inset-0 bg-black/90 backdrop-blur-sm z-50 overflow-y-auto"
-      onClick={(e) => {
-        if (e.target === e.currentTarget) onClose()
-      }}
-    >
-      <div className="min-h-screen p-4 flex items-center justify-center">
-        <Card className="w-full max-w-2xl glass border-orange-500/30 shadow-2xl shadow-orange-500/20 animate-in fade-in zoom-in-95 duration-300">
+    <Dialog open={true} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="max-w-2xl p-0 gap-0 bg-[#121212] border-orange-500/30 text-white overflow-hidden max-h-[90vh] flex flex-col">
+        <DialogHeader className="sr-only">
+          <DialogTitle>{exercise.name}</DialogTitle>
+          <DialogDescription>Detalhes e execução do exercício {exercise.name}</DialogDescription>
+        </DialogHeader>
+
+        <div className="relative flex-1 overflow-y-auto">
           <div className="relative">
-            {/* Close Button */}
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={onClose}
-              className="absolute top-4 right-4 z-10 text-slate-400 hover:text-white bg-slate-900/80 hover:bg-slate-800"
-            >
-              <X className="w-5 h-5" />
-            </Button>
 
             {/* Video Player Section */}
             <div className="relative aspect-video bg-slate-950 rounded-t-lg overflow-hidden border-b border-orange-500/30">
               {isLoadingGif ? (
-                <div className="absolute inset-0 flex items-center justify-center bg-[#121212]">
-                  <Loader2 className="w-10 h-10 text-[#FF8C00] animate-spin" />
-                </div>
+                <Skeleton className="w-full h-full bg-[#1F1F1F] animate-pulse" />
               ) : exerciseGif ? (
                 <img 
                   src={exerciseGif} 
@@ -488,8 +495,8 @@ export function ExerciseDetailModal({ exercise, topProducts, onClose, onFeedback
               )}
             </div>
           </div>
-        </Card>
-      </div>
-    </div>
+        </div>
+      </DialogContent>
+    </Dialog>
   )
 }

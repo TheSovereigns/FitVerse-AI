@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
 import { Badge } from "@/components/ui/badge"
+import { Skeleton } from "@/components/ui/skeleton"
 import { toast } from "sonner"
 
 interface ActiveWorkoutSessionProps {
@@ -92,14 +93,27 @@ export function ActiveWorkoutSession({ workout, onClose, onComplete }: ActiveWor
     }
   }, [isResting, restTimer])
 
+  // --- Dicionário de Fallback (Reserva) ---
+  const getFallbackGif = (name: string) => {
+    const normalized = name.toLowerCase()
+    if (normalized.includes("polichinelo")) return "https://media.giphy.com/media/3o7qDEq2bMbcbPRQ2c/giphy.gif"
+    if (normalized.includes("agachamento")) return "https://media.giphy.com/media/1iTH1WIUjM0VATSw/giphy.gif"
+    if (normalized.includes("flexão") || normalized.includes("flexao")) return "https://media.giphy.com/media/3o6Zt481isNVuQI1l6/giphy.gif"
+    if (normalized.includes("abdominal")) return "https://media.giphy.com/media/3o7TKMt1VVNkHVyPaE/giphy.gif"
+    return null
+  }
+
   // --- Fetch GIF Demonstrativo (ExerciseDB) ---
   useEffect(() => {
     const fetchGif = async () => {
       if (!workout?.exercises?.[currentExerciseIndex]) return
       
-      const exerciseName = workout.exercises[currentExerciseIndex].name
+      const originalName = workout.exercises[currentExerciseIndex].name
+      // Limpeza do nome para aumentar chances de match na API (remove acentos e caracteres especiais)
+      const cleanName = originalName.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z\s]/g, "").trim()
+      
       // Cache Key baseada no nome do exercício
-      const cacheKey = `gif_cache_${exerciseName}`
+      const cacheKey = `gif_cache_${cleanName}`
       
       // 1. Verifica Cache Local (Performance)
       const cached = localStorage.getItem(cacheKey)
@@ -113,7 +127,7 @@ export function ActiveWorkoutSession({ workout, onClose, onComplete }: ActiveWor
 
       try {
         // Chamada à API ExerciseDB
-        const response = await fetch(`https://exercisedb.p.rapidapi.com/exercises/name/${encodeURIComponent(exerciseName)}`, {
+        const response = await fetch(`https://exercisedb.p.rapidapi.com/exercises/name/${encodeURIComponent(cleanName)}`, {
           headers: {
             'X-RapidAPI-Key': process.env.NEXT_PUBLIC_RAPIDAPI_KEY || '',
             'X-RapidAPI-Host': 'exercisedb.p.rapidapi.com'
@@ -132,9 +146,15 @@ export function ActiveWorkoutSession({ workout, onClose, onComplete }: ActiveWor
 
           setExerciseGif(gifUrl)
           localStorage.setItem(cacheKey, gifUrl)
+        } else {
+          // Tenta fallback se a API não retornar nada
+          const fallback = getFallbackGif(originalName)
+          if (fallback) setExerciseGif(fallback)
         }
       } catch (error) {
         console.error("Erro ao carregar GIF:", error)
+        const fallback = getFallbackGif(originalName)
+        if (fallback) setExerciseGif(fallback)
       } finally {
         setIsLoadingGif(false)
       }
@@ -258,9 +278,7 @@ export function ActiveWorkoutSession({ workout, onClose, onComplete }: ActiveWor
           {/* GIF Demonstrativo */}
           <div className="relative w-full aspect-video bg-[#1A1A1A] rounded-xl overflow-hidden border border-[#1F1F1F] shadow-lg group">
             {isLoadingGif ? (
-              <div className="absolute inset-0 flex items-center justify-center">
-                <Loader2 className="w-8 h-8 text-[#FF8C00] animate-spin" />
-              </div>
+              <Skeleton className="w-full h-full bg-[#1F1F1F] animate-pulse" />
             ) : exerciseGif ? (
               <img 
                 src={exerciseGif} 
