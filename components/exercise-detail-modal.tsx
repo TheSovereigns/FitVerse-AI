@@ -57,6 +57,7 @@ export function ExerciseDetailModal({ exercise, topProducts, onClose, onFeedback
   const [selectedDifficulty, setSelectedDifficulty] = useState<number | null>(null)
   const [exerciseGif, setExerciseGif] = useState<string | null>(null)
   const [isLoadingGif, setIsLoadingGif] = useState(false)
+  const [showFallback, setShowFallback] = useState(false)
 
   useEffect(() => {
     let interval: NodeJS.Timeout
@@ -204,10 +205,12 @@ export function ExerciseDetailModal({ exercise, topProducts, onClose, onFeedback
 
   return (
     <Dialog open={true} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent aria-describedby="exercise-description" className="max-w-2xl p-0 gap-0 bg-[#121212] border-orange-500/30 text-white overflow-hidden max-h-[90vh] flex flex-col">
+      <DialogContent aria-describedby="exercise-modal-desc" className="max-w-2xl p-0 gap-0 bg-[#121212] border-orange-500/30 text-white overflow-hidden max-h-[90vh] flex flex-col">
         <DialogHeader className="sr-only">
           <DialogTitle>{exercise.name}</DialogTitle>
-          <DialogDescription id="exercise-description">Detalhes e execução do exercício {exercise.name}</DialogDescription>
+          <DialogDescription id="exercise-modal-desc">
+            Visualização detalhada e instruções técnicas para o exercício {exercise.name}
+          </DialogDescription>
         </DialogHeader>
 
         <div className="relative flex-1 overflow-y-auto">
@@ -216,9 +219,9 @@ export function ExerciseDetailModal({ exercise, topProducts, onClose, onFeedback
             {/* Video Player Section */}
             <div className="relative aspect-video bg-slate-950 rounded-t-lg overflow-hidden border-b border-orange-500/30">
               {isLoadingGif ? (
-                <div className="absolute inset-0 flex items-center justify-center bg-[#121212]">
+                <div className="absolute inset-0 flex flex-col items-center justify-center bg-[#121212] gap-2">
                   <Loader2 className="w-10 h-10 text-[#FF8C00] animate-spin" />
-                  <span className="sr-only">Carregando demonstração...</span>
+                  <span className="text-xs text-slate-500 animate-pulse">Buscando demonstração técnica...</span>
                 </div>
               ) : exerciseGif ? (
                 <img 
@@ -230,7 +233,7 @@ export function ExerciseDetailModal({ exercise, topProducts, onClose, onFeedback
                 <div className="absolute inset-0 flex flex-col items-center justify-center text-slate-600 bg-[#121212]">
                   <ImageIcon className="w-16 h-16 mb-3 opacity-20" />
                   <span className="text-sm uppercase tracking-widest font-medium opacity-50">
-                    Demonstração indisponível
+                    {showFallback ? "Visualização indisponível" : "Sem demonstração"}
                   </span>
                 </div>
               )}
