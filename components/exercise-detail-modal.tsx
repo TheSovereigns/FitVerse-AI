@@ -75,16 +75,18 @@ export function ExerciseDetailModal({ exercise, topProducts, onClose, onFeedback
     return () => clearInterval(interval)
   }, [isResting, timer])
 
-  // --- Mapeamento Técnico Fixo (Hardcoded) ---
+  // Mapeamento de Segurança (Fallback)
   const FIXED_EXERCISES: Record<string, string> = {
     "agachamento livre": "https://media.giphy.com/media/1iTH1WIUjM0VATSw/giphy.gif",
     "agachamento": "https://media.giphy.com/media/1iTH1WIUjM0VATSw/giphy.gif",
+    "agachamento com halteres": "https://media.giphy.com/media/3o7qDEq2bMbcbPRQ2c/giphy.gif", // Goblet Squat
     "flexão de braço": "https://media.giphy.com/media/3o6Zt481isNVuQI1l6/giphy.gif",
     "flexão": "https://media.giphy.com/media/3o6Zt481isNVuQI1l6/giphy.gif",
     "polichinelos": "https://media.giphy.com/media/5t9IcRmvr9vgQ/giphy.gif",
     "polichinelo": "https://media.giphy.com/media/5t9IcRmvr9vgQ/giphy.gif",
     "remada invertida": "https://media.giphy.com/media/3o6Zt481isNVuQI1l6/giphy.gif",
     "supino": "https://media.giphy.com/media/4BJUu68A2yJq/giphy.gif",
+    "supino reto": "https://media.giphy.com/media/4BJUu68A2yJq/giphy.gif",
     "abdominal supra": "https://media.giphy.com/media/3o7TKMt1VVNkHVyPaE/giphy.gif",
   }
 
@@ -92,6 +94,7 @@ export function ExerciseDetailModal({ exercise, topProducts, onClose, onFeedback
   useEffect(() => {
     const fetchGif = async () => {
       if (!exercise?.name) return
+      // Reset de Estado
       
       setIsLoadingGif(true)
       setExerciseGif(null)
@@ -184,6 +187,12 @@ export function ExerciseDetailModal({ exercise, topProducts, onClose, onFeedback
     fetchGif()
   }, [exercise.name])
 
+  useEffect(() => {
+    // Reset state when exercise changes to prevent showing old media
+    setExerciseGif(null);
+    setIsLoadingGif(true);
+  }, [exercise.name]);
+
   const handleStartRest = () => {
     if (currentSet < sets) {
       setIsResting(true)
@@ -224,8 +233,9 @@ export function ExerciseDetailModal({ exercise, topProducts, onClose, onFeedback
       <DialogContent className="max-w-2xl p-0 gap-0 bg-[#121212] border-orange-500/30 text-white overflow-hidden max-h-[90vh] flex flex-col">
         <DialogHeader className="sr-only">
           <DialogTitle>{exercise.name}</DialogTitle>
-          <DialogDescription className="sr-only">
-            Demonstração técnica da execução do exercício
+          {/* Correção de Acessibilidade */}
+          <DialogDescription>
+            Demonstração técnica da execução do exercício {exercise.name}.
           </DialogDescription>
         </DialogHeader>
 
@@ -239,7 +249,7 @@ export function ExerciseDetailModal({ exercise, topProducts, onClose, onFeedback
                   <Loader2 className="w-10 h-10 text-[#FF8C00] animate-spin" />
                   <span className="text-xs text-slate-500 animate-pulse">Buscando demonstração técnica...</span>
                 </div>
-              ) : exerciseGif ? (
+              ) : exerciseGif && exerciseGif !== 'undefined' ? (
                 <img 
                   src={exerciseGif} 
                   alt={exercise.name} 
