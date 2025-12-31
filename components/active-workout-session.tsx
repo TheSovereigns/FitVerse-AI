@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect, useRef } from "react"
-import { X, Check, Clock, Flame, Trophy, ChevronRight, Save } from "lucide-react"
+import { X, Check, Clock, Flame, Trophy, ChevronRight, Save, Loader2, Image as ImageIcon } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
@@ -23,6 +23,8 @@ export function ActiveWorkoutSession({ workout, onClose, onComplete }: ActiveWor
   const [elapsedTime, setElapsedTime] = useState(0)
   const [rpeValues, setRpeValues] = useState<Record<string, number>>({})
   const [isFinished, setIsFinished] = useState(false)
+  const [exerciseGif, setExerciseGif] = useState<string | null>(null)
+  const [isLoadingGif, setIsLoadingGif] = useState(false)
   
   const timerRef = useRef<NodeJS.Timeout | null>(null)
   const workoutTimerRef = useRef<NodeJS.Timeout | null>(null)
@@ -89,6 +91,57 @@ export function ActiveWorkoutSession({ workout, onClose, onComplete }: ActiveWor
       if (timerRef.current) clearInterval(timerRef.current)
     }
   }, [isResting, restTimer])
+
+  // --- Fetch GIF Demonstrativo (ExerciseDB) ---
+  useEffect(() => {
+    const fetchGif = async () => {
+      if (!workout?.exercises?.[currentExerciseIndex]) return
+      
+      const exerciseName = workout.exercises[currentExerciseIndex].name
+      // Cache Key baseada no nome do exercício
+      const cacheKey = `gif_cache_${exerciseName}`
+      
+      // 1. Verifica Cache Local (Performance)
+      const cached = localStorage.getItem(cacheKey)
+      if (cached) {
+        setExerciseGif(cached)
+        return
+      }
+
+      setIsLoadingGif(true)
+      setExerciseGif(null)
+
+      try {
+        // Chamada à API ExerciseDB
+        const response = await fetch(`https://exercisedb.p.rapidapi.com/exercises/name/${encodeURIComponent(exerciseName)}`, {
+          headers: {
+            'X-RapidAPI-Key': process.env.NEXT_PUBLIC_RAPIDAPI_KEY || '',
+            'X-RapidAPI-Host': 'exercisedb.p.rapidapi.com'
+          }
+        })
+
+        const data = await response.json()
+        
+        if (Array.isArray(data) && data.length > 0) {
+          // Filtro de Equipamento: Tenta encontrar a variante correta (ex: body weight vs dumbbell)
+          const location = workout.criteria?.location || ""
+          const targetEquipment = location.includes("Sem Equipamento") ? "body weight" : location.includes("Halteres") ? "dumbbell" : null
+          
+          const match = targetEquipment ? data.find((ex: any) => ex.equipment === targetEquipment) : data[0]
+          const gifUrl = match ? match.gifUrl : data[0].gifUrl
+
+          setExerciseGif(gifUrl)
+          localStorage.setItem(cacheKey, gifUrl)
+        }
+      } catch (error) {
+        console.error("Erro ao carregar GIF:", error)
+      } finally {
+        setIsLoadingGif(false)
+      }
+    }
+
+    fetchGif()
+  }, [currentExerciseIndex, workout])
 
   // --- Lógica de Navegação ---
   const currentExercise = workout.exercises[currentExerciseIndex]
@@ -202,6 +255,26 @@ export function ActiveWorkoutSession({ workout, onClose, onComplete }: ActiveWor
       <div className="flex-1 overflow-y-auto p-4 space-y-6 pb-20">
         {/* Card do Exercício */}
         <div className="space-y-4">
+          {/* GIF Demonstrativo */}
+          <div className="relative w-full aspect-video bg-[#1A1A1A] rounded-xl overflow-hidden border border-[#1F1F1F] shadow-lg group">
+            {isLoadingGif ? (
+              <div className="absolute inset-0 flex items-center justify-center">
+                <Loader2 className="w-8 h-8 text-[#FF8C00] animate-spin" />
+              </div>
+            ) : exerciseGif ? (
+              <img 
+                src={exerciseGif} 
+                alt={currentExercise.name} 
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <div className="absolute inset-0 flex flex-col items-center justify-center text-slate-600">
+                <ImageIcon className="w-12 h-12 mb-2 opacity-30" />
+                <span className="text-xs uppercase tracking-widest font-medium opacity-50">Sem demonstração</span>
+              </div>
+            )}
+          </div>
+
           <div className="flex items-start justify-between">
             <div>
               <Badge variant="outline" className="mb-2 border-[#FF8C00]/30 text-[#FF8C00]">
