@@ -20,12 +20,18 @@ interface TrainingTabProps {
 export function TrainingTab({ metabolicPlan, scanHistory, userGoal }: TrainingTabProps) {
   const [isGenerating, setIsGenerating] = useState(false)
   const [generatedWorkouts, setGeneratedWorkouts] = useState<any[]>([])
-  const [activeFilter, setActiveFilter] = useState("gym")
+  const [activeFilter, setActiveFilter] = useState("all")
   const [showGeneratorModal, setShowGeneratorModal] = useState(false)
 
   const handleGenerateWorkouts = async (criteria: any) => {
     setIsGenerating(true)
     setShowGeneratorModal(false) // Fecha o modal ao iniciar
+
+    // Atualiza o filtro automaticamente para corresponder ao treino gerado
+    if (criteria.location === "Academia") setActiveFilter("gym")
+    else if (criteria.location === "Casa (Halteres)") setActiveFilter("dumbbells")
+    else if (criteria.location === "Casa (Sem Equipamento)") setActiveFilter("bodyweight")
+
     try {
       const response = await fetch("/api/generate-workouts", {
         method: "POST",
@@ -49,11 +55,27 @@ export function TrainingTab({ metabolicPlan, scanHistory, userGoal }: TrainingTa
   }
 
   const filters = [
+    { id: "all", label: "Todos", icon: Zap },
     { id: "home", label: "Em Casa", icon: Home },
     { id: "gym", label: "Academia", icon: Building2 },
     { id: "dumbbells", label: "Halteres", icon: Dumbbell },
     { id: "bodyweight", label: "Sem Equipamento", icon: User },
   ]
+
+  // Lógica de Filtragem
+  const filteredWorkouts = generatedWorkouts.filter((workout) => {
+    if (activeFilter === "all") return true
+    
+    // Busca flexível nos dados do treino (nome, categoria, etc)
+    const searchStr = JSON.stringify(workout).toLowerCase()
+    
+    if (activeFilter === "gym") return searchStr.includes("academia") || searchStr.includes("gym")
+    if (activeFilter === "home") return searchStr.includes("casa") || searchStr.includes("home")
+    if (activeFilter === "dumbbells") return searchStr.includes("halteres") || searchStr.includes("dumbbells")
+    if (activeFilter === "bodyweight") return searchStr.includes("sem equipamento") || searchStr.includes("calistenia") || searchStr.includes("bodyweight")
+    
+    return true
+  })
 
   return (
     <div className="space-y-6 pb-20 text-slate-300">
@@ -163,17 +185,17 @@ export function TrainingTab({ metabolicPlan, scanHistory, userGoal }: TrainingTa
       )}
 
       {/* Lista de Treinos Gerados */}
-      {generatedWorkouts.length > 0 && (
+      {filteredWorkouts.length > 0 && (
         <div className="px-4 space-y-6">
           <div className="flex items-center justify-between">
             <h3 className="text-lg font-semibold text-white">Seus Treinos</h3>
             <Badge variant="outline" className="border-[#FF8C00] text-[#FF8C00] bg-[#FF8C00]/10">
-              {generatedWorkouts.length} Opções
+              {filteredWorkouts.length} Opções
             </Badge>
           </div>
 
           <div className="grid gap-6">
-            {generatedWorkouts.map((workout, index) => (
+            {filteredWorkouts.map((workout, index) => (
               <WorkoutCard key={index} workout={workout} />
             ))}
           </div>
