@@ -70,7 +70,7 @@ export function TrainingTab({ metabolicPlan, scanHistory, userGoal }: TrainingTa
     const searchStr = JSON.stringify(workout).toLowerCase()
     
     if (activeFilter === "gym") return searchStr.includes("academia") || searchStr.includes("gym")
-    if (activeFilter === "home") return searchStr.includes("casa") || searchStr.includes("home")
+    if (activeFilter === "home") return searchStr.includes("casa") || searchStr.includes("home") || searchStr.includes("halteres") || searchStr.includes("dumbbells") || searchStr.includes("sem equipamento") || searchStr.includes("bodyweight") || searchStr.includes("calistenia")
     if (activeFilter === "dumbbells") return searchStr.includes("halteres") || searchStr.includes("dumbbells")
     if (activeFilter === "bodyweight") return searchStr.includes("sem equipamento") || searchStr.includes("calistenia") || searchStr.includes("bodyweight")
     
@@ -102,20 +102,6 @@ export function TrainingTab({ metabolicPlan, scanHistory, userGoal }: TrainingTa
             </DialogContent>
           </Dialog>
         </div>
-
-        {/* Card de Objetivo */}
-        <Card className="bg-gradient-to-br from-[#121212] to-[#0A0A0A] border-[#1F1F1F] shadow-lg relative overflow-hidden rounded-2xl">
-          <div className="absolute top-0 right-0 w-24 h-24 bg-[#FF8C00]/10 rounded-full blur-2xl -mr-10 -mt-10" />
-          <CardContent className="p-4 flex items-center justify-between relative z-10">
-            <div className="space-y-1">
-              <p className="text-xs font-medium text-[#FF8C00] uppercase tracking-wider">Seu Objetivo Atual</p>
-              <h3 className="text-lg font-bold text-white">{userGoal || "Hipertrofia & Longevidade"}</h3>
-            </div>
-            <div className="h-12 w-12 rounded-full bg-[#FF8C00]/10 border border-[#FF8C00]/20 flex items-center justify-center">
-              <Trophy className="h-5 w-5 text-[#FF8C00]" />
-            </div>
-          </CardContent>
-        </Card>
 
         {/* Filtros Inteligentes (Chips) */}
         <ScrollArea className="w-full whitespace-nowrap">
@@ -206,6 +192,8 @@ export function TrainingTab({ metabolicPlan, scanHistory, userGoal }: TrainingTa
 }
 
 function WorkoutCard({ workout }: { workout: any }) {
+  const [isStarted, setIsStarted] = useState(false)
+
   return (
     <Card className="bg-[#121212] border-[#1F1F1F] overflow-hidden hover:border-[#FF8C00]/50 transition-all duration-300 ease-in-out group shadow-lg rounded-2xl">
       <CardHeader className="p-0">
@@ -279,15 +267,21 @@ function WorkoutCard({ workout }: { workout: any }) {
         </div>
 
         <Button 
-          className="w-full bg-gradient-to-r from-[#FF8C00] to-[#FF4500] hover:shadow-orange-500/40 text-white font-bold transition-all duration-300 ease-in-out"
+          className={`w-full font-bold transition-all duration-300 ease-in-out ${
+            isStarted 
+              ? "bg-green-600 hover:bg-green-700 text-white shadow-none" 
+              : "bg-gradient-to-r from-[#FF8C00] to-[#FF4500] hover:shadow-orange-500/40 text-white"
+          }`}
           onClick={() => {
+            setIsStarted(true)
             toast.success(`Treino Iniciado: ${workout.name}`, {
               description: "Prepare-se! O cronômetro foi ativado.",
               duration: 3000,
             })
           }}
+          disabled={isStarted}
         >
-          <Play className="h-4 w-4 mr-2 fill-white" /> Iniciar Treino
+          {isStarted ? "Treino em Andamento..." : <><Play className="h-4 w-4 mr-2 fill-white" /> Iniciar Treino</>}
         </Button>
       </CardContent>
     </Card>
