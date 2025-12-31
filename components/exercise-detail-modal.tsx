@@ -74,13 +74,13 @@ export function ExerciseDetailModal({ exercise, topProducts, onClose, onFeedback
     return () => clearInterval(interval)
   }, [isResting, timer])
 
-  // --- Dicionário de Fallback ---
-  const getFallbackGif = (name: string) => {
-    const normalized = name.toLowerCase()
-    if (normalized.includes("polichinelo")) return "https://media.giphy.com/media/3o7qDEq2bMbcbPRQ2c/giphy.gif"
-    if (normalized.includes("agachamento")) return "https://media.giphy.com/media/l41Yy4J96X8ehz8xG/giphy.gif"
-    if (normalized.includes("flexão") || normalized.includes("flexao")) return "https://media.giphy.com/media/3o6Zt481isNVuQI1l6/giphy.gif"
-    return null
+  // --- Mapeamento Estático de Mídia (Prioridade) ---
+  const EXERCISE_GIFS: Record<string, string> = {
+    "agachamento": "https://media.giphy.com/media/1iTH1WIUjM0VATSw/giphy.gif",
+    "flexão": "https://media.giphy.com/media/3o6Zt481isNVuQI1l6/giphy.gif",
+    "polichinelo": "https://media.giphy.com/media/5t9IcRmvr9vgQ/giphy.gif",
+    "supino": "https://media.giphy.com/media/4BJUu68A2yJq/giphy.gif",
+    "abdominal": "https://media.giphy.com/media/3o7TKMt1VVNkHVyPaE/giphy.gif",
   }
 
   // --- Fetch GIF Demonstrativo (ExerciseDB) ---
@@ -88,11 +88,23 @@ export function ExerciseDetailModal({ exercise, topProducts, onClose, onFeedback
     const fetchGif = async () => {
       if (!exercise?.name) return
       
+      setIsLoadingGif(true)
+      setExerciseGif(null)
+
       const cleanName = exercise.name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z\s]/g, "").trim()
       
+      // 1. Verifica Mapeamento Estático (Prioridade)
+      for (const [key, url] of Object.entries(EXERCISE_GIFS)) {
+        if (cleanName.includes(key)) {
+          setExerciseGif(url)
+          setIsLoadingGif(false)
+          return
+        }
+      }
+
       // Tradução simples PT -> EN para melhorar busca na API
       const termMap: Record<string, string> = {
-        "agachamento": "squat",
+        "agachamento": "barbell squat",
         "flexão": "push up",
         "flexao": "push up",
         "abdominal": "crunch",
@@ -122,15 +134,13 @@ export function ExerciseDetailModal({ exercise, topProducts, onClose, onFeedback
       // Cache Key baseada no termo de busca
       const cacheKey = `gif_cache_${searchTerm.replace(/\s/g, '_')}`
       
-      // 1. Verifica Cache Local (Performance)
+      // 2. Verifica Cache Local (Performance)
       const cached = localStorage.getItem(cacheKey)
       if (cached) {
         setExerciseGif(cached)
+        setIsLoadingGif(false)
         return
       }
-
-      setIsLoadingGif(true)
-      setExerciseGif(null)
 
       try {
         // Chamada à API ExerciseDB
@@ -146,8 +156,8 @@ export function ExerciseDetailModal({ exercise, topProducts, onClose, onFeedback
         if (Array.isArray(data) && data.length > 0) {
           const match = data[0] // Pega o primeiro resultado
           
-          // Validação simples: garante que temos uma URL
-          if (match.gifUrl) {
+          // Validação de Conteúdo
+          if (match.gifUrl && match.gifUrl.startsWith("http")) {
             setExerciseGif(match.gifUrl)
             localStorage.setItem(cacheKey, match.gifUrl)
           }
@@ -206,7 +216,10 @@ export function ExerciseDetailModal({ exercise, topProducts, onClose, onFeedback
             {/* Video Player Section */}
             <div className="relative aspect-video bg-slate-950 rounded-t-lg overflow-hidden border-b border-orange-500/30">
               {isLoadingGif ? (
-                <Skeleton className="w-full h-full bg-[#1F1F1F] animate-pulse" />
+                <div className="absolute inset-0 flex items-center justify-center bg-[#121212]">
+                  <Loader2 className="w-10 h-10 text-[#FF8C00] animate-spin" />
+                  <span className="sr-only">Carregando demonstração...</span>
+                </div>
               ) : exerciseGif ? (
                 <img 
                   src={exerciseGif} 
