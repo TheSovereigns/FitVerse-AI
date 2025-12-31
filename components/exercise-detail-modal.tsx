@@ -78,10 +78,15 @@ export function ExerciseDetailModal({ exercise, topProducts, onClose, onFeedback
   // --- Mapeamento Estático de Mídia (Prioridade) ---
   const EXERCISE_GIFS: Record<string, string> = {
     "agachamento": "https://media.giphy.com/media/1iTH1WIUjM0VATSw/giphy.gif",
+    "agachamento livre": "https://media.giphy.com/media/1iTH1WIUjM0VATSw/giphy.gif",
+    "agachamento com barra": "https://media.giphy.com/media/1iTH1WIUjM0VATSw/giphy.gif",
     "flexão": "https://media.giphy.com/media/3o6Zt481isNVuQI1l6/giphy.gif",
+    "flexao de braco": "https://media.giphy.com/media/3o6Zt481isNVuQI1l6/giphy.gif",
     "polichinelo": "https://media.giphy.com/media/5t9IcRmvr9vgQ/giphy.gif",
+    "polichinelos": "https://media.giphy.com/media/5t9IcRmvr9vgQ/giphy.gif",
     "supino": "https://media.giphy.com/media/4BJUu68A2yJq/giphy.gif",
     "abdominal": "https://media.giphy.com/media/3o7TKMt1VVNkHVyPaE/giphy.gif",
+    "remada invertida": "https://media.giphy.com/media/3o6Zt481isNVuQI1l6/giphy.gif", // Placeholder técnico
   }
 
   // --- Fetch GIF Demonstrativo (ExerciseDB) ---
@@ -92,7 +97,13 @@ export function ExerciseDetailModal({ exercise, topProducts, onClose, onFeedback
       setIsLoadingGif(true)
       setExerciseGif(null)
 
-      const cleanName = exercise.name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z\s]/g, "").trim()
+      // Limpeza de prefixos e caracteres especiais (Filtro de Nome)
+      const cleanName = exercise.name
+        .replace(/^(Aquecimento|Circuito|Série|Treino)[:\s]+/i, "")
+        .toLowerCase()
+        .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+        .replace(/[^a-z\s]/g, "")
+        .trim()
       
       // 1. Verifica Mapeamento Estático (Prioridade)
       for (const [key, url] of Object.entries(EXERCISE_GIFS)) {
@@ -205,10 +216,10 @@ export function ExerciseDetailModal({ exercise, topProducts, onClose, onFeedback
 
   return (
     <Dialog open={true} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent aria-describedby="exercise-modal-desc" className="max-w-2xl p-0 gap-0 bg-[#121212] border-orange-500/30 text-white overflow-hidden max-h-[90vh] flex flex-col">
+      <DialogContent className="max-w-2xl p-0 gap-0 bg-[#121212] border-orange-500/30 text-white overflow-hidden max-h-[90vh] flex flex-col">
         <DialogHeader className="sr-only">
           <DialogTitle>{exercise.name}</DialogTitle>
-          <DialogDescription id="exercise-modal-desc">
+          <DialogDescription>
             Visualização detalhada e instruções técnicas para o exercício {exercise.name}
           </DialogDescription>
         </DialogHeader>
@@ -228,6 +239,10 @@ export function ExerciseDetailModal({ exercise, topProducts, onClose, onFeedback
                   src={exerciseGif} 
                   alt={exercise.name} 
                   className="w-full h-full object-cover"
+                  onError={() => {
+                    setExerciseGif(null)
+                    setShowFallback(true)
+                  }}
                 />
               ) : (
                 <div className="absolute inset-0 flex flex-col items-center justify-center text-slate-600 bg-[#121212]">
