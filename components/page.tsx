@@ -1,9 +1,19 @@
 "use client"
 
+import { useState } from "react"
+import { loadStripe } from "@stripe/stripe-js"
 import { Button } from "@/components/ui/button"
-import { CheckCircle2, Zap, ArrowRight } from "lucide-react"
+import { CheckCircle2, Zap, ArrowRight, Loader2 } from "lucide-react"
+
+// Inicialize o Stripe fora do componente para evitar recriação
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
+
+// ❗ IMPORTANTE: Coloque aqui o ID do seu plano do Stripe
+const STRIPE_PRICE_ID = "price_1Q..."; // Substitua pelo seu Price ID real
 
 export default function SubscriptionPage() {
+  const [isLoading, setIsLoading] = useState(false);
+
   const features = [
     "Scans ilimitados com BioScan AI",
     "Geração de treinos e dietas sem limites",
@@ -11,6 +21,40 @@ export default function SubscriptionPage() {
     "Histórico completo de scans",
     "Suporte prioritário",
   ]
+
+  const handleCheckout = async () => {
+    if (!STRIPE_PRICE_ID || !STRIPE_PRICE_ID.startsWith("price_")) {
+      alert("Por favor, configure o 'STRIPE_PRICE_ID' com um ID de preço válido do Stripe no arquivo da página de assinatura.");
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const response = await fetch('/api/stripe/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ priceId: STRIPE_PRICE_ID }),
+      });
+
+      const data = await response.json();
+      
+      if (!response.ok) throw new Error(data.message || "Falha ao criar a sessão de checkout.");
+
+      const stripe = await stripePromise;
+      if (stripe) {
+        const { error } = await stripe.redirectToCheckout({ sessionId: data.sessionId });
+        if (error) {
+          console.error("Erro ao redirecionar para o Stripe:", error);
+          alert(error.message);
+        }
+      }
+    } catch (error) {
+      console.error("Erro no checkout:", error);
+      alert(error instanceof Error ? error.message : "Ocorreu um erro desconhecido.");
+    } finally {
+      setIsLoading(false);
+    }
+  }
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-4 text-foreground bg-background font-sans antialiased">
@@ -57,10 +101,21 @@ export default function SubscriptionPage() {
           </div>
 
           <Button
+            onClick={handleCheckout}
+            disabled={isLoading}
             className="w-full h-16 bg-primary hover:bg-primary/90 hover:shadow-[0_0_30px_rgba(255,140,0,0.4)] text-primary-foreground font-black text-sm uppercase tracking-[0.2em] rounded-2xl transition-all duration-300 group"
           >
-            ASSINAR AGORA
-            <ArrowRight className="w-5 h-5 ml-2 transition-transform group-hover:translate-x-1" />
+            {isLoading ? (
+              <div className="flex items-center gap-2">
+                <Loader2 className="w-5 h-5 animate-spin" />
+                PROCESSANDO...
+              </div>
+            ) : (
+              <>
+                ASSINAR AGORA
+                <ArrowRight className="w-5 h-5 ml-2 transition-transform group-hover:translate-x-1" />
+              </>
+            )}
           </Button>
         </div>
 

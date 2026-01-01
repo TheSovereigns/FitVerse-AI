@@ -3,8 +3,7 @@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { Badge } from "@/components/ui/badge"
-import { Clock, Flame, ChefHat, Utensils, Activity, CheckCircle2, Sparkles } from "lucide-react"
+import { Clock, Flame, ChefHat, Utensils, Activity, CheckCircle2, Sparkles, Zap, Beef, Cookie, Droplet } from "lucide-react"
 
 type Recipe = { // Tipo unificado para consistência
   name: string;
@@ -31,74 +30,69 @@ interface RecipeModalProps {
 export function RecipeModal({ recipe, onClose }: RecipeModalProps) {
   return (
     <Dialog open={true} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-2xl max-h-[90vh] flex flex-col p-0 gap-0" showCloseButton={false}>
+      <DialogContent className="max-w-3xl max-h-[90vh] flex flex-col p-0 gap-0 bg-zinc-950/50 backdrop-blur-xl border border-primary shadow-[0_0_30px_rgba(249,115,22,0.3)] rounded-2xl" showCloseButton={false}>
         <ScrollArea className="flex-1 p-6">
-          <DialogHeader className="mb-6">
-            <div className="flex items-start justify-between gap-4">
-              <div className="space-y-1">
-                <DialogTitle className="text-2xl font-bold text-primary">{recipe.name}</DialogTitle>
-                <DialogDescription className="text-base text-muted-foreground">
-                  {recipe.description}
-                </DialogDescription>
-              </div>
-              <Badge 
-                variant={
-                  recipe.difficulty === "Fácil" ? "secondary" : 
-                  recipe.difficulty === "Médio" ? "default" : "destructive"
-                }
-                className="shrink-0"
-              >
-                {recipe.difficulty}
-              </Badge>
-            </div>
-          </DialogHeader>
+          <div className="text-center mb-6">
+            <h2 className="text-2xl font-bold text-white">Receita Inteligente</h2>
+            <p className="text-zinc-500 text-sm">Análise e Preparo Guiado por IA</p>
+          </div>
+
+          <div className="mb-8 text-center">
+            <DialogTitle className="text-3xl font-bold text-primary">{recipe.name}</DialogTitle>
+            <DialogDescription className="text-base text-zinc-400 mt-1 max-w-2xl mx-auto">
+              {recipe.description}
+            </DialogDescription>
+          </div>
 
           <div className="grid grid-cols-3 gap-4 mb-8">
-            <div className="flex flex-col items-center justify-center p-4 bg-muted/40 rounded-xl border border-border/50">
+            <div className="flex flex-col items-center justify-center p-4 bg-zinc-900/40 rounded-xl border border-primary/20">
               <Clock className="w-5 h-5 mb-2 text-primary" />
-              <span className="text-xs text-muted-foreground font-medium uppercase tracking-wider">Tempo</span>
-              <span className="font-bold">{recipe.prepTime}</span>
+              <span className="text-xs text-zinc-400 font-medium uppercase tracking-wider">Tempo</span>
+              <span className="font-bold text-white">{recipe.prepTime}</span>
             </div>
-            <div className="flex flex-col items-center justify-center p-4 bg-muted/40 rounded-xl border border-border/50">
+            <div className="flex flex-col items-center justify-center p-4 bg-zinc-900/40 rounded-xl border border-primary/20">
               <Flame className="w-5 h-5 mb-2 text-primary" />
-              <span className="text-xs text-muted-foreground font-medium uppercase tracking-wider">Calorias</span>
-              <span className="font-bold">{recipe.macros.calories}</span>
+              <span className="text-xs text-zinc-400 font-medium uppercase tracking-wider">Calorias</span>
+              <span className="font-bold text-white">{recipe.macros.calories}</span>
             </div>
-            <div className="flex flex-col items-center justify-center p-4 bg-muted/40 rounded-xl border border-border/50">
-              <Activity className="w-5 h-5 mb-2 text-primary" />
-              <span className="text-xs text-muted-foreground font-medium uppercase tracking-wider">Proteína</span>
-              <span className="font-bold">{recipe.macros.protein}g</span>
+            <div className="flex flex-col items-center justify-center p-4 bg-zinc-900/40 rounded-xl border border-primary/20">
+              <ChefHat className="w-5 h-5 mb-2 text-primary" />
+              <span className="text-xs text-zinc-400 font-medium uppercase tracking-wider">Dificuldade</span>
+              <span className="font-bold text-white">{recipe.difficulty}</span>
             </div>
           </div>
 
           <div className="space-y-8">
             <div>
-              <h3 className="flex items-center gap-2 font-bold text-lg mb-4 text-primary border-b pb-2">
+              <h3 className="flex items-center gap-2 font-bold text-lg mb-4 text-primary border-b border-primary/20 pb-2">
                 <Utensils className="w-5 h-5" />
                 Ingredientes
               </h3>
-              <ul className="grid gap-3">
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                 {recipe.ingredients.map((ingredient, index) => (
-                  <li key={index} className="flex items-start gap-3 text-sm bg-muted/30 p-3 rounded-lg border border-transparent hover:border-border/50 transition-colors">
-                    <div className="mt-1.5 w-1.5 h-1.5 rounded-full bg-primary shrink-0" />
-                    <span className="leading-relaxed">{ingredient}</span>
-                  </li>
+                  <div key={index} className="relative p-3 text-center bg-zinc-900/40 rounded-lg border border-primary/20">
+                    <div className="absolute top-0 left-0 w-2 h-2 border-t border-l border-primary/50 rounded-tl-md" />
+                    <div className="absolute top-0 right-0 w-2 h-2 border-t border-r border-primary/50 rounded-tr-md" />
+                    <div className="absolute bottom-0 left-0 w-2 h-2 border-b border-l border-primary/50 rounded-bl-md" />
+                    <div className="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-primary/50 rounded-br-md" />
+                    <span className="text-sm text-zinc-300 leading-tight">{ingredient}</span>
+                  </div>
                 ))}
-              </ul>
+              </div>
             </div>
 
             <div>
-              <h3 className="flex items-center gap-2 font-bold text-lg mb-4 text-primary border-b pb-2">
+              <h3 className="flex items-center gap-2 font-bold text-lg mb-4 text-primary border-b border-primary/20 pb-2">
                 <ChefHat className="w-5 h-5" />
                 Modo de Preparo
               </h3>
               <div className="space-y-6">
                 {recipe.instructions.map((step, index) => (
                   <div key={index} className="flex gap-4 group">
-                    <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-sm border border-primary/20 group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
+                    <div className="flex-shrink-0 w-8 h-8 rounded-full bg-zinc-900 text-primary flex items-center justify-center font-bold text-sm border border-primary/20 group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
                       {index + 1}
                     </div>
-                    <p className="text-sm leading-relaxed pt-1.5 text-muted-foreground group-hover:text-foreground transition-colors">
+                    <p className="text-sm leading-relaxed pt-1.5 text-zinc-400 group-hover:text-white transition-colors">
                       {step}
                     </p>
                   </div>
@@ -107,25 +101,28 @@ export function RecipeModal({ recipe, onClose }: RecipeModalProps) {
             </div>
 
             {recipe.biohackingTips && recipe.biohackingTips.length > 0 && (
-              <div className="bg-emerald-500/5 border border-emerald-500/20 rounded-xl p-6">
-                <h3 className="flex items-center gap-2 font-bold text-lg mb-4 text-emerald-600 dark:text-emerald-400">
+              <div>
+                <h3 className="flex items-center gap-2 font-bold text-lg mb-4 text-emerald-400 border-b border-emerald-400/20 pb-2">
                   <Sparkles className="w-5 h-5" />
                   Dicas de Biohacking
                 </h3>
-                <ul className="space-y-3">
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                   {recipe.biohackingTips.map((tip, index) => (
-                    <li key={index} className="flex items-start gap-3 text-sm text-emerald-900/80 dark:text-emerald-100/80">
-                      <CheckCircle2 className="w-4 h-4 mt-0.5 shrink-0" />
-                      <span>{tip}</span>
-                    </li>
+                    <div key={index} className="relative p-3 text-center bg-emerald-950/20 rounded-lg border border-emerald-500/30">
+                      <div className="absolute top-0 left-0 w-2 h-2 border-t border-l border-emerald-500/50 rounded-tl-md" />
+                      <div className="absolute top-0 right-0 w-2 h-2 border-t border-r border-emerald-500/50 rounded-tr-md" />
+                      <div className="absolute bottom-0 left-0 w-2 h-2 border-b border-l border-emerald-500/50 rounded-bl-md" />
+                      <div className="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-emerald-500/50 rounded-br-md" />
+                      <span className="text-sm text-emerald-200 leading-tight">{tip}</span>
+                    </div>
                   ))}
-                </ul>
+                </div>
               </div>
             )}
           </div>
         </ScrollArea>
-        <div className="p-4 border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-          <Button onClick={onClose} className="w-full" variant="outline">Fechar Receita</Button>
+        <div className="p-4 border-t border-primary/20 bg-black/50">
+          <Button onClick={onClose} className="w-full bg-primary/10 border border-primary/30 text-primary hover:bg-primary/20" variant="outline">Fechar Receita</Button>
         </div>
       </DialogContent>
     </Dialog>
