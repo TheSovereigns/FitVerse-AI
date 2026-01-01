@@ -4,7 +4,7 @@ import { AlertTriangle, Check, Activity, ShieldCheck, AlertCircle } from "lucide
 import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
 
-interface ScanDashboardProps {
+interface BioScanResultProps {
   productName?: string
   score?: number
   attentionPoints?: string[]
@@ -12,13 +12,13 @@ interface ScanDashboardProps {
   goalAlignment?: number
 }
 
-export function ScanDashboard({
+export function BioScanResults({
   productName = "Arroz Branco",
   score = 45,
   attentionPoints = ["Alto Índice Glicêmico", "Pobre em Fibras", "Calorias Vazias"],
   benefits = ["Fonte de Energia Rápida", "Fácil Digestão", "Sem Glúten"],
   goalAlignment = 30
-}: ScanDashboardProps) {
+}: BioScanResultProps) {
   return (
     <div className="w-full max-w-4xl mx-auto space-y-6 p-4 bg-black text-zinc-100 rounded-3xl border border-zinc-800/50 shadow-2xl">
       
