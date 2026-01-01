@@ -89,6 +89,14 @@ export function ScanDashboard({ onScan, isScanning = false }: ScanDashboardProps
           <div className="absolute bottom-6 left-6 w-8 h-8 border-b-2 border-l-2 border-primary opacity-60" />
           <div className="absolute bottom-6 right-6 w-8 h-8 border-b-2 border-r-2 border-primary opacity-60" />
 
+          {/* Scanning Animation */}
+          {isDragging && (
+            <div className="absolute inset-0 z-20 pointer-events-none overflow-hidden rounded-[2rem]">
+              <div className="absolute left-0 right-0 h-[2px] bg-primary shadow-[0_0_20px_rgba(249,115,22,0.8)] animate-scan" />
+              <div className="absolute inset-0 bg-primary/5 animate-pulse" />
+            </div>
+          )}
+
           {/* Conteúdo Central */}
           <div className="relative z-10 flex flex-col items-center gap-6 p-6 text-center">
             {isScanning ? (

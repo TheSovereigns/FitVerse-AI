@@ -206,38 +206,13 @@ export default function HomePage() {
           <div className="md:hidden font-bold text-xl flex items-center gap-2 text-foreground"><ScanLine className="text-primary" /><span>FitVerse</span></div>
           <div className="hidden md:block text-sm font-medium text-muted-foreground">Bem-vindo de volta, Atleta.</div>
           <div className="flex items-center gap-3">
-             <Button variant="ghost" size="sm" onClick={() => router.push("/admin-login")} className="text-xs text-muted-foreground hover:text-foreground transition-all duration-300 ease-in-out">Admin</Button>
-             {!isPremium ? (<Button size="sm" onClick={() => handleCheckout("price_1Q...")} disabled={loadingStripe} className="bg-[#ADFF2F] hover:bg-[#98E028] text-black font-bold border-none transition-all duration-300 ease-in-out hover:scale-105">{loadingStripe ? <Loader2 className="w-3 h-3 animate-spin" /> : "Upgrade Premium"}</Button>) : (<span className="text-xs font-bold text-[#ADFF2F] border border-[#ADFF2F]/30 bg-[#ADFF2F]/10 px-3 py-1 rounded-full select-none">PREMIUM</span>)}
+             <Button variant="ghost" size="sm" onClick={() => router.push("/admin-login")} className="text-xs text-muted-foreground hover:text-foreground transition-all duration-300 ease-in-out">Admin</Button>             
              <div className="w-8 h-8 rounded-full bg-accent border border-border flex items-center justify-center overflow-hidden cursor-pointer" onClick={() => setCurrentView("profile")}><User className="w-4 h-4 text-muted-foreground" /></div>
           </div>
         </header>
 
         <main className="flex-1 p-4 md:p-8 overflow-y-auto pb-24 md:pb-8">
-        {currentView === "dashboard" && (
-          <div className="space-y-8">
-            {/* Widgets de Resumo */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
-               <div className="p-4 rounded-2xl bg-card border border-border space-y-1 shadow-lg">
-                  <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Calorias</p>
-                  <p className="text-xl font-bold text-primary">1,250 <span className="text-sm text-muted-foreground font-normal">/ 2,400</span></p>
-               </div>
-               <div className="p-4 rounded-2xl bg-card border border-border space-y-1 shadow-lg">
-                  <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Proteína</p>
-                  <p className="text-xl font-bold text-primary">98g <span className="text-sm text-muted-foreground font-normal">/ 180g</span></p>
-               </div>
-               <div className="p-4 rounded-2xl bg-card border border-border space-y-1 shadow-lg">
-                  <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Treino</p>
-                  <p className="text-xl font-bold text-primary">Leg Day</p>
-               </div>
-               <div className="p-4 rounded-2xl bg-card border border-border space-y-1 shadow-lg">
-                  <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Água</p>
-                  <p className="text-xl font-bold text-primary">1.5L</p>
-               </div>
-            </div>
-
-            <ScanDashboard onScan={handleScan} />
-          </div>
-        )}
+        {currentView === "dashboard" && <ScanDashboard onScan={handleScan} />}
         {currentView === "result" && (isAnalyzing || !currentAnalysis ? <ProductSkeleton /> : <ProductResult result={currentAnalysis} onBack={() => setCurrentView("dashboard")} />)}
         {currentView === "recipes" && <RecipesTab />}
         {currentView === "training" && <TrainingTab />}

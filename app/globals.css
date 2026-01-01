@@ -149,4 +149,25 @@
     border: 1px solid var(--primary);
     box-shadow: 0 0 10px color-mix(in oklch, var(--primary), transparent 50%), inset 0 0 10px color-mix(in oklch, var(--primary), transparent 90%);
   }
+
+  @keyframes scan {
+    0% {
+      top: 0%;
+      opacity: 0;
+    }
+    10% {
+      opacity: 1;
+    }
+    90% {
+      opacity: 1;
+    }
+    100% {
+      top: 100%;
+      opacity: 0;
+    }
+  }
+
+  .animate-scan {
+    animation: scan 2s linear infinite;
+  }
 }
