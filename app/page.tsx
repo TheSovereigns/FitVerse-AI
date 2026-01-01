@@ -133,7 +133,10 @@ export default function HomePage() {
       const response = await fetch('/api/analyze-product', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ imageData: imageData }), // A API espera um objeto com a propriedade 'imageData'
+        body: JSON.stringify({ 
+          imageData: imageData,
+          metabolicPlan: userMetabolicPlan // Adicionando contexto do usuário para uma análise completa
+        }),
       });
 
       if (!response.ok) {
