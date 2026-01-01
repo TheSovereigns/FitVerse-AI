@@ -12,10 +12,11 @@ import { HealthProfile } from "@/components/health-profile"
 import { ProductSkeleton } from "@/components/product-skeleton"
 import { RecipesTab } from "@/components/recipes-tab"
 import { TrainingTab } from "@/components/training-tab"
-import { Home, ScanLine, User, Calculator, ChefHat, Dumbbell, Loader2, LayoutDashboard, ShoppingBag, LogOut } from "lucide-react"
+import { SettingsPage } from "@/components/settings-page"
+import { Home, ScanLine, User, Calculator, ChefHat, Dumbbell, Loader2, LayoutDashboard, ShoppingBag, Settings } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
-type View = "dashboard" | "result" | "recipes" | "training" | "profile" | "planner"
+type View = "dashboard" | "result" | "recipes" | "training" | "profile" | "planner" | "settings"
 
 // Inicialize o Stripe fora do componente para evitar recriação
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
@@ -176,37 +177,38 @@ export default function HomePage() {
   const currentAnalysis = analysisResult;
 
   return (
-    <div className="min-h-screen bg-[#080808] text-slate-300 font-sans selection:bg-[#FF8C00]/30 flex">
+    <div className="min-h-screen bg-background text-muted-foreground font-sans selection:bg-primary/30 flex">
       {/* Sidebar Desktop */}
-      <aside className="hidden md:flex flex-col w-64 fixed inset-y-0 left-0 bg-[#121212] border-r border-[#1F1F1F] z-50">
-        <div className="p-6 flex items-center gap-2 font-bold text-2xl tracking-tighter text-white">
-          <ScanLine className="text-[#FF8C00]" />
-          <span>FitVerse<span className="text-[#FF8C00]">AI</span></span>
+      <aside className="hidden md:flex flex-col w-64 fixed inset-y-0 left-0 bg-sidebar border-r border-sidebar-border z-50">
+        <div className="p-6 flex items-center gap-2 font-bold text-2xl tracking-tighter text-sidebar-foreground">
+          <ScanLine className="text-primary" />
+          <span>FitVerse<span className="text-primary">AI</span></span>
         </div>
         
         <nav className="flex-1 px-4 space-y-2 mt-4">
-          <Button variant="ghost" onClick={() => setCurrentView("dashboard")} className={`w-full justify-start gap-3 transition-all duration-300 ease-in-out ${currentView === "dashboard" ? "bg-[#FF8C00]/10 text-[#FF8C00]" : "text-slate-400 hover:text-white hover:bg-[#1F1F1F]"}`}><LayoutDashboard className="w-5 h-5" />Dashboard</Button>
-          <Button variant="ghost" onClick={() => setCurrentView("training")} className={`w-full justify-start gap-3 transition-all duration-300 ease-in-out ${currentView === "training" ? "bg-[#FF8C00]/10 text-[#FF8C00]" : "text-slate-400 hover:text-white hover:bg-[#1F1F1F]"}`}><Dumbbell className="w-5 h-5" />NutriTrain</Button>
-          <Button variant="ghost" onClick={() => setCurrentView("planner")} className={`w-full justify-start gap-3 transition-all duration-300 ease-in-out ${currentView === "planner" ? "bg-[#FF8C00]/10 text-[#FF8C00]" : "text-slate-400 hover:text-white hover:bg-[#1F1F1F]"}`}><Calculator className="w-5 h-5" />Dieta AI</Button>
-          <Button variant="ghost" onClick={() => setCurrentView("recipes")} className={`w-full justify-start gap-3 transition-all duration-300 ease-in-out ${currentView === "recipes" ? "bg-[#FF8C00]/10 text-[#FF8C00]" : "text-slate-400 hover:text-white hover:bg-[#1F1F1F]"}`}><ChefHat className="w-5 h-5" />Receitas</Button>
-          <Button variant="ghost" disabled className="w-full justify-start gap-3 text-slate-600 cursor-not-allowed"><ShoppingBag className="w-5 h-5" />Loja <span className="text-[10px] bg-[#1F1F1F] px-1.5 py-0.5 rounded ml-auto">Soon</span></Button>
+          <Button variant="ghost" onClick={() => setCurrentView("dashboard")} className={`w-full justify-start gap-3 transition-all duration-300 ease-in-out ${currentView === "dashboard" ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-accent"}`}><LayoutDashboard className="w-5 h-5" />Dashboard</Button>
+          <Button variant="ghost" onClick={() => setCurrentView("training")} className={`w-full justify-start gap-3 transition-all duration-300 ease-in-out ${currentView === "training" ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-accent"}`}><Dumbbell className="w-5 h-5" />NutriTrain</Button>
+          <Button variant="ghost" onClick={() => setCurrentView("planner")} className={`w-full justify-start gap-3 transition-all duration-300 ease-in-out ${currentView === "planner" ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-accent"}`}><Calculator className="w-5 h-5" />Dieta AI</Button>
+          <Button variant="ghost" onClick={() => setCurrentView("recipes")} className={`w-full justify-start gap-3 transition-all duration-300 ease-in-out ${currentView === "recipes" ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-accent"}`}><ChefHat className="w-5 h-5" />Receitas Inteligentes</Button>
+          <Button variant="ghost" disabled className="w-full justify-start gap-3 text-muted-foreground/50 cursor-not-allowed"><ShoppingBag className="w-5 h-5" />Loja <span className="text-[10px] bg-accent px-1.5 py-0.5 rounded ml-auto">Soon</span></Button>
         </nav>
 
-        <div className="p-4 border-t border-[#1F1F1F] space-y-2">
-           <Button variant="ghost" onClick={() => setCurrentView("profile")} className={`w-full justify-start gap-3 transition-all duration-300 ease-in-out ${currentView === "profile" ? "bg-[#FF8C00]/10 text-[#FF8C00]" : "text-slate-400 hover:text-white hover:bg-[#1F1F1F]"}`}><User className="w-5 h-5" />Perfil</Button>
+        <div className="p-4 border-t border-sidebar-border space-y-2">
+           <Button variant="ghost" onClick={() => setCurrentView("profile")} className={`w-full justify-start gap-3 transition-all duration-300 ease-in-out ${currentView === "profile" ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-accent"}`}><User className="w-5 h-5" />Perfil</Button>
+           <Button variant="ghost" onClick={() => setCurrentView("settings")} className={`w-full justify-start gap-3 transition-all duration-300 ease-in-out ${currentView === "settings" ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-accent"}`}><Settings className="w-5 h-5" />Configurações</Button>
         </div>
       </aside>
 
       {/* Main Content */}
       <div className="flex-1 md:pl-64 flex flex-col min-h-screen relative">
         {/* Header */}
-        <header className="sticky top-0 z-40 border-b border-[#1F1F1F] bg-[#080808]/80 backdrop-blur-md px-4 h-16 flex items-center justify-between">
-          <div className="md:hidden font-bold text-xl flex items-center gap-2 text-white"><ScanLine className="text-[#FF8C00]" /><span>FitVerse</span></div>
-          <div className="hidden md:block text-sm font-medium text-slate-500">Bem-vindo de volta, Atleta.</div>
+        <header className="sticky top-0 z-40 border-b border-border bg-background/80 backdrop-blur-md px-4 h-16 flex items-center justify-between">
+          <div className="md:hidden font-bold text-xl flex items-center gap-2 text-foreground"><ScanLine className="text-primary" /><span>FitVerse</span></div>
+          <div className="hidden md:block text-sm font-medium text-muted-foreground">Bem-vindo de volta, Atleta.</div>
           <div className="flex items-center gap-3">
-             <Button variant="ghost" size="sm" onClick={() => router.push("/admin-login")} className="text-xs text-slate-500 hover:text-white transition-all duration-300 ease-in-out">Admin</Button>
+             <Button variant="ghost" size="sm" onClick={() => router.push("/admin-login")} className="text-xs text-muted-foreground hover:text-foreground transition-all duration-300 ease-in-out">Admin</Button>
              {!isPremium ? (<Button size="sm" onClick={() => handleCheckout("price_1Q...")} disabled={loadingStripe} className="bg-[#ADFF2F] hover:bg-[#98E028] text-black font-bold border-none transition-all duration-300 ease-in-out hover:scale-105">{loadingStripe ? <Loader2 className="w-3 h-3 animate-spin" /> : "Upgrade Premium"}</Button>) : (<span className="text-xs font-bold text-[#ADFF2F] border border-[#ADFF2F]/30 bg-[#ADFF2F]/10 px-3 py-1 rounded-full select-none">PREMIUM</span>)}
-             <div className="w-8 h-8 rounded-full bg-[#1F1F1F] border border-[#333] flex items-center justify-center overflow-hidden cursor-pointer" onClick={() => setCurrentView("profile")}><User className="w-4 h-4 text-slate-400" /></div>
+             <div className="w-8 h-8 rounded-full bg-accent border border-border flex items-center justify-center overflow-hidden cursor-pointer" onClick={() => setCurrentView("profile")}><User className="w-4 h-4 text-muted-foreground" /></div>
           </div>
         </header>
 
@@ -215,21 +217,21 @@ export default function HomePage() {
           <div className="space-y-8">
             {/* Widgets de Resumo */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
-               <div className="p-4 rounded-2xl bg-[#121212] border border-[#1F1F1F] space-y-1 shadow-lg">
-                  <p className="text-xs text-slate-500 uppercase tracking-wider font-semibold">Calorias</p>
-                  <p className="text-xl font-bold text-orange-400">1,250 <span className="text-sm text-slate-500 font-normal">/ 2,400</span></p>
+               <div className="p-4 rounded-2xl bg-card border border-border space-y-1 shadow-lg">
+                  <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Calorias</p>
+                  <p className="text-xl font-bold text-primary">1,250 <span className="text-sm text-muted-foreground font-normal">/ 2,400</span></p>
                </div>
-               <div className="p-4 rounded-2xl bg-[#121212] border border-[#1F1F1F] space-y-1 shadow-lg">
-                  <p className="text-xs text-slate-500 uppercase tracking-wider font-semibold">Proteína</p>
-                  <p className="text-xl font-bold text-orange-400">98g <span className="text-sm text-slate-500 font-normal">/ 180g</span></p>
+               <div className="p-4 rounded-2xl bg-card border border-border space-y-1 shadow-lg">
+                  <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Proteína</p>
+                  <p className="text-xl font-bold text-primary">98g <span className="text-sm text-muted-foreground font-normal">/ 180g</span></p>
                </div>
-               <div className="p-4 rounded-2xl bg-[#121212] border border-[#1F1F1F] space-y-1 shadow-lg">
-                  <p className="text-xs text-slate-500 uppercase tracking-wider font-semibold">Treino</p>
-                  <p className="text-xl font-bold text-orange-400">Leg Day</p>
+               <div className="p-4 rounded-2xl bg-card border border-border space-y-1 shadow-lg">
+                  <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Treino</p>
+                  <p className="text-xl font-bold text-primary">Leg Day</p>
                </div>
-               <div className="p-4 rounded-2xl bg-[#121212] border border-[#1F1F1F] space-y-1 shadow-lg">
-                  <p className="text-xs text-slate-500 uppercase tracking-wider font-semibold">Água</p>
-                  <p className="text-xl font-bold text-orange-400">1.5L</p>
+               <div className="p-4 rounded-2xl bg-card border border-border space-y-1 shadow-lg">
+                  <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Água</p>
+                  <p className="text-xl font-bold text-primary">1.5L</p>
                </div>
             </div>
 
@@ -240,6 +242,7 @@ export default function HomePage() {
         {currentView === "recipes" && <RecipesTab />}
         {currentView === "training" && <TrainingTab />}
         {currentView === "planner" && <MetabolicPlanner onPlanCreated={setUserMetabolicPlan} />}
+        {currentView === "settings" && <SettingsPage />}
         {currentView === "profile" && (<div className="pt-4"><HealthProfile scanHistory={scanHistory} /></div>)}
         </main>
       </div>
@@ -254,13 +257,14 @@ export default function HomePage() {
       />
 
       {/* Mobile Bottom Nav */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-[#121212]/90 backdrop-blur-lg border-t border-[#1F1F1F] z-50 pb-safe">
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-card/90 backdrop-blur-lg border-t border-border z-50 pb-safe">
         <div className="flex items-center justify-around px-1 py-3 max-w-lg mx-auto">
-          <Button variant="ghost" size="sm" onClick={() => setCurrentView("dashboard")} className={`flex flex-col items-center gap-1 h-auto py-2 transition-all duration-300 ease-in-out ${currentView === "dashboard" ? "text-[#FF8C00]" : "text-slate-500 hover:text-white"}`}><Home className="w-5 h-5" /><span className="text-[10px] font-medium">Início</span></Button>
-          <Button variant="ghost" size="sm" onClick={() => setCurrentView("training")} className={`flex flex-col items-center gap-1 h-auto py-2 transition-all duration-300 ease-in-out ${currentView === "training" ? "text-[#FF8C00]" : "text-slate-500 hover:text-white"}`}><Dumbbell className="w-5 h-5" /><span className="text-[10px] font-medium">Treino</span></Button>
-          <Button variant="ghost" size="sm" onClick={handleNavScan} className="flex flex-col items-center gap-1 h-auto py-2 text-slate-400 relative -mt-4"><div className="absolute -top-6 left-1/2 -translate-x-1/2 w-16 h-16 rounded-full bg-gradient-to-br from-[#FF8C00] to-[#FF4500] flex items-center justify-center shadow-xl shadow-orange-500/30 transition-transform active:scale-95 hover:scale-105 border-4 border-[#080808]"><ScanLine className="w-7 h-7 text-white" /></div><span className="text-[10px] font-medium mt-10">Scan</span></Button>
-          <Button variant="ghost" size="sm" onClick={() => setCurrentView("planner")} className={`flex flex-col items-center gap-1 h-auto py-2 transition-all duration-300 ease-in-out ${currentView === "planner" ? "text-[#FF8C00]" : "text-slate-500 hover:text-white"}`}><Calculator className="w-5 h-5" /><span className="text-[10px] font-medium">Dieta</span></Button>
-          <Button variant="ghost" size="sm" onClick={() => setCurrentView("profile")} className={`flex flex-col items-center gap-1 h-auto py-2 transition-all duration-300 ease-in-out ${currentView === "profile" ? "text-[#FF8C00]" : "text-slate-500 hover:text-white"}`}><User className="w-5 h-5" /><span className="text-[10px] font-medium">Perfil</span></Button>
+          <Button variant="ghost" size="sm" onClick={() => setCurrentView("dashboard")} className={`flex flex-col items-center gap-1 h-auto py-2 transition-all duration-300 ease-in-out ${currentView === "dashboard" ? "text-primary" : "text-muted-foreground hover:text-foreground"}`}><Home className="w-5 h-5" /><span className="text-[10px] font-medium">Início</span></Button>
+          <Button variant="ghost" size="sm" onClick={() => setCurrentView("training")} className={`flex flex-col items-center gap-1 h-auto py-2 transition-all duration-300 ease-in-out ${currentView === "training" ? "text-primary" : "text-muted-foreground hover:text-foreground"}`}><Dumbbell className="w-5 h-5" /><span className="text-[10px] font-medium">NutriTrain</span></Button>
+          <Button variant="ghost" size="sm" onClick={handleNavScan} className="flex flex-col items-center gap-1 h-auto py-2 text-muted-foreground relative -mt-4"><div className="absolute -top-6 left-1/2 -translate-x-1/2 w-16 h-16 rounded-full bg-gradient-to-br from-primary to-primary/90 flex items-center justify-center shadow-xl shadow-primary/30 transition-transform active:scale-95 hover:scale-105 border-4 border-background"><ScanLine className="w-7 h-7 text-primary-foreground" /></div><span className="text-[10px] font-medium mt-10">Scan</span></Button>
+          <Button variant="ghost" size="sm" onClick={() => setCurrentView("planner")} className={`flex flex-col items-center gap-1 h-auto py-2 transition-all duration-300 ease-in-out ${currentView === "planner" ? "text-primary" : "text-muted-foreground hover:text-foreground"}`}><Calculator className="w-5 h-5" /><span className="text-[10px] font-medium">Dieta AI</span></Button>
+          <Button variant="ghost" size="sm" onClick={() => setCurrentView("profile")} className={`flex flex-col items-center gap-1 h-auto py-2 transition-all duration-300 ease-in-out ${currentView === "profile" ? "text-primary" : "text-muted-foreground hover:text-foreground"}`}><User className="w-5 h-5" /><span className="text-[10px] font-medium">Perfil</span></Button>
+          <Button variant="ghost" size="sm" onClick={() => setCurrentView("settings")} className={`flex flex-col items-center gap-1 h-auto py-2 transition-all duration-300 ease-in-out ${currentView === "settings" ? "text-primary" : "text-muted-foreground hover:text-foreground"}`}><Settings className="w-5 h-5" /><span className="text-[10px] font-medium">Ajustes</span></Button>
         </div>
       </nav>
     </div>

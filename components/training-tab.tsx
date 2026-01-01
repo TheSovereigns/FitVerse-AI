@@ -1,17 +1,36 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Dumbbell, Flame, Clock, Trophy, Zap, Play, Settings2, Home, Building2, User } from "lucide-react"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuLabel, DropdownMenuSeparator } from "@/components/ui/dropdown-menu"
+import { Dumbbell, Flame, Clock, Trophy, Zap, Play, Settings2, Home, Building2, User, ArrowRight, Trash2, Download, ArrowUpDown, Feather, Swords, Activity } from "lucide-react"
 import { WorkoutGenerator } from "@/components/workout-generator"
 import { ActiveWorkoutSession } from "@/components/active-workout-session"
 import { ExerciseDetailModal } from "@/components/exercise-detail-modal"
 import { toast } from "sonner"
+
+interface Exercise {
+  name: string
+  sets: string
+  reps: string
+  rest: string
+}
+
+interface Workout {
+  name: string
+  category: string
+  duration: string
+  calories: string
+  difficulty: string
+  aiVerdict: string
+  exercises: Exercise[]
+  criteria?: any
+}
 
 interface TrainingTabProps {
   metabolicPlan?: any
@@ -21,11 +40,50 @@ interface TrainingTabProps {
 
 export function TrainingTab({ metabolicPlan, scanHistory, userGoal }: TrainingTabProps) {
   const [isGenerating, setIsGenerating] = useState(false)
-  const [generatedWorkouts, setGeneratedWorkouts] = useState<any[]>([])
+  const [generatedWorkouts, setGeneratedWorkouts] = useState<Workout[]>([])
   const [activeFilter, setActiveFilter] = useState("all")
   const [showGeneratorModal, setShowGeneratorModal] = useState(false)
-  const [activeSessionWorkout, setActiveSessionWorkout] = useState<any>(null)
+  const [sortBy, setSortBy] = useState("default")
+  const [activeSessionWorkout, setActiveSessionWorkout] = useState<Workout | null>(null)
   const [selectedExerciseDetail, setSelectedExerciseDetail] = useState<any>(null)
+
+  // Carregar treinos salvos ao iniciar
+  useEffect(() => {
+    const savedWorkouts = localStorage.getItem("nutritrain-workouts")
+    if (savedWorkouts) {
+      try {
+        setGeneratedWorkouts(JSON.parse(savedWorkouts))
+      } catch (e) {
+        console.error("Falha ao carregar treinos salvos:", e)
+      }
+    }
+  }, [])
+
+  // Salvar treinos sempre que houver atualização
+  useEffect(() => {
+    if (generatedWorkouts.length > 0) {
+      localStorage.setItem("nutritrain-workouts", JSON.stringify(generatedWorkouts))
+    }
+  }, [generatedWorkouts])
+
+  const handleClearHistory = () => {
+    if (window.confirm("Tem certeza que deseja limpar todo o histórico? Essa ação não pode ser desfeita.")) {
+      localStorage.removeItem("nutritrain-workouts")
+      setGeneratedWorkouts([])
+      toast.success("Histórico de treinos limpo.")
+    }
+  }
+
+  const handleExportWorkouts = () => {
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(generatedWorkouts, null, 2))
+    const downloadAnchorNode = document.createElement('a')
+    downloadAnchorNode.setAttribute("href", dataStr)
+    downloadAnchorNode.setAttribute("download", "meus-treinos-nutritrain.json")
+    document.body.appendChild(downloadAnchorNode)
+    downloadAnchorNode.click()
+    downloadAnchorNode.remove()
+    toast.success("Treinos exportados com sucesso!")
+  }
 
   const handleGenerateWorkouts = async (criteria: any) => {
     setIsGenerating(true)
@@ -129,78 +187,98 @@ export function TrainingTab({ metabolicPlan, scanHistory, userGoal }: TrainingTa
       default:
         return false
     }
+  }).sort((a, b) => {
+    if (sortBy === "default") return 0
+
+    if (sortBy.includes("difficulty")) {
+      const getWeight = (w: Workout) => {
+        const d = w.difficulty.toLowerCase()
+        if (d.includes("iniciante")) return 1
+        if (d.includes("intermediário") || d.includes("intermediario")) return 2
+        if (d.includes("avançado") || d.includes("avancado")) return 3
+        return 0
+      }
+      return sortBy === "difficulty_desc" ? getWeight(b) - getWeight(a) : getWeight(a) - getWeight(b)
+    }
+
+    if (sortBy.includes("duration")) {
+      const getDuration = (w: Workout) => parseInt(w.duration.replace(/\D/g, '')) || 0
+      return sortBy === "duration_desc" ? getDuration(b) - getDuration(a) : getDuration(a) - getDuration(b)
+    }
+
+    return 0
   })
 
   return (
-    <div className="space-y-6 pb-20 text-slate-300">
-      {/* Header da Seção */}
-      <div className="px-4 pt-2 space-y-4">
-        <div className="flex items-center justify-between">
-          <div>
-            <h2 className="text-2xl font-bold text-white tracking-tight">NutriTrain <span className="text-[#FF8C00]">AI</span></h2>
-            <p className="text-xs text-slate-400">Treinos personalizados para sua longevidade</p>
-          </div>
-          <Dialog open={showGeneratorModal} onOpenChange={setShowGeneratorModal}>
-            <DialogTrigger asChild>
-              <Button size="icon" variant="outline" className="border-[#1F1F1F] bg-[#121212] text-[#FF8C00] hover:bg-[#1F1F1F] hover:border-[#FF8C00]/50 transition-all duration-300 ease-in-out">
-                <Settings2 className="h-5 w-5" />
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="bg-[#121212]/90 backdrop-blur-xl border-[#1F1F1F] text-white sm:max-w-lg rounded-2xl">
-              <DialogHeader>
-                <DialogTitle className="text-xl font-bold">Ajuste Fino da IA</DialogTitle>
-              </DialogHeader>
-              <div className="py-4">
-                <WorkoutGenerator onGenerate={handleGenerateWorkouts} isLoading={isGenerating} />
-              </div>
-            </DialogContent>
-          </Dialog>
-        </div>
-
-        {/* Filtros Inteligentes (Chips) */}
-        <ScrollArea className="w-full whitespace-nowrap">
-          <div className="flex space-x-3 pb-2">
-            {filters.map((filter) => {
-              const Icon = filter.icon
-              const isActive = activeFilter === filter.id
-              return (
-                <button
-                  key={filter.id}
-                  onClick={() => setActiveFilter(filter.id)}
-                  className={`
-                    flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 border
-                    ${isActive
-                      ? "bg-[#FF8C00] text-black border-[#FF8C00] shadow-[0_0_15px_rgba(255,140,0,0.3)]" 
-                      : "bg-[#121212] text-slate-400 border-[#1F1F1F] hover:border-[#FF8C00]/50 hover:text-white"
-                    }
-                  `}
-                >
-                  <Icon className="h-4 w-4" />
-                  {filter.label}
-                </button>
-              )
-            })}
-          </div>
-          <ScrollBar orientation="horizontal" className="hidden" />
-        </ScrollArea>
+    <div className="px-4 pt-8 pb-24 text-foreground bg-background min-h-screen">
+      {/* Cabeçalho text-foreground */}
+      <div className="mb-6">
+        <h1 className="text-4xl font-black mb-2 text-balance tracking-tighter uppercase italic">
+          NutriTrain <span className="text-primary">AI</span>
+        </h1>
+        <p className="text-muted-foreground text-pretty font-medium text-sm">
+          Gere treinos personalizados com base no seu perfil e objetivos.
+        </p>
       </div>
+
+      {/* Filtros Inteligentes (Chips) */}
+      <ScrollArea className="w-full whitespace-nowrap -mx-4 px-4 mb-6">
+        <div className="flex space-x-3 pb-2">
+          {filters.map((filter) => {
+            const Icon = filter.icon
+            const isActive = activeFilter === filter.id
+            return (
+              <button
+                key={filter.id}
+                onClick={() => setActiveFilter(filter.id)}
+                className={`
+                  flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 border
+                  ${isActive
+                    ? "bg-primary text-primary-foreground border-primary shadow-[0_0_15px_rgba(249,115,22,0.3)]" 
+                    : "bg-card text-muted-foreground border-border hover:border-primary/50 hover:text-foreground"
+                  }
+                `}
+              >
+                <Icon className="h-4 w-4" />
+                {filter.label}
+              </button>
+            )
+          })}
+        </div>
+        <ScrollBar orientation="horizontal" className="hidden" />
+      </ScrollArea>
 
       {/* Estado Vazio ou Loading */}
       {!isGenerating && generatedWorkouts.length === 0 && (
-        <div className="px-4 py-12 text-center space-y-4">
-          <div className="w-20 h-20 rounded-full bg-[#121212] flex items-center justify-center mx-auto mb-4 border border-[#1F1F1F]">
-            <Dumbbell className="h-10 w-10 text-slate-700" />
+        <div className="w-full">
+          <div className="relative bg-card border border-border rounded-[2rem] p-8 text-center overflow-hidden border-b-[6px] border-b-primary">
+            {/* Cantoneiras */}
+            <div className="absolute top-0 left-0 w-8 h-8 border-t-2 border-l-2 border-primary rounded-tl-xl opacity-80" />
+            <div className="absolute top-0 right-0 w-8 h-8 border-t-2 border-r-2 border-primary rounded-tr-xl opacity-80" />
+            <div className="absolute bottom-0 left-0 w-8 h-8 border-b-2 border-l-2 border-primary rounded-bl-xl opacity-80" />
+            <div className="absolute bottom-0 right-0 w-8 h-8 border-b-2 border-r-2 border-primary rounded-br-xl opacity-80" />
+
+            <h3 className="text-lg font-bold text-foreground">Nenhum Treino Gerado</h3>
+            <p className="text-sm text-muted-foreground mt-2 mb-6">
+              Use o botão abaixo para personalizar e gerar seu plano de treino com IA.
+            </p>
+            <Dialog open={showGeneratorModal} onOpenChange={setShowGeneratorModal}>
+              <DialogTrigger asChild>
+                <Button className="w-full max-w-md mx-auto h-16 bg-primary hover:bg-primary/90 text-primary-foreground font-black text-sm uppercase tracking-[0.2em] rounded-2xl transition-all duration-300 group">
+                  Configurar Treino
+                  <ArrowRight className="w-5 h-5 ml-2 transition-transform group-hover:translate-x-1" />
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="bg-card/90 backdrop-blur-xl border-border text-foreground sm:max-w-lg rounded-2xl">
+                <DialogHeader>
+                  <DialogTitle className="text-xl font-bold">Ajuste Fino da IA</DialogTitle>
+                </DialogHeader>
+                <div className="py-4">
+                  <WorkoutGenerator onGenerate={handleGenerateWorkouts} isLoading={isGenerating} />
+                </div>
+              </DialogContent>
+            </Dialog>
           </div>
-          <h3 className="text-lg font-medium text-white">Nenhum treino gerado</h3>
-          <p className="text-sm text-slate-400 max-w-xs mx-auto">
-            Use o botão de configurações acima para personalizar e gerar seu plano de treino com IA.
-          </p>
-          <Button 
-            onClick={() => setShowGeneratorModal(true)}
-            className="bg-[#FF8C00] hover:bg-[#e67e00] text-black font-bold mt-4 transition-all duration-300 ease-in-out"
-          >
-            Configurar Treino
-          </Button>
         </div>
       )}
 
@@ -208,14 +286,14 @@ export function TrainingTab({ metabolicPlan, scanHistory, userGoal }: TrainingTa
       {isGenerating && (
         <div className="px-4 py-12 space-y-6">
           {[1, 2].map((i) => (
-            <Card key={i} className="bg-[#121212] border-[#1F1F1F] overflow-hidden rounded-2xl">
+            <Card key={i} className="bg-card border-border overflow-hidden rounded-2xl">
               <CardContent className="p-0">
-                <div className="h-48 bg-[#1A1A1A] animate-pulse" />
+                <div className="h-48 bg-muted animate-pulse" />
                 <div className="p-4 space-y-3">
-                  <div className="h-6 w-3/4 bg-[#1A1A1A] rounded animate-pulse" />
+                  <div className="h-6 w-3/4 bg-muted rounded animate-pulse" />
                   <div className="flex gap-2">
-                    <div className="h-4 w-16 bg-[#1A1A1A] rounded animate-pulse" />
-                    <div className="h-4 w-16 bg-[#1A1A1A] rounded animate-pulse" />
+                    <div className="h-4 w-16 bg-muted rounded animate-pulse" />
+                    <div className="h-4 w-16 bg-muted rounded animate-pulse" />
                   </div>
                 </div>
               </CardContent>
@@ -226,22 +304,68 @@ export function TrainingTab({ metabolicPlan, scanHistory, userGoal }: TrainingTa
 
       {/* Lista de Treinos Gerados */}
       {filteredWorkouts.length > 0 && (
-        <div className="px-4 space-y-6">
+        <div className="space-y-6">
           <div className="flex items-center justify-between">
-            <h3 className="text-lg font-semibold text-white">Seus Treinos</h3>
-            <Badge variant="outline" className="border-[#FF8C00] text-[#FF8C00] bg-[#FF8C00]/10">
-              {filteredWorkouts.length} Opções
-            </Badge>
+            <h3 className="text-lg font-semibold text-foreground">Seus Treinos</h3>
+            <div className="flex items-center gap-2">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="h-8 border-primary/20 hover:bg-primary/5 text-primary"
+                  >
+                    <ArrowUpDown className="w-4 h-4 mr-2" />
+                    Ordenar
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuLabel>Ordenar por</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => setSortBy("default")}>Padrão</DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setSortBy("difficulty_desc")}>Dificuldade (Maior)</DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setSortBy("difficulty_asc")}>Dificuldade (Menor)</DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setSortBy("duration_desc")}>Duração (Maior)</DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setSortBy("duration_asc")}>Duração (Menor)</DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={handleExportWorkouts}
+                className="h-8 border-primary/20 hover:bg-primary/5 text-primary"
+              >
+                <Download className="w-4 h-4 mr-2" />
+                Exportar
+              </Button>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={handleClearHistory}
+                className="text-muted-foreground hover:text-destructive h-8"
+              >
+                <Trash2 className="w-4 h-4 mr-2" />
+                Limpar
+              </Button>
+              <Badge variant="outline" className="border-primary text-primary bg-primary/10">
+                {filteredWorkouts.length} Opções
+              </Badge>
+            </div>
           </div>
 
           <div className="grid gap-6">
             {filteredWorkouts.map((workout, index) => (
-              <WorkoutCard 
+              <div 
                 key={index} 
-                workout={workout} 
-                onStart={setActiveSessionWorkout} 
-                onExerciseClick={setSelectedExerciseDetail}
-              />
+                className="animate-in fade-in slide-in-from-bottom-4 duration-700 fill-mode-backwards" 
+                style={{ animationDelay: `${index * 150}ms` }}
+              >
+                <WorkoutCard 
+                  workout={workout} 
+                  onStart={setActiveSessionWorkout} 
+                  onExerciseClick={setSelectedExerciseDetail}
+                />
+              </div>
             ))}
           </div>
         </div>
@@ -276,37 +400,47 @@ export function TrainingTab({ metabolicPlan, scanHistory, userGoal }: TrainingTa
   )
 }
 
-function WorkoutCard({ workout, onStart, onExerciseClick }: { workout: any, onStart: (workout: any) => void, onExerciseClick: (ex: any) => void }) {
+function WorkoutCard({ workout, onStart, onExerciseClick }: { workout: Workout, onStart: (workout: Workout) => void, onExerciseClick: (ex: Exercise) => void }) {
   // Estado local removido em favor do controle global da sessão
 
+  const getDifficultyIcon = (level: string) => {
+    const l = level.toLowerCase()
+    if (l.includes("iniciante")) return <Feather className="w-5 h-5 text-green-500" />
+    if (l.includes("avançado") || l.includes("avancado")) return <Swords className="w-5 h-5 text-red-500" />
+    return <Activity className="w-5 h-5 text-yellow-500" />
+  }
+
   return (
-    <Card className="bg-[#121212] border-[#1F1F1F] overflow-hidden hover:border-[#FF8C00]/50 transition-all duration-300 ease-in-out group shadow-lg rounded-2xl">
+    <Card className="bg-card border-border overflow-hidden hover:border-primary/50 transition-all duration-300 ease-in-out group shadow-lg rounded-2xl">
       <CardHeader className="p-0">
-        <div className="relative h-48 w-full bg-[#1A1A1A]">
+        <div className="relative h-48 w-full bg-muted">
           {/* Placeholder visual para o treino - idealmente seria uma imagem gerada ou do banco */}
-          <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-t from-[#121212] to-transparent">
-            <Dumbbell className="h-16 w-16 text-slate-800 group-hover:text-[#FF8C00] transition-colors duration-300" />
+          <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-t from-card to-transparent">
+            <Dumbbell className="h-16 w-16 text-muted-foreground/20 group-hover:text-primary transition-colors duration-300" />
           </div>
           
           <div className="absolute top-3 right-3 flex gap-2">
-            <Badge className="bg-black/60 backdrop-blur text-white border-none hover:bg-black/80">
+            <Badge className="bg-primary text-primary-foreground border-none hover:bg-primary/90 shadow-lg shadow-primary/20">
               {workout.category}
             </Badge>
           </div>
           
           <div className="absolute bottom-3 left-3 right-3">
-            <h3 className="text-xl font-bold text-orange-500 mb-1">{workout.name}</h3>
-            <div className="flex items-center gap-3 text-xs text-slate-300">
+            <div className="flex items-center gap-2 mb-1">
+              <h3 className="text-xl font-bold text-primary">{workout.name}</h3>
+              {getDifficultyIcon(workout.difficulty)}
+            </div>
+            <div className="flex items-center gap-3 text-xs text-muted-foreground">
               <div className="flex items-center gap-1">
-                <Clock className="h-3 w-3 text-[#FF8C00]" />
+                <Clock className="h-3 w-3 text-primary" />
                 {workout.duration}
               </div>
               <div className="flex items-center gap-1">
-                <Flame className="h-3 w-3 text-red-500" />
+                <Flame className="h-3 w-3 text-primary" />
                 {workout.calories} kcal
               </div>
               <div className="flex items-center gap-1">
-                <Trophy className="h-3 w-3 text-yellow-500" />
+                <Trophy className="h-3 w-3 text-primary" />
                 {workout.difficulty}
               </div>
             </div>
@@ -315,14 +449,14 @@ function WorkoutCard({ workout, onStart, onExerciseClick }: { workout: any, onSt
       </CardHeader>
       
       <CardContent className="p-4 space-y-4">
-        <div className="bg-[#0A0A0A] p-3 rounded-lg border border-[#1F1F1F]">
-          <p className="text-sm text-slate-400 italic">
-            "<span className="text-slate-300">{workout.aiVerdict}</span>"
+        <div className="bg-muted/50 p-3 rounded-lg border border-border">
+          <p className="text-sm text-muted-foreground italic">
+            "<span className="text-foreground">{workout.aiVerdict}</span>"
           </p>
         </div>
 
         <div className="space-y-3">
-          <h4 className="text-sm font-semibold text-[#FF8C00] uppercase tracking-wider flex items-center gap-2">
+          <h4 className="text-sm font-semibold text-primary uppercase tracking-wider flex items-center gap-2">
             <Zap className="h-4 w-4" /> Circuito Principal
           </h4>
           
@@ -330,25 +464,25 @@ function WorkoutCard({ workout, onStart, onExerciseClick }: { workout: any, onSt
             {workout.exercises.slice(0, 3).map((exercise: any, idx: number) => (
               <div 
                 key={idx} 
-                className="flex items-start gap-3 p-2 rounded-lg hover:bg-[#1A1A1A] transition-colors cursor-pointer group/item"
+                className="flex items-start gap-3 p-2 rounded-lg hover:bg-primary/10 transition-colors cursor-pointer group/item"
                 onClick={() => onExerciseClick(exercise)}
               >
-                <div className="h-10 w-10 rounded-lg bg-[#1F1F1F] flex-shrink-0 overflow-hidden">
+                <div className="h-10 w-10 rounded-lg bg-muted flex-shrink-0 overflow-hidden">
                   {/* Placeholder para imagem do exercício */}
-                  <div className="w-full h-full flex items-center justify-center text-xs font-bold text-slate-600">
+                  <div className="w-full h-full flex items-center justify-center text-xs font-bold text-muted-foreground">
                     {idx + 1}
                   </div>
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-white truncate group-hover/item:text-[#FF8C00] transition-colors">{exercise.name}</p>
-                  <p className="text-xs text-slate-500">
+                  <p className="text-sm font-medium text-foreground truncate group-hover/item:text-primary transition-colors">{exercise.name}</p>
+                  <p className="text-xs text-muted-foreground">
                     {exercise.sets} x {exercise.reps} • {exercise.rest} descanso
                   </p>
                 </div>
               </div>
             ))}
             {workout.exercises.length > 3 && (
-              <p className="text-xs text-center text-slate-500 pt-1">
+              <p className="text-xs text-center text-muted-foreground pt-1">
                 + {workout.exercises.length - 3} exercícios adicionais
               </p>
             )}
@@ -357,7 +491,7 @@ function WorkoutCard({ workout, onStart, onExerciseClick }: { workout: any, onSt
 
         <Button 
           className={`w-full font-bold transition-all duration-300 ease-in-out ${
-            "bg-gradient-to-r from-[#FF8C00] to-[#FF4500] hover:shadow-orange-500/40 text-white"
+            "bg-primary hover:bg-primary/90 hover:shadow-primary/40 text-primary-foreground"
           }`}
           onClick={() => {
             onStart(workout)

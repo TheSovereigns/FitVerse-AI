@@ -12,40 +12,43 @@ export function RevenueChart({ data }: RevenueChartProps) {
       <AreaChart data={data} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
         <defs>
           <linearGradient id="colorBRL" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%" stopColor="#FF8C00" stopOpacity={0.4}/>
-            <stop offset="95%" stopColor="#FF8C00" stopOpacity={0}/>
+            <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.4}/>
+            <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0}/>
           </linearGradient>
           <linearGradient id="colorUSD" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%" stopColor="#8884d8" stopOpacity={0.4}/>
-            <stop offset="95%" stopColor="#8884d8" stopOpacity={0}/>
+            <stop offset="5%" stopColor="hsl(var(--chart-2))" stopOpacity={0.4}/>
+            <stop offset="95%" stopColor="hsl(var(--chart-2))" stopOpacity={0}/>
           </linearGradient>
         </defs>
         <XAxis 
           dataKey="month" 
-          stroke="#444444" 
+          stroke="hsl(var(--muted-foreground))"
           fontSize={12} 
           tickLine={false} 
           axisLine={false} 
         />
         <YAxis 
-          stroke="#444444" 
+          stroke="hsl(var(--muted-foreground))"
           fontSize={12} 
           tickLine={false} 
           axisLine={false} 
           tickFormatter={(value) => `R$${value/1000}k`} 
         />
-        <CartesianGrid strokeDasharray="3 3" stroke="#1F1F1F" />
+        <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
         <Tooltip 
           contentStyle={{ 
-            backgroundColor: "rgba(18, 18, 18, 0.9)", 
-            border: "1px solid #1F1F1F", 
-            borderRadius: "16px",
-            backdropFilter: "blur(4px)"
+            backgroundColor: "hsl(var(--popover))",
+            borderColor: "hsl(var(--border))",
+            color: "hsl(var(--popover-foreground))",
+            borderRadius: "var(--radius)",
+            borderWidth: "1px",
+            backdropFilter: "blur(4px)",
+            boxShadow: "none",
           }}
-          cursor={{ stroke: '#FF8C00', strokeWidth: 1, strokeDasharray: '3 3' }}
+          cursor={{ stroke: 'hsl(var(--primary))', strokeWidth: 1, strokeDasharray: '3 3' }}
         />
-        <Area type="monotone" dataKey="brl" stroke="#FF8C00" strokeWidth={2} fillOpacity={1} fill="url(#colorBRL)" />
-        <Area type="monotone" dataKey="usd" stroke="#8884d8" strokeWidth={2} fillOpacity={1} fill="url(#colorUSD)" />
+        <Area type="monotone" dataKey="brl" stroke="hsl(var(--primary))" strokeWidth={2} fillOpacity={1} fill="url(#colorBRL)" />
+        <Area type="monotone" dataKey="usd" stroke="hsl(var(--chart-2))" strokeWidth={2} fillOpacity={1} fill="url(#colorUSD)" />
       </AreaChart>
     </ResponsiveContainer>
   )

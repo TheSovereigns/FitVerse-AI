@@ -240,36 +240,36 @@ export function ActiveWorkoutSession({ workout, onClose, onComplete }: ActiveWor
   // --- Tela de Finalização ---
   if (isFinished) {
     return (
-      <div className="fixed inset-0 z-50 bg-[#080808] flex flex-col items-center justify-center p-6 animate-in fade-in duration-300">
+      <div className="fixed inset-0 z-50 bg-background flex flex-col items-center justify-center p-6 animate-in fade-in duration-300">
         <div className="max-w-md w-full space-y-8 text-center">
-          <div className="w-24 h-24 bg-[#FF8C00]/20 rounded-full flex items-center justify-center mx-auto mb-6 animate-bounce">
-            <Trophy className="w-12 h-12 text-[#FF8C00]" />
+          <div className="w-24 h-24 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-6 animate-bounce">
+            <Trophy className="w-12 h-12 text-primary" />
           </div>
           
           <div>
-            <h2 className="text-3xl font-bold text-white mb-2">Treino Concluído!</h2>
-            <p className="text-slate-400">Você dominou o {workout.name}</p>
+            <h2 className="text-3xl font-bold text-foreground mb-2">Treino Concluído!</h2>
+            <p className="text-muted-foreground">Você dominou o {workout.name}</p>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
-            <Card className="bg-[#121212] border-[#1F1F1F] p-4">
+            <Card className="bg-card border-border p-4">
               <div className="flex flex-col items-center">
                 <Clock className="w-6 h-6 text-blue-500 mb-2" />
-                <span className="text-2xl font-bold text-white">{formatTime(elapsedTime)}</span>
-                <span className="text-xs text-slate-500 uppercase">Tempo Total</span>
+                <span className="text-2xl font-bold text-foreground">{formatTime(elapsedTime)}</span>
+                <span className="text-xs text-muted-foreground uppercase">Tempo Total</span>
               </div>
             </Card>
-            <Card className="bg-[#121212] border-[#1F1F1F] p-4">
+            <Card className="bg-card border-border p-4">
               <div className="flex flex-col items-center">
                 <Flame className="w-6 h-6 text-red-500 mb-2" />
-                <span className="text-2xl font-bold text-white">~200</span>
-                <span className="text-xs text-slate-500 uppercase">Kcal Estimadas</span>
+                <span className="text-2xl font-bold text-foreground">~200</span>
+                <span className="text-xs text-muted-foreground uppercase">Kcal Estimadas</span>
               </div>
             </Card>
           </div>
 
           <Button 
-            className="w-full h-14 text-lg font-bold bg-[#FF8C00] hover:bg-[#e67e00] text-black"
+            className="w-full h-14 text-lg font-bold bg-primary hover:bg-primary/90 text-primary-foreground"
             onClick={() => onComplete({ elapsedTime, rpeValues })}
           >
             <Save className="w-5 h-5 mr-2" />
@@ -285,29 +285,29 @@ export function ActiveWorkoutSession({ workout, onClose, onComplete }: ActiveWor
   const isExerciseComplete = currentExerciseSets.every(Boolean)
 
   return (
-    <div className="fixed inset-0 z-50 bg-[#080808] flex flex-col animate-in slide-in-from-bottom duration-300">
+    <div className="fixed inset-0 z-50 bg-background flex flex-col animate-in slide-in-from-bottom duration-300">
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-[#1F1F1F] bg-[#121212]">
+      <div className="flex items-center justify-between p-4 border-b border-border bg-card">
         <div className="flex flex-col">
-          <h3 className="font-bold text-white text-sm uppercase tracking-wider truncate max-w-[200px]">{workout.name}</h3>
-          <span className="text-xs text-[#FF8C00] font-mono">{formatTime(elapsedTime)}</span>
+          <h3 className="font-bold text-foreground text-sm uppercase tracking-wider truncate max-w-[200px]">{workout.name}</h3>
+          <span className="text-xs text-primary font-mono">{formatTime(elapsedTime)}</span>
         </div>
-        <Button variant="ghost" size="icon" onClick={onClose} className="text-slate-400 hover:text-white">
+        <Button variant="ghost" size="icon" onClick={onClose} className="text-muted-foreground hover:text-foreground">
           <X className="w-6 h-6" />
         </Button>
       </div>
 
       {/* Barra de Progresso */}
-      <Progress value={progress} className="h-1 bg-[#1F1F1F]" indicatorClassName="bg-[#FF8C00]" />
+      <Progress value={progress} className="h-1 bg-muted" indicatorClassName="bg-primary" />
 
       {/* Conteúdo Principal */}
       <div className="flex-1 overflow-y-auto p-4 space-y-6 pb-20">
         {/* Card do Exercício */}
         <div className="space-y-4">
           {/* GIF Demonstrativo */}
-          <div className="relative w-full aspect-video bg-[#1A1A1A] rounded-xl overflow-hidden border border-[#1F1F1F] shadow-lg group">
+          <div className="relative w-full aspect-video bg-muted rounded-xl overflow-hidden border border-border shadow-lg group">
             {isLoadingGif ? (
-              <Skeleton className="w-full h-full bg-[#1F1F1F] animate-pulse" />
+              <Skeleton className="w-full h-full bg-muted-foreground/20 animate-pulse" />
             ) : exerciseGif ? (
               <img 
                 src={exerciseGif} 
@@ -315,7 +315,7 @@ export function ActiveWorkoutSession({ workout, onClose, onComplete }: ActiveWor
                 className="w-full h-full object-cover"
               />
             ) : (
-              <div className="absolute inset-0 flex flex-col items-center justify-center text-slate-600">
+              <div className="absolute inset-0 flex flex-col items-center justify-center text-muted-foreground">
                 <ImageIcon className="w-12 h-12 mb-2 opacity-30" />
                 <span className="text-xs uppercase tracking-widest font-medium opacity-50">Sem demonstração</span>
               </div>
@@ -324,10 +324,10 @@ export function ActiveWorkoutSession({ workout, onClose, onComplete }: ActiveWor
 
           <div className="flex items-start justify-between">
             <div>
-              <Badge variant="outline" className="mb-2 border-[#FF8C00]/30 text-[#FF8C00]">
+              <Badge variant="outline" className="mb-2 border-primary/30 text-primary">
                 Exercício {currentExerciseIndex + 1} de {totalExercises}
               </Badge>
-              <h2 className="text-3xl font-bold text-white leading-tight">{currentExercise.name}</h2>
+              <h2 className="text-3xl font-bold text-foreground leading-tight">{currentExercise.name}</h2>
             </div>
           </div>
 
@@ -340,16 +340,16 @@ export function ActiveWorkoutSession({ workout, onClose, onComplete }: ActiveWor
                 disabled={isCompleted}
                 className={`
                   w-full p-4 rounded-xl border flex items-center justify-between transition-all duration-300
-                  ${isCompleted 
-                    ? "bg-[#FF8C00]/10 border-[#FF8C00] text-[#FF8C00]" 
-                    : "bg-[#121212] border-[#1F1F1F] text-slate-300 hover:border-[#FF8C00]/50 active:scale-[0.98]"
+                  ${isCompleted
+                    ? "bg-primary/10 border-primary text-primary"
+                    : "bg-card border-border text-foreground hover:border-primary/50 active:scale-[0.98]"
                   }
                 `}
               >
                 <div className="flex items-center gap-3">
                   <div className={`
                     w-8 h-8 rounded-full flex items-center justify-center border-2 transition-colors
-                    ${isCompleted ? "bg-[#FF8C00] border-[#FF8C00] text-black" : "border-slate-600"}
+                    ${isCompleted ? "bg-primary border-primary text-primary-foreground" : "border-muted-foreground"}
                   `}>
                     {isCompleted ? <Check className="w-5 h-5" /> : <span className="text-xs font-bold">{idx + 1}</span>}
                   </div>
@@ -366,22 +366,22 @@ export function ActiveWorkoutSession({ workout, onClose, onComplete }: ActiveWor
 
         {/* Overlay de Descanso */}
         {isResting && (
-          <Card className="bg-[#1A1A1A] border-[#FF8C00]/30 animate-in zoom-in-95 duration-300 shadow-2xl shadow-black/50 sticky bottom-4">
+          <Card className="bg-card border-primary/30 animate-in zoom-in-95 duration-300 shadow-2xl shadow-black/50 dark:shadow-primary/10 sticky bottom-4">
             <CardContent className="p-6 flex flex-col items-center text-center">
-              <span className="text-sm text-slate-400 uppercase tracking-widest mb-2">Descanso</span>
-              <div className="text-5xl font-black text-white font-mono mb-4 tabular-nums">
+              <span className="text-sm text-muted-foreground uppercase tracking-widest mb-2">Descanso</span>
+              <div className="text-5xl font-black text-foreground font-mono mb-4 tabular-nums">
                 00:{restTimer.toString().padStart(2, '0')}
               </div>
               <div className="flex gap-3 w-full">
                 <Button 
                   variant="outline" 
-                  className="flex-1 border-[#333] hover:bg-[#333] text-white"
+                  className="flex-1"
                   onClick={() => setRestTimer(prev => prev + 10)}
                 >
                   +10s
                 </Button>
                 <Button 
-                  className="flex-1 bg-[#FF8C00] text-black hover:bg-[#e67e00]"
+                  className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90"
                   onClick={() => setIsResting(false)}
                 >
                   Pular
@@ -393,11 +393,11 @@ export function ActiveWorkoutSession({ workout, onClose, onComplete }: ActiveWor
 
         {/* Input de RPE (Aparece quando todas as séries acabam) */}
         {isExerciseComplete && !isResting && (
-          <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 pt-4 border-t border-[#1F1F1F]">
-            <div className="bg-[#121212] p-4 rounded-xl border border-[#1F1F1F]">
-              <label className="text-sm font-bold text-slate-300 mb-4 block flex justify-between">
+          <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 pt-4 border-t border-border">
+            <div className="bg-card p-4 rounded-xl border border-border">
+              <label className="text-sm font-bold text-foreground mb-4 block flex justify-between">
                 <span>Percepção de Esforço (RPE)</span>
-                <span className="text-[#FF8C00]">{rpeValues[currentExercise.name] || 5} / 10</span>
+                <span className="text-primary">{rpeValues[currentExercise.name] || 5} / 10</span>
               </label>
               
               <input 
@@ -406,17 +406,17 @@ export function ActiveWorkoutSession({ workout, onClose, onComplete }: ActiveWor
                 max="10" 
                 value={rpeValues[currentExercise.name] || 5}
                 onChange={(e) => setRpeValues({...rpeValues, [currentExercise.name]: parseInt(e.target.value)})}
-                className="w-full h-2 bg-[#1F1F1F] rounded-lg appearance-none cursor-pointer accent-[#FF8C00]"
+                className="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer accent-primary"
               />
               
-              <div className="flex justify-between mt-2 text-xs text-slate-500">
+              <div className="flex justify-between mt-2 text-xs text-muted-foreground">
                 <span>Leve</span>
                 <span>Máximo</span>
               </div>
             </div>
 
             <Button 
-              className="w-full h-14 text-lg font-bold bg-white text-black hover:bg-slate-200 shadow-lg"
+              className="w-full h-14 text-lg font-bold bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg"
               onClick={handleNextExercise}
             >
               {currentExerciseIndex < totalExercises - 1 ? (

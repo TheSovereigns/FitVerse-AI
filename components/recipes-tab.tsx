@@ -2,11 +2,10 @@
 
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { RecipeModal } from "@/components/recipe-modal"
-import { ChefHat, Clock, Target, Sparkles, Search, Loader2 } from "lucide-react"
+import { ChefHat, Clock, Target, Flame, Search, Loader2, ArrowRight } from "lucide-react"
 
 type Recipe = {
   name: string
@@ -83,98 +82,100 @@ export function RecipesTab({ metabolicPlan }: RecipesTabProps) {
   }
 
   return (
-    <div className="px-4 pt-8 pb-6 max-w-2xl mx-auto">
-      <div className="mb-8">
-        <div className="flex items-center gap-3 mb-2">
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary to-accent flex items-center justify-center shadow-lg shadow-primary/50">
-            <ChefHat className="w-6 h-6 text-white" />
-          </div>
-          <div>
-            <h1 className="text-2xl font-bold text-balance text-foreground">Receitas Inteligentes</h1>
-            <p className="text-sm text-muted-foreground">Geradas por IA para seu perfil</p>
-          </div>
-        </div>
+    <div className="px-4 pt-8 pb-24 text-foreground bg-background min-h-screen">
+      {/* Cabeçalho */}
+      <div className="mb-6">
+        <h1 className="text-4xl font-black mb-2 text-balance tracking-tighter uppercase italic">
+          Receitas <span className="text-primary">Inteligentes</span>
+        </h1>
+        <p className="text-muted-foreground text-pretty font-medium text-sm">
+          Gere receitas personalizadas com base no seu perfil e ingredientes.
+        </p>
       </div>
 
-      {metabolicPlan && (
-        <Card className="mb-6 border-primary/30 bg-card shadow-lg shadow-primary/20">
-          <CardContent className="pt-6">
-            <div className="flex items-start gap-3">
-              <div className="w-10 h-10 rounded-full bg-primary/20 border border-primary/40 flex items-center justify-center flex-shrink-0 shadow-md shadow-primary/30">
-                <Target className="w-5 h-5 text-primary" />
-              </div>
-              <div>
-                <p className="font-semibold text-sm mb-1">Suas Metas Diárias</p>
-                <div className="flex flex-wrap gap-2 text-xs">
-                  <span className="px-2 py-1 rounded-full bg-background/80 border">
-                    {metabolicPlan.dailyCalories} kcal
-                  </span>
-                  <span className="px-2 py-1 rounded-full bg-background/80 border">
-                    {metabolicPlan.macros?.protein}g proteína
-                  </span>
-                  <span className="px-2 py-1 rounded-full bg-background/80 border">
-                    {metabolicPlan.macros?.carbs}g carbos
-                  </span>
-                  <span className="px-2 py-1 rounded-full bg-background/80 border">
-                    {metabolicPlan.macros?.fat}g gordura
-                  </span>
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
+      {/* Container Principal */}
+      <form onSubmit={(e) => { e.preventDefault(); handleGenerateRecipes(); }} className="relative bg-card border border-border rounded-[2rem] p-6 overflow-hidden border-b-[6px] border-b-primary shadow-2xl">
+        {/* Cantoneiras Iluminadas (4 cantos) */}
+        <div className="absolute top-0 left-0 w-8 h-8 border-t-2 border-l-2 border-primary rounded-tl-xl opacity-80" />
+        <div className="absolute top-0 right-0 w-8 h-8 border-t-2 border-r-2 border-primary rounded-tr-xl opacity-80" />
+        <div className="absolute bottom-0 left-0 w-8 h-8 border-b-2 border-l-2 border-primary rounded-bl-xl opacity-80" />
+        <div className="absolute bottom-0 right-0 w-8 h-8 border-b-2 border-r-2 border-primary rounded-br-xl opacity-80" />
+        
+        {/* Glow de Fundo */}
+        <div className="absolute top-0 right-0 w-64 h-64 bg-primary opacity-[0.03] blur-[80px] pointer-events-none" />
 
-      <Card className="mb-8 shadow-lg border-primary/30 shadow-primary/20">
-        <CardHeader>
-          <CardTitle className="text-lg">Gerar Receitas Fit</CardTitle>
-          <CardDescription>Digite um ingrediente ou produto para criar receitas personalizadas</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="ingredient">Ingrediente ou Produto</Label>
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              <Input
-                id="ingredient"
-                placeholder="Ex: frango, ovos, batata doce..."
-                value={ingredient}
-                onChange={(e) => setIngredient(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && handleGenerateRecipes()}
-                className="pl-10"
-              />
+        <div className="space-y-8 relative z-10">
+          {/* Cabeçalho da Seção */}
+          <div className="flex items-center gap-4">
+            <div className="w-14 h-14 rounded-full bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-[0_0_20px_rgba(255,140,0,0.3)]">
+              <ChefHat className="w-6 h-6 text-black" />
+            </div>
+            <div>
+              <h3 className="font-black text-xl uppercase tracking-tight text-foreground">Gerador de Receitas</h3>
+              <p className="text-xs text-muted-foreground font-bold tracking-wider uppercase">Powered by IA</p>
             </div>
           </div>
 
-          <Button onClick={handleGenerateRecipes} disabled={isGenerating || !ingredient.trim()} className="w-full">
+          {/* Input de Ingredientes */}
+          <div className="space-y-2">
+            <Label htmlFor="ingredient" className="text-sm font-medium text-muted-foreground">
+              Ingrediente Principal
+            </Label>
+            <Input
+              id="ingredient"
+              placeholder="Ex: frango, ovos, batata doce..."
+              value={ingredient}
+              onChange={(e) => setIngredient(e.target.value)}
+              className="h-12 px-4 bg-muted/50 border border-input focus:border-primary focus:ring-1 focus:ring-primary text-foreground placeholder:text-muted-foreground rounded-xl transition-all"
+            />
+          </div>
+
+          {/* Botão de Ação */}
+          <Button
+            type="submit"
+            className="w-full h-16 bg-primary hover:bg-primary/90 hover:shadow-[0_0_30px_rgba(255,140,0,0.4)] text-primary-foreground font-black text-sm uppercase tracking-[0.2em] rounded-2xl transition-all duration-300 group"
+            disabled={isGenerating || !ingredient.trim()}
+          >
             {isGenerating ? (
-              <>
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                Gerando Receitas...
-              </>
+              <div className="flex items-center gap-3">
+                <Loader2 className="w-5 h-5 animate-spin" />
+                GERANDO...
+              </div>
             ) : (
               <>
-                <Sparkles className="w-4 h-4 mr-2" />
-                Gerar 3 Receitas
+                GERAR 3 RECEITAS
+                <ArrowRight className="w-5 h-5 ml-2 transition-transform group-hover:translate-x-1" />
               </>
             )}
           </Button>
-        </CardContent>
-      </Card>
+        </div>
+      </form>
 
-      {recipes.length > 0 && (
-        <div className="space-y-4 mb-8">
-          <h2 className="text-xl font-bold text-foreground">Receitas Geradas</h2>
-          <div className="grid gap-4">
-            {recipes.map((recipe, index) => (
-              <Card
+      {(isGenerating || recipes.length > 0) && (
+        <div className="w-full space-y-4 mb-8 mt-12">
+          <h2 className="text-xl font-bold text-foreground text-center">Receitas Geradas</h2>
+          <div className="grid md:grid-cols-2 gap-4">
+            {isGenerating ? (
+              [...Array(3)].map((_, index) => (
+                <div key={index} className="bg-card/50 border border-border rounded-2xl p-4 animate-pulse">
+                  <div className="h-6 bg-muted rounded w-3/4 mb-3"></div>
+                  <div className="h-4 bg-muted rounded w-full mb-4"></div>
+                  <div className="flex gap-4">
+                    <div className="h-5 bg-muted rounded w-1/4"></div>
+                    <div className="h-5 bg-muted rounded w-1/4"></div>
+                  </div>
+                </div>
+              ))
+            ) : (
+              recipes.map((recipe, index) => (
+              <div
                 key={index}
-                className="overflow-hidden hover:shadow-lg hover:shadow-primary/30 transition-all cursor-pointer border-primary/20 hover:border-primary/60 bg-card"
+                className="overflow-hidden hover:shadow-lg hover:shadow-primary/10 transition-all cursor-pointer border border-border hover:border-primary/30 bg-card backdrop-blur-xl rounded-2xl p-4"
                 onClick={() => setSelectedRecipe(recipe)}
               >
-                <CardHeader className="pb-3">
+                <div className="pb-3">
                   <div className="flex items-start justify-between gap-3">
-                    <CardTitle className="text-lg text-balance">{recipe.name}</CardTitle>
+                    <h4 className="text-lg font-bold text-foreground text-balance">{recipe.name}</h4>
                     <span
                       className={`px-2.5 py-1 rounded-full text-[10px] font-semibold border whitespace-nowrap ${getDifficultyColor(recipe.difficulty)}`}
                     >
@@ -182,33 +183,33 @@ export function RecipesTab({ metabolicPlan }: RecipesTabProps) {
                     </span>
                   </div>
                   {recipe.description && (
-                    <CardDescription className="text-pretty leading-relaxed mt-2">{recipe.description}</CardDescription>
+                    <p className="text-muted-foreground text-pretty leading-relaxed mt-2 text-sm">{recipe.description}</p>
                   )}
-                </CardHeader>
-                <CardContent className="space-y-3">
+                </div>
+                <div className="space-y-3">
                   <div className="flex items-center gap-4 text-sm text-muted-foreground">
                     <div className="flex items-center gap-1.5">
-                      <Clock className="w-4 h-4" />
+                      <Clock className="w-4 h-4 text-primary" />
                       <span>{recipe.prepTime}</span>
                     </div>
                     <div className="flex items-center gap-1.5">
-                      <Target className="w-4 h-4" />
+                      <Flame className="w-4 h-4 text-primary" />
                       <span>{recipe.macros.calories} kcal</span>
                     </div>
                   </div>
 
                   <div className="grid grid-cols-3 gap-2">
-                    <div className="text-center p-2 rounded-lg bg-blue-500/5 border border-blue-500/10">
+                    <div className="text-center p-2 rounded-lg bg-muted border border-border">
                       <p className="text-xs text-muted-foreground mb-0.5">Proteína</p>
-                      <p className="text-sm font-bold text-blue-600">{recipe.macros.protein}g</p>
+                      <p className="text-sm font-bold text-foreground">{recipe.macros.protein}g</p>
                     </div>
-                    <div className="text-center p-2 rounded-lg bg-amber-500/5 border border-amber-500/10">
+                    <div className="text-center p-2 rounded-lg bg-muted border border-border">
                       <p className="text-xs text-muted-foreground mb-0.5">Carbos</p>
-                      <p className="text-sm font-bold text-amber-600">{recipe.macros.carbs}g</p>
+                      <p className="text-sm font-bold text-foreground">{recipe.macros.carbs}g</p>
                     </div>
-                    <div className="text-center p-2 rounded-lg bg-rose-500/5 border border-rose-500/10">
+                    <div className="text-center p-2 rounded-lg bg-muted border border-border">
                       <p className="text-xs text-muted-foreground mb-0.5">Gordura</p>
-                      <p className="text-sm font-bold text-rose-600">{recipe.macros.fat}g</p>
+                      <p className="text-sm font-bold text-foreground">{recipe.macros.fat}g</p>
                     </div>
                   </div>
 
@@ -223,27 +224,27 @@ export function RecipesTab({ metabolicPlan }: RecipesTabProps) {
                   >
                     Salvar Receita
                   </Button>
-                </CardContent>
-              </Card>
-            ))}
+                </div>
+              </div>
+            )))}
           </div>
         </div>
       )}
 
       {savedRecipes.length > 0 && (
-        <div className="space-y-4">
+        <div className="space-y-4 mt-8">
           <h2 className="text-xl font-bold text-foreground">Receitas Salvas</h2>
           <div className="grid gap-4">
             {savedRecipes.map((recipe, index) => (
-              <Card
+              <div
                 key={index}
-                className="overflow-hidden hover:shadow-lg transition-all cursor-pointer"
+                className="overflow-hidden hover:shadow-lg transition-all cursor-pointer bg-card/50 border border-border rounded-xl p-4"
                 onClick={() => setSelectedRecipe(recipe)}
               >
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-base text-balance">{recipe.name}</CardTitle>
-                </CardHeader>
-                <CardContent>
+                <div className="pb-3">
+                  <h4 className="text-base font-bold text-foreground text-balance">{recipe.name}</h4>
+                </div>
+                <div>
                   <div className="flex items-center gap-4 text-sm text-muted-foreground">
                     <div className="flex items-center gap-1.5">
                       <Clock className="w-4 h-4" />
@@ -254,8 +255,8 @@ export function RecipesTab({ metabolicPlan }: RecipesTabProps) {
                       <span>{recipe.macros.calories} kcal</span>
                     </div>
                   </div>
-                </CardContent>
-              </Card>
+                </div>
+              </div>
             ))}
           </div>
         </div>

@@ -1,14 +1,12 @@
 "use client"
 
 import type React from "react"
-
 import { useState } from "react"
-import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Activity, TrendingUp, Target, Zap, ArrowRight } from "lucide-react"
+import { Activity, TrendingUp, Target, Zap, ArrowRight, Loader2 } from "lucide-react"
 import { MetabolicDashboard } from "./metabolic-dashboard"
 
 export interface BioPerfil {
@@ -35,6 +33,7 @@ export interface MetabolicPlan {
   prediction: {
     weeks: number
     explanation: string
+    macroTips?: string[]
   }
 }
 
@@ -54,18 +53,61 @@ export function MetabolicPlanner() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
+    setPlan(null) // Limpa o plano anterior
 
+    // Simula o tempo de processamento da IA
+    await new Promise(resolve => setTimeout(resolve, 2000))
+    
     try {
-      const response = await fetch("/api/calculate-macros", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(perfil),
-      })
+      // --- Lógica de Geração (Cálculos) ---
+      // 1. Calcular TMB (Taxa Metabólica Basal) - Fórmula de Mifflin-St Jeor
+      let tmb = (10 * perfil.weight) + (6.25 * perfil.height) - (5 * perfil.age)
+      tmb += perfil.gender === 'male' ? 5 : -161
 
-      if (!response.ok) throw new Error("Failed to calculate macros")
+      // 2. Calcular Gasto Energético Total (GET)
+      const activityMultipliers = {
+        sedentary: 1.2,
+        moderate: 1.55,
+        active: 1.725,
+        athlete: 1.9,
+      }
+      let get = tmb * activityMultipliers[perfil.activityLevel]
 
-      const data = await response.json()
-      setPlan(data.plan)
+      // 3. Ajustar calorias com base no objetivo
+      let finalCalories = get
+      if (perfil.goal === 'lose_weight') finalCalories -= 500
+      if (perfil.goal === 'gain_muscle') finalCalories += 500
+
+      // 4. Gerar plano de macros (ex: 40% Carbo, 30% Prot, 30% Gordura)
+      const proteinGrams = perfil.goal === 'gain_muscle' ? perfil.weight * 2 : perfil.weight * 1.6
+      const proteinCalories = proteinGrams * 4
+      const fatCalories = finalCalories * 0.25
+      const fatGrams = fatCalories / 9
+      const carbCalories = finalCalories - proteinCalories - fatCalories
+      const carbGrams = carbCalories / 4
+
+      const generatedPlan: MetabolicPlan = {
+        macros: {
+          calories: Math.round(finalCalories),
+          protein: Math.round((proteinCalories / finalCalories) * 100),
+          carbs: Math.round((carbCalories / finalCalories) * 100),
+          fat: Math.round((fatCalories / finalCalories) * 100),
+          proteinGrams: Math.round(proteinGrams),
+          carbsGrams: Math.round(carbGrams),
+          fatGrams: Math.round(fatGrams),
+        },
+        prediction: {
+          weeks: 12, // Valor estático para exemplo
+          explanation: `Com base em um ${perfil.goal === 'lose_weight' ? 'déficit' : 'superávit'} calórico consistente, seu corpo começará a se adaptar nas primeiras semanas, otimizando o uso de energia e a síntese proteica.`,
+          macroTips: [
+            "Priorize fontes de proteína magra como frango e peixe.",
+            "Consuma carboidratos complexos como batata doce e aveia para energia sustentada.",
+            "Inclua gorduras saudáveis como abacate e nozes para suporte hormonal."
+          ]
+        }
+      }
+
+      setPlan(generatedPlan)
       setShowDashboard(true)
     } catch (error) {
       console.error("Error calculating macros:", error)
@@ -80,27 +122,42 @@ export function MetabolicPlanner() {
   }
 
   return (
-    <div className="px-4 pt-8 pb-24">
+    <div className="px-4 pt-8 pb-24 text-foreground bg-background min-h-screen">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold mb-2 text-balance text-foreground">Planejamento Metabólico de IA</h1>
-        <p className="text-muted-foreground text-pretty">
+        <h1 className="text-4xl font-black mb-2 text-balance tracking-tighter uppercase italic">
+          Planejamento <span className="text-primary">Metabólico</span>
+        </h1>
+        <p className="text-muted-foreground text-pretty font-medium text-sm">
           Descubra suas necessidades calóricas e alcance seus objetivos com precisão científica
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <Card className="p-5 bg-card border-primary/30 shadow-lg shadow-primary/20">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 rounded-full bg-primary/20 border border-primary/40 flex items-center justify-center shadow-md shadow-primary/30">
-              <Activity className="w-5 h-5 text-primary" />
-            </div>
-            <div>
-              <h3 className="font-semibold text-foreground">Calculadora de Bio-Perfil</h3>
-              <p className="text-xs text-muted-foreground">Preencha seus dados básicos</p>
-            </div>
-          </div>
+      <form onSubmit={handleSubmit} className="relative bg-card border border-border rounded-[2rem] p-6 overflow-hidden border-b-[6px] border-b-primary shadow-2xl">
+        {/* Cantoneiras Iluminadas (4 cantos) */}
+        <div className="absolute top-0 left-0 w-8 h-8 border-t-2 border-l-2 border-primary rounded-tl-xl opacity-80" />
+        <div className="absolute top-0 right-0 w-8 h-8 border-t-2 border-r-2 border-primary rounded-tr-xl opacity-80" />
+        <div className="absolute bottom-0 left-0 w-8 h-8 border-b-2 border-l-2 border-primary rounded-bl-xl opacity-80" />
+        <div className="absolute bottom-0 right-0 w-8 h-8 border-b-2 border-r-2 border-primary rounded-br-xl opacity-80" />
+        
+        {/* Glow de Fundo */}
+        <div className="absolute top-0 right-0 w-64 h-64 bg-primary opacity-[0.03] blur-[80px] pointer-events-none" />
 
-          <div className="space-y-4">
+        {/* Efeito de Escaneamento (Loading) */}
+        {isLoading && <div className="absolute inset-0 bg-gradient-to-b from-transparent via-primary/10 to-transparent animate-scan-effect" />}
+
+        <div className="space-y-8 relative z-10">
+          {/* Seção 1: Bio-Perfil */}
+          <div>
+            <div className="flex items-center gap-4 mb-6">
+              <div className="w-14 h-14 rounded-full bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-[0_0_20px_rgba(255,140,0,0.3)]">
+                <Activity className="w-6 h-6 text-black" />
+              </div>
+              <div>
+                <h3 className="font-black text-xl uppercase tracking-tight text-foreground">Bio-Perfil</h3>
+                <p className="text-xs text-muted-foreground font-bold tracking-wider uppercase">Dados Corporais</p>
+              </div>
+            </div>
+
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-2">
                 <Label htmlFor="age" className="text-sm font-medium">
@@ -111,18 +168,18 @@ export function MetabolicPlanner() {
                   type="number"
                   placeholder="25"
                   value={perfil.age || ""}
-                  onChange={(e) => setPerfil({ ...perfil, age: Number.parseInt(e.target.value) || 0 })}
-                  className="h-11"
+                  onChange={(e) => setPerfil({ ...perfil, age: parseInt(e.target.value) || 0 })} // Use parseInt for age
+                  className="h-12 px-4 bg-muted/50 border border-input focus:border-primary focus:ring-1 focus:ring-primary text-foreground placeholder:text-muted-foreground rounded-xl transition-all"
                   required
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="gender" className="text-sm font-medium">
+                <Label htmlFor="gender" className="text-sm font-medium text-muted-foreground">
                   Género
                 </Label>
                 <Select value={perfil.gender} onValueChange={(v) => setPerfil({ ...perfil, gender: v as any })}>
-                  <SelectTrigger id="gender" className="h-11">
+                  <SelectTrigger id="gender" className="h-12 px-4 bg-muted/50 border border-input focus:border-primary focus:ring-1 focus:ring-primary text-foreground rounded-xl transition-all">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -144,8 +201,8 @@ export function MetabolicPlanner() {
                   step="0.1"
                   placeholder="70"
                   value={perfil.weight || ""}
-                  onChange={(e) => setPerfil({ ...perfil, weight: Number.parseFloat(e.target.value) || 0 })}
-                  className="h-11"
+                  onChange={(e) => setPerfil({ ...perfil, weight: parseFloat(e.target.value) || 0 })} // Use parseFloat for weight
+                  className="h-12 px-4 bg-muted/50 border border-input focus:border-primary focus:ring-1 focus:ring-primary text-foreground placeholder:text-muted-foreground rounded-xl transition-all"
                   required
                 />
               </div>
@@ -159,8 +216,8 @@ export function MetabolicPlanner() {
                   type="number"
                   placeholder="175"
                   value={perfil.height || ""}
-                  onChange={(e) => setPerfil({ ...perfil, height: Number.parseInt(e.target.value) || 0 })}
-                  className="h-11"
+                  onChange={(e) => setPerfil({ ...perfil, height: parseInt(e.target.value) || 0 })} // Use parseInt for height
+                  className="h-12 px-4 bg-muted/50 border border-input focus:border-primary focus:ring-1 focus:ring-primary text-foreground placeholder:text-muted-foreground rounded-xl transition-all"
                   required
                 />
               </div>
@@ -174,7 +231,7 @@ export function MetabolicPlanner() {
                 value={perfil.activityLevel}
                 onValueChange={(v) => setPerfil({ ...perfil, activityLevel: v as any })}
               >
-                <SelectTrigger id="activity" className="h-11">
+                <SelectTrigger id="activity" className="h-12 px-4 bg-muted/50 border border-input focus:border-primary focus:ring-1 focus:ring-primary text-foreground rounded-xl transition-all">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -186,20 +243,20 @@ export function MetabolicPlanner() {
               </Select>
             </div>
           </div>
-        </Card>
 
-        <Card className="p-5 bg-card border-accent/30 shadow-lg shadow-accent/20">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 rounded-full bg-accent/20 border border-accent/40 flex items-center justify-center shadow-md shadow-accent/30">
-              <Target className="w-5 h-5 text-accent" />
+          {/* Seção 2: Objetivo */}
+          <div>
+            <div className="flex items-center gap-4 mb-6">
+              <div className="w-14 h-14 rounded-full bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-[0_0_20px_rgba(255,140,0,0.3)]">
+                <Target className="w-6 h-6 text-black" />
+              </div>
+              <div>
+                <h3 className="font-black text-xl uppercase tracking-tight text-foreground">Objetivo</h3>
+                <p className="text-xs text-muted-foreground font-bold tracking-wider uppercase">Definição de Meta</p>
+              </div>
             </div>
-            <div>
-              <h3 className="font-semibold text-foreground">Seu Objetivo</h3>
-              <p className="text-xs text-muted-foreground">O que deseja alcançar?</p>
-            </div>
-          </div>
 
-          <div className="space-y-2">
+            <div className="space-y-3">
             {[
               { value: "lose_weight", icon: TrendingUp, label: "Emagrecer", desc: "Défice calórico controlado" },
               { value: "gain_muscle", icon: Zap, label: "Ganhar Massa Muscular", desc: "Superávit + proteína alta" },
@@ -209,52 +266,51 @@ export function MetabolicPlanner() {
                 key={option.value}
                 type="button"
                 onClick={() => setPerfil({ ...perfil, goal: option.value as any })}
-                className={`w-full flex items-center gap-3 p-4 rounded-lg border-2 transition-all ${
+                className={`w-full flex items-center gap-3 p-4 rounded-2xl border transition-all duration-300 group ${
                   perfil.goal === option.value
-                    ? "border-primary bg-primary/10 shadow-md shadow-primary/30"
-                    : "border-border bg-secondary hover:border-primary/40"
+                    ? "border-primary bg-primary/10 shadow-[inset_0_0_20px_rgba(255,140,0,0.1)]"
+                    : "border-border bg-muted/30 hover:border-primary/50 hover:bg-muted/50"
                 }`}
               >
                 <div
                   className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                    perfil.goal === option.value ? "bg-accent/10" : "bg-muted"
+                    perfil.goal === option.value ? "bg-primary text-primary-foreground shadow-[0_0_10px_rgba(255,140,0,0.4)]" : "bg-muted text-muted-foreground group-hover:text-foreground"
                   }`}
                 >
                   <option.icon
-                    className={`w-5 h-5 ${perfil.goal === option.value ? "text-accent" : "text-muted-foreground"}`}
+                    className="w-5 h-5"
                   />
                 </div>
                 <div className="flex-1 text-left">
-                  <p className="font-medium">{option.label}</p>
-                  <p className="text-xs text-muted-foreground">{option.desc}</p>
+                  <p className={`font-bold tracking-tight ${perfil.goal === option.value ? "text-foreground" : "text-muted-foreground group-hover:text-foreground"}`}>{option.label}</p>
+                  <p className="text-xs text-muted-foreground group-hover:text-muted-foreground/80">{option.desc}</p>
                 </div>
                 {perfil.goal === option.value && (
-                  <div className="w-5 h-5 rounded-full bg-accent flex items-center justify-center">
-                    <div className="w-2 h-2 rounded-full bg-accent-foreground" />
-                  </div>
+                  <div className="w-4 h-4 rounded-full bg-primary shadow-[0_0_10px_rgba(255,140,0,0.5)]" />
                 )}
               </button>
             ))}
           </div>
-        </Card>
+          </div>
 
-        <Button
-          type="submit"
-          className="w-full h-12 text-base font-semibold bg-primary hover:bg-primary/80 shadow-lg shadow-primary/40"
-          disabled={isLoading}
-        >
-          {isLoading ? (
-            <div className="flex items-center gap-2">
-              <div className="w-4 h-4 border-2 border-primary-foreground border-t-transparent rounded-full animate-spin" />
-              Calculando...
-            </div>
-          ) : (
-            <>
-              Calcular Meu Plano
-              <ArrowRight className="w-5 h-5 ml-2" />
-            </>
-          )}
-        </Button>
+          <Button
+            type="submit"
+            className="w-full h-16 bg-primary hover:bg-primary/90 hover:shadow-[0_0_30px_rgba(255,140,0,0.4)] text-primary-foreground font-black text-sm uppercase tracking-[0.2em] rounded-2xl transition-all duration-300 group mt-4"
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <div className="flex items-center gap-3">
+                <Loader2 className="w-5 h-5 animate-spin" />
+                PROCESSANDO...
+              </div>
+            ) : (
+              <>
+                GERAR PROTOCOLO METABÓLICO
+                <ArrowRight className="w-5 h-5 ml-2 transition-transform group-hover:translate-x-1" />
+              </>
+            )}
+          </Button>
+        </div>
       </form>
     </div>
   )

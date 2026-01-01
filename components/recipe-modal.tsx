@@ -59,12 +59,12 @@ export function RecipeModal({ recipe, onClose }: RecipeModalProps) {
               <span className="font-bold">{recipe.prepTime}</span>
             </div>
             <div className="flex flex-col items-center justify-center p-4 bg-muted/40 rounded-xl border border-border/50">
-              <Flame className="w-5 h-5 mb-2 text-orange-500" />
+              <Flame className="w-5 h-5 mb-2 text-primary" />
               <span className="text-xs text-muted-foreground font-medium uppercase tracking-wider">Calorias</span>
               <span className="font-bold">{recipe.macros.calories}</span>
             </div>
             <div className="flex flex-col items-center justify-center p-4 bg-muted/40 rounded-xl border border-border/50">
-              <Activity className="w-5 h-5 mb-2 text-blue-500" />
+              <Activity className="w-5 h-5 mb-2 text-primary" />
               <span className="text-xs text-muted-foreground font-medium uppercase tracking-wider">Proteína</span>
               <span className="font-bold">{recipe.macros.protein}g</span>
             </div>

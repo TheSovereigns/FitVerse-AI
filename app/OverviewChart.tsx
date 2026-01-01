@@ -12,25 +12,32 @@ export function OverviewChart({ data }: OverviewChartProps) {
       <LineChart data={data}>
         <XAxis 
           dataKey="time" 
-          stroke="#888888" 
+          stroke="hsl(var(--muted-foreground))"
           fontSize={12} 
           tickLine={false} 
           axisLine={false} 
         />
         <YAxis 
-          stroke="#888888" 
+          stroke="hsl(var(--muted-foreground))"
           fontSize={12} 
           tickLine={false} 
           axisLine={false} 
           tickFormatter={(value) => `${value}`} 
         />
         <Tooltip 
-          contentStyle={{ backgroundColor: "#1f2937", border: "none", borderRadius: "8px", color: "#fff" }}
+          contentStyle={{
+            backgroundColor: "hsl(var(--popover))",
+            borderColor: "hsl(var(--border))",
+            color: "hsl(var(--popover-foreground))",
+            borderRadius: "var(--radius)",
+            borderWidth: "1px",
+            boxShadow: "none",
+          }}
         />
         <Line 
           type="monotone" 
           dataKey="users" 
-          stroke="#FF8C00" 
+          stroke="hsl(var(--primary))"
           strokeWidth={2} 
           activeDot={{ r: 8 }} 
         />

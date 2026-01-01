@@ -24,7 +24,7 @@ const SelectionGroup = ({
   icon: any 
 }) => (
   <div className="space-y-3">
-    <div className="flex items-center gap-2 text-[#FF8C00] font-semibold text-sm uppercase tracking-wider">
+    <div className="flex items-center gap-2 text-primary font-semibold text-sm uppercase tracking-wider">
       <Icon className="w-4 h-4" />
       <span>{label}</span>
     </div>
@@ -35,9 +35,9 @@ const SelectionGroup = ({
           onClick={() => onChange(option)}
           className={`
             px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ease-in-out border
-            ${value === option 
-              ? "bg-[#FF8C00] text-black border-[#FF8C00] shadow-[0_0_10px_rgba(255,140,0,0.4)]" 
-              : "bg-[#121212] text-zinc-400 border-[#1F1F1F] hover:border-[#FF8C00]/50 hover:text-white"
+            ${value === option
+              ? "bg-primary text-primary-foreground border-primary shadow-[0_0_10px_rgba(255,140,0,0.4)]"
+              : "bg-card text-muted-foreground border-border hover:border-primary/50 hover:text-foreground"
             }
           `}
         >
@@ -110,7 +110,7 @@ export function WorkoutGenerator({ onGenerate, isLoading }: WorkoutGeneratorProp
 
         {/* Campo de Observações */}
         <div className="space-y-3">
-          <div className="flex items-center gap-2 text-[#FF8C00] font-semibold text-sm uppercase tracking-wider">
+          <div className="flex items-center gap-2 text-primary font-semibold text-sm uppercase tracking-wider">
             <FileText className="w-4 h-4" />
             <span>Observações Adicionais</span>
           </div>
@@ -118,7 +118,7 @@ export function WorkoutGenerator({ onGenerate, isLoading }: WorkoutGeneratorProp
             value={observations}
             onChange={(e) => setObservations(e.target.value)}
             placeholder="Ex: Tenho dor no joelho, quero focar em glúteos, tenho apenas elásticos..."
-            className="w-full min-h-[100px] p-4 rounded-xl bg-[#121212] border border-[#1F1F1F] text-zinc-300 placeholder:text-zinc-600 focus:border-[#FF8C00] focus:ring-1 focus:ring-[#FF8C00] outline-none transition-all resize-none text-sm"
+            className="w-full min-h-[100px] p-4 rounded-xl bg-card border border-border text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all resize-none text-sm"
           />
         </div>
 
@@ -129,15 +129,15 @@ export function WorkoutGenerator({ onGenerate, isLoading }: WorkoutGeneratorProp
             disabled={isLoading}
             className={`
               w-full h-14 text-lg font-bold uppercase tracking-widest transition-all duration-300 ease-in-out
-              ${isLoading 
-                ? "bg-[#1F1F1F] text-zinc-500 cursor-not-allowed border border-[#333]" 
-                : "bg-gradient-to-r from-[#FF8C00] to-[#FF4500] hover:shadow-orange-500/40 text-white shadow-[0_0_20px_rgba(255,140,0,0.3)]"
+              ${isLoading
+                ? "bg-muted text-muted-foreground cursor-not-allowed border border-border"
+                : "bg-gradient-to-r from-primary to-primary/80 hover:shadow-primary/40 text-primary-foreground shadow-[0_0_20px_rgba(255,140,0,0.3)]"
               }
             `}
           >
             {isLoading ? (
               <div className="flex items-center justify-center gap-3">
-                <Loader2 className="w-6 h-6 animate-spin text-[#FF8C00]" />
+                <Loader2 className="w-6 h-6 animate-spin text-primary" />
                 <span className="animate-pulse">Criando seu treino...</span>
               </div>
             ) : (
@@ -150,8 +150,8 @@ export function WorkoutGenerator({ onGenerate, isLoading }: WorkoutGeneratorProp
           
           {/* Barra de Progresso Decorativa (só aparece carregando) */}
           {isLoading && (
-            <div className="w-full h-1 bg-[#121212] mt-4 rounded-full overflow-hidden">
-              <div className="h-full bg-[#FF8C00] animate-progress-indeterminate" />
+            <div className="w-full h-1 bg-muted mt-4 rounded-full overflow-hidden">
+              <div className="h-full bg-primary animate-progress-indeterminate" />
             </div>
           )}
         </div>
