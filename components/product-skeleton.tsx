@@ -52,7 +52,7 @@ export function ProductSkeleton() {
               <Skeleton key={i} className="h-20 rounded-lg bg-emerald-950/20 border border-emerald-900/30" />
             ))}
           </div>
-        </Card>
+        </div>
       </div>
     </div>
   )
