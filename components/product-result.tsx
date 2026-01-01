@@ -1,14 +1,14 @@
-import { ArrowLeft, AlertTriangle, CheckCircle, Activity, Target } from "lucide-react"
+import { ArrowLeft, AlertTriangle, Check, Activity, ShieldCheck, AlertCircle, Flame, Dumbbell, Wheat, Droplets } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
 
 export interface ProductAnalysis {
   productName: string
   longevityScore: number
   brand?: string
-  alerts?: { title: string; description: string; severity?: string }[]
-  insights?: { title?: string; description: string; type?: string }[]
+  alerts?: { title: string; description: string }[]
+  insights?: { title?: string; description: string }[]
   macros?: { calories: number; protein: number; carbs: number; fat: number }
-  ingredients?: string[]
   fitnessAlignment?: {
     goal: string
     suitability: "Excelente" | "Bom" | "Neutro" | "Ruim"
@@ -32,121 +32,150 @@ export function ProductResult({ result, onBack, imageData }: ProductResultProps)
     )
   }
 
-  const score = result.longevityScore || 0
-  const scoreColor = score >= 70 ? "text-green-500" : score >= 40 ? "text-yellow-500" : "text-red-500"
-  const scoreBorder = score >= 70 ? "border-green-500" : score >= 40 ? "border-yellow-500" : "border-red-500"
-  const scoreBg = score >= 70 ? "bg-green-500/10" : score >= 40 ? "bg-yellow-500/10" : "bg-red-500/10"
+  // Mapeamento de dados para a nova interface
+  const productName = result.productName
+  const score = result.longevityScore
+  const attentionPoints = result.alerts?.map(a => a.title) ?? []
+  const benefits = result.insights?.map(i => i.title || i.description) ?? []
+
+  const getGoalAlignmentPercentage = (suitability: string): number => {
+    switch (suitability?.toLowerCase()) {
+      case "excelente": return 95
+      case "bom": return 75
+      case "neutro": return 50
+      case "ruim": return 25
+      default: return 30 // Valor de fallback
+    }
+  }
+
+  const goalAlignment = result.fitnessAlignment && result.fitnessAlignment.length > 0
+    ? getGoalAlignmentPercentage(result.fitnessAlignment[0].suitability)
+    : 30
 
   return (
-    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-20">
-      {/* Header */}
-      <div className="flex items-center gap-2">
-        <Button variant="ghost" size="icon" onClick={onBack} className="rounded-full">
+    <div className="w-full max-w-4xl mx-auto space-y-6 p-4 bg-black text-zinc-100 rounded-3xl border border-zinc-800/50 shadow-2xl animate-in fade-in duration-500">
+      <div className="flex">
+        <Button variant="ghost" size="icon" onClick={onBack} className="rounded-full text-zinc-400 hover:bg-zinc-800 hover:text-white">
           <ArrowLeft className="w-6 h-6" />
         </Button>
-        <h1 className="text-lg font-bold text-foreground">Análise de Longevidade</h1>
       </div>
 
-      {/* Score Card */}
-      <div className="bg-card border border-border rounded-2xl p-6 flex items-center justify-between relative overflow-hidden shadow-lg">
-        <div className="z-10 max-w-[60%]">
-          <h2 className="text-2xl font-bold text-foreground mb-1 leading-tight">{result.productName}</h2>
-          <p className="text-muted-foreground text-sm">{result.brand || "Marca não identificada"}</p>
-        </div>
-        
-        <div className={`relative w-20 h-20 flex items-center justify-center rounded-full border-4 ${scoreBorder} bg-background z-10 shadow-2xl`}>
-          <span className={`text-2xl font-bold ${scoreColor}`}>{score}</span>
-        </div>
-        
-        {/* Background Glow */}
-        <div className={`absolute right-0 top-1/2 -translate-y-1/2 w-32 h-32 ${scoreBg} blur-3xl rounded-full pointer-events-none opacity-50`} />
-      </div>
+      {/* Header de Produto - Banner Centralizado */}
+      <div className="relative overflow-hidden rounded-2xl bg-zinc-900/30 border border-zinc-800 backdrop-blur-md p-6 group">
+        {/* Cantoneiras Laranjas (Visual de Laboratório) */}
+        <div className="absolute top-0 left-0 w-6 h-6 border-t-2 border-l-2 border-primary opacity-80" />
+        <div className="absolute top-0 right-0 w-6 h-6 border-t-2 border-r-2 border-primary opacity-80" />
+        <div className="absolute bottom-0 left-0 w-6 h-6 border-b-2 border-l-2 border-primary opacity-80" />
+        <div className="absolute bottom-0 right-0 w-6 h-6 border-b-2 border-r-2 border-primary opacity-80" />
 
-      {/* Alerts */}
-      {result.alerts && result.alerts.length > 0 && (
-        <div className="space-y-3">
-          <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-wider ml-1">Pontos de Atenção</h3>
-          {result.alerts.map((alert, index) => (
-            <div key={index} className="bg-red-500/5 border border-red-500/20 rounded-xl p-4 flex gap-3 items-start">
-              <AlertTriangle className="w-5 h-5 text-red-500 shrink-0 mt-0.5" />
-              <div>
-                <p className="font-bold text-red-400 text-sm">{alert.title}</p>
-                <p className="text-muted-foreground text-xs mt-1 leading-relaxed">{alert.description}</p>
-              </div>
+        <div className="flex flex-col md:flex-row items-center justify-between gap-6 relative z-10">
+          <div className="text-center md:text-left space-y-2">
+            <Badge variant="outline" className="border-primary text-primary bg-primary/10 px-3 py-1">
+              BIO-SCANNER v2.0
+            </Badge>
+            <div>
+              <h1 className="text-3xl md:text-4xl font-black text-white tracking-tighter uppercase italic">
+                {productName}
+              </h1>
+              <p className="text-zinc-500 text-sm font-medium">
+                Análise de composição e impacto metabólico
+              </p>
             </div>
-          ))}
+          </div>
+
+          {/* Score Circular Pulsante */}
+          <div className="relative">
+            <div className="absolute inset-0 bg-primary rounded-full blur-2xl opacity-20 animate-pulse" />
+            <div className="relative w-24 h-24 rounded-full border-[3px] border-primary flex flex-col items-center justify-center bg-black/80 shadow-[0_0_30px_rgba(249,115,22,0.3)]">
+              <span className="text-4xl font-black text-white leading-none">{score}</span>
+              <span className="text-[9px] text-primary font-bold uppercase tracking-widest mt-1">Score</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Macros Grid */}
+      {result.macros && (
+        <div className="grid grid-cols-4 gap-3">
+          <div className="bg-zinc-900/30 border border-zinc-800 backdrop-blur-md rounded-xl p-3 flex flex-col items-center justify-center gap-1 group hover:border-primary/50 transition-colors">
+            <Flame className="w-4 h-4 text-primary mb-1" />
+            <span className="text-lg font-bold text-white">{result.macros.calories}</span>
+            <span className="text-[10px] text-zinc-500 uppercase tracking-wider">Kcal</span>
+          </div>
+          <div className="bg-zinc-900/30 border border-zinc-800 backdrop-blur-md rounded-xl p-3 flex flex-col items-center justify-center gap-1 group hover:border-primary/50 transition-colors">
+            <Dumbbell className="w-4 h-4 text-primary mb-1" />
+            <span className="text-lg font-bold text-white">{result.macros.protein}g</span>
+            <span className="text-[10px] text-zinc-500 uppercase tracking-wider">Prot</span>
+          </div>
+          <div className="bg-zinc-900/30 border border-zinc-800 backdrop-blur-md rounded-xl p-3 flex flex-col items-center justify-center gap-1 group hover:border-primary/50 transition-colors">
+            <Wheat className="w-4 h-4 text-primary mb-1" />
+            <span className="text-lg font-bold text-white">{result.macros.carbs}g</span>
+            <span className="text-[10px] text-zinc-500 uppercase tracking-wider">Carb</span>
+          </div>
+          <div className="bg-zinc-900/30 border border-zinc-800 backdrop-blur-md rounded-xl p-3 flex flex-col items-center justify-center gap-1 group hover:border-primary/50 transition-colors">
+            <Droplets className="w-4 h-4 text-primary mb-1" />
+            <span className="text-lg font-bold text-white">{result.macros.fat}g</span>
+            <span className="text-[10px] text-zinc-500 uppercase tracking-wider">Gord</span>
+          </div>
         </div>
       )}
 
-      {/* Insights */}
-      {result.insights && result.insights.length > 0 && (
-        <div className="space-y-3">
-          <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-wider ml-1">Benefícios</h3>
-          {result.insights.map((insight, index) => (
-            <div key={index} className="bg-green-500/5 border border-green-500/20 rounded-xl p-4 flex gap-3 items-start">
-              <CheckCircle className="w-5 h-5 text-green-500 shrink-0 mt-0.5" />
-              <div>
-                <p className="font-bold text-green-400 text-sm">{insight.title || "Ponto Positivo"}</p>
-                <p className="text-muted-foreground text-xs mt-1 leading-relaxed">{insight.description}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* Fitness Goal Alignment */}
-      {result.fitnessAlignment && result.fitnessAlignment.length > 0 && (
-        <div className="space-y-3">
-          <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-wider ml-1 flex items-center gap-2">
-            <Target className="w-3 h-3" />
-            Alinhamento com Objetivos
+      {/* Seção Alinhamento com Objetivos - Barra de Progresso */}
+      <div className="space-y-3 bg-zinc-900/20 p-4 rounded-2xl border border-zinc-800/50">
+        <div className="flex justify-between items-end">
+          <h3 className="text-xs font-bold text-zinc-400 uppercase tracking-widest flex items-center gap-2">
+            <Activity className="w-3 h-3 text-primary" />
+            Compatibilidade Metabólica
           </h3>
-          {result.fitnessAlignment.map((alignment, index) => {
-            const suitabilityColor =
-              alignment.suitability === "Excelente" ? "text-cyan-400" :
-              alignment.suitability === "Bom" ? "text-green-400" :
-              alignment.suitability === "Neutro" ? "text-yellow-400" : "text-red-400"
-            const suitabilityBg =
-              alignment.suitability === "Excelente" ? "bg-cyan-500/10 border-cyan-500/20" :
-              alignment.suitability === "Bom" ? "bg-green-500/10 border-green-500/20" :
-              alignment.suitability === "Neutro" ? "bg-yellow-500/10 border-yellow-500/20" : "bg-red-500/10 border-red-500/20"
-
-            return (
-              <div key={index} className="bg-card border border-border rounded-xl p-4">
-                <div className="flex justify-between items-center mb-2">
-                  <p className="font-bold text-foreground text-sm">{alignment.goal}</p>
-                  <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${suitabilityBg} ${suitabilityColor}`}>{alignment.suitability}</span>
-                </div>
-                <p className="text-muted-foreground text-xs mt-1 leading-relaxed">{alignment.justification}</p>
-              </div>
-            )})}
+          <span className="text-primary font-mono font-bold text-lg">{goalAlignment}%</span>
         </div>
-      )}
-      
-      {/* Macros (Optional) */}
-      {result.macros && (result.macros.calories > 0 || result.macros.protein > 0) && (
-         <div className="space-y-3">
-            <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-wider ml-1">Informação Nutricional</h3>
-            <div className="grid grid-cols-4 gap-2">
-                <div className="bg-card p-3 rounded-xl text-center border border-border">
-                <p className="text-[10px] text-muted-foreground uppercase">Kcal</p>
-                <p className="font-bold text-foreground text-sm">{result.macros.calories}</p>
-                </div>
-                <div className="bg-card p-3 rounded-xl text-center border border-border">
-                <p className="text-[10px] text-muted-foreground uppercase">Prot</p>
-                <p className="font-bold text-foreground text-sm">{result.macros.protein}g</p>
-                </div>
-                <div className="bg-card p-3 rounded-xl text-center border border-border">
-                <p className="text-[10px] text-muted-foreground uppercase">Carb</p>
-                <p className="font-bold text-foreground text-sm">{result.macros.carbs}g</p>
-                </div>
-                <div className="bg-card p-3 rounded-xl text-center border border-border">
-                <p className="text-[10px] text-muted-foreground uppercase">Gord</p>
-                <p className="font-bold text-foreground text-sm">{result.macros.fat}g</p>
-                </div>
-            </div>
-         </div>
-      )}
+
+        <div className="h-3 w-full bg-zinc-900 rounded-full overflow-hidden border border-zinc-800 relative">
+          <div className="absolute inset-0 grid grid-cols-[repeat(20,1fr)] gap-[1px] opacity-10 pointer-events-none">
+            {[...Array(20)].map((_, i) => <div key={i} className="bg-white h-full w-[1px]" />)}
+          </div>
+          <div
+            className="h-full bg-gradient-to-r from-primary to-orange-500 shadow-[0_0_10px_rgba(249,115,22,0.6)] relative transition-all duration-1000 ease-out"
+            style={{ width: `${goalAlignment}%` }}
+          >
+            <div className="absolute right-0 top-0 bottom-0 w-[2px] bg-white shadow-[0_0_5px_white]" />
+          </div>
+        </div>
+      </div>
+
+      <div className="grid md:grid-cols-2 gap-4">
+        {/* Grid de Pontos de Atenção (Gamificação) */}
+        <div className="space-y-3">
+          <h3 className="text-xs font-bold text-zinc-400 uppercase tracking-widest flex items-center gap-2 pl-1">
+            <AlertTriangle className="w-3 h-3 text-red-500" />
+            Alertas
+          </h3>
+          <div className="grid grid-cols-3 gap-2">
+            {attentionPoints.map((point, i) => (
+              <div key={i} className="bg-red-950/20 border border-red-500/20 rounded-lg p-2 flex flex-col items-center text-center gap-2 hover:bg-red-950/30 transition-colors group cursor-default backdrop-blur-md">
+                <AlertCircle className="w-5 h-5 text-red-500 drop-shadow-[0_0_3px_rgba(239,68,68,0.5)] group-hover:scale-110 transition-transform" />
+                <span className="text-[10px] font-medium text-red-200/80 leading-tight line-clamp-2">{point}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Grid de Benefícios */}
+        <div className="space-y-3">
+          <h3 className="text-xs font-bold text-zinc-400 uppercase tracking-widest flex items-center gap-2 pl-1">
+            <ShieldCheck className="w-3 h-3 text-emerald-500" />
+            Benefícios
+          </h3>
+          <div className="grid grid-cols-3 gap-2">
+            {benefits.map((point, i) => (
+              <div key={i} className="bg-emerald-950/20 border border-emerald-500/20 rounded-lg p-2 flex flex-col items-center text-center gap-2 hover:bg-emerald-950/30 transition-colors group cursor-default backdrop-blur-md">
+                <Check className="w-5 h-5 text-emerald-500 drop-shadow-[0_0_3px_rgba(16,185,129,0.5)] group-hover:scale-110 transition-transform" />
+                <span className="text-[10px] font-medium text-emerald-200/80 leading-tight line-clamp-2">{point}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
     </div>
   )
 }

@@ -1,117 +1,173 @@
 "use client"
 
-import { AlertTriangle, Check, Activity, ShieldCheck, AlertCircle } from "lucide-react"
+import { useState, useRef } from "react"
+import { Upload, Camera, Scan, History, ChevronRight, Loader2 } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
 
 interface ScanDashboardProps {
-  productName?: string
-  score?: number
-  attentionPoints?: string[]
-  benefits?: string[]
-  goalAlignment?: number
+  onScan: (file: File) => void
+  isScanning?: boolean
 }
 
-export function ScanDashboard({
-  productName = "Arroz Branco",
-  score = 45,
-  attentionPoints = ["Alto Índice Glicêmico", "Pobre em Fibras", "Calorias Vazias"],
-  benefits = ["Fonte de Energia Rápida", "Fácil Digestão", "Sem Glúten"],
-  goalAlignment = 30
-}: ScanDashboardProps) {
+export function ScanDashboard({ onScan, isScanning = false }: ScanDashboardProps) {
+  const [isDragging, setIsDragging] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault()
+    setIsDragging(true)
+  }
+
+  const handleDragLeave = () => {
+    setIsDragging(false)
+  }
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault()
+    setIsDragging(false)
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      onScan(e.dataTransfer.files[0])
+    }
+  }
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      onScan(e.target.files[0])
+    }
+  }
+
   return (
-    <div className="w-full max-w-4xl mx-auto space-y-6 p-4 bg-black text-zinc-100 rounded-3xl border border-zinc-800/50 shadow-2xl">
+    <div className="w-full max-w-4xl mx-auto space-y-8 p-4 animate-in fade-in duration-500">
       
-      {/* Header de Produto - Banner Centralizado */}
-      <div className="relative overflow-hidden rounded-2xl bg-zinc-900/30 border border-zinc-800 backdrop-blur-md p-6 group">
-        {/* Cantoneiras Laranjas (Visual de Laboratório) */}
-        <div className="absolute top-0 left-0 w-6 h-6 border-t-2 border-l-2 border-[#F97316] opacity-80" />
-        <div className="absolute top-0 right-0 w-6 h-6 border-t-2 border-r-2 border-[#F97316] opacity-80" />
-        <div className="absolute bottom-0 left-0 w-6 h-6 border-b-2 border-l-2 border-[#F97316] opacity-80" />
-        <div className="absolute bottom-0 right-0 w-6 h-6 border-b-2 border-r-2 border-[#F97316] opacity-80" />
-
-        <div className="flex flex-col md:flex-row items-center justify-between gap-6 relative z-10">
-          <div className="text-center md:text-left space-y-2">
-            <Badge variant="outline" className="border-[#F97316] text-[#F97316] bg-[#F97316]/10 px-3 py-1">
-              BIO-SCANNER v2.0
+      {/* Header do Terminal */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-black text-white tracking-tighter uppercase italic flex items-center gap-2">
+            Bio<span className="text-primary">Scanner</span>
+            <Badge variant="outline" className="ml-2 border-primary/50 text-primary bg-primary/10 text-[10px] py-0 h-5">
+              ONLINE
             </Badge>
-            <div>
-              <h1 className="text-3xl md:text-4xl font-black text-white tracking-tighter uppercase italic">
-                {productName}
-              </h1>
-              <p className="text-zinc-500 text-sm font-medium">
-                Análise de composição e impacto metabólico
-              </p>
-            </div>
-          </div>
-
-          {/* Score Circular Pulsante */}
-          <div className="relative">
-            <div className="absolute inset-0 bg-[#F97316] rounded-full blur-2xl opacity-20 animate-pulse" />
-            <div className="relative w-24 h-24 rounded-full border-[3px] border-[#F97316] flex flex-col items-center justify-center bg-black/80 shadow-[0_0_30px_rgba(249,115,22,0.3)]">
-              <span className="text-4xl font-black text-white leading-none">{score}</span>
-              <span className="text-[9px] text-[#F97316] font-bold uppercase tracking-widest mt-1">Score</span>
-            </div>
-          </div>
+          </h1>
+          <p className="text-zinc-500 text-sm font-medium">
+            Terminal de análise nutricional avançada
+          </p>
+        </div>
+        <div className="hidden md:flex items-center gap-2 text-xs font-mono text-zinc-600">
+          <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+          SYSTEM_READY
         </div>
       </div>
 
-      {/* Seção Alinhamento com Objetivos - Barra de Progresso */}
-      <div className="space-y-3 bg-zinc-900/20 p-4 rounded-2xl border border-zinc-800/50">
-        <div className="flex justify-between items-end">
-          <h3 className="text-xs font-bold text-zinc-400 uppercase tracking-widest flex items-center gap-2">
-            <Activity className="w-3 h-3 text-[#F97316]" />
-            Compatibilidade Metabólica
-          </h3>
-          <span className="text-[#F97316] font-mono font-bold text-lg">{goalAlignment}%</span>
-        </div>
+      {/* Área Principal de Scan */}
+      <div className="relative group">
+        {/* Efeitos de Fundo (Glow) */}
+        <div className="absolute -inset-1 bg-gradient-to-r from-primary/20 to-orange-600/20 rounded-[2rem] blur-xl opacity-50 group-hover:opacity-100 transition duration-1000" />
         
-        <div className="h-3 w-full bg-zinc-900 rounded-full overflow-hidden border border-zinc-800 relative">
-           {/* Linhas de grade sutis para efeito tech */}
-           <div className="absolute inset-0 grid grid-cols-[repeat(20,1fr)] gap-[1px] opacity-10 pointer-events-none">
-              {[...Array(20)].map((_, i) => <div key={i} className="bg-white h-full w-[1px]" />)}
-           </div>
-           <div 
-             className="h-full bg-gradient-to-r from-[#F97316] to-orange-500 shadow-[0_0_10px_rgba(249,115,22,0.6)] relative transition-all duration-1000 ease-out"
-             style={{ width: `${goalAlignment}%` }}
-           >
-             <div className="absolute right-0 top-0 bottom-0 w-[2px] bg-white shadow-[0_0_5px_white]" />
-           </div>
-        </div>
+        <Card 
+          className={cn(
+            "relative bg-black border-2 border-dashed rounded-[2rem] h-[400px] flex flex-col items-center justify-center transition-all duration-300 overflow-hidden",
+            isDragging ? "border-primary bg-primary/5 scale-[1.01]" : "border-zinc-800 hover:border-primary/50 hover:bg-zinc-900/50"
+          )}
+          onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
+          onDrop={handleDrop}
+        >
+          {/* Grid Decorativo */}
+          <div className="absolute inset-0 grid grid-cols-[repeat(40,1fr)] gap-1 opacity-[0.03] pointer-events-none">
+            {[...Array(40)].map((_, i) => <div key={i} className="bg-white h-full w-[1px]" />)}
+          </div>
+          <div className="absolute inset-0 grid grid-rows-[repeat(40,1fr)] gap-1 opacity-[0.03] pointer-events-none">
+            {[...Array(40)].map((_, i) => <div key={i} className="bg-white w-full h-[1px]" />)}
+          </div>
+
+          {/* Cantoneiras Tech */}
+          <div className="absolute top-6 left-6 w-8 h-8 border-t-2 border-l-2 border-primary opacity-60" />
+          <div className="absolute top-6 right-6 w-8 h-8 border-t-2 border-r-2 border-primary opacity-60" />
+          <div className="absolute bottom-6 left-6 w-8 h-8 border-b-2 border-l-2 border-primary opacity-60" />
+          <div className="absolute bottom-6 right-6 w-8 h-8 border-b-2 border-r-2 border-primary opacity-60" />
+
+          {/* Conteúdo Central */}
+          <div className="relative z-10 flex flex-col items-center gap-6 p-6 text-center">
+            {isScanning ? (
+              <div className="flex flex-col items-center gap-4">
+                <div className="relative">
+                  <div className="absolute inset-0 bg-primary blur-xl opacity-20 animate-pulse" />
+                  <Loader2 className="w-16 h-16 text-primary animate-spin" />
+                </div>
+                <div className="space-y-1">
+                  <h3 className="text-xl font-bold text-white">Analisando Amostra...</h3>
+                  <p className="text-zinc-500 text-sm">Processando composição molecular</p>
+                </div>
+              </div>
+            ) : (
+              <>
+                <div className="relative group/icon cursor-pointer" onClick={() => fileInputRef.current?.click()}>
+                  <div className="absolute inset-0 bg-primary rounded-full blur-2xl opacity-0 group-hover/icon:opacity-20 transition-opacity duration-500" />
+                  <div className="w-24 h-24 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center group-hover/icon:border-primary/50 group-hover/icon:scale-110 transition-all duration-300">
+                    <Scan className="w-10 h-10 text-zinc-400 group-hover/icon:text-primary transition-colors" />
+                  </div>
+                  <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 bg-primary text-black text-[10px] font-bold px-2 py-0.5 rounded-full opacity-0 group-hover/icon:opacity-100 transition-all duration-300 translate-y-2 group-hover/icon:translate-y-0">
+                    UPLOAD
+                  </div>
+                </div>
+
+                <div className="space-y-2 max-w-md">
+                  <h3 className="text-2xl font-bold text-white">
+                    Arraste ou Clique para Escanear
+                  </h3>
+                  <p className="text-zinc-500 text-sm">
+                    Suporta JPG, PNG e WEBP. Análise instantânea via IA.
+                  </p>
+                </div>
+
+                <div className="flex gap-3 mt-4">
+                  <Button 
+                    variant="outline" 
+                    className="border-zinc-800 bg-black hover:bg-zinc-900 hover:text-primary hover:border-primary/30 transition-all"
+                    onClick={() => fileInputRef.current?.click()}
+                  >
+                    <Upload className="w-4 h-4 mr-2" />
+                    Carregar Arquivo
+                  </Button>
+                  <Button 
+                    className="bg-primary hover:bg-primary/90 text-white font-bold shadow-[0_0_15px_rgba(249,115,22,0.3)]"
+                    onClick={() => fileInputRef.current?.click()}
+                  >
+                    <Camera className="w-4 h-4 mr-2" />
+                    Usar Câmera
+                  </Button>
+                </div>
+              </>
+            )}
+          </div>
+          
+          <input 
+            type="file" 
+            ref={fileInputRef} 
+            className="hidden" 
+            accept="image/*"
+            onChange={handleFileSelect}
+          />
+        </Card>
       </div>
 
-      <div className="grid md:grid-cols-2 gap-4">
-        {/* Grid de Pontos de Atenção (Gamificação) */}
-        <div className="space-y-3">
-          <h3 className="text-xs font-bold text-zinc-400 uppercase tracking-widest flex items-center gap-2 pl-1">
-            <AlertTriangle className="w-3 h-3 text-red-500" />
-            Alertas
-          </h3>
-          <div className="grid grid-cols-3 gap-2">
-            {attentionPoints.map((point, i) => (
-              <div key={i} className="bg-red-950/10 border border-red-900/30 rounded-lg p-2 flex flex-col items-center text-center gap-2 hover:bg-red-950/20 transition-colors group cursor-default">
-                <AlertCircle className="w-5 h-5 text-red-500 drop-shadow-[0_0_3px_rgba(239,68,68,0.5)] group-hover:scale-110 transition-transform" />
-                <span className="text-[10px] font-medium text-red-200/80 leading-tight line-clamp-2">{point}</span>
-              </div>
-            ))}
+      {/* Footer / Histórico Recente (Mock) */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {[1, 2, 3].map((_, i) => (
+          <div key={i} className="bg-zinc-900/30 border border-zinc-800/50 rounded-xl p-4 flex items-center gap-3 hover:bg-zinc-900/50 hover:border-primary/20 transition-colors cursor-pointer group">
+            <div className="w-10 h-10 rounded-lg bg-zinc-800 flex items-center justify-center text-zinc-500 group-hover:text-primary group-hover:bg-primary/10 transition-colors">
+              <History className="w-5 h-5" />
+            </div>
+            <div className="flex-1">
+              <p className="text-sm font-medium text-zinc-300 group-hover:text-white">Scan #{2409 + i}</p>
+              <p className="text-xs text-zinc-600">Há {i * 2 + 5} min</p>
+            </div>
+            <ChevronRight className="w-4 h-4 text-zinc-700 group-hover:text-primary transition-colors" />
           </div>
-        </div>
-
-        {/* Grid de Benefícios */}
-        <div className="space-y-3">
-          <h3 className="text-xs font-bold text-zinc-400 uppercase tracking-widest flex items-center gap-2 pl-1">
-            <ShieldCheck className="w-3 h-3 text-emerald-500" />
-            Benefícios
-          </h3>
-          <div className="grid grid-cols-3 gap-2">
-            {benefits.map((point, i) => (
-              <div key={i} className="bg-emerald-950/10 border border-emerald-900/30 rounded-lg p-2 flex flex-col items-center text-center gap-2 hover:bg-emerald-950/20 transition-colors group cursor-default">
-                <Check className="w-5 h-5 text-emerald-500 drop-shadow-[0_0_3px_rgba(16,185,129,0.5)] group-hover:scale-110 transition-transform" />
-                <span className="text-[10px] font-medium text-emerald-200/80 leading-tight line-clamp-2">{point}</span>
-              </div>
-            ))}
-          </div>
-        </div>
+        ))}
       </div>
     </div>
   )
