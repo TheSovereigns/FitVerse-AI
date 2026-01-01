@@ -95,7 +95,7 @@ export function ProductResult({ result, onBack, imageData }: ProductResultProps)
       </div>
 
       {/* Macros Grid */}
-      {result.macros && (
+      {result.macros && (result.macros.calories > 0 || result.macros.protein > 0 || result.macros.carbs > 0 || result.macros.fat > 0) && (
         <div className="grid grid-cols-4 gap-3">
           <div className="bg-zinc-900/30 border border-zinc-800 backdrop-blur-md rounded-xl p-3 flex flex-col items-center justify-center gap-1 group hover:border-primary/50 transition-colors">
             <Flame className="w-4 h-4 text-primary mb-1" />
