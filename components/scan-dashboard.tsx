@@ -157,6 +157,7 @@ export function ScanDashboard({ onScan, isScanning = false }: ScanDashboardProps
             ref={fileInputRef} 
             className="hidden" 
             accept="image/*"
+            capture="environment" // Adicionado para abrir a câmera diretamente
             onChange={handleFileSelect}
           />
         </Card>

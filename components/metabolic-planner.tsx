@@ -37,7 +37,11 @@ export interface MetabolicPlan {
   }
 }
 
-export function MetabolicPlanner() {
+interface MetabolicPlannerProps {
+  onPlanCreated: (plan: MetabolicPlan) => void;
+}
+
+export function MetabolicPlanner({ onPlanCreated }: MetabolicPlannerProps) {
   const [showDashboard, setShowDashboard] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [plan, setPlan] = useState<MetabolicPlan | null>(null)
@@ -54,60 +58,23 @@ export function MetabolicPlanner() {
     e.preventDefault()
     setIsLoading(true)
     setPlan(null) // Limpa o plano anterior
-
-    // Simula o tempo de processamento da IA
-    await new Promise(resolve => setTimeout(resolve, 2000))
     
     try {
-      // --- Lógica de Geração (Cálculos) ---
-      // 1. Calcular TMB (Taxa Metabólica Basal) - Fórmula de Mifflin-St Jeor
-      let tmb = (10 * perfil.weight) + (6.25 * perfil.height) - (5 * perfil.age)
-      tmb += perfil.gender === 'male' ? 5 : -161
+      const response = await fetch('/api/generate-metabolic-plan', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ perfil }),
+      });
 
-      // 2. Calcular Gasto Energético Total (GET)
-      const activityMultipliers = {
-        sedentary: 1.2,
-        moderate: 1.55,
-        active: 1.725,
-        athlete: 1.9,
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Falha na geração do plano metabólico pela IA');
       }
-      let get = tmb * activityMultipliers[perfil.activityLevel]
 
-      // 3. Ajustar calorias com base no objetivo
-      let finalCalories = get
-      if (perfil.goal === 'lose_weight') finalCalories -= 500
-      if (perfil.goal === 'gain_muscle') finalCalories += 500
-
-      // 4. Gerar plano de macros (ex: 40% Carbo, 30% Prot, 30% Gordura)
-      const proteinGrams = perfil.goal === 'gain_muscle' ? perfil.weight * 2 : perfil.weight * 1.6
-      const proteinCalories = proteinGrams * 4
-      const fatCalories = finalCalories * 0.25
-      const fatGrams = fatCalories / 9
-      const carbCalories = finalCalories - proteinCalories - fatCalories
-      const carbGrams = carbCalories / 4
-
-      const generatedPlan: MetabolicPlan = {
-        macros: {
-          calories: Math.round(finalCalories),
-          protein: Math.round((proteinCalories / finalCalories) * 100),
-          carbs: Math.round((carbCalories / finalCalories) * 100),
-          fat: Math.round((fatCalories / finalCalories) * 100),
-          proteinGrams: Math.round(proteinGrams),
-          carbsGrams: Math.round(carbGrams),
-          fatGrams: Math.round(fatGrams),
-        },
-        prediction: {
-          weeks: 12, // Valor estático para exemplo
-          explanation: `Com base em um ${perfil.goal === 'lose_weight' ? 'déficit' : 'superávit'} calórico consistente, seu corpo começará a se adaptar nas primeiras semanas, otimizando o uso de energia e a síntese proteica.`,
-          macroTips: [
-            "Priorize fontes de proteína magra como frango e peixe.",
-            "Consuma carboidratos complexos como batata doce e aveia para energia sustentada.",
-            "Inclua gorduras saudáveis como abacate e nozes para suporte hormonal."
-          ]
-        }
-      }
+      const generatedPlan: MetabolicPlan = await response.json();
 
       setPlan(generatedPlan)
+      onPlanCreated(generatedPlan)
       setShowDashboard(true)
     } catch (error) {
       console.error("Error calculating macros:", error)

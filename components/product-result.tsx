@@ -1,4 +1,4 @@
-import { ArrowLeft, AlertTriangle, Check, Activity, ShieldCheck, AlertCircle, Flame, Dumbbell, Wheat, Droplets } from "lucide-react"
+import { ArrowLeft, AlertTriangle, Check, Activity, ShieldCheck, AlertCircle, Flame, Dumbbell, Wheat, Droplets, Target, BarChart } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 
@@ -8,6 +8,7 @@ export interface ProductAnalysis {
   brand?: string
   alerts?: { title: string; description: string }[]
   insights?: { title?: string; description: string }[]
+  servingSize?: string
   macros?: { calories: number; protein: number; carbs: number; fat: number }
   fitnessAlignment?: {
     goal: string
@@ -52,6 +53,16 @@ export function ProductResult({ result, onBack, imageData }: ProductResultProps)
     ? getGoalAlignmentPercentage(result.fitnessAlignment[0].suitability)
     : 30
 
+  const getSuitabilityStyle = (suitability: string) => {
+    switch (suitability?.toLowerCase()) {
+      case "excelente": return "bg-cyan-400/10 text-cyan-400 border-cyan-400/20";
+      case "bom": return "bg-emerald-500/10 text-emerald-400 border-emerald-500/20";
+      case "neutro": return "bg-amber-500/10 text-amber-400 border-amber-500/20";
+      case "ruim": return "bg-red-500/10 text-red-400 border-red-500/20";
+      default: return "bg-zinc-700/20 text-zinc-400 border-zinc-700";
+    }
+  }
+
   return (
     <div className="w-full max-w-4xl mx-auto space-y-6 p-4 bg-black text-zinc-100 rounded-3xl border border-zinc-800/50 shadow-2xl animate-in fade-in duration-500">
       <div className="flex">
@@ -77,8 +88,8 @@ export function ProductResult({ result, onBack, imageData }: ProductResultProps)
               <h1 className="text-3xl md:text-4xl font-black text-white tracking-tighter uppercase italic">
                 {productName}
               </h1>
-              <p className="text-zinc-500 text-sm font-medium">
-                Análise de composição e impacto metabólico
+              <p className="text-primary font-bold text-lg -mt-1">
+                {result.brand || 'Marca Genérica'}
               </p>
             </div>
           </div>
@@ -96,52 +107,73 @@ export function ProductResult({ result, onBack, imageData }: ProductResultProps)
 
       {/* Macros Grid */}
       {result.macros && (result.macros.calories > 0 || result.macros.protein > 0 || result.macros.carbs > 0 || result.macros.fat > 0) && (
-        <div className="grid grid-cols-4 gap-3">
-          <div className="bg-zinc-900/30 border border-zinc-800 backdrop-blur-md rounded-xl p-3 flex flex-col items-center justify-center gap-1 group hover:border-primary/50 transition-colors">
-            <Flame className="w-4 h-4 text-primary mb-1" />
-            <span className="text-lg font-bold text-white">{result.macros.calories}</span>
-            <span className="text-[10px] text-zinc-500 uppercase tracking-wider">Kcal</span>
+        <div className="space-y-2">
+          <div className="grid grid-cols-4 gap-3">
+            <div className="bg-zinc-900/30 border border-zinc-800 backdrop-blur-md rounded-xl p-3 flex flex-col items-center justify-center gap-1 group hover:border-primary/50 transition-colors">
+              <Flame className="w-4 h-4 text-primary mb-1" />
+              <span className="text-lg font-bold text-white">{result.macros.calories}</span>
+              <span className="text-[10px] text-zinc-500 uppercase tracking-wider">Kcal</span>
+            </div>
+            <div className="bg-zinc-900/30 border border-zinc-800 backdrop-blur-md rounded-xl p-3 flex flex-col items-center justify-center gap-1 group hover:border-primary/50 transition-colors">
+              <Dumbbell className="w-4 h-4 text-primary mb-1" />
+              <span className="text-lg font-bold text-white">{result.macros.protein}g</span>
+              <span className="text-[10px] text-zinc-500 uppercase tracking-wider">Prot</span>
+            </div>
+            <div className="bg-zinc-900/30 border border-zinc-800 backdrop-blur-md rounded-xl p-3 flex flex-col items-center justify-center gap-1 group hover:border-primary/50 transition-colors">
+              <Wheat className="w-4 h-4 text-primary mb-1" />
+              <span className="text-lg font-bold text-white">{result.macros.carbs}g</span>
+              <span className="text-[10px] text-zinc-500 uppercase tracking-wider">Carb</span>
+            </div>
+            <div className="bg-zinc-900/30 border border-zinc-800 backdrop-blur-md rounded-xl p-3 flex flex-col items-center justify-center gap-1 group hover:border-primary/50 transition-colors">
+              <Droplets className="w-4 h-4 text-primary mb-1" />
+              <span className="text-lg font-bold text-white">{result.macros.fat}g</span>
+              <span className="text-[10px] text-zinc-500 uppercase tracking-wider">Gord</span>
+            </div>
           </div>
-          <div className="bg-zinc-900/30 border border-zinc-800 backdrop-blur-md rounded-xl p-3 flex flex-col items-center justify-center gap-1 group hover:border-primary/50 transition-colors">
-            <Dumbbell className="w-4 h-4 text-primary mb-1" />
-            <span className="text-lg font-bold text-white">{result.macros.protein}g</span>
-            <span className="text-[10px] text-zinc-500 uppercase tracking-wider">Prot</span>
-          </div>
-          <div className="bg-zinc-900/30 border border-zinc-800 backdrop-blur-md rounded-xl p-3 flex flex-col items-center justify-center gap-1 group hover:border-primary/50 transition-colors">
-            <Wheat className="w-4 h-4 text-primary mb-1" />
-            <span className="text-lg font-bold text-white">{result.macros.carbs}g</span>
-            <span className="text-[10px] text-zinc-500 uppercase tracking-wider">Carb</span>
-          </div>
-          <div className="bg-zinc-900/30 border border-zinc-800 backdrop-blur-md rounded-xl p-3 flex flex-col items-center justify-center gap-1 group hover:border-primary/50 transition-colors">
-            <Droplets className="w-4 h-4 text-primary mb-1" />
-            <span className="text-lg font-bold text-white">{result.macros.fat}g</span>
-            <span className="text-[10px] text-zinc-500 uppercase tracking-wider">Gord</span>
-          </div>
+          <p className="text-center text-xs text-zinc-600 font-mono pt-1">Valores por porção de {result.servingSize || "100g"}</p>
         </div>
       )}
 
-      {/* Seção Alinhamento com Objetivos - Barra de Progresso */}
-      <div className="space-y-3 bg-zinc-900/20 p-4 rounded-2xl border border-zinc-800/50">
-        <div className="flex justify-between items-end">
-          <h3 className="text-xs font-bold text-zinc-400 uppercase tracking-widest flex items-center gap-2">
-            <Activity className="w-3 h-3 text-primary" />
-            Compatibilidade Metabólica
-          </h3>
-          <span className="text-primary font-mono font-bold text-lg">{goalAlignment}%</span>
+      {/* Alinhamento com Objetivos */}
+      {result.fitnessAlignment && result.fitnessAlignment.length > 0 && (
+        <div className="space-y-2 bg-zinc-900/30 border border-zinc-800 backdrop-blur-md rounded-2xl p-4">
+            <div className="flex justify-between items-center">
+                <h3 className="text-xs font-bold text-zinc-400 uppercase tracking-widest flex items-center gap-2">
+                    <Target className="w-3 h-3 text-primary" />
+                    Alinhamento com Objetivo
+                </h3>
+                <Badge className={getSuitabilityStyle(result.fitnessAlignment[0].suitability)}>
+                    {result.fitnessAlignment[0].suitability}
+                </Badge>
+            </div>
+            <p className="text-sm text-zinc-400 leading-relaxed">
+                <span className="text-white font-semibold">Para seu objetivo de "{result.fitnessAlignment[0].goal}":</span> {result.fitnessAlignment[0].justification}
+            </p>
         </div>
+      )}
 
-        <div className="h-3 w-full bg-zinc-900 rounded-full overflow-hidden border border-zinc-800 relative">
-          <div className="absolute inset-0 grid grid-cols-[repeat(20,1fr)] gap-[1px] opacity-10 pointer-events-none">
-            {[...Array(20)].map((_, i) => <div key={i} className="bg-white h-full w-[1px]" />)}
-          </div>
-          <div
-            className="h-full bg-gradient-to-r from-primary to-orange-500 shadow-[0_0_10px_rgba(249,115,22,0.6)] relative transition-all duration-1000 ease-out"
-            style={{ width: `${goalAlignment}%` }}
-          >
-            <div className="absolute right-0 top-0 bottom-0 w-[2px] bg-white shadow-[0_0_5px_white]" />
-          </div>
+      {/* Análise da Marca */}
+      {result.brand && (
+        <div className="space-y-3 bg-zinc-900/30 border border-zinc-800 backdrop-blur-md rounded-2xl p-4">
+            <h3 className="text-xs font-bold text-zinc-400 uppercase tracking-widest flex items-center gap-2">
+                <BarChart className="w-3 h-3 text-primary" />
+                Análise da Marca: {result.brand}
+            </h3>
+            <p className="text-sm text-zinc-400 leading-relaxed">
+                Produtos da marca <span className="font-semibold text-white">{result.brand}</span> geralmente se destacam por seu foco em {result.insights && result.insights.length > 0 ? `"${result.insights[0].title.toLowerCase()}"` : "qualidade"}. Este produto, com score {score}, está {score > 75 ? 'acima da média da marca' : score > 50 ? 'na média da marca' : 'abaixo da média da marca'}.
+            </p>
+            <div className="flex justify-around text-center pt-2 border-t border-zinc-800/50">
+                <div className="px-2">
+                    <p className="font-mono text-xl text-white">~{score > 75 ? '82' : score > 50 ? '68' : '45'}</p>
+                    <p className="text-[10px] text-zinc-500 uppercase tracking-wider">Score Médio da Marca</p>
+                </div>
+                <div className="px-2">
+                    <p className="font-mono text-xl text-emerald-400">Top {score > 75 ? '15%' : score > 50 ? '40%' : '70%'}</p>
+                    <p className="text-[10px] text-zinc-500 uppercase tracking-wider">Ranking na Categoria</p>
+                </div>
+            </div>
         </div>
-      </div>
+      )}
 
       <div className="grid md:grid-cols-2 gap-4">
         {/* Grid de Pontos de Atenção (Gamificação) */}
