@@ -45,17 +45,17 @@ export function ScanDashboard({ onScan, isScanning = false }: ScanDashboardProps
       {/* Header do Terminal */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-black text-white tracking-tighter uppercase italic flex items-center gap-2">
+          <h1 className="text-3xl font-black text-foreground tracking-tighter uppercase italic flex items-center gap-2">
             Bio<span className="text-primary">Scanner</span>
             <Badge variant="outline" className="ml-2 border-primary/50 text-primary bg-primary/10 text-[10px] py-0 h-5">
               ONLINE
             </Badge>
           </h1>
-          <p className="text-zinc-500 text-sm font-medium">
+          <p className="text-muted-foreground text-sm font-medium">
             Terminal de análise nutricional avançada
           </p>
         </div>
-        <div className="hidden md:flex items-center gap-2 text-xs font-mono text-zinc-600">
+        <div className="hidden md:flex items-center gap-2 text-xs font-mono text-muted-foreground">
           <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
           SYSTEM_READY
         </div>
@@ -68,8 +68,8 @@ export function ScanDashboard({ onScan, isScanning = false }: ScanDashboardProps
         
         <Card 
           className={cn(
-            "relative bg-black border-2 border-dashed rounded-[2rem] h-[400px] flex flex-col items-center justify-center transition-all duration-300 overflow-hidden",
-            isDragging ? "border-primary bg-primary/5 scale-[1.01]" : "border-zinc-800 hover:border-primary/50 hover:bg-zinc-900/50"
+            "relative bg-card border-2 border-dashed rounded-[2rem] h-[400px] flex flex-col items-center justify-center transition-all duration-300 overflow-hidden",
+            isDragging ? "border-primary bg-primary/5 scale-[1.01]" : "border-border hover:border-primary/50 hover:bg-muted/50"
           )}
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
@@ -77,10 +77,10 @@ export function ScanDashboard({ onScan, isScanning = false }: ScanDashboardProps
         >
           {/* Grid Decorativo */}
           <div className="absolute inset-0 grid grid-cols-[repeat(40,1fr)] gap-1 opacity-[0.03] pointer-events-none">
-            {[...Array(40)].map((_, i) => <div key={i} className="bg-white h-full w-[1px]" />)}
+            {[...Array(40)].map((_, i) => <div key={i} className="bg-foreground h-full w-[1px]" />)}
           </div>
           <div className="absolute inset-0 grid grid-rows-[repeat(40,1fr)] gap-1 opacity-[0.03] pointer-events-none">
-            {[...Array(40)].map((_, i) => <div key={i} className="bg-white w-full h-[1px]" />)}
+            {[...Array(40)].map((_, i) => <div key={i} className="bg-foreground w-full h-[1px]" />)}
           </div>
 
           {/* Cantoneiras Tech */}
@@ -106,16 +106,16 @@ export function ScanDashboard({ onScan, isScanning = false }: ScanDashboardProps
                   <Loader2 className="w-16 h-16 text-primary animate-spin" />
                 </div>
                 <div className="space-y-1">
-                  <h3 className="text-xl font-bold text-white">Analisando Amostra...</h3>
-                  <p className="text-zinc-500 text-sm">Processando composição molecular</p>
+                  <h3 className="text-xl font-bold text-foreground">Analisando Amostra...</h3>
+                  <p className="text-muted-foreground text-sm">Processando composição molecular</p>
                 </div>
               </div>
             ) : (
               <>
                 <div className="relative group/icon cursor-pointer" onClick={() => fileInputRef.current?.click()}>
                   <div className="absolute inset-0 bg-primary rounded-full blur-2xl opacity-0 group-hover/icon:opacity-20 transition-opacity duration-500" />
-                  <div className="w-24 h-24 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center group-hover/icon:border-primary/50 group-hover/icon:scale-110 transition-all duration-300">
-                    <Scan className="w-10 h-10 text-zinc-400 group-hover/icon:text-primary transition-colors" />
+                  <div className="w-24 h-24 rounded-full bg-muted border border-border flex items-center justify-center group-hover/icon:border-primary/50 group-hover/icon:scale-110 transition-all duration-300">
+                    <Scan className="w-10 h-10 text-muted-foreground group-hover/icon:text-primary transition-colors" />
                   </div>
                   <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 bg-primary text-black text-[10px] font-bold px-2 py-0.5 rounded-full opacity-0 group-hover/icon:opacity-100 transition-all duration-300 translate-y-2 group-hover/icon:translate-y-0">
                     UPLOAD
@@ -123,10 +123,10 @@ export function ScanDashboard({ onScan, isScanning = false }: ScanDashboardProps
                 </div>
 
                 <div className="space-y-2 max-w-md">
-                  <h3 className="text-2xl font-bold text-white">
+                  <h3 className="text-2xl font-bold text-foreground">
                     Arraste ou Clique para Escanear
                   </h3>
-                  <p className="text-zinc-500 text-sm">
+                  <p className="text-muted-foreground text-sm">
                     Suporta JPG, PNG e WEBP. Análise instantânea via IA.
                   </p>
                 </div>
@@ -134,7 +134,7 @@ export function ScanDashboard({ onScan, isScanning = false }: ScanDashboardProps
                 <div className="flex gap-3 mt-4">
                   <Button 
                     variant="outline" 
-                    className="border-zinc-800 bg-black hover:bg-zinc-900 hover:text-primary hover:border-primary/30 transition-all"
+                    className="border-border bg-card hover:bg-muted hover:text-primary hover:border-primary/30 transition-all"
                     onClick={() => fileInputRef.current?.click()}
                   >
                     <Upload className="w-4 h-4 mr-2" />
@@ -166,15 +166,15 @@ export function ScanDashboard({ onScan, isScanning = false }: ScanDashboardProps
       {/* Footer / Histórico Recente (Mock) */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {[1, 2, 3].map((_, i) => (
-          <div key={i} className="bg-zinc-900/30 border border-zinc-800/50 rounded-xl p-4 flex items-center gap-3 hover:bg-zinc-900/50 hover:border-primary/20 transition-colors cursor-pointer group">
-            <div className="w-10 h-10 rounded-lg bg-zinc-800 flex items-center justify-center text-zinc-500 group-hover:text-primary group-hover:bg-primary/10 transition-colors">
+          <div key={i} className="bg-card/30 border border-border/50 rounded-xl p-4 flex items-center gap-3 hover:bg-muted/50 hover:border-primary/20 transition-colors cursor-pointer group">
+            <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center text-muted-foreground group-hover:text-primary group-hover:bg-primary/10 transition-colors">
               <History className="w-5 h-5" />
             </div>
             <div className="flex-1">
-              <p className="text-sm font-medium text-zinc-300 group-hover:text-white">Scan #{2409 + i}</p>
-              <p className="text-xs text-zinc-600">Há {i * 2 + 5} min</p>
+              <p className="text-sm font-medium text-foreground group-hover:text-primary">Scan #{2409 + i}</p>
+              <p className="text-xs text-muted-foreground">Há {i * 2 + 5} min</p>
             </div>
-            <ChevronRight className="w-4 h-4 text-zinc-700 group-hover:text-primary transition-colors" />
+            <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
           </div>
         ))}
       </div>

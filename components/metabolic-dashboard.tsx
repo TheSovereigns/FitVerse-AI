@@ -4,7 +4,7 @@ import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
-import { ArrowLeft, TrendingUp, Calendar, Flame, Beef, Cookie, Droplet, Sparkles } from "lucide-react"
+import { ArrowLeft, TrendingUp, Calendar, Flame, Beef, Cookie, Droplet, Sparkles, Utensils } from "lucide-react"
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts"
 import type { BioPerfil, MetabolicPlan } from "./metabolic-planner"
 
@@ -130,6 +130,35 @@ export function MetabolicDashboard({ plan, perfil, onBack }: MetabolicDashboardP
             </div>
           </div>
         </Card>
+
+        {plan.diet && (
+          <Card className="p-6">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                <Utensils className="w-6 h-6 text-primary" />
+              </div>
+              <div>
+                <h3 className="font-semibold text-lg">{plan.diet.title}</h3>
+                <p className="text-xs text-muted-foreground">{plan.diet.summary}</p>
+              </div>
+            </div>
+            <div className="space-y-4">
+              {plan.diet.meals.map((meal, index) => (
+                <div key={index} className="p-3 bg-muted/50 rounded-lg">
+                  <p className="font-bold text-sm text-foreground mb-1">{meal.name}</p>
+                  <ul className="space-y-1">
+                    {meal.items.map((item, itemIndex) => (
+                      <li key={itemIndex} className="flex items-start gap-2 text-sm text-muted-foreground">
+                        <div className="w-1.5 h-1.5 rounded-full bg-primary mt-1.5 shrink-0" />
+                        <span>{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+          </Card>
+        )}
 
         <Card className="p-6 bg-gradient-to-br from-card via-card to-primary/5 border-primary/20">
           <div className="flex items-center gap-3 mb-4">

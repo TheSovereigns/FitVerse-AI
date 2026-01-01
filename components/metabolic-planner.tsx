@@ -35,6 +35,14 @@ export interface MetabolicPlan {
     explanation: string
     macroTips?: string[]
   }
+  diet?: {
+    title: string;
+    summary: string;
+    meals: {
+      name: string;
+      items: string[];
+    }[];
+  }
 }
 
 interface MetabolicPlannerProps {
@@ -60,6 +68,8 @@ export function MetabolicPlanner({ onPlanCreated }: MetabolicPlannerProps) {
     setPlan(null) // Limpa o plano anterior
     
     try {
+      // A chamada à API agora é a fonte da verdade para o plano metabólico,
+      // incluindo a previsão e a dieta, garantindo resultados dinâmicos.
       const response = await fetch('/api/generate-metabolic-plan', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -72,7 +82,7 @@ export function MetabolicPlanner({ onPlanCreated }: MetabolicPlannerProps) {
       }
 
       const generatedPlan: MetabolicPlan = await response.json();
-
+      
       setPlan(generatedPlan)
       onPlanCreated(generatedPlan)
       setShowDashboard(true)

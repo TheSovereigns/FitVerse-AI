@@ -130,7 +130,7 @@ export function RecipesSection({ productName, dietProfile }: RecipesSectionProps
                   </div>
                   <div className="flex items-center gap-1">
                     <Users className="w-3 h-3" />
-                    {recipe.servings}x
+                  {recipe.servings || 1}x
                   </div>
                   <div className="flex items-center gap-1">
                     <Flame className="w-3 h-3" />
@@ -176,10 +176,7 @@ export function RecipesSection({ productName, dietProfile }: RecipesSectionProps
 
       {selectedRecipe && showRecipeModal && (
         <RecipeModal
-          recipe={{
-            ...selectedRecipe,
-            biohackingTips: selectedRecipe.biohackingTips || [],
-          }}
+          recipe={selectedRecipe}
           onClose={() => {
             setShowRecipeModal(false)
             setSelectedRecipe(null)

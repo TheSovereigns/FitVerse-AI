@@ -6,20 +6,21 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { Badge } from "@/components/ui/badge"
 import { Clock, Flame, ChefHat, Utensils, Activity, CheckCircle2, Sparkles } from "lucide-react"
 
-interface Recipe {
-  name: string
-  prepTime: string
-  difficulty: "Fácil" | "Médio" | "Difícil"
+type Recipe = { // Tipo unificado para consistência
+  name: string;
+  prepTime: string;
+  difficulty: "Fácil" | "Médio" | "Difícil";
   macros: {
-    calories: number
-    protein: number
-    carbs: number
-    fat: number
-  }
-  ingredients: string[]
-  instructions: string[]
-  biohackingTips: string[]
-  description?: string
+    calories: number;
+    protein: number;
+    carbs: number;
+    fat: number;
+  };
+  ingredients: string[];
+  instructions: string[];
+  biohackingTips?: string[];
+  description?: string;
+  servings?: number;
 }
 
 interface RecipeModalProps {

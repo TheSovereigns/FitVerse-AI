@@ -7,20 +7,21 @@ import { Label } from "@/components/ui/label"
 import { RecipeModal } from "@/components/recipe-modal"
 import { ChefHat, Clock, Target, Flame, Search, Loader2, ArrowRight } from "lucide-react"
 
-type Recipe = {
-  name: string
-  prepTime: string
-  difficulty: "Fácil" | "Médio" | "Difícil"
+type Recipe = { // Tipo unificado para consistência
+  name: string;
+  prepTime: string;
+  difficulty: "Fácil" | "Médio" | "Difícil";
   macros: {
-    calories: number
-    protein: number
-    carbs: number
-    fat: number
-  }
-  ingredients: string[]
-  instructions: string[]
-  biohackingTips: string[]
-  description?: string // Added description field
+    calories: number;
+    protein: number;
+    carbs: number;
+    fat: number;
+  };
+  ingredients: string[];
+  instructions: string[];
+  biohackingTips?: string[];
+  description?: string;
+  servings?: number;
 }
 
 type RecipesTabProps = {
