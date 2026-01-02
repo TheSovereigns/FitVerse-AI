@@ -14,7 +14,7 @@ import { RecipesTab } from "@/components/recipes-tab"
 import { TrainingTab } from "@/components/training-tab"
 import { SettingsPage } from "@/components/settings-page"
 import { StoreTab } from "@/components/store-tab"
-import { Home, ScanLine, User, Calculator, ChefHat, Dumbbell, Loader2, LayoutDashboard, ShoppingBag, Settings } from "lucide-react"
+import { Home, ScanLine, User, Calculator, ChefHat, Dumbbell, Loader2, LayoutDashboard, ShoppingBag, Settings, Crown } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 type View = "dashboard" | "result" | "recipes" | "training" | "profile" | "planner" | "settings" | "store"
@@ -210,7 +210,7 @@ export default function HomePage() {
           <div className="md:hidden font-bold text-xl flex items-center gap-2 text-foreground"><ScanLine className="text-primary" /><span>FitVerse</span></div>
           <div className="hidden md:block text-sm font-medium text-muted-foreground">Bem-vindo de volta, Atleta.</div>
           <div className="flex items-center gap-3">
-             <Button variant="ghost" size="sm" onClick={() => router.push("/admin-login")} className="text-xs text-muted-foreground hover:text-foreground transition-all duration-300 ease-in-out">Admin</Button>             
+             <Button variant="ghost" size="sm" onClick={() => router.push("/admin-login")} className="text-xs text-muted-foreground hover:text-foreground transition-all duration-300 ease-in-out">Admin</Button>
              <div className="w-8 h-8 rounded-full bg-accent border border-border flex items-center justify-center overflow-hidden cursor-pointer" onClick={() => setCurrentView("profile")}><User className="w-4 h-4 text-muted-foreground" /></div>
           </div>
         </header>
@@ -222,8 +222,8 @@ export default function HomePage() {
         {currentView === "training" && <TrainingTab />}
         {currentView === "planner" && <MetabolicPlanner onPlanCreated={setUserMetabolicPlan} />}
         {currentView === "store" && <StoreTab />}
-        {currentView === "settings" && <SettingsPage />}
-        {currentView === "profile" && (<div className="pt-4"><HealthProfile scanHistory={scanHistory} /></div>)}
+        {currentView === "settings" && <SettingsPage onBack={() => setCurrentView("profile")} />}
+        {currentView === "profile" && (<div className="pt-4"><HealthProfile scanHistory={scanHistory} onNavigateToSettings={() => setCurrentView("settings")} onNavigateToSubscription={() => router.push('/subscription')} /></div>)}
         </main>
       </div>
 
@@ -238,13 +238,12 @@ export default function HomePage() {
 
       {/* Mobile Bottom Nav */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-card/90 backdrop-blur-lg border-t border-border z-50 pb-safe">
-        <div className="flex items-center justify-around px-1 py-3 max-w-lg mx-auto">
-          <Button variant="ghost" size="sm" onClick={() => setCurrentView("dashboard")} className={`flex flex-col items-center gap-1 h-auto py-2 transition-all duration-300 ease-in-out ${currentView === "dashboard" ? "text-primary" : "text-muted-foreground hover:text-foreground"}`}><Home className="w-5 h-5" /><span className="text-[10px] font-medium">Início</span></Button>
-          <Button variant="ghost" size="sm" onClick={() => setCurrentView("training")} className={`flex flex-col items-center gap-1 h-auto py-2 transition-all duration-300 ease-in-out ${currentView === "training" ? "text-primary" : "text-muted-foreground hover:text-foreground"}`}><Dumbbell className="w-5 h-5" /><span className="text-[10px] font-medium">NutriTrain</span></Button>
-          <Button variant="ghost" size="sm" onClick={handleNavScan} className="flex flex-col items-center gap-1 h-auto py-2 text-muted-foreground relative -mt-4"><div className="absolute -top-6 left-1/2 -translate-x-1/2 w-16 h-16 rounded-full bg-gradient-to-br from-primary to-primary/90 flex items-center justify-center shadow-xl shadow-primary/30 transition-transform active:scale-95 hover:scale-105 border-4 border-background"><ScanLine className="w-7 h-7 text-primary-foreground" /></div><span className="text-[10px] font-medium mt-10">Scan</span></Button>
-          <Button variant="ghost" size="sm" onClick={() => setCurrentView("planner")} className={`flex flex-col items-center gap-1 h-auto py-2 transition-all duration-300 ease-in-out ${currentView === "planner" ? "text-primary" : "text-muted-foreground hover:text-foreground"}`}><Calculator className="w-5 h-5" /><span className="text-[10px] font-medium">Dieta AI</span></Button>
-          <Button variant="ghost" size="sm" onClick={() => setCurrentView("store")} className={`flex flex-col items-center gap-1 h-auto py-2 transition-all duration-300 ease-in-out ${currentView === "store" ? "text-primary" : "text-muted-foreground hover:text-foreground"}`}><ShoppingBag className="w-5 h-5" /><span className="text-[10px] font-medium">Loja</span></Button>
-          <Button variant="ghost" size="sm" onClick={() => setCurrentView("profile")} className={`flex flex-col items-center gap-1 h-auto py-2 transition-all duration-300 ease-in-out ${currentView === "profile" ? "text-primary" : "text-muted-foreground hover:text-foreground"}`}><User className="w-5 h-5" /><span className="text-[10px] font-medium">Perfil</span></Button>
+        <div className="flex items-center justify-around px-1 py-1.5 max-w-lg mx-auto">
+          <Button variant="ghost" size="sm" onClick={() => setCurrentView("dashboard")} className={`flex flex-col items-center gap-0.5 h-auto p-1 transition-all duration-300 ease-in-out ${currentView === "dashboard" ? "text-primary" : "text-muted-foreground hover:text-foreground"}`}><Home className="w-5 h-5" /><span className="text-[9px] font-medium">Início</span></Button>
+          <Button variant="ghost" size="sm" onClick={() => setCurrentView("training")} className={`flex flex-col items-center gap-0.5 h-auto p-1 transition-all duration-300 ease-in-out ${currentView === "training" ? "text-primary" : "text-muted-foreground hover:text-foreground"}`}><Dumbbell className="w-5 h-5" /><span className="text-[9px] font-medium">NutriTrain</span></Button>
+          <Button variant="ghost" size="sm" onClick={handleNavScan} className="flex flex-col items-center gap-0.5 h-auto p-1 text-muted-foreground relative -mt-4"><div className="absolute -top-6 left-1/2 -translate-x-1/2 w-16 h-16 rounded-full bg-gradient-to-br from-primary to-primary/90 flex items-center justify-center shadow-xl shadow-primary/30 transition-transform active:scale-95 hover:scale-105 border-4 border-background"><ScanLine className="w-7 h-7 text-primary-foreground" /></div><span className="text-[10px] font-medium mt-10">Scan</span></Button>
+          <Button variant="ghost" size="sm" onClick={() => setCurrentView("planner")} className={`flex flex-col items-center gap-0.5 h-auto p-1 transition-all duration-300 ease-in-out ${currentView === "planner" ? "text-primary" : "text-muted-foreground hover:text-foreground"}`}><Calculator className="w-5 h-5" /><span className="text-[9px] font-medium">Dieta AI</span></Button>
+          <Button variant="ghost" size="sm" onClick={() => setCurrentView("profile")} className={`flex flex-col items-center gap-0.5 h-auto p-1 transition-all duration-300 ease-in-out ${currentView === "profile" ? "text-primary" : "text-muted-foreground hover:text-foreground"}`}><User className="w-5 h-5" /><span className="text-[9px] font-medium">Perfil</span></Button>
         </div>
       </nav>
     </div>

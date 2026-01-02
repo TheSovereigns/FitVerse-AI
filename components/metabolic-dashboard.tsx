@@ -28,7 +28,7 @@ export function MetabolicDashboard({ plan, perfil, onBack }: MetabolicDashboardP
   }
 
   return (
-    <div className="px-4 pt-8 pb-24">
+    <div className="px-4 md:px-6 pt-8 pb-24 w-full max-w-4xl mx-auto grid place-items-center">
       <div className="flex items-center gap-3 mb-6">
         <Button variant="ghost" size="icon" onClick={onBack} className="h-10 w-10 rounded-full">
           <ArrowLeft className="w-5 h-5" />
@@ -39,15 +39,15 @@ export function MetabolicDashboard({ plan, perfil, onBack }: MetabolicDashboardP
         </div>
       </div>
 
-      <div className="space-y-4">
-        <Card className="p-6 bg-gradient-to-br from-primary/90 to-primary text-primary-foreground border-0 shadow-lg shadow-primary/20">
+      <div className="space-y-6 w-full">
+        <Card className="p-6 bg-gradient-to-br from-primary/90 to-primary text-primary-foreground border-0 shadow-lg shadow-primary/20 relative overflow-visible mt-8">
           <div className="flex items-start justify-between mb-4">
             <div>
               <p className="text-primary-foreground/70 text-sm mb-1">Meta Diária</p>
               <p className="text-4xl font-bold">{Math.round(plan.macros.calories)}</p>
               <p className="text-sm text-primary-foreground/80 mt-1">calorias</p>
             </div>
-            <div className="w-14 h-14 rounded-full bg-primary-foreground/10 backdrop-blur-sm flex items-center justify-center">
+            <div className="w-20 h-20 rounded-full bg-primary-foreground/10 backdrop-blur-sm flex items-center justify-center border-4 border-primary-foreground/20 absolute -top-8 right-6 shadow-xl">
               <Flame className="w-7 h-7 text-primary-foreground" />
             </div>
           </div>
@@ -196,7 +196,7 @@ export function MetabolicDashboard({ plan, perfil, onBack }: MetabolicDashboardP
                 ))}
               </div>
             )}
-            <Progress value={15} className="h-2" />
+            <Progress value={15} className="h-2 w-full bg-muted" indicatorClassName="bg-primary" />
             <p className="text-xs text-muted-foreground text-center">Sua jornada está apenas começando!</p>
           </div>
         </Card>

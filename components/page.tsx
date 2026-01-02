@@ -4,6 +4,7 @@ import { useState } from "react"
 import { loadStripe } from "@stripe/stripe-js"
 import { Button } from "@/components/ui/button"
 import { CheckCircle2, Zap, ArrowRight, Loader2 } from "lucide-react"
+import { toast } from "sonner"
 
 // Inicialize o Stripe fora do componente para evitar recriação
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
@@ -24,7 +25,9 @@ export default function SubscriptionPage() {
 
   const handleCheckout = async () => {
     if (!STRIPE_PRICE_ID || !STRIPE_PRICE_ID.startsWith("price_")) {
-      alert("Por favor, configure o 'STRIPE_PRICE_ID' com um ID de preço válido do Stripe no arquivo da página de assinatura.");
+      toast.error("ID de Preço do Stripe não configurado.", {
+        description: "Por favor, configure o 'STRIPE_PRICE_ID' com um ID de preço válido.",
+      });
       return;
     }
 
@@ -38,19 +41,23 @@ export default function SubscriptionPage() {
 
       const data = await response.json();
       
-      if (!response.ok) throw new Error(data.message || "Falha ao criar a sessão de checkout.");
+      if (!response.ok) throw new Error(data.message || "Falha ao criar a sessão de checkout. Verifique o backend.");
 
       const stripe = await stripePromise;
       if (stripe) {
         const { error } = await stripe.redirectToCheckout({ sessionId: data.sessionId });
         if (error) {
           console.error("Erro ao redirecionar para o Stripe:", error);
-          alert(error.message);
+          toast.error("Erro ao redirecionar para o pagamento.", {
+            description: error.message,
+          });
         }
       }
     } catch (error) {
       console.error("Erro no checkout:", error);
-      alert(error instanceof Error ? error.message : "Ocorreu um erro desconhecido.");
+      toast.error("Ocorreu um erro no checkout.", {
+        description: error instanceof Error ? error.message : "Ocorreu um erro desconhecido.",
+      });
     } finally {
       setIsLoading(false);
     }

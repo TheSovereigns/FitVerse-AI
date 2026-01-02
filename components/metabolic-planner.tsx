@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Activity, TrendingUp, Target, Zap, ArrowRight, Loader2 } from "lucide-react"
+import { Activity, TrendingUp, Target, Zap, ArrowRight, Loader2, FileText } from "lucide-react"
 import { MetabolicDashboard } from "./metabolic-dashboard"
 
 export interface BioPerfil {
@@ -53,6 +53,7 @@ export function MetabolicPlanner({ onPlanCreated }: MetabolicPlannerProps) {
   const [showDashboard, setShowDashboard] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [plan, setPlan] = useState<MetabolicPlan | null>(null)
+  const [observations, setObservations] = useState("")
   const [perfil, setPerfil] = useState<BioPerfil>({
     age: 0,
     weight: 0,
@@ -73,76 +74,20 @@ export function MetabolicPlanner({ onPlanCreated }: MetabolicPlannerProps) {
     setIsLoading(true)
     setPlan(null) // Limpa o plano anterior
 
-    // Simula o tempo de processamento da IA
-    await new Promise(resolve => setTimeout(resolve, 1500))
-    
     try {
-      // --- Lógica de Geração Local (Cálculos) ---
-      // 1. Calcular TMB (Taxa Metabólica Basal) - Fórmula de Mifflin-St Jeor
-      let tmb = (10 * perfil.weight) + (6.25 * perfil.height) - (5 * perfil.age)
-      tmb += perfil.gender === 'male' ? 5 : -161
+      // Reativando a chamada à API para gerar um plano verdadeiramente personalizado
+      const response = await fetch('/api/generate-metabolic-plan', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ perfil, observations }), // Enviando o perfil e as observações
+      });
 
-      // 2. Calcular Gasto Energético Total (GET)
-      const activityMultipliers = {
-        sedentary: 1.2,
-        moderate: 1.55,
-        active: 1.725,
-        athlete: 1.9,
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Falha na geração do plano metabólico pela IA');
       }
-      let get = tmb * activityMultipliers[perfil.activityLevel]
 
-      // 3. Ajustar calorias com base no objetivo
-      let finalCalories = get
-      if (perfil.goal === 'lose_weight') finalCalories -= 500
-      if (perfil.goal === 'gain_muscle') finalCalories += 500
-
-      // 4. Gerar plano de macros
-      const proteinGrams = perfil.goal === 'gain_muscle' ? perfil.weight * 2.2 : perfil.weight * 1.8
-      const proteinCalories = proteinGrams * 4
-      const fatGrams = perfil.weight * 1 // 1g of fat per kg of body weight
-      const fatCalories = fatGrams * 9
-      const carbCalories = finalCalories - proteinCalories - fatCalories
-      const carbGrams = carbCalories / 4
-
-      const goalLabels = { lose_weight: "Emagrecer", gain_muscle: "Ganhar Massa", maintenance: "Manutenção" }
-      const goalText = perfil.goal === 'lose_weight' ? 'déficit' : perfil.goal === 'gain_muscle' ? 'superávit' : 'equilíbrio';
-
-      const dietExamples = {
-        lose_weight: { breakfast: ["Ovos mexidos com espinafre", "Café preto sem açúcar"], lunch: ["Peito de frango grelhado (150g)", "Salada de folhas verdes à vontade", "Quinoa (4 colheres de sopa)"], snack: ["Iogurte grego natural", "Um punhado de amêndoas"], dinner: ["Salmão assado com brócolis no vapor", "Batata doce pequena"], },
-        gain_muscle: { breakfast: ["Shake de Whey Protein com aveia e banana", "Pasta de amendoim (1 colher)"], lunch: ["Arroz integral (6 colheres de sopa)", "Feijão (1 concha)", "Patinho moído (180g)", "Salada"], snack: ["Ovos cozidos (3 unidades)", "Castanhas"], dinner: ["Macarrão integral com frango desfiado (180g) e molho de tomate", "Queijo cottage"], },
-        maintenance: { breakfast: ["Tapioca com queijo branco e peito de peru", "Suco de laranja natural"], lunch: ["Filé de tilápia (150g)", "Arroz 7 grãos", "Legumes cozidos"], snack: ["Frutas com aveia e mel"], dinner: ["Sopa de legumes com carne magra", "Pão integral"], }
-      };
-
-      const generatedPlan: MetabolicPlan = {
-        macros: {
-          calories: Math.round(finalCalories),
-          protein: Math.round((proteinCalories / finalCalories) * 100),
-          carbs: Math.round((carbCalories / finalCalories) * 100),
-          fat: Math.round((fatCalories / finalCalories) * 100),
-          proteinGrams: Math.round(proteinGrams),
-          carbsGrams: Math.round(carbGrams),
-          fatGrams: Math.round(fatGrams),
-        },
-        prediction: {
-          weeks: 12,
-          explanation: `Com base em um ${goalText} calórico consistente de aproximadamente ${Math.abs(Math.round(finalCalories - get))} kcal e uma ingestão proteica otimizada de ${Math.round(proteinGrams)}g, seu corpo começará a se adaptar nas primeiras semanas, otimizando o uso de energia e a síntese proteica para seu objetivo de ${goalLabels[perfil.goal]}.`,
-          macroTips: [
-            "Priorize fontes de proteína magra como frango, peixe e ovos.",
-            "Consuma carboidratos complexos como batata doce e aveia para energia sustentada.",
-            "Inclua gorduras saudáveis como abacate e nozes para suporte hormonal."
-          ]
-        },
-        diet: {
-          title: `Exemplo de Dieta para ${goalLabels[perfil.goal]}`,
-          summary: `Este é um plano alimentar exemplo, focado em atingir suas metas de ${Math.round(finalCalories)} kcal com alimentos nutritivos.`,
-          meals: [
-            { name: "Café da Manhã", items: dietExamples[perfil.goal].breakfast },
-            { name: "Almoço", items: dietExamples[perfil.goal].lunch },
-            { name: "Lanche da Tarde", items: dietExamples[perfil.goal].snack },
-            { name: "Jantar", items: dietExamples[perfil.goal].dinner },
-          ]
-        }
-      }
+      const generatedPlan: MetabolicPlan = await response.json();
       
       setPlan(generatedPlan)
       onPlanCreated(generatedPlan)
@@ -329,6 +274,25 @@ export function MetabolicPlanner({ onPlanCreated }: MetabolicPlannerProps) {
               </button>
             ))}
           </div>
+          </div>
+
+          {/* Seção 3: Observações Adicionais */}
+          <div>
+            <div className="flex items-center gap-4 mb-6">
+              <div className="w-14 h-14 rounded-full bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-[0_0_20px_rgba(255,140,0,0.3)]">
+                <FileText className="w-6 h-6 text-black" />
+              </div>
+              <div>
+                <h3 className="font-black text-xl uppercase tracking-tight text-foreground">Observações</h3>
+                <p className="text-xs text-muted-foreground font-bold tracking-wider uppercase">Restrições e Preferências</p>
+              </div>
+            </div>
+            <textarea
+              value={observations}
+              onChange={(e) => setObservations(e.target.value)}
+              placeholder="Ex: Sou vegano, tenho alergia a glúten, não gosto de peixe..."
+              className="w-full min-h-[100px] p-4 rounded-xl bg-muted/50 border border-input text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all resize-none text-sm"
+            />
           </div>
 
           <Button

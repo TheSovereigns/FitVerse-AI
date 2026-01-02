@@ -64,15 +64,15 @@ export function ProductResult({ result, onBack, imageData }: ProductResultProps)
   }
 
   return (
-    <div className="w-full max-w-4xl mx-auto space-y-6 p-4 bg-black text-zinc-100 rounded-3xl border border-zinc-800/50 shadow-2xl animate-in fade-in duration-500">
+    <div className="w-full max-w-4xl mx-auto space-y-6 p-4 bg-card text-card-foreground rounded-3xl border border-border shadow-2xl animate-in fade-in duration-500">
       <div className="flex">
-        <Button variant="ghost" size="icon" onClick={onBack} className="rounded-full text-zinc-400 hover:bg-zinc-800 hover:text-white">
+        <Button variant="ghost" size="icon" onClick={onBack} className="rounded-full text-muted-foreground hover:bg-accent hover:text-accent-foreground">
           <ArrowLeft className="w-6 h-6" />
         </Button>
       </div>
 
       {/* Header de Produto - Banner Centralizado */}
-      <div className="relative overflow-hidden rounded-2xl bg-zinc-900/30 border border-zinc-800 backdrop-blur-md p-6 group">
+      <div className="relative overflow-hidden rounded-2xl bg-muted/30 border border-border backdrop-blur-md p-6 group">
         {/* Cantoneiras Laranjas (Visual de Laboratório) */}
         <div className="absolute top-0 left-0 w-6 h-6 border-t-2 border-l-2 border-primary opacity-80" />
         <div className="absolute top-0 right-0 w-6 h-6 border-t-2 border-r-2 border-primary opacity-80" />
@@ -85,10 +85,10 @@ export function ProductResult({ result, onBack, imageData }: ProductResultProps)
               BIO-SCANNER v2.0
             </Badge>
             <div>
-              <h1 className="text-3xl md:text-4xl font-black text-white tracking-tighter uppercase italic">
+              <h1 className="text-3xl md:text-4xl font-black text-foreground tracking-tighter uppercase italic">
                 {productName}
               </h1>
-              <p className="text-primary font-bold text-lg -mt-1">
+              <p className="text-muted-foreground font-bold text-lg -mt-1">
                 {result.brand || 'Marca Genérica'}
               </p>
             </div>
@@ -97,8 +97,8 @@ export function ProductResult({ result, onBack, imageData }: ProductResultProps)
           {/* Score Circular Pulsante */}
           <div className="relative">
             <div className="absolute inset-0 bg-primary rounded-full blur-2xl opacity-20 animate-pulse" />
-            <div className="relative w-24 h-24 rounded-full border-[3px] border-primary flex flex-col items-center justify-center bg-black/80 shadow-[0_0_30px_rgba(249,115,22,0.3)]">
-              <span className="text-4xl font-black text-white leading-none">{score}</span>
+            <div className="relative w-24 h-24 rounded-full border-[3px] border-primary flex flex-col items-center justify-center bg-background/80 shadow-[0_0_30px_rgba(249,115,22,0.3)]">
+              <span className="text-4xl font-black text-foreground leading-none">{score}</span>
               <span className="text-[9px] text-primary font-bold uppercase tracking-widest mt-1">Score</span>
             </div>
           </div>
@@ -109,36 +109,36 @@ export function ProductResult({ result, onBack, imageData }: ProductResultProps)
       {result.macros && (result.macros.calories > 0 || result.macros.protein > 0 || result.macros.carbs > 0 || result.macros.fat > 0) && (
         <div className="space-y-2">
           <div className="grid grid-cols-4 gap-3">
-            <div className="bg-zinc-900/30 border border-zinc-800 backdrop-blur-md rounded-xl p-3 flex flex-col items-center justify-center gap-1 group hover:border-primary/50 transition-colors">
+            <div className="bg-muted/30 border border-border backdrop-blur-md rounded-xl p-3 flex flex-col items-center justify-center gap-1 group hover:border-primary/50 transition-colors">
               <Flame className="w-4 h-4 text-primary mb-1" />
-              <span className="text-lg font-bold text-white">{result.macros.calories}</span>
-              <span className="text-[10px] text-zinc-500 uppercase tracking-wider">Kcal</span>
+              <span className="text-lg font-bold text-foreground">{result.macros.calories}</span>
+              <span className="text-[10px] text-muted-foreground uppercase tracking-wider">Kcal</span>
             </div>
-            <div className="bg-zinc-900/30 border border-zinc-800 backdrop-blur-md rounded-xl p-3 flex flex-col items-center justify-center gap-1 group hover:border-primary/50 transition-colors">
+            <div className="bg-muted/30 border border-border backdrop-blur-md rounded-xl p-3 flex flex-col items-center justify-center gap-1 group hover:border-primary/50 transition-colors">
               <Dumbbell className="w-4 h-4 text-primary mb-1" />
-              <span className="text-lg font-bold text-white">{result.macros.protein}g</span>
-              <span className="text-[10px] text-zinc-500 uppercase tracking-wider">Prot</span>
+              <span className="text-lg font-bold text-foreground">{result.macros.protein}g</span>
+              <span className="text-[10px] text-muted-foreground uppercase tracking-wider">Prot</span>
             </div>
-            <div className="bg-zinc-900/30 border border-zinc-800 backdrop-blur-md rounded-xl p-3 flex flex-col items-center justify-center gap-1 group hover:border-primary/50 transition-colors">
+            <div className="bg-muted/30 border border-border backdrop-blur-md rounded-xl p-3 flex flex-col items-center justify-center gap-1 group hover:border-primary/50 transition-colors">
               <Wheat className="w-4 h-4 text-primary mb-1" />
-              <span className="text-lg font-bold text-white">{result.macros.carbs}g</span>
-              <span className="text-[10px] text-zinc-500 uppercase tracking-wider">Carb</span>
+              <span className="text-lg font-bold text-foreground">{result.macros.carbs}g</span>
+              <span className="text-[10px] text-muted-foreground uppercase tracking-wider">Carb</span>
             </div>
-            <div className="bg-zinc-900/30 border border-zinc-800 backdrop-blur-md rounded-xl p-3 flex flex-col items-center justify-center gap-1 group hover:border-primary/50 transition-colors">
+            <div className="bg-muted/30 border border-border backdrop-blur-md rounded-xl p-3 flex flex-col items-center justify-center gap-1 group hover:border-primary/50 transition-colors">
               <Droplets className="w-4 h-4 text-primary mb-1" />
-              <span className="text-lg font-bold text-white">{result.macros.fat}g</span>
-              <span className="text-[10px] text-zinc-500 uppercase tracking-wider">Gord</span>
+              <span className="text-lg font-bold text-foreground">{result.macros.fat}g</span>
+              <span className="text-[10px] text-muted-foreground uppercase tracking-wider">Gord</span>
             </div>
           </div>
-          <p className="text-center text-xs text-zinc-600 font-mono pt-1">Valores por porção de {result.servingSize || "100g"}</p>
+          <p className="text-center text-xs text-muted-foreground font-mono pt-1">Valores por porção de {result.servingSize || "100g"}</p>
         </div>
       )}
 
       {/* Alinhamento com Objetivos */}
       {result.fitnessAlignment && result.fitnessAlignment.length > 0 && (
-        <div className="space-y-2 bg-zinc-900/30 border border-zinc-800 backdrop-blur-md rounded-2xl p-4">
+        <div className="space-y-2 bg-muted/30 border border-border backdrop-blur-md rounded-2xl p-4">
             <div className="flex justify-between items-center">
-                <h3 className="text-xs font-bold text-zinc-400 uppercase tracking-widest flex items-center gap-2">
+                <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-2">
                     <Target className="w-3 h-3 text-primary" />
                     Alinhamento com Objetivo
                 </h3>
@@ -146,30 +146,30 @@ export function ProductResult({ result, onBack, imageData }: ProductResultProps)
                     {result.fitnessAlignment[0].suitability}
                 </Badge>
             </div>
-            <p className="text-sm text-zinc-400 leading-relaxed">
-                <span className="text-white font-semibold">Para seu objetivo de "{result.fitnessAlignment[0].goal}":</span> {result.fitnessAlignment[0].justification}
+            <p className="text-sm text-muted-foreground leading-relaxed">
+                <span className="text-foreground font-semibold">Para seu objetivo de "{result.fitnessAlignment[0].goal}":</span> {result.fitnessAlignment[0].justification}
             </p>
         </div>
       )}
 
       {/* Análise da Marca */}
       {result.brand && (
-        <div className="space-y-3 bg-zinc-900/30 border border-zinc-800 backdrop-blur-md rounded-2xl p-4">
-            <h3 className="text-xs font-bold text-zinc-400 uppercase tracking-widest flex items-center gap-2">
+        <div className="space-y-3 bg-muted/30 border border-border backdrop-blur-md rounded-2xl p-4">
+            <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-2">
                 <BarChart className="w-3 h-3 text-primary" />
                 Análise da Marca: {result.brand}
             </h3>
-            <p className="text-sm text-zinc-400 leading-relaxed">
-                Produtos da marca <span className="font-semibold text-white">{result.brand}</span> geralmente se destacam por seu foco em {result.insights && result.insights.length > 0 ? `"${result.insights[0].title.toLowerCase()}"` : "qualidade"}. Este produto, com score {score}, está {score > 75 ? 'acima da média da marca' : score > 50 ? 'na média da marca' : 'abaixo da média da marca'}.
+            <p className="text-sm text-muted-foreground leading-relaxed">
+                Produtos da marca <span className="font-semibold text-foreground">{result.brand}</span> geralmente se destacam por seu foco em {result.insights && result.insights.length > 0 ? `"${result.insights[0].title.toLowerCase()}"` : "qualidade"}. Este produto, com score {score}, está {score > 75 ? 'acima da média da marca' : score > 50 ? 'na média da marca' : 'abaixo da média da marca'}.
             </p>
-            <div className="flex justify-around text-center pt-2 border-t border-zinc-800/50">
+            <div className="flex justify-around text-center pt-2 border-t border-border/50">
                 <div className="px-2">
-                    <p className="font-mono text-xl text-white">~{score > 75 ? '82' : score > 50 ? '68' : '45'}</p>
-                    <p className="text-[10px] text-zinc-500 uppercase tracking-wider">Score Médio da Marca</p>
+                    <p className="font-mono text-xl text-foreground">~{score > 75 ? '82' : score > 50 ? '68' : '45'}</p>
+                    <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Score Médio da Marca</p>
                 </div>
                 <div className="px-2">
                     <p className="font-mono text-xl text-emerald-400">Top {score > 75 ? '15%' : score > 50 ? '40%' : '70%'}</p>
-                    <p className="text-[10px] text-zinc-500 uppercase tracking-wider">Ranking na Categoria</p>
+                    <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Ranking na Categoria</p>
                 </div>
             </div>
         </div>
@@ -178,7 +178,7 @@ export function ProductResult({ result, onBack, imageData }: ProductResultProps)
       <div className="grid md:grid-cols-2 gap-4">
         {/* Grid de Pontos de Atenção (Gamificação) */}
         <div className="space-y-3">
-          <h3 className="text-xs font-bold text-zinc-400 uppercase tracking-widest flex items-center gap-2 pl-1">
+          <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-2 pl-1">
             <AlertTriangle className="w-3 h-3 text-red-500" />
             Alertas
           </h3>
@@ -194,7 +194,7 @@ export function ProductResult({ result, onBack, imageData }: ProductResultProps)
 
         {/* Grid de Benefícios */}
         <div className="space-y-3">
-          <h3 className="text-xs font-bold text-zinc-400 uppercase tracking-widest flex items-center gap-2 pl-1">
+          <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-2 pl-1">
             <ShieldCheck className="w-3 h-3 text-emerald-500" />
             Benefícios
           </h3>

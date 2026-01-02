@@ -33,9 +33,9 @@ const SelectionGroup = ({
         <button
           key={option}
           onClick={() => onChange(option)}
-          className={`
-            px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ease-in-out border
-            ${value === option
+          className={`px-3 md:px-4 py-2 rounded-full text-xs md:text-sm font-medium transition-all duration-300 ease-in-out border
+            ${
+              value === option
               ? "bg-primary text-primary-foreground border-primary shadow-[0_0_10px_rgba(255,140,0,0.4)]"
               : "bg-card text-muted-foreground border-border hover:border-primary/50 hover:text-foreground"
             }
@@ -66,9 +66,8 @@ export function WorkoutGenerator({ onGenerate, isLoading }: WorkoutGeneratorProp
   }
 
   return (
-    <div className="w-full max-w-4xl mx-auto space-y-8 p-1">
-      <div className="space-y-8">
-        <div className="grid md:grid-cols-2 gap-8">
+    <div className="w-full space-y-6 md:space-y-8">
+        <div className="grid md:grid-cols-2 gap-6 md:gap-8">
           {/* Coluna 1 */}
           <div className="space-y-6">
             <SelectionGroup 
@@ -107,7 +106,6 @@ export function WorkoutGenerator({ onGenerate, isLoading }: WorkoutGeneratorProp
             />
           </div>
         </div>
-
         {/* Campo de Observações */}
         <div className="space-y-3">
           <div className="flex items-center gap-2 text-primary font-semibold text-sm uppercase tracking-wider">
@@ -155,7 +153,6 @@ export function WorkoutGenerator({ onGenerate, isLoading }: WorkoutGeneratorProp
             </div>
           )}
         </div>
-      </div>
     </div>
   )
 }

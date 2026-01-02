@@ -30,7 +30,7 @@ interface RecipeModalProps {
 export function RecipeModal({ recipe, onClose }: RecipeModalProps) {
   return (
     <Dialog open={true} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-3xl max-h-[90vh] flex flex-col p-0 gap-0 bg-zinc-950/50 backdrop-blur-xl border border-primary shadow-[0_0_30px_rgba(249,115,22,0.3)] rounded-2xl" showCloseButton={false}>
+      <DialogContent className="max-w-4xl w-full max-h-[90vh] flex flex-col p-0 gap-0 bg-zinc-950/90 backdrop-blur-xl border border-primary/30 shadow-[0_0_50px_rgba(249,115,22,0.15)] rounded-3xl overflow-hidden" showCloseButton={false}>
         <ScrollArea className="flex-1 p-6">
           <div className="text-center mb-6">
             <h2 className="text-2xl font-bold text-white">Receita Inteligente</h2>
@@ -45,17 +45,17 @@ export function RecipeModal({ recipe, onClose }: RecipeModalProps) {
           </div>
 
           <div className="grid grid-cols-3 gap-4 mb-8">
-            <div className="flex flex-col items-center justify-center p-4 bg-zinc-900/40 rounded-xl border border-primary/20">
+            <div className="flex flex-col items-center justify-center p-4 bg-zinc-900/40 rounded-xl border border-primary/20 aspect-square">
               <Clock className="w-5 h-5 mb-2 text-primary" />
               <span className="text-xs text-zinc-400 font-medium uppercase tracking-wider">Tempo</span>
               <span className="font-bold text-white">{recipe.prepTime}</span>
             </div>
-            <div className="flex flex-col items-center justify-center p-4 bg-zinc-900/40 rounded-xl border border-primary/20">
+            <div className="flex flex-col items-center justify-center p-4 bg-zinc-900/40 rounded-xl border border-primary/20 aspect-square">
               <Flame className="w-5 h-5 mb-2 text-primary" />
               <span className="text-xs text-zinc-400 font-medium uppercase tracking-wider">Calorias</span>
               <span className="font-bold text-white">{recipe.macros.calories}</span>
             </div>
-            <div className="flex flex-col items-center justify-center p-4 bg-zinc-900/40 rounded-xl border border-primary/20">
+            <div className="flex flex-col items-center justify-center p-4 bg-zinc-900/40 rounded-xl border border-primary/20 aspect-square">
               <ChefHat className="w-5 h-5 mb-2 text-primary" />
               <span className="text-xs text-zinc-400 font-medium uppercase tracking-wider">Dificuldade</span>
               <span className="font-bold text-white">{recipe.difficulty}</span>

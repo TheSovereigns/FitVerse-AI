@@ -8,7 +8,7 @@ import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuLabel, DropdownMenuSeparator } from "@/components/ui/dropdown-menu"
-import { Dumbbell, Flame, Clock, Trophy, Zap, Play, Settings2, Home, Building2, User, ArrowRight, Trash2, Download, ArrowUpDown, Feather, Swords, Activity } from "lucide-react"
+import { Dumbbell, Flame, Clock, Trophy, Zap, Play, Settings2, Home, Building2, User, ArrowRight, Trash2, Download, ArrowUpDown, Feather, Swords, Activity, MoreHorizontal } from "lucide-react"
 import { WorkoutGenerator } from "@/components/workout-generator"
 import { ActiveWorkoutSession } from "@/components/active-workout-session"
 import { ExerciseDetailModal } from "@/components/exercise-detail-modal"
@@ -210,10 +210,10 @@ export function TrainingTab({ metabolicPlan, scanHistory, userGoal }: TrainingTa
   })
 
   return (
-    <div className="px-4 pt-8 pb-24 text-foreground bg-background min-h-screen">
+    <div className="space-y-6 pb-8">
       {/* Cabeçalho text-foreground */}
-      <div className="mb-6">
-        <h1 className="text-4xl font-black mb-2 text-balance tracking-tighter uppercase italic">
+      <div>
+        <h1 className="text-2xl md:text-4xl font-black mb-2 text-balance tracking-tighter uppercase italic">
           NutriTrain <span className="text-primary">AI</span>
         </h1>
         <p className="text-muted-foreground text-pretty font-medium text-sm">
@@ -222,7 +222,7 @@ export function TrainingTab({ metabolicPlan, scanHistory, userGoal }: TrainingTa
       </div>
 
       {/* Filtros Inteligentes (Chips) */}
-      <ScrollArea className="w-full whitespace-nowrap -mx-4 px-4 mb-6">
+      <ScrollArea className="w-full whitespace-nowrap">
         <div className="flex space-x-3 pb-2">
           {filters.map((filter) => {
             const Icon = filter.icon
@@ -231,8 +231,7 @@ export function TrainingTab({ metabolicPlan, scanHistory, userGoal }: TrainingTa
               <button
                 key={filter.id}
                 onClick={() => setActiveFilter(filter.id)}
-                className={`
-                  flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 border
+                className={`flex items-center gap-2 px-3 md:px-4 py-2 rounded-full text-xs md:text-sm font-medium transition-all duration-200 border
                   ${isActive
                     ? "bg-primary text-primary-foreground border-primary shadow-[0_0_15px_rgba(249,115,22,0.3)]" 
                     : "bg-card text-muted-foreground border-border hover:border-primary/50 hover:text-foreground"
@@ -250,8 +249,8 @@ export function TrainingTab({ metabolicPlan, scanHistory, userGoal }: TrainingTa
 
       {/* Estado Vazio ou Loading */}
       {!isGenerating && generatedWorkouts.length === 0 && (
-        <div className="w-full">
-          <div className="relative bg-card border border-border rounded-[2rem] p-8 text-center overflow-hidden border-b-[6px] border-b-primary">
+        <div className="w-full max-w-md mx-auto pt-8">
+          <div className="relative bg-card border border-border rounded-[2rem] p-6 text-center overflow-hidden border-b-[6px] border-b-primary">
             {/* Cantoneiras */}
             <div className="absolute top-0 left-0 w-8 h-8 border-t-2 border-l-2 border-primary rounded-tl-xl opacity-80" />
             <div className="absolute top-0 right-0 w-8 h-8 border-t-2 border-r-2 border-primary rounded-tr-xl opacity-80" />
@@ -264,18 +263,18 @@ export function TrainingTab({ metabolicPlan, scanHistory, userGoal }: TrainingTa
             </p>
             <Dialog open={showGeneratorModal} onOpenChange={setShowGeneratorModal}>
               <DialogTrigger asChild>
-                <Button className="w-full max-w-md mx-auto h-16 bg-primary hover:bg-primary/90 text-primary-foreground font-black text-sm uppercase tracking-[0.2em] rounded-2xl transition-all duration-300 group">
+                <Button className="w-[90%] mx-auto h-12 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-sm uppercase tracking-widest transition-all duration-300 group shadow-[0_0_20px_rgba(249,115,22,0.3)]">
                   Configurar Treino
                   <ArrowRight className="w-5 h-5 ml-2 transition-transform group-hover:translate-x-1" />
                 </Button>
               </DialogTrigger>
-              <DialogContent className="bg-card/90 backdrop-blur-xl border-border text-foreground sm:max-w-lg rounded-2xl">
-                <DialogHeader>
+              <DialogContent className="bg-card/90 backdrop-blur-xl border-border text-foreground sm:max-w-lg rounded-2xl p-0 flex flex-col max-h-[90vh]">
+                <DialogHeader className="p-6 pb-2">
                   <DialogTitle className="text-xl font-bold">Ajuste Fino da IA</DialogTitle>
                 </DialogHeader>
-                <div className="py-4">
+                <ScrollArea className="flex-1 px-6 pb-6">
                   <WorkoutGenerator onGenerate={handleGenerateWorkouts} isLoading={isGenerating} />
-                </div>
+                </ScrollArea>
               </DialogContent>
             </Dialog>
           </div>
@@ -284,11 +283,11 @@ export function TrainingTab({ metabolicPlan, scanHistory, userGoal }: TrainingTa
 
       {/* Loading State */}
       {isGenerating && (
-        <div className="px-4 py-12 space-y-6">
+        <div className="py-8 space-y-6">
           {[1, 2].map((i) => (
             <Card key={i} className="bg-card border-border overflow-hidden rounded-2xl">
               <CardContent className="p-0">
-                <div className="h-48 bg-muted animate-pulse" />
+                <div className="h-40 md:h-48 bg-muted animate-pulse" />
                 <div className="p-4 space-y-3">
                   <div className="h-6 w-3/4 bg-muted rounded animate-pulse" />
                   <div className="flex gap-2">
@@ -305,7 +304,7 @@ export function TrainingTab({ metabolicPlan, scanHistory, userGoal }: TrainingTa
       {/* Lista de Treinos Gerados */}
       {filteredWorkouts.length > 0 && (
         <div className="space-y-6">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <h3 className="text-lg font-semibold text-foreground">Seus Treinos</h3>
             <div className="flex items-center gap-2">
               <DropdownMenu>
@@ -313,7 +312,7 @@ export function TrainingTab({ metabolicPlan, scanHistory, userGoal }: TrainingTa
                   <Button 
                     variant="outline" 
                     size="sm" 
-                    className="h-8 border-primary/20 hover:bg-primary/5 text-primary"
+                    className="h-9 border-border bg-card hover:bg-accent"
                   >
                     <ArrowUpDown className="w-4 h-4 mr-2" />
                     Ordenar
@@ -329,27 +328,23 @@ export function TrainingTab({ metabolicPlan, scanHistory, userGoal }: TrainingTa
                   <DropdownMenuItem onClick={() => setSortBy("duration_asc")}>Duração (Menor)</DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
-              <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={handleExportWorkouts}
-                className="h-8 border-primary/20 hover:bg-primary/5 text-primary"
-              >
-                <Download className="w-4 h-4 mr-2" />
-                Exportar
-              </Button>
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                onClick={handleClearHistory}
-                className="text-muted-foreground hover:text-destructive h-8"
-              >
-                <Trash2 className="w-4 h-4 mr-2" />
-                Limpar
-              </Button>
+              <div className="h-6 w-px bg-border hidden sm:block" />
               <Badge variant="outline" className="border-primary text-primary bg-primary/10">
                 {filteredWorkouts.length} Opções
               </Badge>
+              <div className="flex-grow" />
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon" className="h-9 w-9">
+                    <MoreHorizontal className="w-5 h-5" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={handleExportWorkouts}><Download className="w-4 h-4 mr-2" /> Exportar Treinos</DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleClearHistory} className="focus:bg-destructive/10 focus:text-destructive text-destructive"><Trash2 className="w-4 h-4 mr-2" /> Limpar Histórico</DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </div>
 
@@ -413,7 +408,7 @@ function WorkoutCard({ workout, onStart, onExerciseClick }: { workout: Workout, 
   return (
     <Card className="bg-card border-border overflow-hidden hover:border-primary/50 transition-all duration-300 ease-in-out group shadow-lg rounded-2xl">
       <CardHeader className="p-0">
-        <div className="relative h-48 w-full bg-muted">
+        <div className="relative h-36 md:h-48 w-full bg-muted">
           {/* Placeholder visual para o treino - idealmente seria uma imagem gerada ou do banco */}
           <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-t from-card to-transparent">
             <Dumbbell className="h-16 w-16 text-muted-foreground/20 group-hover:text-primary transition-colors duration-300" />
@@ -427,7 +422,7 @@ function WorkoutCard({ workout, onStart, onExerciseClick }: { workout: Workout, 
           
           <div className="absolute bottom-3 left-3 right-3">
             <div className="flex items-center gap-2 mb-1">
-              <h3 className="text-xl font-bold text-primary">{workout.name}</h3>
+              <h3 className="text-lg md:text-xl font-bold text-primary">{workout.name}</h3>
               {getDifficultyIcon(workout.difficulty)}
             </div>
             <div className="flex items-center gap-3 text-xs text-muted-foreground">
@@ -448,7 +443,7 @@ function WorkoutCard({ workout, onStart, onExerciseClick }: { workout: Workout, 
         </div>
       </CardHeader>
       
-      <CardContent className="p-4 space-y-4">
+      <CardContent className="p-3 md:p-4 space-y-4">
         <div className="bg-muted/50 p-3 rounded-lg border border-border">
           <p className="text-sm text-muted-foreground italic">
             "<span className="text-foreground">{workout.aiVerdict}</span>"

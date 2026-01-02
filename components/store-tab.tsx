@@ -258,7 +258,7 @@ export function StoreTab() {
   const totalCartItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
   return (
-    <div className="px-4 pt-8 pb-24 bg-black text-zinc-300 min-h-screen">
+    <div className="px-4 md:px-6 pt-8 pb-24 bg-black text-zinc-300 min-h-screen max-w-7xl mx-auto">
       
       {/* Header */}
       <div className="flex justify-between items-center mb-8">
@@ -353,7 +353,7 @@ export function StoreTab() {
                 </div>
               </div>
               <Button 
-                className="w-full bg-primary/10 text-primary border border-primary/20 hover:bg-primary hover:text-white transition-all group/btn"
+                className="w-full h-12 rounded-xl bg-primary/10 text-primary border border-primary/20 hover:bg-primary hover:text-white transition-all group/btn font-bold"
                 onClick={(e) => { e.stopPropagation(); handleAddToCart(product); }}
               >
                 Adicionar

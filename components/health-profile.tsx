@@ -6,7 +6,7 @@ import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
-import { User, TrendingUp, Target, Calendar, Award, Sparkles, Clock, Crown } from "lucide-react"
+import { User, TrendingUp, Target, Calendar, Award, Sparkles, Clock, Crown, Settings } from "lucide-react"
 import { ScanHistory } from "@/components/scan-history"
 
 interface ScanHistoryItem {
@@ -19,9 +19,10 @@ interface ScanHistoryItem {
 
 interface HealthProfileProps {
   scanHistory: ScanHistoryItem[]
+  onNavigateToSettings: () => void;
 }
 
-export function HealthProfile({ scanHistory }: HealthProfileProps) {
+export function HealthProfile({ scanHistory, onNavigateToSettings }: HealthProfileProps) {
   const [localScanHistory, setLocalScanHistory] = useState<ScanHistoryItem[]>(scanHistory)
   const [selectedPeriod, setSelectedPeriod] = useState<"week" | "month">("week")
   const router = useRouter()
@@ -128,33 +129,44 @@ export function HealthProfile({ scanHistory }: HealthProfileProps) {
   return (
     <div className="px-4 pt-8 pb-24 text-foreground bg-background min-h-screen">
       {/* Header */}
-      <div className="mb-6 flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <div className="w-14 h-14 rounded-full bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-lg shadow-primary/20">
-            <User className="w-6 h-6 text-primary-foreground" />
+      <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div className="flex items-center justify-between w-full md:w-auto">
+          <div className="flex items-center gap-4">
+            <div className="w-14 h-14 rounded-full bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-lg shadow-primary/20">
+              <User className="w-6 h-6 text-primary-foreground" />
+            </div>
+            <div>
+              <h1 className="text-2xl md:text-4xl font-black tracking-tighter uppercase italic">
+                Perfil <span className="text-primary">Saúde</span>
+              </h1>
+              <p className="text-muted-foreground text-pretty font-medium text-sm">
+                Seu progresso.
+              </p>
+            </div>
           </div>
-          <div>
-            <h1 className="text-4xl font-black tracking-tighter uppercase italic">
-              Perfil de <span className="text-primary">Saúde</span>
-            </h1>
-            <p className="text-muted-foreground text-pretty font-medium text-sm">
-              Seu progresso e histórico de longevidade.
-            </p>
-          </div>
+          {/* Botão de Configurações Mobile (Visível ao lado do título) */}
+          <Button variant="ghost" size="icon" onClick={onNavigateToSettings} className="rounded-full md:hidden">
+            <Settings className="w-6 h-6" />
+          </Button>
         </div>
-        <div className="flex space-x-2 p-1 bg-muted/50 border border-border rounded-full">
-          <button
-            onClick={() => setSelectedPeriod("week")}
-            className={`px-4 py-2 rounded-full text-xs font-semibold transition-all duration-300 ${selectedPeriod === "week" ? "bg-primary/10 text-primary border border-primary" : "text-muted-foreground border border-transparent hover:bg-accent"}`}
-          >
-            7 Dias
-          </button>
-          <button
-            onClick={() => setSelectedPeriod("month")}
-            className={`px-4 py-2 rounded-full text-xs font-semibold transition-all duration-300 ${selectedPeriod === "month" ? "bg-primary/10 text-primary border border-primary" : "text-muted-foreground border border-transparent hover:bg-accent"}`}
-          >
-            30 Dias
-          </button>
+
+        <div className="flex items-center gap-2 self-end md:self-auto">
+          <div className="flex space-x-2 p-1 bg-muted/50 border border-border rounded-full w-full md:w-auto">
+            <button
+              onClick={() => setSelectedPeriod("week")}
+              className={`px-4 py-2 rounded-full text-xs font-semibold transition-all duration-300 ${selectedPeriod === "week" ? "bg-primary/10 text-primary border border-primary" : "text-muted-foreground border border-transparent hover:bg-accent"}`}
+            >
+              7 Dias
+            </button>
+            <button
+              onClick={() => setSelectedPeriod("month")}
+              className={`px-4 py-2 rounded-full text-xs font-semibold transition-all duration-300 ${selectedPeriod === "month" ? "bg-primary/10 text-primary border border-primary" : "text-muted-foreground border border-transparent hover:bg-accent"}`}
+            >
+              30 Dias
+            </button>
+          </div>
+          {/* Botão de Configurações Desktop */}
+          <Button variant="ghost" size="icon" onClick={onNavigateToSettings} className="rounded-full hidden md:flex"><Settings className="w-5 h-5" /></Button>
         </div>
       </div>
 
