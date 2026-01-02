@@ -37,7 +37,7 @@ const SelectionGroup = ({
             ${
               value === option
               ? "bg-primary text-primary-foreground border-primary shadow-[0_0_10px_rgba(255,140,0,0.4)]"
-              : "bg-card text-muted-foreground border-border hover:border-primary/50 hover:text-foreground"
+              : "bg-white dark:bg-card text-muted-foreground border-gray-200 dark:border-border hover:border-primary/50 hover:text-foreground"
             }
           `}
         >
@@ -116,7 +116,7 @@ export function WorkoutGenerator({ onGenerate, isLoading }: WorkoutGeneratorProp
             value={observations}
             onChange={(e) => setObservations(e.target.value)}
             placeholder="Ex: Tenho dor no joelho, quero focar em glúteos, tenho apenas elásticos..."
-            className="w-full min-h-[100px] p-4 rounded-xl bg-card border border-border text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all resize-none text-sm"
+            className="w-full min-h-[100px] p-4 rounded-xl bg-white dark:bg-card border border-gray-200 dark:border-border text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all resize-none text-sm"
           />
         </div>
 
@@ -128,7 +128,7 @@ export function WorkoutGenerator({ onGenerate, isLoading }: WorkoutGeneratorProp
             className={`
               w-full h-14 text-lg font-bold uppercase tracking-widest transition-all duration-300 ease-in-out
               ${isLoading
-                ? "bg-muted text-muted-foreground cursor-not-allowed border border-border"
+                ? "bg-gray-100 dark:bg-muted text-muted-foreground cursor-not-allowed border border-gray-200 dark:border-border"
                 : "bg-gradient-to-r from-primary to-primary/80 hover:shadow-primary/40 text-primary-foreground shadow-[0_0_20px_rgba(255,140,0,0.3)]"
               }
             `}
@@ -148,7 +148,7 @@ export function WorkoutGenerator({ onGenerate, isLoading }: WorkoutGeneratorProp
           
           {/* Barra de Progresso Decorativa (só aparece carregando) */}
           {isLoading && (
-            <div className="w-full h-1 bg-muted mt-4 rounded-full overflow-hidden">
+            <div className="w-full h-1 bg-gray-100 dark:bg-muted mt-4 rounded-full overflow-hidden">
               <div className="h-full bg-primary animate-progress-indeterminate" />
             </div>
           )}
