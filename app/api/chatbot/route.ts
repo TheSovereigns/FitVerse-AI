@@ -30,46 +30,36 @@ export async function POST(req: Request) {
   }
 
   try {
-    const criteria = await req.json();
+    const body = await req.json();
+    const { message, history, userMetabolicPlan } = body;
 
-    const prompt = `
-      Crie um plano de treino baseado nos seguintes critérios:
-      - Foco: ${criteria.focus}
-      - Nível: ${criteria.level}
-      - Duração: ${criteria.duration}
-      - Local: ${criteria.location}
-      - Objetivo do usuário: ${criteria.goal}
+    if (!message) {
+      return NextResponse.json({ error: 'Mensagem vazia.' }, { status: 400, headers });
+    }
 
-      Retorne um array JSON chamado "workouts" contendo um único objeto de treino.
-      O objeto de treino deve ter a seguinte estrutura:
-      {
-        "name": "Nome do Treino (ex: Hipertrofia de Peito e Tríceps)",
-        "category": "${criteria.focus}",
-        "duration": "${criteria.duration}",
-        "calories": "Estimativa de calorias queimadas (ex: 350-500)",
-        "difficulty": "${criteria.level}",
-        "aiVerdict": "Um breve veredito da IA sobre o treino, em português.",
-        "exercises": [
-          { "name": "Nome do Exercício 1", "sets": "3", "reps": "10-12", "rest": "60s" },
-          { "name": "Nome do Exercício 2", "sets": "4", "reps": "8-10", "rest": "90s" }
-        ]
-      }
-      Gere de 5 a 7 exercícios. O JSON deve ser estrito, sem markdown.
+    const systemPrompt = `Você é o FitVerse AI, um assistente especializado EXCLUSIVAMENTE em fitness, nutrição, saúde, emagrecimento, academia e uso da plataforma FitVerse.
+    
+    Seu objetivo é fornecer conselhos seguros, motivadores e baseados em evidências dentro dessas áreas.
+    
+    REGRAS RÍGIDAS:
+    1. Se o usuário perguntar sobre qualquer assunto que NÃO seja relacionado a saúde, fitness, nutrição, emagrecimento, academia ou sobre o site FitVerse, você deve recusar educadamente responder, dizendo que só pode ajudar com tópicos de saúde e fitness.
+    2. NUNCA forneça conselhos médicos. Se a pergunta parecer de natureza médica (diagnóstico, tratamento de doenças, etc.), recomende ao usuário que consulte um profissional de saúde.
+    3. Sempre que possível, personalize as respostas com base nos dados do usuário fornecidos abaixo.
+    
+    ${userMetabolicPlan ? `Aqui estão os dados do plano metabólico do usuário para contextualizar suas respostas: ${JSON.stringify(userMetabolicPlan, null, 2)}` : ''}
     `;
 
-    const result = await model.generateContent(prompt);
+    const chat = model.startChat({
+      history: history || [],
+    });
+
+    const result = await chat.sendMessage(`${systemPrompt}\n\nUser: ${message}`);
     const response = await result.response;
-    let text = response.text();
+    const reply = response.text();
 
-    // Limpeza de markdown se houver
-    text = text.replace(/```json/g, '').replace(/```/g, '').trim();
-
-    const workoutPlan = JSON.parse(text);
-
-    return NextResponse.json(workoutPlan, { headers });
-
+    return NextResponse.json({ reply }, { headers });
   } catch (error) {
-    console.error('Erro ao gerar treino com IA:', error);
-    return NextResponse.json({ error: 'Falha ao gerar treino com a IA.' }, { status: 500, headers });
+    console.error('Erro no chatbot:', error);
+    return NextResponse.json({ error: 'Falha ao processar mensagem.' }, { status: 500, headers });
   }
 }

@@ -14,7 +14,7 @@ export async function OPTIONS() {
 const apiKey = process.env.GEMINI_API_KEY;
 const genAI = apiKey ? new GoogleGenerativeAI(apiKey) : null;
 
-// Usando gemini-1.5-flash que tem capacidade de visão (multimodal)
+// Usando gemini-2.5-flash que tem capacidade de visão (multimodal)
 const model = genAI ? genAI.getGenerativeModel({
   model: 'gemini-1.5-flash',
 }) : null;
