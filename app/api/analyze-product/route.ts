@@ -16,7 +16,7 @@ const genAI = apiKey ? new GoogleGenerativeAI(apiKey) : null;
 
 // Usando gemini-2.5-flash que tem capacidade de visão (multimodal)
 const model = genAI ? genAI.getGenerativeModel({
-  model: 'gemini-1.5-flash',
+  model: 'gemini-2.5-flash',
 }) : null;
 
 export async function POST(req: Request) {
