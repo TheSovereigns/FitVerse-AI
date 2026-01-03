@@ -111,8 +111,8 @@ function HomeDashboard({
               <div key={index} className="flex items-center gap-4 p-3 bg-white dark:bg-black/60 backdrop-blur-md border border-gray-200 dark:border-white/10 rounded-2xl shadow-sm hover:shadow-md transition-shadow dark:shadow-none">
                 <div className="relative">
                   <img src={product.image || "/placeholder.svg?width=64&height=64"} alt={product.productName} className="w-16 h-16 rounded-2xl object-cover bg-gray-700" />
-                  <Badge className={cn(
-                    "absolute -top-2 -right-2 border-2 border-background text-xs font-bold",
+                  <Badge className={cn( // @ts-ignore
+                    "absolute -top-2 -right-2 border-2 border-white dark:border-black text-xs font-bold",
                     product.longevityScore > 80 ? "bg-green-100 text-green-800 border-green-200 dark:bg-green-500/20 dark:text-green-300 dark:border-green-400/30" :
                     product.longevityScore > 60 ? "bg-yellow-100 text-yellow-800 border-yellow-200 dark:bg-yellow-500/20 dark:text-yellow-300 dark:border-yellow-400/30" :
                     "bg-red-100 text-red-800 border-red-200 dark:bg-red-500/20 dark:text-red-300 dark:border-red-400/30"
