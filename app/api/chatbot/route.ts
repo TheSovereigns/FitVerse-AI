@@ -74,7 +74,7 @@ export async function POST(req: Request) {
     const limitedHistory = (history || []).slice(-MAX_HISTORY_LENGTH);
 
     // Mapeamento robusto do histórico para evitar erros de formato
-    const chatHistory: Content[] = limitedHistory.map((msg: any) => {
+    let chatHistory: Content[] = limitedHistory.map((msg: any) => {
       let parts = [];
       if (Array.isArray(msg.parts)) {
         parts = msg.parts.map((part: any) => ({ text: part.text || '' }));
@@ -89,6 +89,11 @@ export async function POST(req: Request) {
       };
     });
 
+    // Garante que o histórico comece com uma mensagem do usuário (requisito do Gemini)
+    if (chatHistory.length > 0 && chatHistory[0].role !== 'user') {
+      chatHistory.shift();
+    }
+
     const chat = model.startChat({ generationConfig, safetySettings, history: chatHistory });
     const fullMessage = `${systemPrompt}\n\nPERGUNTA: ${message}`;
     
@@ -97,7 +102,6 @@ export async function POST(req: Request) {
     const reply = response.text();
 
     return NextResponse.json({ reply }, { headers });
-
   } catch (error) {
     console.error('Erro detalhado no chatbot:', error);
     return NextResponse.json({ error: `Erro interno: ${error instanceof Error ? error.message : 'Erro desconhecido'}` }, { status: 500, headers });
