@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useRef, useEffect } from 'react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import { Bot, User, Loader2, Send } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -54,6 +56,11 @@ export function ChatbotTab() {
       }
 
       const data = await response.json();
+
+      if (typeof data.reply !== 'string') {
+        throw new Error("A resposta da IA não veio no formato esperado.");
+      }
+
       const botMessage: Message = { role: 'model', text: data.reply };
       setMessages(prev => [...prev, botMessage]);
 
@@ -84,8 +91,13 @@ export function ChatbotTab() {
                 ? 'bg-primary text-primary-foreground rounded-br-none'
                 : 'bg-gray-100 dark:bg-gray-800 rounded-bl-none'
             )}>
-              {/* A classe whitespace-pre-wrap é a chave para renderizar as quebras de linha (\n) */}
-              <p className="text-sm whitespace-pre-wrap">{msg.text}</p>
+              <ReactMarkdown
+                className="prose prose-sm dark:prose-invert max-w-none"
+                remarkPlugins={[remarkGfm]}
+                components={{ p: ({node, ...props}) => <p className="mb-2 last:mb-0" {...props} /> }}
+              >
+                {msg.text}
+              </ReactMarkdown>
             </div>
             {msg.role === 'user' && (
               <div className="w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">

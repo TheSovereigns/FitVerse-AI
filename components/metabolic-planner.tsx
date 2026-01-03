@@ -1,345 +1,121 @@
-"use client"
+"use client";
 
-import type React from "react"
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Activity, TrendingUp, Target, Zap, ArrowRight, Loader2, FileText } from "lucide-react"
-import { MetabolicDashboard } from "./metabolic-dashboard"
-
-export interface BioPerfil {
-  age: number
-  weight: number
-  height: number
-  gender: "male" | "female"
-  activityLevel: "sedentary" | "moderate" | "active" | "athlete"
-  goal: "lose_weight" | "gain_muscle" | "maintenance"
-}
-
-export interface MacroTarget {
-  calories: number
-  protein: number
-  carbs: number
-  fat: number
-  proteinGrams: number
-  carbsGrams: number
-  fatGrams: number
-}
-
-export interface MetabolicPlan {
-  macros: MacroTarget
-  prediction: {
-    weeks: number
-    explanation: string
-    macroTips?: string[]
-  }
-  diet?: {
-    title: string;
-    summary: string;
-    meals: {
-      name: string;
-      items: string[];
-    }[];
-  }
-}
+import { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Loader2 } from 'lucide-react';
 
 interface MetabolicPlannerProps {
-  onPlanCreated: (plan: MetabolicPlan, perfil: BioPerfil) => void;
+  onPlanCreated: (plan: any, profile: any) => void;
 }
 
 export function MetabolicPlanner({ onPlanCreated }: MetabolicPlannerProps) {
-  const [showDashboard, setShowDashboard] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
-  const [plan, setPlan] = useState<MetabolicPlan | null>(null)
-  const [observations, setObservations] = useState("")
-  const [perfil, setPerfil] = useState<BioPerfil>({
-    age: 0,
-    weight: 0,
-    height: 0,
-    gender: "male",
-    activityLevel: "moderate",
-    goal: "maintenance",
-  })
+  const [weight, setWeight] = useState('');
+  const [height, setHeight] = useState('');
+  const [age, setAge] = useState('');
+  const [gender, setGender] = useState('male');
+  const [activityLevel, setActivityLevel] = useState('sedentary');
+  const [goal, setGoal] = useState('lose_weight');
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-
-    if (perfil.age <= 0 || perfil.weight <= 0 || perfil.height <= 0) {
-      alert("Por favor, preencha todos os campos do seu perfil com valores válidos maiores que zero.");
+  const handleCalculate = async () => {
+    // Validação Pré-Envio no frontend
+    if (!weight || !height || !age || !gender || !activityLevel || !goal) {
+      alert('Por favor, preencha todos os campos do formulário.');
       return;
     }
 
-    setIsLoading(true)
-    setPlan(null) // Limpa o plano anterior
+    setIsLoading(true);
+    setError(null);
+
+    const profileData = {
+      weight: Number(weight),
+      height: Number(height),
+      age: Number(age),
+      gender,
+      activityLevel,
+      goal,
+    };
 
     try {
-      // Reativando a chamada à API para gerar um plano verdadeiramente personalizado
+      console.log("Enviando dados para /api/generate-metabolic-plan:", profileData);
+
       const response = await fetch('/api/generate-metabolic-plan', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ perfil, observations }), // Enviando o perfil e as observações
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(profileData),
       });
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || 'Falha na geração do plano metabólico pela IA');
+        throw new Error(errorData.error || `Erro na API: ${response.statusText}`);
       }
 
-      const generatedPlan: MetabolicPlan = await response.json();
-      
-      setPlan(generatedPlan)
-      onPlanCreated(generatedPlan, perfil) // Passa o plano e o perfil para salvar o contexto
-      setShowDashboard(true)
-    } catch (error) {
-      console.error("Error calculating macros:", error)
-      alert("Erro ao gerar o plano. Verifique os dados e tente novamente.")
-    } finally {
-      setIsLoading(false)
-    }
-  }
+      const plan = await response.json();
+      onPlanCreated(plan, profileData); // Passa o plano e o perfil para o componente pai
 
-  if (showDashboard && plan) {
-    return <MetabolicDashboard plan={plan} perfil={perfil} onBack={() => setShowDashboard(false)} />
-  }
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Ocorreu um erro desconhecido.';
+      console.error("Erro ao calcular plano:", errorMessage);
+      setError(errorMessage);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
-    <div className="flex flex-col h-[100dvh] bg-background text-foreground">
-      <div className="flex-1 overflow-y-auto">
-        <div className="px-4 md:px-6 pt-8 pb-32 md:pb-12 max-w-3xl mx-auto">
-          <div className="mb-8 text-center md:text-left">
-            <h1 className="text-3xl md:text-4xl font-black mb-2 text-balance tracking-tighter uppercase italic">
-              Planejamento <span className="text-primary">Metabólico</span>
-            </h1>
-            <p className="text-muted-foreground text-pretty font-medium text-sm max-w-lg mx-auto md:mx-0">
-              Descubra suas necessidades calóricas e alcance seus objetivos com precisão científica
-            </p>
-          </div>
-
-      <form id="metabolic-form" onSubmit={handleSubmit} className="relative bg-card border border-border rounded-[2rem] p-6 md:p-8 overflow-hidden border-b-[6px] border-b-primary shadow-2xl">
-        {/* Cantoneiras Iluminadas (4 cantos) */}
-        <div className="absolute top-0 left-0 w-8 h-8 border-t-2 border-l-2 border-primary rounded-tl-xl opacity-80" />
-        <div className="absolute top-0 right-0 w-8 h-8 border-t-2 border-r-2 border-primary rounded-tr-xl opacity-80" />
-        <div className="absolute bottom-0 left-0 w-8 h-8 border-b-2 border-l-2 border-primary rounded-bl-xl opacity-80" />
-        <div className="absolute bottom-0 right-0 w-8 h-8 border-b-2 border-r-2 border-primary rounded-br-xl opacity-80" />
-        
-        {/* Glow de Fundo */}
-        <div className="absolute top-0 right-0 w-64 h-64 bg-primary opacity-[0.03] blur-[80px] pointer-events-none" />
-
-        {/* Efeito de Escaneamento (Loading) */}
-        {isLoading && <div className="absolute inset-0 bg-gradient-to-b from-transparent via-primary/10 to-transparent animate-scan-effect" />}
-
-        <div className="space-y-8 relative z-10">
-          {/* Seção 1: Bio-Perfil */}
-          <div>
-            <div className="flex items-center gap-4 mb-6">
-              <div className="w-14 h-14 rounded-full bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-[0_0_20px_rgba(255,140,0,0.3)]">
-                <Activity className="w-6 h-6 text-black" />
-              </div>
-              <div>
-                <h3 className="font-black text-xl uppercase tracking-tight text-foreground">Bio-Perfil</h3>
-                <p className="text-xs text-muted-foreground font-bold tracking-wider uppercase">Dados Corporais</p>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-2">
-                <Label htmlFor="age" className="text-sm font-medium">
-                  Idade
-                </Label>
-                <Input
-                  id="age"
-                  type="number"
-                  placeholder="25"
-                  value={perfil.age || ""}
-                  onChange={(e) => setPerfil({ ...perfil, age: parseInt(e.target.value) || 0 })} // Use parseInt for age
-                  className="h-12 px-4 bg-muted/50 border border-input focus:border-primary focus:ring-1 focus:ring-primary text-foreground placeholder:text-muted-foreground rounded-xl transition-all"
-                  required
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="gender" className="text-sm font-medium text-muted-foreground">
-                  Género
-                </Label>
-                <Select value={perfil.gender} onValueChange={(v) => setPerfil({ ...perfil, gender: v as any })}>
-                  <SelectTrigger id="gender" className="h-12 px-4 bg-muted/50 border border-input focus:border-primary focus:ring-1 focus:ring-primary text-foreground rounded-xl transition-all">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="male">Masculino</SelectItem>
-                    <SelectItem value="female">Feminino</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-2">
-                <Label htmlFor="weight" className="text-sm font-medium">
-                  Peso (kg)
-                </Label>
-                <Input
-                  id="weight"
-                  type="number"
-                  step="0.1"
-                  placeholder="70"
-                  value={perfil.weight || ""}
-                  onChange={(e) => setPerfil({ ...perfil, weight: parseFloat(e.target.value) || 0 })} // Use parseFloat for weight
-                  className="h-12 px-4 bg-muted/50 border border-input focus:border-primary focus:ring-1 focus:ring-primary text-foreground placeholder:text-muted-foreground rounded-xl transition-all"
-                  required
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="height" className="text-sm font-medium">
-                  Altura (cm)
-                </Label>
-                <Input
-                  id="height"
-                  type="number"
-                  placeholder="175"
-                  value={perfil.height || ""}
-                  onChange={(e) => setPerfil({ ...perfil, height: parseInt(e.target.value) || 0 })} // Use parseInt for height
-                  className="h-12 px-4 bg-muted/50 border border-input focus:border-primary focus:ring-1 focus:ring-primary text-foreground placeholder:text-muted-foreground rounded-xl transition-all"
-                  required
-                />
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="activity" className="text-sm font-medium">
-                Nível de Atividade Física
-              </Label>
-              <Select
-                value={perfil.activityLevel}
-                onValueChange={(v) => setPerfil({ ...perfil, activityLevel: v as any })}
-              >
-                <SelectTrigger id="activity" className="h-12 px-4 bg-muted/50 border border-input focus:border-primary focus:ring-1 focus:ring-primary text-foreground rounded-xl transition-all">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="sedentary">Sedentário (pouco ou nenhum exercício)</SelectItem>
-                  <SelectItem value="moderate">Moderado (exercício 3-4x/semana)</SelectItem>
-                  <SelectItem value="active">Ativo (exercício 5-6x/semana)</SelectItem>
-                  <SelectItem value="athlete">Atleta (exercício diário intenso)</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-
-          {/* Seção 2: Objetivo */}
-          <div>
-            <div className="flex items-center gap-4 mb-6">
-              <div className="w-14 h-14 rounded-full bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-[0_0_20px_rgba(255,140,0,0.3)]">
-                <Target className="w-6 h-6 text-black" />
-              </div>
-              <div>
-                <h3 className="font-black text-xl uppercase tracking-tight text-foreground">Objetivo</h3>
-                <p className="text-xs text-muted-foreground font-bold tracking-wider uppercase">Definição de Meta</p>
-              </div>
-            </div>
-
-            <div className="space-y-3">
-            {[
-              { value: "lose_weight", icon: TrendingUp, label: "Emagrecer", desc: "Défice calórico controlado" },
-              { value: "gain_muscle", icon: Zap, label: "Ganhar Massa Muscular", desc: "Superávit + proteína alta" },
-              { value: "maintenance", icon: Activity, label: "Manutenção/Longevidade", desc: "Equilíbrio nutricional" },
-            ].map((option) => (
-              <button
-                key={option.value}
-                type="button"
-                onClick={() => setPerfil({ ...perfil, goal: option.value as any })}
-                className={`w-full flex items-center gap-3 p-4 rounded-2xl border transition-all duration-300 group ${
-                  perfil.goal === option.value
-                    ? "border-primary bg-primary/10 shadow-[inset_0_0_20px_rgba(255,140,0,0.1)]"
-                    : "border-border bg-muted/30 hover:border-primary/50 hover:bg-muted/50"
-                }`}
-              >
-                <div
-                  className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                    perfil.goal === option.value ? "bg-primary text-primary-foreground shadow-[0_0_10px_rgba(255,140,0,0.4)]" : "bg-muted text-muted-foreground group-hover:text-foreground"
-                  }`}
-                >
-                  <option.icon
-                    className="w-5 h-5"
-                  />
-                </div>
-                <div className="flex-1 text-left">
-                  <p className={`font-bold tracking-tight ${perfil.goal === option.value ? "text-foreground" : "text-muted-foreground group-hover:text-foreground"}`}>{option.label}</p>
-                  <p className="text-xs text-muted-foreground group-hover:text-muted-foreground/80">{option.desc}</p>
-                </div>
-                {perfil.goal === option.value && (
-                  <div className="w-4 h-4 rounded-full bg-primary shadow-[0_0_10px_rgba(255,140,0,0.5)]" />
-                )}
-              </button>
-            ))}
-          </div>
-          </div>
-
-          {/* Seção 3: Observações Adicionais */}
-          <div>
-            <div className="flex items-center gap-4 mb-6">
-              <div className="w-14 h-14 rounded-full bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-[0_0_20px_rgba(255,140,0,0.3)]">
-                <FileText className="w-6 h-6 text-black" />
-              </div>
-              <div>
-                <h3 className="font-black text-xl uppercase tracking-tight text-foreground">Observações</h3>
-                <p className="text-xs text-muted-foreground font-bold tracking-wider uppercase">Restrições e Preferências</p>
-              </div>
-            </div>
-            <textarea
-              value={observations}
-              onChange={(e) => setObservations(e.target.value)}
-              placeholder="Ex: Sou vegano, tenho alergia a glúten, não gosto de peixe..."
-              className="w-full min-h-[100px] p-4 rounded-xl bg-muted/50 border border-input text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all resize-none text-sm"
-            />
-          </div>
-
-          <Button
-            type="submit"
-            className="w-full h-16 bg-primary hover:bg-primary/90 hover:shadow-[0_0_30px_rgba(255,140,0,0.4)] text-primary-foreground font-black text-sm uppercase tracking-[0.2em] rounded-2xl transition-all duration-300 group mt-4 hidden md:flex"
-            disabled={isLoading}
-          >
-            {isLoading ? (
-              <div className="flex items-center gap-3">
-                <Loader2 className="w-5 h-5 animate-spin" />
-                PROCESSANDO...
-              </div>
-            ) : (
-              <>
-                GERAR PROTOCOLO METABÓLICO
-                <ArrowRight className="w-5 h-5 ml-2 transition-transform group-hover:translate-x-1" />
-              </>
-            )}
-          </Button>
+    <Card className="w-full max-w-2xl mx-auto">
+      <CardHeader>
+        <CardTitle>Gerador de Dieta com IA</CardTitle>
+        <CardDescription>Preencha seus dados para que nossa IA crie um plano alimentar personalizado para você.</CardDescription>
+      </CardHeader>
+      <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="space-y-2">
+          <Label htmlFor="weight">Peso (kg)</Label>
+          <Input id="weight" type="number" placeholder="Ex: 75" value={weight} onChange={(e) => setWeight(e.target.value)} />
         </div>
-      </form>
-      </div>
-    </div>
-
-      {/* Rodapé Fixo para Mobile */}
-      <div className="md:hidden border-t border-border bg-card/80 backdrop-blur-lg p-4 pb-[max(1rem,env(safe-area-inset-bottom))] shrink-0 shadow-[0_-5px_20px_rgba(0,0,0,0.1)] dark:shadow-[0_-5px_20px_rgba(0,0,0,0.3)]">
-        <Button
-          type="submit"
-          form="metabolic-form"
-          className="w-full h-14 bg-primary hover:bg-primary/90 text-white font-bold text-lg rounded-xl shadow-lg shadow-primary/30"
-          disabled={isLoading}
-        >
-          {isLoading ? (
-            <div className="flex items-center justify-center gap-3">
-              <Loader2 className="w-5 h-5 animate-spin" />
-              <span>Analisando...</span>
-            </div>
-          ) : (
-            <div className="flex items-center justify-center gap-2">
-              <span>Gerar Protocolo</span>
-              <ArrowRight className="w-5 h-5" />
-            </div>
-          )}
+        <div className="space-y-2">
+          <Label htmlFor="height">Altura (cm)</Label>
+          <Input id="height" type="number" placeholder="Ex: 180" value={height} onChange={(e) => setHeight(e.target.value)} />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="age">Idade</Label>
+          <Input id="age" type="number" placeholder="Ex: 30" value={age} onChange={(e) => setAge(e.target.value)} />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="gender">Gênero</Label>
+          <Select value={gender} onValueChange={setGender}>
+            <SelectTrigger id="gender"><SelectValue placeholder="Selecione..." /></SelectTrigger>
+            <SelectContent><SelectItem value="male">Masculino</SelectItem><SelectItem value="female">Feminino</SelectItem></SelectContent>
+          </Select>
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="activityLevel">Nível de Atividade</Label>
+          <Select value={activityLevel} onValueChange={setActivityLevel}>
+            <SelectTrigger id="activityLevel"><SelectValue placeholder="Selecione..." /></SelectTrigger>
+            <SelectContent><SelectItem value="sedentary">Sedentário</SelectItem><SelectItem value="light">Leve (1-3x/sem)</SelectItem><SelectItem value="moderate">Moderado (3-5x/sem)</SelectItem><SelectItem value="active">Ativo (6-7x/sem)</SelectItem><SelectItem value="very_active">Muito Ativo</SelectItem></SelectContent>
+          </Select>
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="goal">Objetivo Principal</Label>
+          <Select value={goal} onValueChange={setGoal}>
+            <SelectTrigger id="goal"><SelectValue placeholder="Selecione..." /></SelectTrigger>
+            <SelectContent><SelectItem value="lose_weight">Perder Peso</SelectItem><SelectItem value="maintain">Manter Peso</SelectItem><SelectItem value="gain_muscle">Ganhar Massa</SelectItem></SelectContent>
+          </Select>
+        </div>
+      </CardContent>
+      <CardFooter className="flex flex-col items-start gap-4">
+        {error && <p className="text-sm text-red-500">{error}</p>}
+        <Button onClick={handleCalculate} disabled={isLoading} className="w-full">
+          {isLoading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Gerando plano...</> : 'Gerar Plano com IA'}
         </Button>
-      </div>
-    </div>
-  )
+      </CardFooter>
+    </Card>
+  );
 }
