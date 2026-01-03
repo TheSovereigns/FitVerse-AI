@@ -384,7 +384,7 @@ export default function DashboardPage() {
   const currentAnalysis = analysisResult;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-orange-50 dark:bg-gradient-to-br dark:from-gray-950 dark:to-black text-gray-900 dark:text-white font-sans selection:bg-primary/30 flex">
+    <div className="min-h-screen bg-gray-50 dark:bg-black text-gray-900 dark:text-white font-sans selection:bg-primary/30 flex">
       {/* Sidebar Desktop */}
       <aside className="hidden md:flex flex-col w-64 fixed inset-y-0 left-0 bg-white dark:bg-gray-950 border-r border-gray-200 dark:border-white/10 z-50">
         <div className="p-6 flex items-center gap-2 font-bold text-2xl tracking-tighter text-gray-900 dark:text-white">

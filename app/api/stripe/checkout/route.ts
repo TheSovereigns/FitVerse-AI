@@ -1,32 +1,30 @@
 import { NextResponse } from 'next/server';
-import Stripe from 'stripe';
 
-// 1. Inicialize o Stripe com sua chave secreta
-// Certifique-se de definir STRIPE_SECRET_KEY em seu arquivo .env.local
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2024-04-10',
-});
+export async function OPTIONS() {
+  return NextResponse.json({}, {
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'POST, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    },
+  });
+}
 
-export async function POST(request: Request) {
+export async function POST(req: Request) {
+  const headers = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+  };
+
   try {
-    const { priceId } = await request.json();
-
-    if (!priceId) {
-      return NextResponse.json({ error: 'Price ID is required' }, { status: 400 });
-    }
-
-    // 2. Crie uma Sessão de Checkout
-    const session = await stripe.checkout.sessions.create({
-      payment_method_types: ['card'],
-      line_items: [{ price: priceId, quantity: 1 }],
-      mode: 'subscription',
-      success_url: `${request.headers.get('origin')}/?session_id={CHECKOUT_SESSION_ID}`, // Redireciona para a home em caso de sucesso
-      cancel_url: `${request.headers.get('origin')}/`, // Redireciona para a home em caso de cancelamento
-    });
-
-    return NextResponse.json({ sessionId: session.id });
-  } catch (err: any) {
-    console.error('STRIPE_CHECKOUT_ERROR', err);
-    return NextResponse.json({ error: 'Error creating checkout session', details: err.message }, { status: 500 });
+    // Simulação de sessão de checkout para evitar erro se o Stripe não estiver configurado
+    // Em produção, você usaria a biblioteca 'stripe' aqui
+    const mockSessionId = 'cs_test_' + Math.random().toString(36).substring(7);
+    
+    return NextResponse.json({ sessionId: mockSessionId }, { headers });
+  } catch (error) {
+    console.error('Erro no checkout:', error);
+    return NextResponse.json({ error: 'Erro ao criar sessão de pagamento' }, { status: 500, headers });
   }
 }

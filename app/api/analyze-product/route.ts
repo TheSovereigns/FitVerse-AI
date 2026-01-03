@@ -1,110 +1,82 @@
-import { createGoogleGenerativeAI } from "@ai-sdk/google"
-import { generateObject } from "ai"
-import { z } from "zod"
+import { NextResponse } from 'next/server';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
-const google = createGoogleGenerativeAI({
-  apiKey: process.env.GEMINI_API_KEY || process.env.GOOGLE_GENERATIVE_AI_API_KEY,
-})
+export async function OPTIONS() {
+  return NextResponse.json({}, {
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'POST, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    },
+  });
+}
 
-export const maxDuration = 30
+const apiKey = process.env.GEMINI_API_KEY;
+const genAI = apiKey ? new GoogleGenerativeAI(apiKey) : null;
 
-const productAnalysisSchema = z.object({
-  productName: z.string(),
-  brand: z.string().optional().default("Desconhecida"),
-  longevityScore: z.number().min(0).max(100),
-  alerts: z.array(
-    z.object({
-      severity: z.enum(["high", "medium", "low"]),
-      title: z.string(),
-      description: z.string(),
-    }),
-  ).default([]),
-  insights: z.array(
-    z.object({
-      type: z.enum(["good", "neutral", "bad"]),
-      title: z.string(),
-      description: z.string(),
-    }),
-  ).default([]),
-  dietFilters: z.object({
-    lowCarb: z.boolean().default(false),
-    glutenFree: z.boolean().default(false),
-    lactoseFree: z.boolean().default(false),
-    vegan: z.boolean().default(false),
-    vegetarian: z.boolean().default(false),
-    keto: z.boolean().default(false),
-  }),
-  macros: z.object({
-    calories: z.number().default(0),
-    protein: z.number().default(0),
-    carbs: z.number().default(0),
-    fat: z.number().default(0),
-    fiber: z.number().optional().default(0),
-    sugar: z.number().optional().default(0),
-  }).default({ calories: 0, protein: 0, carbs: 0, fat: 0 }),
-  ingredients: z.array(z.string()).optional().default([]),
-  fitnessAlignment: z.array(
-    z.object({
-      goal: z.string(),
-      suitability: z.enum(["Excelente", "Bom", "Neutro", "Ruim"]),
-      justification: z.string(),
-    })
-  ).optional().default([]),
-})
+// Usando gemini-1.5-flash que tem capacidade de visão (multimodal)
+const model = genAI ? genAI.getGenerativeModel({
+  model: 'gemini-1.5-flash',
+}) : null;
 
 export async function POST(req: Request) {
+  const headers = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+  };
+
+  if (!apiKey || !model) {
+    return NextResponse.json({ error: 'Chave de API do Gemini não configurada.' }, { status: 500, headers });
+  }
+
   try {
-    const apiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_GENERATIVE_AI_API_KEY
-    if (!apiKey) {
-      return Response.json({ error: "Chave de API do Google (Gemini) não configurada no servidor." }, { status: 500 })
+    const body = await req.json();
+    const { imageData } = body;
+
+    if (!imageData) {
+      return NextResponse.json({ error: 'Imagem não fornecida.' }, { status: 400, headers });
     }
 
-    const { imageData, productUrl } = await req.json()
+    // O imageData vem geralmente como "data:image/jpeg;base64,..."
+    // Precisamos extrair apenas a parte base64
+    const base64Data = imageData.includes('base64,') 
+      ? imageData.split('base64,')[1] 
+      : imageData;
 
-    if (!imageData && !productUrl) {
-      return Response.json({ error: "Image data or product URL is required" }, { status: 400 })
-    }
+    const prompt = `Analise esta imagem de alimento ou produto. 
+    Retorne um JSON estrito (sem markdown) com:
+    - productName: nome do produto
+    - brand: marca ou 'Genérico'
+    - macros: objeto com calories, protein, carbs, fat (números aproximados)
+    - longevityScore: nota de 0 a 100 baseada em quão saudável é
+    - positivePoints: array de strings
+    - negativePoints: array de strings
+    
+    Se não for alimento, retorne erro.`;
 
-    // ✅ PROMPT OTIMIZADO PARA RETORNAR DADOS REAIS E NÃO ZERADOS
-    const prompt = `Atue como um especialista em Biohacking e Nutrição Esportiva. Analise a imagem do rótulo deste produto.
-    Sua resposta DEVE ser um objeto JSON que siga o schema definido.
-    - Extraia o nome real, marca e valores nutricionais (macros) exatos da imagem.
-    - Calcule um 'longevityScore' de 0 a 100, baseado na qualidade dos ingredientes, presença de aditivos, açúcares, gorduras saudáveis, etc. Seja rigoroso.
-    - Identifique 'alerts' (pontos de atenção) como aditivos químicos, alto teor de sódio, açúcar, etc.
-    - Forneça 'insights' (benefícios) como "fonte de proteína de alta qualidade", "rico em fibras", etc.
-    - Analise o 'fitnessAlignment': avalie a adequação do produto para os objetivos 'Ganho de Massa Muscular' e 'Emagrecimento'. Para cada um, forneça 'suitability' ('Excelente', 'Bom', 'Neutro', 'Ruim') e uma 'justification' curta e objetiva baseada nos macros e ingredientes.`
+    const result = await model.generateContent([
+      prompt,
+      {
+        inlineData: {
+          data: base64Data,
+          mimeType: "image/jpeg",
+        },
+      },
+    ]);
 
-    const messages = imageData
-      ? [
-          {
-            role: "user" as const,
-            content: [
-              { type: "text" as const, text: prompt },
-              { type: "image" as const, image: imageData },
-            ],
-          },
-        ]
-      : [
-          {
-            role: "user" as const,
-            content: `${prompt}\n\nProduto: ${productUrl}`,
-          },
-        ]
+    const response = await result.response;
+    let text = response.text();
+    
+    // Limpeza de markdown se houver
+    text = text.replace(/```json/g, '').replace(/```/g, '').trim();
+    
+    const analysis = JSON.parse(text);
 
-    const { object } = await generateObject({
-      // ✅ CORREÇÃO: Modelo da IA ajustado para a versão correta.
-      model: google("gemini-2.5-flash"),
-      schema: productAnalysisSchema,
-      messages,
-      temperature: 0.1, // Menor temperatura = mais precisão nos dados
-    })
+    return NextResponse.json(analysis, { headers });
 
-    // ✅ GARANTE QUE A RESPOSTA VÁ NO FORMATO QUE O FRONT-END ESPERA (objeto plano)
-    return Response.json(object)
   } catch (error) {
-    console.error("[Fitverse] Error analyzing product:", error)
-    // ✅ Retorna o erro real para o frontend exibir e facilitar o debug
-    const errorMessage = error instanceof Error ? error.message : "Erro desconhecido na análise da IA"
-    return Response.json({ error: errorMessage }, { status: 500 })
+    console.error('Erro na análise de produto:', error);
+    return NextResponse.json({ error: 'Falha ao analisar imagem.' }, { status: 500, headers });
   }
 }

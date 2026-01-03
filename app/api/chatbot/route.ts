@@ -15,7 +15,7 @@ const apiKey = process.env.GEMINI_API_KEY;
 const genAI = apiKey ? new GoogleGenerativeAI(apiKey) : null;
 
 const model = genAI ? genAI.getGenerativeModel({
-  model: 'gemini-2.5-flash',
+  model: 'gemini-1.5-flash',
 }) : null;
 
 const generationConfig = {
@@ -100,6 +100,6 @@ export async function POST(req: Request) {
 
   } catch (error) {
     console.error('Erro detalhado no chatbot:', error);
-    return NextResponse.json({ error: 'Erro interno' }, { status: 500, headers });
+    return NextResponse.json({ error: `Erro interno: ${error instanceof Error ? error.message : 'Erro desconhecido'}` }, { status: 500, headers });
   }
 }
