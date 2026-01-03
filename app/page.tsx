@@ -55,7 +55,7 @@ function HomeDashboard({
   const remainingCalories = goals ? Math.max(0, goals.calories - dailyTotals.calories) : 0;
 
   return (
-    <div className="space-y-6 md:space-y-8">
+    <div className="space-y-8">
       {/* Header */}
       <div className="animate-in fade-in duration-500">
         <h1 className="text-3xl font-bold text-gray-900 dark:text-white/90">
@@ -66,20 +66,16 @@ function HomeDashboard({
 
       {/* Main Calorie Circle */}
       <div className="relative flex items-center justify-center animate-in fade-in zoom-in-95 duration-700 my-8 md:my-12">
-        <div className="absolute w-72 h-72 md:w-80 md:h-80 rounded-full border border-dashed border-gray-200 dark:border-white/10" />
-        <div className="absolute w-64 h-64 md:w-72 md:h-72 rounded-full bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10" />
-        <div className="relative w-56 h-56 md:w-64 md:h-64 rounded-full bg-gradient-to-br from-primary/80 to-orange-600 flex flex-col items-center justify-center shadow-2xl shadow-primary/20">
-          <div className="absolute inset-2 rounded-full bg-white/90 dark:bg-gray-900/80 backdrop-blur-sm shadow-[inset_0_8px_20px_rgba(0,0,0,0.1)] dark:shadow-[inset_0_8px_20px_rgba(0,0,0,0.5)]" />
-          <div className="relative z-10 text-center">
-            <span className="text-sm font-medium text-gray-500 dark:text-white/60">Restantes</span>
-            <h2 className="text-5xl md:text-6xl font-bold text-gray-900 dark:text-white tracking-tighter">{Math.round(remainingCalories)}</h2>
-            <span className="text-lg font-medium text-gray-600 dark:text-white/80">Kcal</span>
-          </div>
+        <div className="absolute w-72 h-72 md:w-80 md:h-80 bg-gradient-to-tr from-primary/30 to-orange-400/30 rounded-full blur-3xl opacity-60 dark:opacity-40 animate-pulse" />
+        <div className="relative w-56 h-56 md:w-64 md:h-64 rounded-full bg-white/10 dark:bg-black/20 backdrop-blur-2xl border border-white/20 dark:border-white/10 shadow-2xl shadow-primary/10 flex flex-col items-center justify-center">
+          <span className="text-sm font-medium text-gray-700 dark:text-white/70">Restantes</span>
+          <h2 className="text-5xl md:text-6xl font-bold text-gray-900 dark:text-white tracking-tighter drop-shadow-md">{Math.round(remainingCalories)}</h2>
+          <span className="text-lg font-medium text-gray-800 dark:text-white/80">Kcal</span>
         </div>
       </div>
 
       {/* Macro Grid Card */}
-      <div className="p-4 md:p-6 bg-white dark:bg-white/5 backdrop-blur-md border border-gray-200 dark:border-white/10 rounded-3xl animate-in fade-in slide-in-from-bottom-4 duration-700 delay-200 shadow-lg dark:shadow-none">
+      <div className="p-4 md:p-6 bg-white/20 dark:bg-white/5 backdrop-blur-2xl border border-white/30 dark:border-white/10 rounded-3xl animate-in fade-in slide-in-from-bottom-4 duration-700 delay-200 shadow-xl shadow-black/5 dark:shadow-primary/10">
         <div className="grid grid-cols-3 gap-2 md:gap-4">
           <ProgressCircle
             value={dailyTotals.protein}
@@ -111,7 +107,7 @@ function HomeDashboard({
         <div className="space-y-3">
           {dailyActivity.scannedProducts.length > 0 ? (
             dailyActivity.scannedProducts.slice(0, 3).map((product: any, index: number) => (
-              <div key={index} className="flex items-center gap-4 p-3 bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-2xl shadow-sm hover:shadow-md transition-shadow dark:shadow-none">
+              <div key={index} className="flex items-center gap-4 p-3 bg-white/20 dark:bg-white/5 backdrop-blur-xl border border-white/30 dark:border-white/10 rounded-2xl shadow-lg hover:shadow-xl transition-shadow shadow-black/5 dark:shadow-primary/10">
                 <div className="relative">
                   <img src={product.image || "/placeholder.svg?width=64&height=64"} alt={product.productName} className="w-16 h-16 rounded-2xl object-cover bg-gray-700" />
                   <Badge className={cn(
@@ -134,8 +130,8 @@ function HomeDashboard({
               </div>
             ))
           ) : (
-            <div className="text-center py-8 px-4 bg-gray-50 dark:bg-white/5 border border-dashed border-gray-300 dark:border-white/10 rounded-2xl">
-              <p className="text-sm text-gray-500 dark:text-white/60">Escaneie seu primeiro alimento.</p>
+            <div className="text-center py-8 px-4 bg-white/20 dark:bg-white/5 backdrop-blur-xl border border-dashed border-white/30 dark:border-white/10 rounded-2xl">
+              <p className="text-sm text-gray-700 dark:text-white/60">Escaneie seu primeiro alimento.</p>
             </div>
           )}
         </div>
@@ -377,7 +373,7 @@ export default function DashboardPage() {
   const currentAnalysis = analysisResult;
 
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-gradient-to-br dark:from-gray-950 dark:to-black text-gray-900 dark:text-white font-sans selection:bg-primary/30 flex">
+    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-orange-50 dark:bg-gradient-to-br dark:from-gray-950 dark:to-black text-gray-900 dark:text-white font-sans selection:bg-primary/30 flex">
       {/* Sidebar Desktop */}
       <aside className="hidden md:flex flex-col w-64 fixed inset-y-0 left-0 bg-white dark:bg-gray-950 border-r border-gray-200 dark:border-white/10 z-50">
         <div className="p-6 flex items-center gap-2 font-bold text-2xl tracking-tighter text-gray-900 dark:text-white">
