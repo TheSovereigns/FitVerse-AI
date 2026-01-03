@@ -15,7 +15,7 @@ const apiKey = process.env.GEMINI_API_KEY;
 const genAI = apiKey ? new GoogleGenerativeAI(apiKey) : null;
 
 const model = genAI ? genAI.getGenerativeModel({
-  model: 'gemini-1.5-flash',
+  model: 'gemini-2.5-flash',
 }) : null;
 
 const generationConfig = {
@@ -73,10 +73,21 @@ export async function POST(req: Request) {
 
     const limitedHistory = (history || []).slice(-MAX_HISTORY_LENGTH);
 
-    const chatHistory: Content[] = limitedHistory.map((msg: any) => ({
-      role: msg.role === 'user' ? 'user' : 'model',
-      parts: msg.parts.map((part: any) => ({ text: part.text })),
-    }));
+    // Mapeamento robusto do histórico para evitar erros de formato
+    const chatHistory: Content[] = limitedHistory.map((msg: any) => {
+      let parts = [];
+      if (Array.isArray(msg.parts)) {
+        parts = msg.parts.map((part: any) => ({ text: part.text || '' }));
+      } else if (typeof msg.parts === 'string') {
+        parts = [{ text: msg.parts }];
+      } else {
+        parts = [{ text: '' }];
+      }
+      return {
+        role: msg.role === 'user' ? 'user' : 'model',
+        parts: parts,
+      };
+    });
 
     const chat = model.startChat({ generationConfig, safetySettings, history: chatHistory });
     const fullMessage = `${systemPrompt}\n\nPERGUNTA: ${message}`;
@@ -88,7 +99,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ reply }, { headers });
 
   } catch (error) {
-    console.error('Erro no chatbot:', error);
+    console.error('Erro detalhado no chatbot:', error);
     return NextResponse.json({ error: 'Erro interno' }, { status: 500, headers });
   }
 }

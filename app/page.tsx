@@ -67,8 +67,8 @@ function HomeDashboard({
       {/* Main Calorie Circle */}
       <div className="relative flex items-center justify-center animate-in fade-in zoom-in-95 duration-700 my-8 md:my-12">
         <div className="absolute w-72 h-72 md:w-80 md:h-80 rounded-full border border-dashed border-gray-200 dark:border-white/10" />
-        <div className="absolute w-64 h-64 md:w-72 md:h-72 rounded-full bg-white dark:bg-gray-950 border border-gray-200 dark:border-white/10" />
-        <div className="relative w-56 h-56 md:w-64 md:h-64 rounded-full bg-white dark:bg-gray-950 shadow-2xl flex flex-col items-center justify-center border border-gray-100 dark:border-white/10">
+        <div className="absolute w-64 h-64 md:w-72 md:h-72 rounded-full bg-white dark:bg-black/60 backdrop-blur-md border border-gray-200 dark:border-white/10" />
+        <div className="relative w-56 h-56 md:w-64 md:h-64 rounded-full bg-white dark:bg-black/80 backdrop-blur-xl shadow-2xl flex flex-col items-center justify-center border border-gray-100 dark:border-white/10">
           <span className="text-sm font-medium text-gray-500 dark:text-white/60">Restantes</span>
           <h2 className="text-5xl md:text-6xl font-bold text-gray-900 dark:text-white tracking-tighter">{Math.round(remainingCalories)}</h2>
           <span className="text-lg font-medium text-gray-600 dark:text-white/80">Kcal</span>
@@ -76,7 +76,7 @@ function HomeDashboard({
       </div>
 
       {/* Macro Grid Card */}
-      <div className="p-4 md:p-6 bg-white dark:bg-gray-950 border border-gray-200 dark:border-white/10 rounded-3xl animate-in fade-in slide-in-from-bottom-4 duration-700 delay-200 shadow-lg dark:shadow-none">
+      <div className="p-4 md:p-6 bg-white dark:bg-black/60 backdrop-blur-md border border-gray-200 dark:border-white/10 rounded-3xl animate-in fade-in slide-in-from-bottom-4 duration-700 delay-200 shadow-lg dark:shadow-none">
         <div className="grid grid-cols-3 gap-2 md:gap-4">
           <ProgressCircle
             value={dailyTotals.protein}
@@ -108,7 +108,7 @@ function HomeDashboard({
         <div className="space-y-3">
           {dailyActivity.scannedProducts.length > 0 ? (
             dailyActivity.scannedProducts.slice(0, 3).map((product: any, index: number) => (
-              <div key={index} className="flex items-center gap-4 p-3 bg-white dark:bg-gray-950 border border-gray-200 dark:border-white/10 rounded-2xl shadow-sm hover:shadow-md transition-shadow dark:shadow-none">
+              <div key={index} className="flex items-center gap-4 p-3 bg-white dark:bg-black/60 backdrop-blur-md border border-gray-200 dark:border-white/10 rounded-2xl shadow-sm hover:shadow-md transition-shadow dark:shadow-none">
                 <div className="relative">
                   <img src={product.image || "/placeholder.svg?width=64&height=64"} alt={product.productName} className="w-16 h-16 rounded-2xl object-cover bg-gray-700" />
                   <Badge className={cn(
@@ -131,7 +131,7 @@ function HomeDashboard({
               </div>
             ))
           ) : (
-            <div className="text-center py-8 px-4 bg-white dark:bg-gray-950 border border-dashed border-gray-200 dark:border-white/10 rounded-2xl">
+            <div className="text-center py-8 px-4 bg-white dark:bg-black/60 backdrop-blur-md border border-dashed border-gray-200 dark:border-white/10 rounded-2xl">
               <p className="text-sm text-gray-500 dark:text-white/60">Escaneie seu primeiro alimento.</p>
             </div>
           )}
