@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold, Content } from '@google/generative-ai';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
 export async function OPTIONS() {
   return NextResponse.json({}, {
@@ -18,92 +18,58 @@ const model = genAI ? genAI.getGenerativeModel({
   model: 'gemini-1.5-flash',
 }) : null;
 
-const generationConfig = {
-  temperature: 0.8,
-  topK: 1,
-  topP: 0.95,
-  maxOutputTokens: 2048,
-};
-
-const safetySettings = [
-  { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
-  { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
-  { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
-  { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
-];
-
-const MAX_HISTORY_LENGTH = 20;
-
 export async function POST(req: Request) {
   const headers = {
-    'Access-Control-Allow-Origin': '*',
+    'Access-control-allow-origin': '*',
     'Access-Control-Allow-Methods': 'POST, OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type, Authorization',
   };
 
   if (!apiKey || !model) {
-    return NextResponse.json({ reply: "Erro: Chave de API do Gemini não configurada." }, { status: 500, headers });
+    return NextResponse.json({ error: 'Chave de API do Gemini não configurada.' }, { status: 500, headers });
   }
 
   try {
-    let body;
-    try {
-      body = await req.json();
-    } catch (e) {
-      return NextResponse.json({ error: 'Corpo da requisição inválido.' }, { status: 400, headers });
-    }
+    const criteria = await req.json();
 
-    const { message, history, userMetabolicPlan } = body;
+    const prompt = `
+      Crie um plano de treino baseado nos seguintes critérios:
+      - Foco: ${criteria.focus}
+      - Nível: ${criteria.level}
+      - Duração: ${criteria.duration}
+      - Local: ${criteria.location}
+      - Objetivo do usuário: ${criteria.goal}
 
-    if (!message) {
-      return NextResponse.json({ error: 'Mensagem vazia.' }, { status: 400, headers });
-    }
-
-    const systemPrompt = `Você é o FitVerse AI, um assistente especializado EXCLUSIVAMENTE em fitness, nutrição, saúde, emagrecimento, academia e uso da plataforma FitVerse.
-    
-    Seu objetivo é fornecer conselhos seguros, motivadores e baseados em evidências dentro dessas áreas.
-    
-    REGRAS RÍGIDAS:
-    1. Se o usuário perguntar sobre qualquer assunto que NÃO seja relacionado a saúde, fitness, nutrição, emagrecimento, academia ou sobre o site FitVerse, você deve recusar educadamente responder, dizendo que só pode ajudar com tópicos de saúde e fitness.
-    2. NUNCA forneça conselhos médicos. Se a pergunta parecer de natureza médica (diagnóstico, tratamento de doenças, etc.), recomende ao usuário que consulte um profissional de saúde.
-    3. Sempre que possível, personalize as respostas com base nos dados do usuário fornecidos abaixo.
-    
-    ${userMetabolicPlan ? `Aqui estão os dados do plano metabólico do usuário para contextualizar suas respostas: ${JSON.stringify(userMetabolicPlan, null, 2)}` : ''}
+      Retorne um array JSON chamado "workouts" contendo um único objeto de treino.
+      O objeto de treino deve ter a seguinte estrutura:
+      {
+        "name": "Nome do Treino (ex: Hipertrofia de Peito e Tríceps)",
+        "category": "${criteria.focus}",
+        "duration": "${criteria.duration}",
+        "calories": "Estimativa de calorias queimadas (ex: 350-500)",
+        "difficulty": "${criteria.level}",
+        "aiVerdict": "Um breve veredito da IA sobre o treino, em português.",
+        "exercises": [
+          { "name": "Nome do Exercício 1", "sets": "3", "reps": "10-12", "rest": "60s" },
+          { "name": "Nome do Exercício 2", "sets": "4", "reps": "8-10", "rest": "90s" }
+        ]
+      }
+      Gere de 5 a 7 exercícios. O JSON deve ser estrito, sem markdown.
     `;
 
-    const limitedHistory = (history || []).slice(-MAX_HISTORY_LENGTH);
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    let text = response.text();
 
-    // Mapeamento robusto do histórico para evitar erros de formato
-    let chatHistory: Content[] = limitedHistory.map((msg: any) => {
-      let parts = [];
-      if (Array.isArray(msg.parts)) {
-        parts = msg.parts.map((part: any) => ({ text: part.text || '' }));
-      } else if (typeof msg.parts === 'string') {
-        parts = [{ text: msg.parts }];
-      } else {
-        parts = [{ text: '' }];
-      }
-      return {
-        role: msg.role === 'user' ? 'user' : 'model',
-        parts: parts,
-      };
-    });
+    // Limpeza de markdown se houver
+    text = text.replace(/```json/g, '').replace(/```/g, '').trim();
 
-    // Garante que o histórico comece com uma mensagem do usuário (requisito do Gemini)
-    if (chatHistory.length > 0 && chatHistory[0].role !== 'user') {
-      chatHistory.shift();
-    }
+    const workoutPlan = JSON.parse(text);
 
-    const chat = model.startChat({ generationConfig, safetySettings, history: chatHistory });
-    const fullMessage = `${systemPrompt}\n\nPERGUNTA: ${message}`;
-    
-    const result = await chat.sendMessage(fullMessage);
-    const response = result.response;
-    const reply = response.text();
+    return NextResponse.json(workoutPlan, { headers });
 
-    return NextResponse.json({ reply }, { headers });
   } catch (error) {
-    console.error('Erro detalhado no chatbot:', error);
-    return NextResponse.json({ error: `Erro interno: ${error instanceof Error ? error.message : 'Erro desconhecido'}` }, { status: 500, headers });
+    console.error('Erro ao gerar treino com IA:', error);
+    return NextResponse.json({ error: 'Falha ao gerar treino com a IA.' }, { status: 500, headers });
   }
 }
