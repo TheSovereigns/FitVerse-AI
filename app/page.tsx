@@ -66,16 +66,17 @@ function HomeDashboard({
 
       {/* Main Calorie Circle */}
       <div className="relative flex items-center justify-center animate-in fade-in zoom-in-95 duration-700 my-8 md:my-12">
-        <div className="absolute w-72 h-72 md:w-80 md:h-80 bg-gradient-to-tr from-primary/30 to-orange-400/30 rounded-full blur-3xl opacity-60 dark:opacity-40 animate-pulse" />
-        <div className="relative w-56 h-56 md:w-64 md:h-64 rounded-full bg-white/10 dark:bg-black/20 backdrop-blur-2xl border border-white/20 dark:border-white/10 shadow-2xl shadow-primary/10 flex flex-col items-center justify-center">
-          <span className="text-sm font-medium text-gray-700 dark:text-white/70">Restantes</span>
-          <h2 className="text-5xl md:text-6xl font-bold text-gray-900 dark:text-white tracking-tighter drop-shadow-md">{Math.round(remainingCalories)}</h2>
-          <span className="text-lg font-medium text-gray-800 dark:text-white/80">Kcal</span>
+        <div className="absolute w-72 h-72 md:w-80 md:h-80 rounded-full border border-dashed border-gray-200 dark:border-white/10" />
+        <div className="absolute w-64 h-64 md:w-72 md:h-72 rounded-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10" />
+        <div className="relative w-56 h-56 md:w-64 md:h-64 rounded-full bg-white dark:bg-gray-900 shadow-2xl flex flex-col items-center justify-center border border-gray-100 dark:border-white/10">
+          <span className="text-sm font-medium text-gray-500 dark:text-white/60">Restantes</span>
+          <h2 className="text-5xl md:text-6xl font-bold text-gray-900 dark:text-white tracking-tighter">{Math.round(remainingCalories)}</h2>
+          <span className="text-lg font-medium text-gray-600 dark:text-white/80">Kcal</span>
         </div>
       </div>
 
       {/* Macro Grid Card */}
-      <div className="p-4 md:p-6 bg-white/20 dark:bg-white/5 backdrop-blur-2xl border border-white/30 dark:border-white/10 rounded-3xl animate-in fade-in slide-in-from-bottom-4 duration-700 delay-200 shadow-xl shadow-black/5 dark:shadow-primary/10">
+      <div className="p-4 md:p-6 bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-3xl animate-in fade-in slide-in-from-bottom-4 duration-700 delay-200 shadow-lg dark:shadow-none">
         <div className="grid grid-cols-3 gap-2 md:gap-4">
           <ProgressCircle
             value={dailyTotals.protein}
@@ -107,7 +108,7 @@ function HomeDashboard({
         <div className="space-y-3">
           {dailyActivity.scannedProducts.length > 0 ? (
             dailyActivity.scannedProducts.slice(0, 3).map((product: any, index: number) => (
-              <div key={index} className="flex items-center gap-4 p-3 bg-white/20 dark:bg-white/5 backdrop-blur-xl border border-white/30 dark:border-white/10 rounded-2xl shadow-lg hover:shadow-xl transition-shadow shadow-black/5 dark:shadow-primary/10">
+              <div key={index} className="flex items-center gap-4 p-3 bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-2xl shadow-sm hover:shadow-md transition-shadow dark:shadow-none">
                 <div className="relative">
                   <img src={product.image || "/placeholder.svg?width=64&height=64"} alt={product.productName} className="w-16 h-16 rounded-2xl object-cover bg-gray-700" />
                   <Badge className={cn(
@@ -130,8 +131,8 @@ function HomeDashboard({
               </div>
             ))
           ) : (
-            <div className="text-center py-8 px-4 bg-white/20 dark:bg-white/5 backdrop-blur-xl border border-dashed border-white/30 dark:border-white/10 rounded-2xl">
-              <p className="text-sm text-gray-700 dark:text-white/60">Escaneie seu primeiro alimento.</p>
+            <div className="text-center py-8 px-4 bg-gray-50 dark:bg-white/5 border border-dashed border-gray-200 dark:border-white/10 rounded-2xl">
+              <p className="text-sm text-gray-500 dark:text-white/60">Escaneie seu primeiro alimento.</p>
             </div>
           )}
         </div>
@@ -264,10 +265,16 @@ export default function DashboardPage() {
         body: JSON.stringify({ priceId }),
       });
 
-      const data = await response.json()
-      
-      if (!response.ok) throw new Error(data.message);
+      if (!response.ok) {
+        try {
+          const errorData = await response.json();
+          throw new Error(errorData.message || 'Erro no checkout');
+        } catch {
+          throw new Error('Erro ao processar pagamento');
+        }
+      }
 
+      const data = await response.json()
       const stripe = await stripePromise;
       if (stripe) {
         const { error } = await stripe.redirectToCheckout({ sessionId: data.sessionId });
@@ -323,8 +330,12 @@ export default function DashboardPage() {
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Falha na análise da IA');
+        try {
+          const errorData = await response.json();
+          throw new Error(errorData.error || 'Falha na análise da IA');
+        } catch {
+          throw new Error('Falha na análise da IA (Erro de servidor)');
+        }
       }
 
       const analysis: ProductAnalysis = await response.json();
@@ -382,18 +393,18 @@ export default function DashboardPage() {
         </div>
         
         <nav className="flex-1 px-4 space-y-2 mt-4">
-          <Button variant="ghost" onClick={() => setCurrentView("home")} className={`w-full justify-start gap-3 transition-all duration-300 ease-in-out ${currentView === "home" ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-accent"}`}><Home className="w-5 h-5" />Página Inicial</Button>
-          <Button variant="ghost" onClick={() => setCurrentView("dashboard")} className={`w-full justify-start gap-3 transition-all duration-300 ease-in-out ${currentView === "dashboard" ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-accent"}`}><ScanLine className="w-5 h-5" />BioScan</Button>
-          <Button variant="ghost" onClick={() => setCurrentView("training")} className={`w-full justify-start gap-3 transition-all duration-300 ease-in-out ${currentView === "training" ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-accent"}`}><Dumbbell className="w-5 h-5" />NutriTrain</Button>
-          <Button variant="ghost" onClick={() => setCurrentView("planner")} className={`w-full justify-start gap-3 transition-all duration-300 ease-in-out ${currentView === "planner" ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-accent"}`}><Calculator className="w-5 h-5" />Dieta AI</Button>
-          <Button variant="ghost" onClick={() => setCurrentView("recipes")} className={`w-full justify-start gap-3 transition-all duration-300 ease-in-out ${currentView === "recipes" ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-accent"}`}><ChefHat className="w-5 h-5" />Receitas</Button>
-          <Button variant="ghost" onClick={() => setCurrentView("store")} className={`w-full justify-start gap-3 transition-all duration-300 ease-in-out ${currentView === "store" ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-accent"}`}><ShoppingBag className="w-5 h-5" />Loja</Button>
-          <Button variant="ghost" onClick={() => setCurrentView("chatbot")} className={`w-full justify-start gap-3 transition-all duration-300 ease-in-out ${currentView === "chatbot" ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-accent"}`}><Bot className="w-5 h-5" />AI Chat</Button>
+          <Button variant="ghost" onClick={() => setCurrentView("home")} className={`w-full justify-start gap-3 transition-all duration-300 ease-in-out ${currentView === "home" ? "bg-gray-100/80 dark:bg-white/10 backdrop-blur-md border border-gray-200/50 dark:border-white/20 shadow-sm text-primary" : "text-muted-foreground hover:text-foreground hover:bg-gray-50/50 hover:backdrop-blur-sm"}`}><Home className="w-5 h-5" />Página Inicial</Button>
+          <Button variant="ghost" onClick={() => setCurrentView("dashboard")} className={`w-full justify-start gap-3 transition-all duration-300 ease-in-out ${currentView === "dashboard" ? "bg-gray-100/80 dark:bg-white/10 backdrop-blur-md border border-gray-200/50 dark:border-white/20 shadow-sm text-primary" : "text-muted-foreground hover:text-foreground hover:bg-gray-50/50 hover:backdrop-blur-sm"}`}><ScanLine className="w-5 h-5" />BioScan</Button>
+          <Button variant="ghost" onClick={() => setCurrentView("training")} className={`w-full justify-start gap-3 transition-all duration-300 ease-in-out ${currentView === "training" ? "bg-gray-100/80 dark:bg-white/10 backdrop-blur-md border border-gray-200/50 dark:border-white/20 shadow-sm text-primary" : "text-muted-foreground hover:text-foreground hover:bg-gray-50/50 hover:backdrop-blur-sm"}`}><Dumbbell className="w-5 h-5" />NutriTrain</Button>
+          <Button variant="ghost" onClick={() => setCurrentView("planner")} className={`w-full justify-start gap-3 transition-all duration-300 ease-in-out ${currentView === "planner" ? "bg-gray-100/80 dark:bg-white/10 backdrop-blur-md border border-gray-200/50 dark:border-white/20 shadow-sm text-primary" : "text-muted-foreground hover:text-foreground hover:bg-gray-50/50 hover:backdrop-blur-sm"}`}><Calculator className="w-5 h-5" />Dieta AI</Button>
+          <Button variant="ghost" onClick={() => setCurrentView("recipes")} className={`w-full justify-start gap-3 transition-all duration-300 ease-in-out ${currentView === "recipes" ? "bg-gray-100/80 dark:bg-white/10 backdrop-blur-md border border-gray-200/50 dark:border-white/20 shadow-sm text-primary" : "text-muted-foreground hover:text-foreground hover:bg-gray-50/50 hover:backdrop-blur-sm"}`}><ChefHat className="w-5 h-5" />Receitas</Button>
+          <Button variant="ghost" onClick={() => setCurrentView("store")} className={`w-full justify-start gap-3 transition-all duration-300 ease-in-out ${currentView === "store" ? "bg-gray-100/80 dark:bg-white/10 backdrop-blur-md border border-gray-200/50 dark:border-white/20 shadow-sm text-primary" : "text-muted-foreground hover:text-foreground hover:bg-gray-50/50 hover:backdrop-blur-sm"}`}><ShoppingBag className="w-5 h-5" />Loja</Button>
+          <Button variant="ghost" onClick={() => setCurrentView("chatbot")} className={`w-full justify-start gap-3 transition-all duration-300 ease-in-out ${currentView === "chatbot" ? "bg-gray-100/80 dark:bg-white/10 backdrop-blur-md border border-gray-200/50 dark:border-white/20 shadow-sm text-primary" : "text-muted-foreground hover:text-foreground hover:bg-gray-50/50 hover:backdrop-blur-sm"}`}><Bot className="w-5 h-5" />AI Chat</Button>
         </nav>
 
         <div className="p-4 border-t border-gray-200 dark:border-white/10 space-y-2">
-           <Button variant="ghost" onClick={() => setCurrentView("profile")} className={`w-full justify-start gap-3 transition-all duration-300 ease-in-out ${currentView === "profile" ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-accent"}`}><User className="w-5 h-5" />Perfil</Button>
-           <Button variant="ghost" onClick={() => setCurrentView("settings")} className={`w-full justify-start gap-3 transition-all duration-300 ease-in-out ${currentView === "settings" ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-accent"}`}><Settings className="w-5 h-5" />Configurações</Button>
+           <Button variant="ghost" onClick={() => setCurrentView("profile")} className={`w-full justify-start gap-3 transition-all duration-300 ease-in-out ${currentView === "profile" ? "bg-gray-100/80 dark:bg-white/10 backdrop-blur-md border border-gray-200/50 dark:border-white/20 shadow-sm text-primary" : "text-muted-foreground hover:text-foreground hover:bg-gray-50/50 hover:backdrop-blur-sm"}`}><User className="w-5 h-5" />Perfil</Button>
+           <Button variant="ghost" onClick={() => setCurrentView("settings")} className={`w-full justify-start gap-3 transition-all duration-300 ease-in-out ${currentView === "settings" ? "bg-gray-100/80 dark:bg-white/10 backdrop-blur-md border border-gray-200/50 dark:border-white/20 shadow-sm text-primary" : "text-muted-foreground hover:text-foreground hover:bg-gray-50/50 hover:backdrop-blur-sm"}`}><Settings className="w-5 h-5" />Configurações</Button>
         </div>
       </aside>
 
@@ -433,7 +444,7 @@ export default function DashboardPage() {
       />
 
       {/* Floating Action Button */}
-      <Button onClick={handleNavScan} className="fixed bottom-24 right-6 md:bottom-8 md:right-8 z-50 h-16 w-16 rounded-full bg-gradient-to-br from-primary to-orange-400 text-white shadow-2xl shadow-primary/30 transition-transform hover:scale-110 active:scale-95 animate-in fade-in zoom-in-95 duration-500">
+      <Button onClick={handleNavScan} className="fixed bottom-24 right-6 md:bottom-8 md:right-8 z-50 h-16 w-16 rounded-full bg-primary/80 backdrop-blur-md border border-white/20 text-white shadow-2xl shadow-primary/30 transition-transform hover:scale-110 active:scale-95 animate-in fade-in zoom-in-95 duration-500">
         <ScanLine className="h-8 w-8" />
       </Button>
 
