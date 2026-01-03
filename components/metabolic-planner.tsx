@@ -46,7 +46,7 @@ export interface MetabolicPlan {
 }
 
 interface MetabolicPlannerProps {
-  onPlanCreated: (plan: MetabolicPlan) => void;
+  onPlanCreated: (plan: MetabolicPlan, perfil: BioPerfil) => void;
 }
 
 export function MetabolicPlanner({ onPlanCreated }: MetabolicPlannerProps) {
@@ -90,7 +90,7 @@ export function MetabolicPlanner({ onPlanCreated }: MetabolicPlannerProps) {
       const generatedPlan: MetabolicPlan = await response.json();
       
       setPlan(generatedPlan)
-      onPlanCreated(generatedPlan)
+      onPlanCreated(generatedPlan, perfil) // Passa o plano e o perfil para salvar o contexto
       setShowDashboard(true)
     } catch (error) {
       console.error("Error calculating macros:", error)
@@ -105,17 +105,19 @@ export function MetabolicPlanner({ onPlanCreated }: MetabolicPlannerProps) {
   }
 
   return (
-    <div className="px-4 pt-8 pb-24 text-foreground bg-background min-h-screen">
-      <div className="mb-6">
-        <h1 className="text-4xl font-black mb-2 text-balance tracking-tighter uppercase italic">
-          Planejamento <span className="text-primary">Metabólico</span>
-        </h1>
-        <p className="text-muted-foreground text-pretty font-medium text-sm">
-          Descubra suas necessidades calóricas e alcance seus objetivos com precisão científica
-        </p>
-      </div>
+    <div className="flex flex-col h-[100dvh] bg-background text-foreground">
+      <div className="flex-1 overflow-y-auto">
+        <div className="px-4 md:px-6 pt-8 pb-32 md:pb-12 max-w-3xl mx-auto">
+          <div className="mb-8 text-center md:text-left">
+            <h1 className="text-3xl md:text-4xl font-black mb-2 text-balance tracking-tighter uppercase italic">
+              Planejamento <span className="text-primary">Metabólico</span>
+            </h1>
+            <p className="text-muted-foreground text-pretty font-medium text-sm max-w-lg mx-auto md:mx-0">
+              Descubra suas necessidades calóricas e alcance seus objetivos com precisão científica
+            </p>
+          </div>
 
-      <form onSubmit={handleSubmit} className="relative bg-card border border-border rounded-[2rem] p-6 overflow-hidden border-b-[6px] border-b-primary shadow-2xl">
+      <form id="metabolic-form" onSubmit={handleSubmit} className="relative bg-card border border-border rounded-[2rem] p-6 md:p-8 overflow-hidden border-b-[6px] border-b-primary shadow-2xl">
         {/* Cantoneiras Iluminadas (4 cantos) */}
         <div className="absolute top-0 left-0 w-8 h-8 border-t-2 border-l-2 border-primary rounded-tl-xl opacity-80" />
         <div className="absolute top-0 right-0 w-8 h-8 border-t-2 border-r-2 border-primary rounded-tr-xl opacity-80" />
@@ -297,7 +299,7 @@ export function MetabolicPlanner({ onPlanCreated }: MetabolicPlannerProps) {
 
           <Button
             type="submit"
-            className="w-full h-16 bg-primary hover:bg-primary/90 hover:shadow-[0_0_30px_rgba(255,140,0,0.4)] text-primary-foreground font-black text-sm uppercase tracking-[0.2em] rounded-2xl transition-all duration-300 group mt-4"
+            className="w-full h-16 bg-primary hover:bg-primary/90 hover:shadow-[0_0_30px_rgba(255,140,0,0.4)] text-primary-foreground font-black text-sm uppercase tracking-[0.2em] rounded-2xl transition-all duration-300 group mt-4 hidden md:flex"
             disabled={isLoading}
           >
             {isLoading ? (
@@ -314,6 +316,30 @@ export function MetabolicPlanner({ onPlanCreated }: MetabolicPlannerProps) {
           </Button>
         </div>
       </form>
+      </div>
+    </div>
+
+      {/* Rodapé Fixo para Mobile */}
+      <div className="md:hidden border-t border-border bg-card/80 backdrop-blur-lg p-4 pb-[max(1rem,env(safe-area-inset-bottom))] shrink-0 shadow-[0_-5px_20px_rgba(0,0,0,0.1)] dark:shadow-[0_-5px_20px_rgba(0,0,0,0.3)]">
+        <Button
+          type="submit"
+          form="metabolic-form"
+          className="w-full h-14 bg-primary hover:bg-primary/90 text-white font-bold text-lg rounded-xl shadow-lg shadow-primary/30"
+          disabled={isLoading}
+        >
+          {isLoading ? (
+            <div className="flex items-center justify-center gap-3">
+              <Loader2 className="w-5 h-5 animate-spin" />
+              <span>Analisando...</span>
+            </div>
+          ) : (
+            <div className="flex items-center justify-center gap-2">
+              <span>Gerar Protocolo</span>
+              <ArrowRight className="w-5 h-5" />
+            </div>
+          )}
+        </Button>
+      </div>
     </div>
   )
 }

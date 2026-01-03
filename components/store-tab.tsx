@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import { useState, useMemo, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
@@ -70,18 +70,24 @@ const products: Product[] = [
 
 // --- Componente do Overlay de Detalhes do Produto ---
 function ProductDetailOverlay({ product, onClose, onAddToCart }: { product: Product; onClose: () => void; onAddToCart: (product: Product) => void; }) {
-  return (
-    <div className="fixed inset-0 bg-white dark:bg-black z-50 animate-in fade-in duration-300">
-      <ScrollArea className="h-full">
-        <div className="container mx-auto max-w-5xl px-4 py-12">
-          {/* Header com botão de voltar */}
-          <div className="mb-8">
-            <Button variant="ghost" onClick={onClose} className="text-gray-500 dark:text-zinc-400 hover:bg-gray-100 dark:hover:bg-zinc-800 hover:text-gray-900 dark:hover:text-white">
-              <ArrowLeft className="w-5 h-5 mr-2" />
-              Voltar para a Loja
-            </Button>
-          </div>
+  // Bloqueia o scroll da página principal quando o modal abre (sensação de App Nativo)
+  useEffect(() => {
+    document.body.style.overflow = "hidden";
+    return () => { document.body.style.overflow = "unset"; };
+  }, []);
 
+  return (
+    <div className="fixed inset-0 bg-white dark:bg-black z-[60] animate-in fade-in duration-300 flex flex-col h-[100dvh]">
+      {/* Header Fixo */}
+      <div className="flex items-center px-4 py-3 border-b border-gray-200 dark:border-zinc-800 bg-white dark:bg-black shrink-0">
+        <Button variant="ghost" onClick={onClose} className="-ml-2 text-gray-500 dark:text-zinc-400 hover:bg-gray-100 dark:hover:bg-zinc-800 hover:text-gray-900 dark:hover:text-white">
+          <ArrowLeft className="w-5 h-5 mr-2" />
+          Voltar para a Loja
+        </Button>
+      </div>
+
+      <ScrollArea className="flex-1">
+        <div className="container mx-auto max-w-5xl px-4 py-8 pb-32 md:pb-8">
           <div className="grid md:grid-cols-2 gap-8 lg:gap-12">
             {/* Coluna de Imagens */}
             <div>
@@ -100,7 +106,7 @@ function ProductDetailOverlay({ product, onClose, onAddToCart }: { product: Prod
             {/* Coluna de Informações */}
             <div className="flex flex-col">
               <Badge variant="outline" className="border-primary text-primary bg-primary/10 mb-3 w-fit">{product.category}</Badge>
-              <h1 className="text-4xl font-black text-gray-900 dark:text-white tracking-tighter mb-4">{product.name}</h1>
+              <h1 className="text-3xl md:text-4xl font-black text-gray-900 dark:text-white tracking-tighter mb-4">{product.name}</h1>
               <div className="flex items-center gap-4 mb-6">
                 <div className="flex items-center gap-1 text-xs text-gray-500 dark:text-zinc-400">
                   <Star className="w-5 h-5 text-amber-400 fill-amber-400" />
@@ -115,7 +121,7 @@ function ProductDetailOverlay({ product, onClose, onAddToCart }: { product: Prod
                   <p className="text-4xl font-black text-primary">R$ {product.price.toFixed(2)}</p>
                   <p className="text-xs text-gray-500 dark:text-zinc-500">ou em até 12x sem juros</p>
                 </div>
-                <Button onClick={() => onAddToCart(product)} className="w-full h-14 bg-primary hover:bg-primary/90 text-white font-bold text-lg">Adicionar ao Carrinho</Button>
+                <Button onClick={() => onAddToCart(product)} className="w-full h-14 bg-primary hover:bg-primary/90 text-white font-bold text-lg hidden md:flex">Adicionar ao Carrinho</Button>
               </div>
             </div>
           </div>
@@ -123,7 +129,7 @@ function ProductDetailOverlay({ product, onClose, onAddToCart }: { product: Prod
           {/* Seção de Certificados */}
           <div className="mt-16 pt-12 border-t border-gray-200 dark:border-zinc-800">
             <h2 className="text-2xl font-bold text-center text-gray-900 dark:text-white mb-8">Nossa Garantia de Qualidade</h2>
-            <div className="grid md:grid-cols-4 gap-8">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8">
               <div className="text-center"><div className="w-16 h-16 mx-auto mb-4 rounded-full bg-primary/10 border-2 border-primary/30 flex items-center justify-center"><Award className="w-8 h-8 text-primary" /></div><h3 className="font-semibold text-gray-900 dark:text-white">Qualidade Premium</h3><p className="text-sm text-gray-500 dark:text-zinc-500 mt-1">Ingredientes e materiais selecionados para máxima performance.</p></div>
               <div className="text-center"><div className="w-16 h-16 mx-auto mb-4 rounded-full bg-primary/10 border-2 border-primary/30 flex items-center justify-center"><ShieldCheck className="w-8 h-8 text-primary" /></div><h3 className="font-semibold text-gray-900 dark:text-white">Testado e Aprovado</h3><p className="text-sm text-gray-500 dark:text-zinc-500 mt-1">Todos os produtos são rigorosamente testados por atletas.</p></div>
               <div className="text-center"><div className="w-16 h-16 mx-auto mb-4 rounded-full bg-primary/10 border-2 border-primary/30 flex items-center justify-center"><Truck className="w-8 h-8 text-primary" /></div><h3 className="font-semibold text-gray-900 dark:text-white">Entrega Rápida</h3><p className="text-sm text-gray-500 dark:text-zinc-500 mt-1">Receba seus produtos com agilidade e segurança em todo o Brasil.</p></div>
@@ -132,6 +138,18 @@ function ProductDetailOverlay({ product, onClose, onAddToCart }: { product: Prod
           </div>
         </div>
       </ScrollArea>
+
+      {/* Barra de Ação Fixa para Mobile (Sticky Footer) */}
+      {/* Garante conversão rápida e fácil acesso ao botão de compra */}
+      <div className="md:hidden border-t border-gray-200 dark:border-zinc-800 bg-white dark:bg-black p-4 pb-[max(1rem,env(safe-area-inset-bottom))] flex items-center gap-4 shrink-0 z-10 shadow-[0_-5px_20px_rgba(0,0,0,0.05)]">
+        <div className="flex flex-col">
+          <span className="text-xs text-gray-500 dark:text-zinc-400">Total a pagar</span>
+          <span className="text-xl font-black text-primary">R$ {product.price.toFixed(2)}</span>
+        </div>
+        <Button onClick={() => onAddToCart(product)} className="flex-1 h-12 bg-primary hover:bg-primary/90 text-white font-bold text-lg rounded-xl shadow-lg shadow-primary/25">
+          Adicionar
+        </Button>
+      </div>
     </div>
   )
 }
@@ -140,8 +158,18 @@ function ProductDetailOverlay({ product, onClose, onAddToCart }: { product: Prod
 function CartSidePanel({ items, isOpen, onClose, onUpdateQuantity, onRemoveItem }: { items: CartItem[]; isOpen: boolean; onClose: () => void; onUpdateQuantity: (productId: number, quantity: number) => void; onRemoveItem: (productId: number) => void; }) {
   const totalPrice = useMemo(() => items.reduce((sum, item) => sum + item.price * item.quantity, 0), [items]);
 
+  // Bloqueia o scroll quando o carrinho abre
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+    return () => { document.body.style.overflow = "unset"; };
+  }, [isOpen]);
+
   return (
-    <div className={cn("fixed top-0 right-0 h-full w-full max-w-md bg-white dark:bg-black border-l border-gray-200 dark:border-zinc-800 z-50 transform transition-transform duration-300 ease-in-out", isOpen ? "translate-x-0" : "translate-x-full")}>
+    <div className={cn("fixed top-0 right-0 h-[100dvh] w-full max-w-md bg-white dark:bg-black border-l border-gray-200 dark:border-zinc-800 z-[70] transform transition-transform duration-300 ease-in-out", isOpen ? "translate-x-0" : "translate-x-full")}>
       <div className="flex flex-col h-full">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-zinc-800">
@@ -181,7 +209,7 @@ function CartSidePanel({ items, isOpen, onClose, onUpdateQuantity, onRemoveItem 
 
         {/* Footer */}
         {items.length > 0 && (
-          <div className="p-6 border-t border-gray-200 dark:border-zinc-800 space-y-4">
+          <div className="p-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] border-t border-gray-200 dark:border-zinc-800 space-y-4 bg-white dark:bg-black">
             <div className="flex justify-between text-lg">
               <span className="text-gray-500 dark:text-zinc-400">Total:</span>
               <span className="font-bold text-gray-900 dark:text-white">R$ {totalPrice.toFixed(2)}</span>

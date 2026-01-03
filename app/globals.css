@@ -127,10 +127,21 @@
 
 @layer base {
   * {
-    @apply border-border outline-ring/50;
+    @apply border-border;
   }
+
+  html {
+    /* Previne o zoom automático da fonte ao virar o celular (iOS) */
+    -webkit-text-size-adjust: 100%;
+    -moz-text-size-adjust: 100%;
+    -ms-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+
   body {
     @apply bg-background text-foreground antialiased;
+    /* Desativa o "puxar para atualizar" para uma sensação de app nativo */
+    overscroll-behavior-y: none;
   }
 
   .glow-primary {

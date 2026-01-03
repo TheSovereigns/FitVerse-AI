@@ -285,7 +285,7 @@ export function ActiveWorkoutSession({ workout, onClose, onComplete }: ActiveWor
   const isExerciseComplete = currentExerciseSets.every(Boolean)
 
   return (
-    <div className="fixed inset-0 z-50 bg-background flex flex-col animate-in slide-in-from-bottom duration-300">
+    <div className="fixed inset-0 z-50 bg-background flex flex-col animate-in slide-in-from-bottom duration-300 h-[100dvh]">
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b border-border bg-card">
         <div className="flex flex-col">
@@ -301,7 +301,7 @@ export function ActiveWorkoutSession({ workout, onClose, onComplete }: ActiveWor
       <Progress value={progress} className="h-1 bg-muted" indicatorClassName="bg-primary" />
 
       {/* Conteúdo Principal */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-6 pb-20">
+      <div className="flex-1 overflow-y-auto p-4 space-y-6 pb-40 md:pb-20">
         {/* Card do Exercício */}
         <div className="space-y-4">
           {/* GIF Demonstrativo */}
@@ -366,7 +366,8 @@ export function ActiveWorkoutSession({ workout, onClose, onComplete }: ActiveWor
 
         {/* Overlay de Descanso */}
         {isResting && (
-          <Card className="bg-card border-primary/30 animate-in zoom-in-95 duration-300 shadow-2xl shadow-black/50 dark:shadow-primary/10 sticky bottom-4">
+          <div className="fixed bottom-0 left-0 right-0 p-4 pb-[max(1rem,env(safe-area-inset-bottom))] bg-card/80 backdrop-blur-lg border-t border-border md:relative md:bottom-auto md:left-auto md:right-auto md:p-0 md:pb-0 md:bg-transparent md:border-none md:backdrop-blur-none">
+            <Card className="bg-card border-primary/30 animate-in zoom-in-95 duration-300 shadow-2xl shadow-black/50 dark:shadow-primary/10">
             <CardContent className="p-6 flex flex-col items-center text-center">
               <span className="text-sm text-muted-foreground uppercase tracking-widest mb-2">Descanso</span>
               <div className="text-5xl font-black text-foreground font-mono mb-4 tabular-nums">
@@ -388,12 +389,13 @@ export function ActiveWorkoutSession({ workout, onClose, onComplete }: ActiveWor
                 </Button>
               </div>
             </CardContent>
-          </Card>
+            </Card>
+          </div>
         )}
 
         {/* Input de RPE (Aparece quando todas as séries acabam) */}
         {isExerciseComplete && !isResting && (
-          <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 pt-4 border-t border-border">
+          <div className="fixed bottom-0 left-0 right-0 p-4 pb-[max(1rem,env(safe-area-inset-bottom))] bg-card/80 backdrop-blur-lg border-t border-border md:relative md:bottom-auto md:left-auto md:right-auto md:p-0 md:pb-0 md:bg-transparent md:border-none md:backdrop-blur-none animate-in fade-in slide-in-from-bottom-4">
             <div className="bg-card p-4 rounded-xl border border-border">
               <label className="text-sm font-bold text-foreground mb-4 block flex justify-between">
                 <span>Percepção de Esforço (RPE)</span>
@@ -416,7 +418,7 @@ export function ActiveWorkoutSession({ workout, onClose, onComplete }: ActiveWor
             </div>
 
             <Button 
-              className="w-full h-14 text-lg font-bold bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg"
+              className="w-full h-14 text-lg font-bold bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg mt-4"
               onClick={handleNextExercise}
             >
               {currentExerciseIndex < totalExercises - 1 ? (

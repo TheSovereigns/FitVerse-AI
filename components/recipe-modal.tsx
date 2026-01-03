@@ -29,8 +29,8 @@ interface RecipeModalProps {
 
 export function RecipeModal({ recipe, onClose }: RecipeModalProps) {
   return (
-    <Dialog open={true} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-4xl w-full max-h-[90vh] flex flex-col p-0 gap-0 bg-zinc-950/90 backdrop-blur-xl border border-primary/30 shadow-[0_0_50px_rgba(249,115,22,0.15)] rounded-3xl overflow-hidden" showCloseButton={false}>
+    <Dialog open={true} onOpenChange={(open) => !open && onClose()}>      
+      <DialogContent className="max-w-4xl w-full h-full md:h-auto md:max-h-[90vh] flex flex-col p-0 gap-0 bg-zinc-950/90 backdrop-blur-xl border-primary/30 shadow-[0_0_50px_rgba(249,115,22,0.15)] md:rounded-3xl overflow-hidden" showCloseButton={false}>
         <ScrollArea className="flex-1 p-6">
           <div className="text-center mb-6">
             <h2 className="text-2xl font-bold text-white">Receita Inteligente</h2>
@@ -121,7 +121,7 @@ export function RecipeModal({ recipe, onClose }: RecipeModalProps) {
             )}
           </div>
         </ScrollArea>
-        <div className="p-4 border-t border-primary/20 bg-black/50">
+        <div className="p-4 border-t border-primary/20 bg-black/50 pb-[max(1rem,env(safe-area-inset-bottom))]">
           <Button onClick={onClose} className="w-full bg-primary/10 border border-primary/30 text-primary hover:bg-primary/20" variant="outline">Fechar Receita</Button>
         </div>
       </DialogContent>
