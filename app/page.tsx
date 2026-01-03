@@ -67,7 +67,7 @@ function HomeDashboard({
       {/* Main Calorie Circle */}
       <div className="relative flex items-center justify-center animate-in fade-in zoom-in-95 duration-700 my-8 md:my-12">
         <div className="absolute w-72 h-72 md:w-80 md:h-80 rounded-full border border-dashed border-gray-200 dark:border-white/10" />
-        <div className="absolute w-64 h-64 md:w-72 md:h-72 rounded-full bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-white/10" />
+        <div className="absolute w-64 h-64 md:w-72 md:h-72 rounded-full bg-white dark:bg-gray-900 border border-gray-200 dark:border-white/10" />
         <div className="relative w-56 h-56 md:w-64 md:h-64 rounded-full bg-white dark:bg-gray-900 shadow-2xl flex flex-col items-center justify-center border border-gray-100 dark:border-white/10">
           <span className="text-sm font-medium text-gray-500 dark:text-white/60">Restantes</span>
           <h2 className="text-5xl md:text-6xl font-bold text-gray-900 dark:text-white tracking-tighter">{Math.round(remainingCalories)}</h2>
@@ -131,7 +131,7 @@ function HomeDashboard({
               </div>
             ))
           ) : (
-            <div className="text-center py-8 px-4 bg-gray-50 dark:bg-gray-900 border border-dashed border-gray-200 dark:border-white/10 rounded-2xl">
+            <div className="text-center py-8 px-4 bg-white dark:bg-gray-900 border border-dashed border-gray-200 dark:border-white/10 rounded-2xl">
               <p className="text-sm text-gray-500 dark:text-white/60">Escaneie seu primeiro alimento.</p>
             </div>
           )}

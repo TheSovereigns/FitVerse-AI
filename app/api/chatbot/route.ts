@@ -99,6 +99,6 @@ export async function POST(req: Request) {
 
   } catch (error) {
     console.error('Erro no chatbot:', error);
-    return NextResponse.json({ error: 'Erro interno do servidor.' }, { status: 500, headers });
+    return NextResponse.json({ error: 'Erro interno' }, { status: 500, headers });
   }
 }
