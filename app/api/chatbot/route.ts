@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
-import { GoogleGenerativeAI } from '@google/generative-ai';
-import { HarmCategory, HarmBlockThreshold, Content } from '@google/generative-ai';
+import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold, Content } from '@google/generative-ai';
 
 export async function OPTIONS() {
   return NextResponse.json({}, {
@@ -14,7 +13,10 @@ export async function OPTIONS() {
 
 const apiKey = process.env.GEMINI_API_KEY;
 const genAI = apiKey ? new GoogleGenerativeAI(apiKey) : null;
-const model = genAI ? genAI.getGenerativeModel({ model: 'gemini-1.5-flash' }) : null;
+
+const model = genAI ? genAI.getGenerativeModel({
+  model: 'gemini-1.5-flash',
+}) : null;
 
 const generationConfig = {
   temperature: 0.8,
@@ -71,7 +73,8 @@ export async function POST(req: Request) {
 
     const limitedHistory = (history || []).slice(-MAX_HISTORY_LENGTH);
 
-    let chatHistory: Content[] = limitedHistory.map((msg: any) => {
+    // Mapeamento robusto do histórico para evitar erros de formato
+    const chatHistory: Content[] = limitedHistory.map((msg: any) => {
       let parts = [];
       if (Array.isArray(msg.parts)) {
         parts = msg.parts.map((part: any) => ({ text: part.text || '' }));
@@ -86,6 +89,7 @@ export async function POST(req: Request) {
       };
     });
 
+    // Garante que o histórico comece com uma mensagem do usuário (requisito do Gemini)
     if (chatHistory.length > 0 && chatHistory[0].role !== 'user') {
       chatHistory.shift();
     }
@@ -98,6 +102,7 @@ export async function POST(req: Request) {
     const reply = response.text();
 
     return NextResponse.json({ reply }, { headers });
+
   } catch (error) {
     console.error('Erro detalhado no chatbot:', error);
     return NextResponse.json({ error: `Erro interno: ${error instanceof Error ? error.message : 'Erro desconhecido'}` }, { status: 500, headers });

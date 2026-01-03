@@ -257,6 +257,7 @@ export default function DashboardPage() {
   const handleCheckout = async (priceId: string) => {
     setLoadingStripe(true)
     try {
+      console.log("Iniciando checkout com priceId:", priceId);
       const response = await fetch('/api/stripe/checkout', {
         method: 'POST',
         headers: {
@@ -320,6 +321,7 @@ export default function DashboardPage() {
       }
 
       // ✅ CHAMADA REAL À API: Substitui a simulação por uma chamada real ao seu backend.
+      console.log("Enviando imagem para análise...", { hasImage: !!imageData });
       const response = await fetch('/api/analyze-product', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
