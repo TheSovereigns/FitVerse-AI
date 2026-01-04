@@ -1,25 +1,36 @@
 import { type NextRequest, NextResponse } from "next/server"
+import { createClient } from "@supabase/supabase-js"
+
+// Inicializa o cliente Supabase
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+const supabase = createClient(supabaseUrl, supabaseKey)
 
 export async function POST(request: NextRequest) {
   try {
     const { name, email, password } = await request.json()
 
-    // O armazenamento real acontece no client-side (localStorage)
-    // Em produção, use banco de dados real (Supabase, Neon) com hash de senha
-    const newUser = {
-      id: Date.now().toString(),
-      name,
+    // Cria o usuário no Supabase Auth
+    const { data, error } = await supabase.auth.signUp({
       email,
-      subscription: "free",
-      createdAt: new Date().toISOString(),
+      password,
+      options: {
+        data: {
+          name: name,
+        },
+      },
+    })
+
+    if (error) {
+      return NextResponse.json({ error: error.message }, { status: 400 })
     }
 
     return NextResponse.json({
       user: {
-        id: newUser.id,
-        name: newUser.name,
-        email: newUser.email,
-        subscription: newUser.subscription,
+        id: data.user?.id,
+        name: data.user?.user_metadata?.name,
+        email: data.user?.email,
+        subscription: "free",
       },
     })
   } catch (error) {
