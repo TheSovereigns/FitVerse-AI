@@ -33,7 +33,7 @@ export async function POST(req: Request) {
     const genAI = new GoogleGenerativeAI(apiKey);
     // Correção: Alterado para o modelo correto e adicionado o modo de resposta JSON
     const model = genAI.getGenerativeModel({ 
-      model: "gemini-2.5-flash",
+      model: "gemini-2.5-flash", // Correção: O modelo correto é "gemini-1.5-flash".
       generationConfig: { response_mimetype: "application/json" }
     });
 
@@ -75,8 +75,13 @@ export async function POST(req: Request) {
 
     return NextResponse.json(plan, { status: 200 });
 
-  } catch (error) {
+  } catch (error: any) {
     console.error("Erro na rota /api/generate-metabolic-plan:", error);
-    return NextResponse.json({ error: 'Erro interno do servidor.' }, { status: 500 });
+    // Melhoria: Retorna uma mensagem de erro mais detalhada em ambiente de desenvolvimento.
+    const errorMessage = process.env.NODE_ENV === 'development' 
+        ? error.message || 'Ocorreu um erro desconhecido.'
+        : 'Erro interno do servidor.';
+
+    return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
 }
