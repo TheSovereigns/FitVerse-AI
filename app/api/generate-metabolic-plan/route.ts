@@ -1,135 +1,82 @@
 import { NextResponse } from 'next/server';
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
-export async function OPTIONS() {
-  return NextResponse.json({}, {
-    headers: {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'POST, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-    },
-  });
+// Tipos para o perfil do usuário e o plano metabólico
+interface BioPerfil {
+  weight: number;
+  height: number;
+  age: number;
+  gender: 'male' | 'female';
+  activityLevel: 'sedentary' | 'light' | 'moderate' | 'active' | 'very_active';
+  goal: 'lose_weight' | 'maintain' | 'gain_muscle';
 }
 
-const apiKey = process.env.GEMINI_API_KEY;
-const genAI = apiKey ? new GoogleGenerativeAI(apiKey) : null;
-const model = genAI ? genAI.getGenerativeModel({ model: 'gemini-1.5-flash' }) : null;
-
 export async function POST(req: Request) {
-  const headers = {
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Methods': 'POST, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-  };
-
   try {
-    let body;
-    try {
-      body = await req.json();
-    } catch (e) {
-      return NextResponse.json({ error: 'Corpo da requisição inválido.' }, { status: 400, headers });
+    const body = await req.json() as BioPerfil;
+
+    // Log para verificar se os dados estão chegando corretamente no backend
+    console.log("Dados recebidos na API /api/generate-metabolic-plan:", body);
+
+    // Validação básica dos dados recebidos
+    if (!body.age || !body.gender || !body.weight || !body.height || !body.goal || !body.activityLevel) {
+      return NextResponse.json({ error: 'Dados incompletos.' }, { status: 400 });
     }
 
-    const { weight, height, age, gender, goal, activityLevel } = body;
-
-    // Validação básica
-    if (!weight || !height || !age || !gender || !goal || !activityLevel) {
-      return NextResponse.json(
-        { error: 'Dados incompletos para cálculo.' },
-        { status: 400, headers }
-      );
+    // Inicializa o Gemini
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) {
+      console.error("GEMINI_API_KEY não configurada.");
+      return NextResponse.json({ error: 'Configuração de API ausente.' }, { status: 500 });
     }
 
-    // Cálculo TMB (Taxa Metabólica Basal) - Fórmula de Harris-Benedict Revisada
-    let bmr;
-    if (gender === 'male') {
-      bmr = 88.362 + (13.397 * Number(weight)) + (4.799 * Number(height)) - (5.677 * Number(age));
-    } else {
-      bmr = 447.593 + (9.247 * Number(weight)) + (3.098 * Number(height)) - (4.330 * Number(age));
-    }
+    const genAI = new GoogleGenerativeAI(apiKey);
+    // Correção: Alterado para o modelo correto e adicionado o modo de resposta JSON
+    const model = genAI.getGenerativeModel({ 
+      model: "gemini-2.5-flash",
+      generationConfig: { response_mimetype: "application/json" }
+    });
 
-    // Fator de atividade
-    const activityMultipliers: Record<string, number> = {
-      sedentary: 1.2,
-      light: 1.375,
-      moderate: 1.55,
-      active: 1.725,
-      very_active: 1.9
-    };
-    
-    const multiplier = activityMultipliers[activityLevel] || 1.2;
-    let tdee = bmr * multiplier;
+    const prompt = `
+      Atue como um nutricionista esportivo de elite. Crie um plano metabólico e de dieta personalizado em JSON (Português do Brasil) para este perfil:
+      - Peso: ${body.weight}kg
+      - Altura: ${body.height}cm
+      - Idade: ${body.age} anos
+      - Gênero: ${body.gender}
+      - Nível de Atividade: ${body.activityLevel}
+      - Objetivo: ${body.goal}
 
-    // Ajuste pelo objetivo
-    if (goal === 'lose_weight') tdee -= 500;
-    else if (goal === 'gain_muscle') tdee += 300;
-
-    // Distribuição de Macros (Exemplo: 30% P / 40% C / 30% G)
-    const protein = (tdee * 0.3) / 4;
-    const carbs = (tdee * 0.4) / 4;
-    const fat = (tdee * 0.3) / 9;
-
-    let dietPlan = {
-      title: "Plano Básico Calculado",
-      meals: [
-        { name: "Café da Manhã", calories: Math.round(tdee * 0.25), description: "Opção balanceada com proteínas e fibras." },
-        { name: "Almoço", calories: Math.round(tdee * 0.35), description: "Carboidratos complexos, vegetais e proteína magra." },
-        { name: "Lanche", calories: Math.round(tdee * 0.15), description: "Fruta ou oleaginosas." },
-        { name: "Jantar", calories: Math.round(tdee * 0.25), description: "Refeição leve com foco em proteínas." }
-      ]
-    };
-
-    // Tenta enriquecer o plano com IA se disponível
-    if (model) {
-      try {
-        const prompt = `Atue como um nutricionista esportivo de elite. Crie um plano alimentar diário detalhado e profissional para um paciente com as seguintes necessidades calóricas e de macronutrientes calculadas:
-        
-        - Calorias Totais: ${Math.round(tdee)} kcal
-        - Proteína: ${Math.round(protein)}g
-        - Carboidratos: ${Math.round(carbs)}g
-        - Gordura: ${Math.round(fat)}g
-        - Objetivo: ${goal === 'lose_weight' ? 'Perder gordura corporal' : 'Ganhar massa muscular magra'}
-        
-        Diretrizes do Plano:
-        1. Priorize alimentos naturais, densos em nutrientes e de alto valor biológico.
-        2. Distribua os macronutrientes estrategicamente ao longo do dia para otimizar energia e recuperação.
-        3. Inclua descrições apetitosas e instruções breves de preparo.
-        4. Mantenha um tom profissional, motivador e prescritivo.
-        
-        Retorne APENAS um JSON estrito com a seguinte estrutura (sem markdown, sem explicações adicionais):
-        {
-          "title": "Nome Profissional do Protocolo (ex: Protocolo de Hipertrofia Metabólica)",
-          "meals": [
-            { "name": "Desjejum", "calories": 0, "description": "Descrição detalhada dos alimentos e quantidades (ex: 3 ovos inteiros mexidos com espinafre...)" },
-            { "name": "Almoço", "calories": 0, "description": "Descrição detalhada" },
-            { "name": "Lanche da Tarde", "calories": 0, "description": "Descrição detalhada" },
-            { "name": "Jantar", "calories": 0, "description": "Descrição detalhada" }
-          ]
-        }`;
-
-        const result = await model.generateContent(prompt);
-        const response = await result.response;
-        let text = response.text();
-        text = text.replace(/```json/g, '').replace(/```/g, '').trim();
-        dietPlan = JSON.parse(text);
-      } catch (aiError) {
-        console.error("Erro ao gerar dieta com IA (usando fallback):", aiError);
+      Siga estritamente esta estrutura JSON:
+      {
+        "macros": { "calories": 0, "protein": 0, "carbs": 0, "fat": 0, "proteinGrams": 0, "carbsGrams": 0, "fatGrams": 0 },
+        "diet": {
+          "title": "Nome criativo do plano",
+          "summary": "Resumo motivacional de 1 frase",
+          "meals": [ { "name": "Nome da Refeição (ex: Café da Manhã)", "items": ["Item 1 com quantidade", "Item 2 com quantidade"] } ]
+        },
+        "prediction": {
+          "weeks": 0,
+          "explanation": "Explicação breve da previsão de resultados",
+          "macroTips": ["Dica prática 1", "Dica prática 2"]
+        }
       }
+    `;
+
+    const result = await model.generateContent(prompt);
+    // Melhoria: Com o modo JSON, a resposta já vem formatada e pronta para o parse.
+    const responseText = result.response.text();
+    let plan;
+    try {
+      plan = JSON.parse(responseText);
+    } catch (jsonError) {
+      console.error("Erro ao parsear JSON do Gemini:", responseText);
+      throw new Error("A resposta da IA não é um JSON válido.");
     }
 
-    const plan = {
-      macros: {
-        calories: Math.round(tdee),
-        proteinGrams: Math.round(protein),
-        carbsGrams: Math.round(carbs),
-        fatGrams: Math.round(fat),
-      },
-      diet: dietPlan
-    };
+    return NextResponse.json(plan, { status: 200 });
 
-    return NextResponse.json(plan, { headers });
   } catch (error) {
-    console.error('Erro ao gerar plano:', error);
-    return NextResponse.json({ error: 'Erro interno' }, { status: 500, headers });
+    console.error("Erro na rota /api/generate-metabolic-plan:", error);
+    return NextResponse.json({ error: 'Erro interno do servidor.' }, { status: 500 });
   }
 }
