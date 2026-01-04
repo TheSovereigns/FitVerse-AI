@@ -91,13 +91,14 @@ export function ChatbotTab() {
                 ? 'bg-primary text-primary-foreground rounded-br-none'
                 : 'bg-gray-100 dark:bg-gray-800 rounded-bl-none'
             )}>
-              <ReactMarkdown
-                className="prose prose-sm dark:prose-invert max-w-none"
-                remarkPlugins={[remarkGfm]}
-                components={{ p: ({node, ...props}) => <p className="mb-2 last:mb-0" {...props} /> }}
-              >
-                {msg.text}
-              </ReactMarkdown>
+              <div className="prose prose-sm dark:prose-invert max-w-none">
+                <ReactMarkdown
+                  remarkPlugins={[remarkGfm]}
+                  components={{ p: ({node, ...props}) => <p className="mb-2 last:mb-0" {...props} /> }}
+                >
+                  {msg.text}
+                </ReactMarkdown>
+              </div>
             </div>
             {msg.role === 'user' && (
               <div className="w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">

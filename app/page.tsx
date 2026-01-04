@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useRef, useMemo } from "react"
+import { useState, useEffect, useRef } from "react"
 import { useRouter } from "next/navigation"
 import { loadStripe } from "@stripe/stripe-js"
 import { ScanDashboard } from "@/components/scan-dashboard"
@@ -15,131 +15,14 @@ import { TrainingTab } from "@/components/training-tab"
 import { SettingsPage } from "@/components/settings-page"
 import { StoreTab } from "@/components/store-tab"
 import { ChatbotTab } from "@/components/chatbot-tab"
-import { ProgressCircle } from "@/components/progress-circle"
-import { ScanLine, User, Calculator, ChefHat, Dumbbell, Loader2, ShoppingBag, Settings, Bot, Home, Zap, BarChart, Utensils } from "lucide-react"
+import { ScanLine, User, Calculator, ChefHat, Dumbbell, Loader2, ShoppingBag, Settings, Bot, Home } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { cn } from "@/lib/utils"
+import { HomeDashboard } from "@/components/home-dashboard"
 
 type View = "home" | "dashboard" | "result" | "recipes" | "training" | "profile" | "planner" | "settings" | "store" | "chatbot"
 
 // Inicialize o Stripe fora do componente para evitar recriação
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
-
-function HomeDashboard({
-  userMetabolicPlan,
-  dailyActivity,
-  onNavigate,
-}: {
-  userMetabolicPlan: any;
-  dailyActivity: any;
-  onNavigate: (view: View) => void;
-}) {
-  const userName = "Atleta"; // Placeholder
-
-  // Calcula os totais de macros dos produtos escaneados no dia
-  const dailyTotals = useMemo(() => {
-    if (!dailyActivity.scannedProducts || dailyActivity.scannedProducts.length === 0) {
-      return { calories: 0, protein: 0, carbs: 0, fat: 0 };
-    }
-    return dailyActivity.scannedProducts.reduce((acc: any, product: any) => {
-      const macros = product.macros || { calories: 0, protein: 0, carbs: 0, fat: 0 };
-      acc.calories += macros.calories || 0;
-      acc.protein += macros.protein || 0;
-      acc.carbs += macros.carbs || 0;
-      acc.fat += macros.fat || 0;
-      return acc;
-    }, { calories: 0, protein: 0, carbs: 0, fat: 0 });
-  }, [dailyActivity.scannedProducts]);
-
-  const goals = userMetabolicPlan?.macros;
-  const remainingCalories = goals ? Math.max(0, goals.calories - dailyTotals.calories) : 0;
-
-  return (
-    <div className="space-y-8">
-      {/* Header */}
-      <div className="animate-in fade-in duration-500">
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white/90">
-          Olá, <span className="text-primary">{userName}</span>
-        </h1>
-        <p className="text-gray-500 dark:text-white/60">Seu progresso de hoje.</p>
-      </div>
-
-      {/* Main Calorie Circle */}
-      <div className="relative flex items-center justify-center animate-in fade-in zoom-in-95 duration-700 my-8 md:my-12">
-        <div className="absolute w-72 h-72 md:w-80 md:h-80 rounded-full border border-dashed border-gray-200 dark:border-white/10" />
-        <div className="absolute w-64 h-64 md:w-72 md:h-72 rounded-full bg-white dark:bg-black/60 backdrop-blur-md border border-gray-200 dark:border-white/10" />
-        <div className="relative w-56 h-56 md:w-64 md:h-64 rounded-full bg-white dark:bg-black/80 backdrop-blur-xl shadow-2xl flex flex-col items-center justify-center border border-gray-100 dark:border-white/10">
-          <span className="text-sm font-medium text-gray-500 dark:text-white/60">Restantes</span>
-          <h2 className="text-5xl md:text-6xl font-bold text-gray-900 dark:text-white tracking-tighter">{Math.round(remainingCalories)}</h2>
-          <span className="text-lg font-medium text-gray-600 dark:text-white/80">Kcal</span>
-        </div>
-      </div>
-
-      {/* Macro Grid Card */}
-      <div className="p-4 md:p-6 bg-white dark:bg-black/60 backdrop-blur-md border border-gray-200 dark:border-white/10 rounded-3xl animate-in fade-in slide-in-from-bottom-4 duration-700 delay-200 shadow-lg dark:shadow-none">
-        <div className="grid grid-cols-3 gap-2 md:gap-4">
-          <ProgressCircle
-            value={dailyTotals.protein}
-            target={goals?.proteinGrams || 0}
-            label="Proteína"
-            unit="g"
-            color="text-indigo-600 dark:text-indigo-400"
-          />
-          <ProgressCircle
-            value={dailyTotals.carbs}
-            target={goals?.carbsGrams || 0}
-            label="Carbos"
-            unit="g"
-            color="text-amber-600 dark:text-amber-400"
-          />
-          <ProgressCircle
-            value={dailyTotals.fat}
-            target={goals?.fatGrams || 0}
-            label="Gordura"
-            unit="g"
-            color="text-rose-600 dark:text-rose-400"
-          />
-        </div>
-      </div>
-
-      {/* Recently Uploaded List */}
-      <div className="animate-in fade-in slide-in-from-bottom-4 duration-700 delay-300">
-        <h3 className="text-lg font-bold text-gray-900 dark:text-white/90 mb-4">Recentemente Adicionado</h3>
-        <div className="space-y-3">
-          {dailyActivity.scannedProducts.length > 0 ? (
-            dailyActivity.scannedProducts.slice(0, 3).map((product: any, index: number) => (
-              <div key={index} className="flex items-center gap-4 p-3 bg-white dark:bg-black/60 backdrop-blur-md border border-gray-200 dark:border-white/10 rounded-2xl shadow-sm hover:shadow-md transition-shadow dark:shadow-none">
-                <div className="relative">
-                  <img src={product.image || "/placeholder.svg?width=64&height=64"} alt={product.productName} className="w-16 h-16 rounded-2xl object-cover bg-gray-700" />
-                  <Badge className={cn( // @ts-ignore
-                    "absolute -top-2 -right-2 border-2 border-white dark:border-black text-xs font-bold",
-                    product.longevityScore > 80 ? "bg-green-100 text-green-800 border-green-200 dark:bg-green-500/20 dark:text-green-300 dark:border-green-400/30" :
-                    product.longevityScore > 60 ? "bg-yellow-100 text-yellow-800 border-yellow-200 dark:bg-yellow-500/20 dark:text-yellow-300 dark:border-yellow-400/30" :
-                    "bg-red-100 text-red-800 border-red-200 dark:bg-red-500/20 dark:text-red-300 dark:border-red-400/30"
-                  )}>
-                    {product.longevityScore}
-                  </Badge>
-                </div>
-                <div className="flex-1">
-                  <p className="font-semibold text-gray-900 dark:text-white">{product.productName}</p>
-                  <p className="text-sm text-gray-500 dark:text-white/60">{product.macros?.calories || 0} Kcal • {product.brand || 'Desconhecido'}</p>
-                </div>
-                <div className="text-right">
-                  <p className="font-bold text-gray-900 dark:text-white">{product.macros?.protein || 0}g</p>
-                  <p className="text-xs text-indigo-600 dark:text-indigo-400">Proteína</p>
-                </div>
-              </div>
-            ))
-          ) : (
-            <div className="text-center py-8 px-4 bg-white dark:bg-black/60 backdrop-blur-md border border-dashed border-gray-200 dark:border-white/10 rounded-2xl">
-              <p className="text-sm text-gray-500 dark:text-white/60">Escaneie seu primeiro alimento.</p>
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-}
 
 export default function DashboardPage() {
   const [currentView, setCurrentView] = useState<View>("home")

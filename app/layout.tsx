@@ -9,25 +9,8 @@ import { ThemeProvider } from "@/components/theme-provider"
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" })
 
 export const metadata: Metadata = {
-  title: "Fitverse - Seu Personal Shopper de Longevidade",
+  title: "Fitverse AI",
   description: "Assistente de biohacking que analisa rótulos via foto para ajudar você a fazer escolhas mais saudáveis",
-  icons: {
-    icon: [
-      {
-        url: "/icon-light-32x32.png",
-        media: "(prefers-color-scheme: light)",
-      },
-      {
-        url: "/icon-dark-32x32.png",
-        media: "(prefers-color-scheme: dark)",
-      },
-      {
-        url: "/icon.svg",
-        type: "image/svg+xml",
-      },
-    ],
-    "apple-touch-icon": "/apple-icon.png",
-  },
 }
 
 export default function RootLayout({
