@@ -19,6 +19,10 @@ export function BioScanResults({
   benefits = ["Fonte de Energia Rápida", "Fácil Digestão", "Sem Glúten"],
   goalAlignment = 30
 }: BioScanResultProps) {
+  // Garante que as listas sejam arrays válidos para evitar erros de renderização (crash no .map) caso venham nulos
+  const safeAttentionPoints = Array.isArray(attentionPoints) ? attentionPoints : [];
+  const safeBenefits = Array.isArray(benefits) ? benefits : [];
+
   return (
     <div className="w-full max-w-4xl mx-auto space-y-6 p-4 bg-black text-zinc-100 rounded-3xl border border-zinc-800/50 shadow-2xl">
       
@@ -88,7 +92,7 @@ export function BioScanResults({
             Alertas
           </h3>
           <div className="grid grid-cols-3 gap-2">
-            {attentionPoints.map((point, i) => (
+            {safeAttentionPoints.map((point, i) => (
               <div key={i} className="bg-red-950/10 border border-red-900/30 rounded-lg p-2 flex flex-col items-center text-center gap-2 hover:bg-red-950/20 transition-colors group cursor-default">
                 <AlertCircle className="w-5 h-5 text-red-500 drop-shadow-[0_0_3px_rgba(239,68,68,0.5)] group-hover:scale-110 transition-transform" />
                 <span className="text-[10px] font-medium text-red-200/80 leading-tight line-clamp-2">{point}</span>
@@ -104,7 +108,7 @@ export function BioScanResults({
             Benefícios
           </h3>
           <div className="grid grid-cols-3 gap-2">
-            {benefits.map((point, i) => (
+            {safeBenefits.map((point, i) => (
               <div key={i} className="bg-emerald-950/10 border border-emerald-900/30 rounded-lg p-2 flex flex-col items-center text-center gap-2 hover:bg-emerald-950/20 transition-colors group cursor-default">
                 <Check className="w-5 h-5 text-emerald-500 drop-shadow-[0_0_3px_rgba(16,185,129,0.5)] group-hover:scale-110 transition-transform" />
                 <span className="text-[10px] font-medium text-emerald-200/80 leading-tight line-clamp-2">{point}</span>

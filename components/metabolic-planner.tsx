@@ -42,7 +42,8 @@ export function MetabolicPlanner({ onPlanCreated }: MetabolicPlannerProps) {
     };
 
     try {
-      console.log("Enviando dados para /api/generate-metabolic-plan:", profileData);
+      // Log para o aplicativo/site
+      console.log("Solicitando plano metabólico via App/Site...");
 
       const response = await fetch('/api/generate-metabolic-plan', {
         method: 'POST',

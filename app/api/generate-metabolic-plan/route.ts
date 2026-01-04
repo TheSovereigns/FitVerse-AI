@@ -15,8 +15,8 @@ export async function POST(req: Request) {
   try {
     const body = await req.json() as BioPerfil;
 
-    // Log para verificar se os dados estão chegando corretamente no backend
-    console.log("Dados recebidos na API /api/generate-metabolic-plan:", body);
+    // Log de acesso para o Aplicativo/Site
+    console.log("Solicitação de plano metabólico recebida via Aplicativo/Site.");
 
     // Validação básica dos dados recebidos
     if (!body.age || !body.gender || !body.weight || !body.height || !body.goal || !body.activityLevel) {
@@ -33,8 +33,8 @@ export async function POST(req: Request) {
     const genAI = new GoogleGenerativeAI(apiKey);
     // Correção: Alterado para o modelo correto e adicionado o modo de resposta JSON
     const model = genAI.getGenerativeModel({ 
-      model: "gemini-2.5-flash", // Correção: O modelo correto é "gemini-1.5-flash".
-      generationConfig: { response_mimetype: "application/json" }
+      model: "gemini-2.5-flash",
+      generationConfig: { responseMimeType: "application/json" }
     });
 
     const prompt = `
@@ -46,7 +46,7 @@ export async function POST(req: Request) {
       - Nível de Atividade: ${body.activityLevel}
       - Objetivo: ${body.goal}
 
-      Siga estritamente esta estrutura JSON:
+      Retorne APENAS um objeto JSON válido (sem markdown, sem blocos de código) seguindo estritamente esta estrutura:
       {
         "macros": { "calories": 0, "protein": 0, "carbs": 0, "fat": 0, "proteinGrams": 0, "carbsGrams": 0, "fatGrams": 0 },
         "diet": {
@@ -63,14 +63,18 @@ export async function POST(req: Request) {
     `;
 
     const result = await model.generateContent(prompt);
-    // Melhoria: Com o modo JSON, a resposta já vem formatada e pronta para o parse.
     const responseText = result.response.text();
+    
+    // Limpa a resposta caso a IA inclua blocos de código markdown (```json ... ```)
+    const cleanedText = responseText.replace(/```json/g, '').replace(/```/g, '').trim();
+
     let plan;
     try {
-      plan = JSON.parse(responseText);
+      plan = JSON.parse(cleanedText);
     } catch (jsonError) {
-      console.error("Erro ao parsear JSON do Gemini:", responseText);
-      throw new Error("A resposta da IA não é um JSON válido.");
+      console.error("Erro ao parsear JSON do Gemini:", cleanedText);
+      // Lança um erro mais específico que será pego pelo catch principal
+      throw new Error("A resposta da IA não retornou um JSON válido.");
     }
 
     return NextResponse.json(plan, { status: 200 });

@@ -93,11 +93,12 @@ export function AdminDashboard() {
         setIsLoading(true);
         
         // Verificar sessão
-        const { data: { session } } = await supabase.auth.getSession();
-        if (!session) {
-          router.push("/");
-          return;
-        }
+        // Login de admin removido para acesso via Aplicativo/Site
+        // const { data: { session } } = await supabase.auth.getSession();
+        // if (!session) {
+        //   router.push("/");
+        //   return;
+        // }
 
         // Buscar dados em paralelo: Usuários e Pagamentos (Stripe)
         const [usersResponse, paymentsResponse] = await Promise.all([
