@@ -17,19 +17,21 @@ import {
   ChevronRight,
   ArrowLeft,
   Menu,
-  X
+  X,
+  Database
 } from "lucide-react"
 import { useAuth } from "@/hooks/useAuth"
 import { useTranslation } from "@/lib/i18n"
 import { cn } from "@/lib/utils"
 
-type AdminNavKey = "admin_overview" | "admin_users" | "admin_revenue" | "admin_ai_usage" | "admin_settings"
+type AdminNavKey = "admin_overview" | "admin_users" | "admin_revenue" | "admin_ai_usage" | "admin_dataset" | "admin_settings"
 
 const navItems: { href: string; icon: any; labelKey: AdminNavKey }[] = [
   { href: "/admin-dashboard", icon: LayoutDashboard, labelKey: "admin_overview" },
   { href: "/admin-dashboard/users", icon: Users, labelKey: "admin_users" },
   { href: "/admin-dashboard/revenue", icon: CreditCard, labelKey: "admin_revenue" },
   { href: "/admin-dashboard/ai-usage", icon: Bot, labelKey: "admin_ai_usage" },
+  { href: "/admin-dashboard/dataset", icon: Database, labelKey: "admin_dataset" },
   { href: "/admin-dashboard/settings", icon: Settings, labelKey: "admin_settings" },
 ]
 

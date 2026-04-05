@@ -278,7 +278,7 @@ export function useAuth() {
       user: null,
       profile: null,
       isAdmin: false,
-      isLoading: false,
+      isLoading: true,
       signIn: async () => ({ error: null }),
       signUp: async () => ({ error: null }),
       signOut: async () => {},

@@ -34,6 +34,7 @@ const translations = {
     // Admin
     admin_overview: "Visão Geral", admin_users: "Usuários",
     admin_revenue: "Receita", admin_ai_usage: "Uso da IA",
+    admin_dataset: "Dataset IA",
     admin_settings: "Configurações",
     // Onboarding
     onboarding_welcome: "Bem-vindo ao FitVerse AI",
@@ -93,6 +94,14 @@ const translations = {
     chatbot_placeholder: "Pergunte ao seu Coach...", chatbot_header: "Coach FitVerse",
     chatbot_status: "FitVerse AI Ativo", chatbot_analyzing: "ANALISANDO...",
     chatbot_error: "Erro de conexão bio-neural. Tente novamente.", chatbot_net_error: "Falha na rede neural.",
+    chatbot_rate_experience: "Como está sendo sua experiência com a IA?",
+    chatbot_skip_rating: "Talvez depois",
+    // Feedback
+    feedback_thanks: "Obrigado!", feedback_helpful: "Útil", feedback_reported: "Reportado!",
+    feedback_why_bad: "O que houve de errado?",
+    feedback_reason_incorrect: "Incorreta", feedback_reason_generic: "Genérica",
+    feedback_reason_misunderstood: "Não entendeu", feedback_reason_other: "Outro",
+    feedback_send: "Enviar",
     // Profile
     profile_title: "Perfil", profile_title_accent: ".Bio", profile_subtitle: "Sincronização Vitalis",
     profile_7cycles: "7 Ciclos", profile_30cycles: "30 Ciclos",
@@ -234,6 +243,7 @@ const translations = {
     // Admin
     admin_overview: "Overview", admin_users: "Users",
     admin_revenue: "Revenue", admin_ai_usage: "AI Usage",
+    admin_dataset: "AI Dataset",
     admin_settings: "Settings",
     // Onboarding
     onboarding_welcome: "Welcome to FitVerse AI",
@@ -293,6 +303,14 @@ const translations = {
     chatbot_placeholder: "Ask your Coach...", chatbot_header: "FitVerse Coach",
     chatbot_status: "FitVerse AI Active", chatbot_analyzing: "ANALYZING...",
     chatbot_error: "Bio-neural connection error. Please try again.", chatbot_net_error: "Neural network failure.",
+    chatbot_rate_experience: "How has your AI experience been?",
+    chatbot_skip_rating: "Maybe later",
+    // Feedback
+    feedback_thanks: "Thanks!", feedback_helpful: "Helpful", feedback_reported: "Reported!",
+    feedback_why_bad: "What went wrong?",
+    feedback_reason_incorrect: "Incorrect", feedback_reason_generic: "Too generic",
+    feedback_reason_misunderstood: "Didn't understand", feedback_reason_other: "Other",
+    feedback_send: "Send",
     // Profile
     profile_title: "Profile", profile_title_accent: ".Bio", profile_subtitle: "Vitalis Sync",
     profile_7cycles: "7 Cycles", profile_30cycles: "30 Cycles",
