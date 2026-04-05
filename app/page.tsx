@@ -1,0 +1,515 @@
+"use client"
+
+// FitVerse AI - Main Dashboard
+// Auth-protected dashboard with BioScan, training, diet, and more
+
+import { useState, useEffect, useRef } from "react"
+import { useRouter } from "next/navigation"
+import { motion, AnimatePresence } from "framer-motion"
+import { cn } from "@/lib/utils"
+import { loadStripe } from "@stripe/stripe-js"
+import { ScanDashboard } from "@/components/scan-dashboard"
+import { ProductResult, type ProductAnalysis } from "@/components/product-result"
+import { ScanHistory } from "@/components/scan-history"
+import { UserProfile } from "@/components/user-profile"
+import { MetabolicPlanner } from "@/components/metabolic-planner"
+import { MetabolicDashboard } from "@/components/metabolic-dashboard"
+import { HealthProfile } from "@/components/health-profile"
+import { ProductSkeleton } from "@/components/product-skeleton"
+import { RecipesTab } from "@/components/recipes-tab"
+import { TrainingTab } from "@/components/training-tab"
+import { SettingsPage } from "@/components/settings-page"
+import { StoreTab } from "@/components/store-tab"
+import { ChatbotTab } from "@/components/chatbot-tab"
+import { ScanLine, User, Calculator, ChefHat, Dumbbell, Loader2, ShoppingBag, Settings, Bot, Home, ChevronUp, Shield } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { HomeDashboard } from "@/components/home-dashboard"
+import { DynamicIsland, type IslandState } from "@/components/dynamic-island"
+import { LiquidLaunchpad } from "@/components/liquid-launchpad"
+import { useTranslation } from "@/lib/i18n"
+import { useAuth } from "@/hooks/useAuth"
+
+type View = "home" | "dashboard" | "result" | "recipes" | "training" | "profile" | "planner" | "settings" | "store" | "chatbot"
+
+// Inicialize o Stripe fora do componente para evitar recriação
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
+
+export default function DashboardPage() {
+  const router = useRouter()
+  const { user, isLoading: authLoading } = useAuth()
+  const [currentView, setCurrentView] = useState<View>("home")
+  const [islandState, setIslandState] = useState<IslandState>("idle")
+  const [isDocked, setIsDocked] = useState(false)
+  const [isMenuExpanded, setIsMenuExpanded] = useState(false)
+  const [authTimedOut, setAuthTimedOut] = useState(false)
+  const { t, locale } = useTranslation()
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setAuthTimedOut(true)
+    }, 5000)
+    return () => clearTimeout(timer)
+  }, [])
+
+  useEffect(() => {
+    if ((!authLoading || authTimedOut) && !user) {
+      router.push("/auth/login")
+    }
+  }, [user, authLoading, authTimedOut, router])
+
+  if (authLoading && !authTimedOut) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-[#1a0f00] via-[#0d0705] to-[#1a0f00] flex items-center justify-center">
+        <Loader2 className="w-8 h-8 text-primary animate-spin" />
+      </div>
+    )
+  }
+
+  if (!user) {
+    return null
+  }
+
+  // Monitora o scroll para "encaixar" o cabeçalho na Ilha Dinâmica
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsDocked(window.scrollY > 80)
+    }
+    window.addEventListener("scroll", handleScroll)
+    return () => window.removeEventListener("scroll", handleScroll)
+  }, [])
+
+  const getViewTitle = () => {
+    switch (currentView) {
+      case "home": return t("view_home")
+      case "dashboard": return t("view_bioscan")
+      case "recipes": return t("view_recipes")
+      case "training": return t("view_training")
+      case "profile": return t("view_profile")
+      case "planner": return t("view_planner")
+      case "settings": return t("view_settings")
+      case "chatbot": return t("view_chatbot")
+      default: return t("view_fitverse")
+    }
+  }
+  const [isAnalyzing, setIsAnalyzing] = useState(false)
+  const [analysisResult, setAnalysisResult] = useState<ProductAnalysis | null>(null)
+  const [dailyActivity, setDailyActivity] = useState<any>({
+    date: new Date().toISOString().split('T')[0],
+    scannedProducts: [],
+    generatedDiets: [],
+    generatedWorkouts: [],
+  });
+  const [scanHistory, setScanHistory] = useState<any[]>([
+    {
+      id: "1", // O componente ScanHistory espera 'name' e 'scannedAt'
+      name: "Whey Protein Isolate",
+      scannedAt: new Date(Date.now() - 10 * 60 * 1000).toISOString(), // Simula 10 min atrás
+      score: 92,
+      image: "/placeholder.svg?height=80&width=80",
+      status: "healthy",
+    },
+    {
+      id: "2", // O componente ScanHistory espera 'name' e 'scannedAt'
+      name: "Barra de Cereal",
+      scannedAt: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(), // Simula 1 dia atrás
+      score: 45,
+      image: "/placeholder.svg?height=80&width=80",
+      status: "avoid",
+    },
+    {
+      id: "3", // O componente ScanHistory espera 'name' e 'scannedAt'
+      name: "Iogurte Natural",
+      scannedAt: new Date(Date.now() - 25 * 60 * 60 * 1000).toISOString(), // Simula 25h atrás
+      score: 88,
+      image: "/placeholder.svg?height=80&width=80",
+      status: "healthy",
+    },
+  ])
+
+  const [userMetabolicPlan, setUserMetabolicPlanState] = useState<any>(null)
+
+  // Função wrapper para salvar o plano no localStorage sempre que for atualizado
+  const setUserMetabolicPlan = (plan: any, perfil?: any) => {
+    // Combina o plano e o perfil para ter o contexto completo
+    const fullPlan = plan && perfil ? { ...plan, perfil } : plan;
+    setUserMetabolicPlanState(fullPlan);
+    if (fullPlan) {
+      // Salva o plano completo para a memória do chatbot
+      localStorage.setItem("userMetabolicPlan", JSON.stringify(fullPlan));
+      // Salva a dieta gerada na atividade do dia
+      if (plan?.diet) {
+        setDailyActivity((prev: any) => {
+          const updatedActivity = {
+            ...prev,
+            generatedDiets: prev.generatedDiets.some((d: any) => d.title === plan.diet.title)
+              ? prev.generatedDiets
+              : [...prev.generatedDiets, plan.diet]
+          };
+          localStorage.setItem("dailyActivity", JSON.stringify(updatedActivity));
+          return updatedActivity;
+        });
+      }
+    } else {
+      // Limpa se o plano for nulo
+      localStorage.removeItem("userMetabolicPlan");
+    }
+  }
+
+  const [loadingStripe, setLoadingStripe] = useState(false)
+  const [isPremium, setIsPremium] = useState(false)
+  const bottomNavInputRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    const savedActivity = localStorage.getItem("dailyActivity");
+    const today = new Date().toISOString().split('T')[0];
+    if (savedActivity) {
+      try {
+        const activity = JSON.parse(savedActivity);
+        if (activity.date === today) {
+          setDailyActivity(activity);
+        } else {
+          const newDailyActivity = { date: today, scannedProducts: [], generatedDiets: [], generatedWorkouts: [] };
+          setDailyActivity(newDailyActivity);
+          localStorage.setItem("dailyActivity", JSON.stringify(newDailyActivity));
+        }
+      } catch (e) {
+        console.error("Falha ao carregar atividade diária", e);
+      }
+    }
+
+    const savedPlan = localStorage.getItem("userMetabolicPlan");
+
+    if (user) {
+      setIsPremium(user.user_metadata?.plan === "premium" || user.user_metadata?.subscription === "premium")
+    }
+  }, [user])
+
+  const handleCheckout = async (priceId: string) => {
+    setLoadingStripe(true)
+    try {
+      console.log("Iniciando checkout com priceId:", priceId);
+      const response = await fetch('/api/stripe/checkout', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ priceId }),
+      });
+
+      if (!response.ok) {
+        try {
+          const errorData = await response.json();
+          throw new Error(errorData.message || 'Erro no checkout');
+        } catch {
+          throw new Error('Erro ao processar pagamento');
+        }
+      }
+
+      const data = await response.json()
+      const stripe = await stripePromise;
+      if (stripe) {
+        const { error } = await stripe.redirectToCheckout({ sessionId: data.sessionId });
+        if (error) console.error(error);
+      }
+    } catch (error) {
+      console.error("Erro no checkout:", error)
+      alert("Erro ao iniciar o pagamento. Verifique suas chaves do Stripe.")
+    } finally {
+      setLoadingStripe(false)
+    }
+  }
+
+  const handleScan = async (fileOrUrl?: File | string): Promise<void> => {
+    setIsAnalyzing(true);
+    setIslandState("scanning");
+    setCurrentView("result");
+    setAnalysisResult(null); // Limpa o resultado anterior para evitar mostrar dados antigos
+
+    let displayImage = "/placeholder.svg?height=80&width=80";
+
+    // A API /api/analyze espera uma string base64 da imagem.
+    const toBase64 = (file: File): Promise<string> =>
+      new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result as string);
+        reader.onerror = (error) => reject(error);
+      });
+
+    try {
+      let imageData: string | undefined;
+
+      if (fileOrUrl instanceof File) {
+        displayImage = URL.createObjectURL(fileOrUrl);
+        imageData = await toBase64(fileOrUrl);
+      } else if (typeof fileOrUrl === "string") {
+        displayImage = fileOrUrl;
+        imageData = fileOrUrl; // Assume que a string já é uma URL ou base64
+      }
+
+      if (!imageData) {
+        throw new Error("Nenhuma imagem ou URL fornecida para análise.");
+      }
+
+      // ✅ CHAMADA REAL À API: Substitui a simulação por uma chamada real ao seu backend.
+      console.log("Enviando imagem para análise...", { hasImage: !!imageData });
+      const response = await fetch('/api/analyze-product', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          imageData: imageData,
+          metabolicPlan: userMetabolicPlan,
+          locale,
+        }),
+      });
+
+      if (!response.ok) {
+        try {
+          const errorData = await response.json();
+          throw new Error(errorData.error || 'Falha na análise da IA');
+        } catch {
+          throw new Error('Falha na análise da IA (Erro de servidor)');
+        }
+      }
+
+      const analysis: ProductAnalysis = await response.json();
+
+      // Salva o produto analisado na atividade do dia
+      setDailyActivity((prev: any) => {
+        const updatedActivity = {
+          ...prev,
+          scannedProducts: [...prev.scannedProducts, analysis]
+        };
+        localStorage.setItem("dailyActivity", JSON.stringify(updatedActivity));
+        return updatedActivity;
+      });
+
+      setAnalysisResult(analysis);
+      setIslandState("success");
+      setTimeout(() => setIslandState("idle"), 2000);
+      setScanHistory(prev => [
+        {
+          id: `${prev.length + 1}`,
+          name: analysis.productName, // Corrigido de productName para name
+          scannedAt: new Date().toISOString(), // Corrigido de date para scannedAt e usando ISO string
+          score: analysis.longevityScore,
+          image: displayImage,
+        },
+        ...prev
+      ]);
+    } catch (error) {
+      console.error("Erro durante a análise:", error);
+      setIslandState("error");
+      setTimeout(() => setIslandState("idle"), 3000);
+      alert(error instanceof Error ? error.message : "Ocorreu um erro ao analisar o produto. Tente novamente.");
+      setCurrentView("dashboard"); // Retorna ao dashboard em caso de erro
+    } finally {
+      setIsAnalyzing(false);
+    }
+  }
+
+  const handleNavScan = () => {
+    bottomNavInputRef.current?.click()
+  }
+
+  const handleBottomNavFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      handleScan(file)
+    }
+  }
+
+  const currentAnalysis = analysisResult;
+
+  return (
+    <div className={cn(
+      "min-h-screen bg-transparent text-gray-900 dark:text-white font-sans selection:bg-primary/30 flex transition-all duration-700",
+      isDocked ? "pt-2" : "pt-0"
+    )}>
+      <DynamicIsland 
+        state={islandState} 
+        onNavigate={setCurrentView} 
+        isDocked={isDocked} 
+        title={getViewTitle()} 
+      />
+
+      <LiquidLaunchpad 
+        isOpen={isMenuExpanded} 
+        onClose={() => setIsMenuExpanded(false)} 
+        onNavigate={setCurrentView} 
+        currentView={currentView}
+      />
+
+      {/* Floating Sidebar (Desktop) */}
+      <aside className="hidden md:flex flex-col w-16 lg:w-20 hover:w-56 lg:hover:w-64 fixed top-1/2 -translate-y-1/2 left-4 lg:left-6 glass-strong border-white/20 z-50 rounded-[2rem] lg:rounded-[3rem] transition-all duration-700 ease-in-out group overflow-hidden shadow-[0_0_60px_rgba(0,0,0,0.3)]">
+        <div className="p-4 lg:p-6 flex items-center justify-start gap-3 font-black text-xl tracking-tighter text-foreground mb-6 lg:mb-8 overflow-hidden">
+          <div className="w-6 h-6 flex items-center justify-center shrink-0">
+            <ScanLine className="text-primary size-5 lg:size-6" />
+          </div>
+          <span className="opacity-0 group-hover:opacity-100 transition-all duration-500 translate-x-2 group-hover:translate-x-0 text-sm lg:text-base">FitVerse</span>
+        </div>
+
+        <nav className="flex-1 px-1 lg:px-2 space-y-1 lg:space-y-2 flex flex-col">
+          <NavButton icon={Home} label={t("nav_home")} active={currentView === "home"} onClick={() => setCurrentView("home")} />
+          <NavButton icon={ScanLine} label={t("nav_bioscan")} active={currentView === "dashboard"} onClick={() => setCurrentView("dashboard")} />
+          <NavButton icon={Dumbbell} label={t("nav_workouts")} active={currentView === "training"} onClick={() => setCurrentView("training")} />
+          <NavButton icon={Calculator} label={t("nav_diet")} active={currentView === "planner"} onClick={() => setCurrentView("planner")} />
+          <NavButton icon={ChefHat} label={t("nav_recipes")} active={currentView === "recipes"} onClick={() => setCurrentView("recipes")} />
+          <NavButton icon={ShoppingBag} label={t("nav_store")} active={currentView === "store"} onClick={() => setCurrentView("store")} />
+          <NavButton icon={Bot} label={t("nav_aichat")} active={currentView === "chatbot"} onClick={() => setCurrentView("chatbot")} />
+        </nav>
+
+        <div className="p-2 lg:p-3 mb-3 lg:mb-4 space-y-2 border-t border-white/10 pt-4 flex flex-col items-center">
+          <NavButton icon={User} label={t("nav_profile")} active={currentView === "profile"} onClick={() => setCurrentView("profile")} />
+          <NavButton icon={Settings} label={t("nav_settings")} active={currentView === "settings"} onClick={() => setCurrentView("settings")} />
+        </div>
+      </aside>
+
+      {/* Main Content */}
+      <div className="flex-1 md:pl-24 lg:pl-28 flex flex-col min-h-screen relative transition-all duration-500 max-w-[1400px] mx-auto w-full">
+        {/* Header - Visible on all screens */}
+        <header className="sticky top-0 z-40 bg-transparent px-4 md:px-6 h-14 md:h-20 flex items-center justify-between">
+          <div className="md:hidden font-black text-2xl flex items-center gap-2 text-foreground">
+            <ScanLine className="text-primary size-7" />
+            <span>FitVerse</span>
+          </div>
+          <div className="hidden md:block">
+             {/* Large title or scroll transition space */}
+          </div>
+          <div className="flex items-center gap-4 md:gap-6">
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              onClick={() => router.push("/admin-dashboard")} 
+              className="w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl hover:bg-white/10 active:scale-90 haptic-press transition-all font-sans text-foreground/60 hover:text-foreground"
+              aria-label="Acessar painel admin"
+            >
+              <Shield className="w-5 h-5 md:w-6 md:h-6" />
+            </Button>
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              onClick={() => setCurrentView("profile")}
+              className="w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl hover:bg-white/10 active:scale-90 haptic-press transition-all font-sans text-foreground/60 hover:text-foreground"
+              aria-label="Ver perfil do usuário"
+            >
+              <User className="w-5 h-5 md:w-6 md:h-6" />
+            </Button>
+          </div>
+        </header>
+
+        <main className="flex-1 p-4 md:p-6 lg:p-8 overflow-y-auto pb-24 md:pb-8">
+          {currentView === "home" && <HomeDashboard userMetabolicPlan={userMetabolicPlan} dailyActivity={dailyActivity} onNavigate={setCurrentView} />}
+          {currentView === "dashboard" && <ScanDashboard onScan={handleScan} />}
+          {currentView === "result" && (isAnalyzing || !currentAnalysis ? <ProductSkeleton /> : <ProductResult result={currentAnalysis} onBack={() => setCurrentView("dashboard")} />)}
+          {currentView === "recipes" && <RecipesTab />}
+          {currentView === "training" && <TrainingTab />}
+          {currentView === "planner" && (
+            userMetabolicPlan && userMetabolicPlan.macros && localStorage.getItem("userMetabolicPlan") !== null
+              ? <div className="space-y-4">
+                  <MetabolicDashboard 
+                    plan={userMetabolicPlan} 
+                    perfil={userMetabolicPlan.perfil} 
+                    onBack={() => setCurrentView("home")} 
+                  />
+                  <Button 
+                    onClick={() => {
+                      setUserMetabolicPlanState(null);
+                      localStorage.removeItem("userMetabolicPlan");
+                    }}
+                    className="w-full h-12 glass-strong border border-white/20 text-muted-foreground font-black text-xs uppercase tracking-widest rounded-full"
+                  >
+                    Criar Novo Plano
+                  </Button>
+                </div>
+              : <MetabolicPlanner onPlanCreated={setUserMetabolicPlan} />
+          )}
+          {currentView === "store" && <StoreTab />}
+          {currentView === "settings" && <SettingsPage onBack={() => setCurrentView("profile")} />}
+          {currentView === "chatbot" && <ChatbotTab />}
+          {currentView === "profile" && (<div className="pt-4"><HealthProfile scanHistory={scanHistory} onNavigateToSettings={() => setCurrentView("settings")} onNavigateToSubscription={() => router.push('/subscription')} /></div>)}
+        </main>
+      </div>
+
+      <input
+        type="file"
+        ref={bottomNavInputRef}
+        className="hidden"
+        accept="image/*"
+        onChange={handleBottomNavFileChange}
+      />
+
+      {/* Floating Action Button */}
+      <Button 
+        onClick={handleNavScan} 
+        className="fixed bottom-32 right-8 md:bottom-10 md:right-10 z-50 h-20 w-20 rounded-full glass-strong bg-primary text-white shadow-2xl transition-all duration-500 hover:scale-110 active:scale-75 border border-white/30"
+        aria-label="Escanear produto"
+      >
+        <ScanLine className="h-10 w-10 text-white" />
+      </Button>
+
+      {/* Mobile Bottom Nav - Opens menu on swipe up */}
+      <motion.nav
+        id="mobile-bottom-nav"
+        drag="y"
+        dragConstraints={{ top: 0, bottom: 0 }}
+        dragElastic={0.2}
+        onDragEnd={(_, info) => {
+          if (info.offset.y < -30) setIsMenuExpanded(true)
+        }}
+        className="md:hidden fixed bottom-6 left-4 right-4 glass-strong rounded-[2rem] z-40 shadow-2xl border border-white/20 h-16 px-2 flex items-center justify-around max-w-md mx-auto active:cursor-grab"
+      >
+        <button onClick={() => setCurrentView("home")} className="flex flex-col items-center justify-center p-2">
+          <Home className={cn("w-6 h-6", currentView === "home" ? "text-primary" : "text-muted-foreground")} />
+        </button>
+        <button onClick={() => setCurrentView("training")} className="flex flex-col items-center justify-center p-2">
+          <Dumbbell className={cn("w-6 h-6", currentView === "training" ? "text-primary" : "text-muted-foreground")} />
+        </button>
+        <button onClick={() => setIsMenuExpanded(true)} className="flex flex-col items-center justify-center p-2 -mt-2">
+          <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
+            <ChevronUp className="w-5 h-5 text-primary" />
+          </div>
+        </button>
+        <button onClick={() => setCurrentView("chatbot")} className="flex flex-col items-center justify-center p-2">
+          <Bot className={cn("w-6 h-6", currentView === "chatbot" ? "text-primary" : "text-muted-foreground")} />
+        </button>
+        <button onClick={() => setCurrentView("profile")} className="flex flex-col items-center justify-center p-2">
+          <User className={cn("w-6 h-6", currentView === "profile" ? "text-primary" : "text-muted-foreground")} />
+        </button>
+      </motion.nav>
+    </div>
+  )
+}
+
+function NavButton({ icon: Icon, label, active, onClick }: { icon: any, label: string, active: boolean, onClick: () => void }) {
+  return (
+    <button 
+      onClick={onClick}
+      className={cn(
+        "flex items-center justify-center lg:justify-start gap-3 w-full h-10 lg:h-12 px-2 lg:px-3 rounded-xl lg:rounded-[1.25rem] transition-all duration-500 group relative haptic-press",
+        active ? "text-primary bg-white/10" : "text-foreground/50 hover:text-foreground hover:bg-white/5"
+      )}
+    >
+      {active && <div className="absolute left-0 w-1 h-4 lg:h-6 bg-primary rounded-full animate-in fade-in slide-in-from-left-4 duration-500 shadow-[0_0_10px_rgba(255,149,0,0.6)]" />}
+      <Icon className={cn("w-5 h-5 lg:w-6 lg:h-6 shrink-0 transition-all duration-500", active && "drop-shadow-[0_0_6px_rgba(255,149,0,0.4)]")} />
+      <span className="hidden lg:block font-black text-[10px] uppercase tracking-[0.15em] opacity-0 group-hover:opacity-100 transition-all duration-500 whitespace-nowrap overflow-hidden text-xs">
+        {label}
+      </span>
+    </button>
+  )
+}
+
+function TabButton({ icon: Icon, active, onClick }: { icon: any, active: boolean, onClick: () => void }) {
+  return (
+    <button 
+      onClick={onClick}
+      className={cn(
+        "flex flex-col items-center justify-center size-14 rounded-full transition-all duration-500 relative",
+        active ? "text-primary" : "text-muted-foreground"
+      )}
+    >
+      {active && <div className="absolute top-0 w-1 h-1 bg-primary rounded-full animate-pulse" />}
+      <Icon className={cn("size-7 transition-all duration-500", active ? "scale-125 drop-shadow-[0_0_8px_rgba(255,149,0,0.5)]" : "opacity-60")} />
+    </button>
+  )
+}
