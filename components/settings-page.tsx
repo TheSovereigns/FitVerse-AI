@@ -59,7 +59,7 @@ const SettingRow = ({
 
 export function SettingsPage({ onBack }: { onBack?: () => void }) {
   const { t, locale, setLocale } = useTranslation()
-  const { signOut } = useAuth()
+  const { signOut, profile } = useAuth()
   const router = useRouter()
   const { theme, setTheme } = useTheme()
   const [userSubscription, setUserSubscription] = useState("free")
@@ -214,6 +214,33 @@ export function SettingsPage({ onBack }: { onBack?: () => void }) {
             </SettingRow>
           </div>
         </div>
+
+        {/* Admin Panel */}
+        {profile?.is_admin && (
+          <div>
+            <div className="flex items-center gap-3 px-5 md:px-10 mb-4 md:mb-6">
+              <ShieldCheck className="w-4 h-4 text-orange-500" />
+              <h3 className="font-black text-muted-foreground text-[10px] uppercase tracking-[0.4em] opacity-40">Admin</h3>
+            </div>
+            <div className="glass-strong border-white/10 shadow-2xl rounded-[2.5rem] md:rounded-[3.5rem] overflow-hidden">
+              <SettingRow 
+                icon={ShieldCheck} 
+                title="Admin Dashboard" 
+                description="Acessar painel administrativo"
+                isLast
+              >
+                <Button
+                  variant="ghost"
+                  onClick={() => router.push("/admin-dashboard")}
+                  className="h-10 md:h-12 rounded-full font-black text-[9px] md:text-[10px] tracking-widest px-4 md:px-6 glass border-orange-500/20 text-orange-500 hover:bg-orange-500 hover:text-white transition-all"
+                >
+                  {locale === "en-US" ? "Access" : "Acessar"}
+                  <ChevronRight className="ml-2 w-4 h-4" />
+                </Button>
+              </SettingRow>
+            </div>
+          </div>
+        )}
 
         {/* Footer Actions */}
         <div className="pt-4 md:pt-8 space-y-4 md:space-y-6">

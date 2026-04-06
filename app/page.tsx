@@ -388,17 +388,17 @@ export default function DashboardPage() {
              {/* Large title or scroll transition space */}
           </div>
             <div className="flex items-center gap-4 md:gap-6">
-            {profile?.is_admin && (
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                onClick={() => router.push("/admin-dashboard")} 
-                className="w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl hover:bg-white/10 active:scale-90 haptic-press transition-all font-sans text-foreground/60 hover:text-foreground"
-                aria-label={t("home_access_admin")}
-              >
-                <Shield className="w-5 h-5 md:w-6 md:h-6" />
-              </Button>
-            )}
+              {(profile?.is_admin || user?.user_metadata?.is_admin) && (
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  onClick={() => router.push("/admin-dashboard")} 
+                  className="w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl hover:bg-white/10 active:scale-90 haptic-press transition-all font-sans text-foreground/60 hover:text-foreground"
+                  aria-label={t("home_access_admin")}
+                >
+                  <Shield className="w-5 h-5 md:w-6 md:h-6" />
+                </Button>
+              )}
             <Button 
               variant="ghost" 
               size="icon" 
