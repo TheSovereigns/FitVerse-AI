@@ -60,7 +60,7 @@ const SettingRow = ({
 
 export function SettingsPage({ onBack }: { onBack?: () => void }) {
   const { t, locale, setLocale } = useTranslation()
-  const { signOut, profile: authProfile, user } = useAuth()
+  const { signOut, user: authUser, profile: authProfile } = useAuth()
   const router = useRouter()
   const { theme, setTheme } = useTheme()
   const [userSubscription, setUserSubscription] = useState("free")
@@ -68,23 +68,23 @@ export function SettingsPage({ onBack }: { onBack?: () => void }) {
   const [adsEnabled, setAdsEnabled] = useState(true)
   const [isAdmin, setIsAdmin] = useState(false)
 
+  // Get user from auth or fallback to localStorage
+  const user = authUser
+
   // Check admin status from multiple sources
   useEffect(() => {
-    console.log("[Settings] Checking admin, user:", user)
+    console.log("[Settings] User object full:", JSON.stringify(user))
+    console.log("[Settings] User email:", user?.email)
+    console.log("[Settings] User metadata:", user?.user_metadata)
+    console.log("[Settings] AuthProfile:", authProfile)
+    
     let adminFound = false
     
-    // Check 1: user.email - allow list fallback (temporary for development)
-    const adminEmails = [
-      'seu-email@exemplo.com', // Replace with your email
-      'admin@fitverse.ai',
-    ]
-    if (user?.email && adminEmails.includes(user.email.toLowerCase())) {
-      console.log("[Settings] Admin from email allowlist")
-      setIsAdmin(true)
-      adminFound = true
-    }
+    // Check 1: user.email directly
+    const userEmail = user?.email?.toLowerCase()
+    console.log("[Settings] Checking email:", userEmail)
     
-    // Check 2: user_metadata (most reliable)
+    // Check 2: user_metadata
     if (user?.user_metadata?.is_admin === true) {
       console.log("[Settings] Admin from metadata")
       setIsAdmin(true)
@@ -95,7 +95,7 @@ export function SettingsPage({ onBack }: { onBack?: () => void }) {
     if (user?.id && !adminFound) {
       supabase
         .from('profiles')
-        .select('is_admin')
+        .select('is_admin, email')
         .eq('id', user.id)
         .single()
         .then(({ data }) => {
@@ -104,11 +104,8 @@ export function SettingsPage({ onBack }: { onBack?: () => void }) {
             setIsAdmin(true)
           }
         })
-        .catch((err) => {
-          console.error("[Settings] Admin query error:", err)
-        })
     }
-  }, [user])
+  }, [user, authProfile])
 
   // Also check from user metadata as fallback
   useEffect(() => {
