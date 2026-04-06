@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase'
 import { cookies } from 'next/headers'
+import { createClient } from '@supabase/supabase-js'
 
 type ExportFormat = 'jsonl' | 'alpaca' | 'csv'
 
@@ -16,6 +17,28 @@ interface ExportFilters {
 
 const SYSTEM_PROMPT_PT = 'Você é o FitVerse AI, um assistente especializado em fitness, nutrição, saúde, emagrecimento e academia. Forneça conselhos seguros, motivadores e baseados em evidências.'
 const SYSTEM_PROMPT_EN = 'You are FitVerse AI, an assistant specialized in fitness, nutrition, health, weight loss and gym training. Provide safe, motivating, evidence-based advice.'
+
+async function verifyAdmin(): Promise<boolean> {
+  const cookieStore = cookies()
+  const token = cookieStore.get('sb-access-token')
+  if (!token || !supabaseAdmin) return false
+
+  const supabaseClient = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL ?? '',
+    token.value
+  )
+
+  const { data: { user } } = await supabaseClient.auth.getUser()
+  if (!user) return false
+
+  const { data: profile } = await supabaseAdmin
+    .from('profiles')
+    .select('is_admin')
+    .eq('id', user.id)
+    .single()
+
+  return profile?.is_admin === true
+}
 
 function formatJSONL(messages: Array<{ user_message: string; ai_response: string; edited_response: string | null; user_context: Record<string, unknown>; user_message_lang: string }>): string {
   return messages.map((m) => {
@@ -62,13 +85,12 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'Supabase admin client not configured' }, { status: 500 })
   }
 
-  try {
-    const cookieStore = cookies()
-    const token = cookieStore.get('sb-access-token')
-    if (!token) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
+  const isAdmin = await verifyAdmin()
+  if (!isAdmin) {
+    return NextResponse.json({ error: 'Unauthorized — admin access required' }, { status: 403 })
+  }
 
+  try {
     const body = await req.json()
     const filters: ExportFilters = {
       status: body.status || ['approved', 'edited'],

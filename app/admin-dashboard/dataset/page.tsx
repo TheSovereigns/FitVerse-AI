@@ -226,12 +226,12 @@ export default function DatasetPage() {
     fetchData()
   }, [fetchData])
 
-  const totalMessages = stats.reduce((s, r) => s + (r.total_messages || 0), 0) || 0
-  const totalApproved = stats.reduce((s, r) => s + (r.approved || 0), 0) || 0
-  const totalEdited = stats.reduce((s, r) => s + (r.edited || 0), 0) || 0
-  const totalPending = stats.reduce((s, r) => s + (r.pending_review || 0), 0) || 0
-  const totalRejected = stats.reduce((s, r) => s + (r.rejected || 0), 0) || 0
-  const avgRating = stats.length > 0 ? stats[0]?.avg_rating : null
+  const totalMessages = stats.length > 0 ? (stats[0]?.total_messages ?? 0) : 0
+  const totalApproved = stats.length > 0 ? (stats[0]?.approved ?? 0) : 0
+  const totalEdited = stats.length > 0 ? (stats[0]?.edited ?? 0) : 0
+  const totalPending = stats.length > 0 ? (stats[0]?.pending_review ?? 0) : 0
+  const totalRejected = stats.length > 0 ? (stats[0]?.rejected ?? 0) : 0
+  const avgRating = stats.length > 0 ? (stats[0]?.avg_rating ?? null) : null
   const readyForTraining = totalApproved + totalEdited
   const progressPercent = Math.min(100, (readyForTraining / DATASET_GOAL) * 100)
 
