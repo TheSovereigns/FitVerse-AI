@@ -28,6 +28,7 @@ import { DynamicIsland, type IslandState } from "@/components/dynamic-island"
 import { LiquidLaunchpad } from "@/components/liquid-launchpad"
 import { useTranslation } from "@/lib/i18n"
 import { useAuth } from "@/hooks/useAuth"
+import { supabase } from "@/lib/supabase"
 
 type View = "home" | "dashboard" | "result" | "recipes" | "training" | "profile" | "planner" | "settings" | "store" | "chatbot"
 
@@ -44,6 +45,7 @@ export default function DashboardPage() {
   const [isMenuExpanded, setIsMenuExpanded] = useState(false)
   const [authTimedOut, setAuthTimedOut] = useState(false)
   const [isAnalyzing, setIsAnalyzing] = useState(false)
+  const [isAdmin, setIsAdmin] = useState(false)
   const [analysisResult, setAnalysisResult] = useState<ProductAnalysis | null>(null)
   const [dailyActivity, setDailyActivity] = useState<any>({
     date: new Date().toISOString().split('T')[0],
@@ -151,8 +153,26 @@ export default function DashboardPage() {
 
     if (user) {
       setIsPremium(user.user_metadata?.plan === "premium" || user.user_metadata?.subscription === "premium")
+      // Check admin status from metadata first
+      const userMetaAdmin = user.user_metadata?.is_admin === true
+      setIsAdmin(userMetaAdmin)
+      // Also check from profile if available
+      if (profile?.is_admin) {
+        setIsAdmin(true)
+      }
+      // Double check from database
+      supabase
+        .from('profiles')
+        .select('is_admin')
+        .eq('id', user.id)
+        .single()
+        .then(({ data }) => {
+          if (data?.is_admin) {
+            setIsAdmin(true)
+          }
+        })
     }
-  }, [user])
+  }, [user, profile])
 
   const setUserMetabolicPlan = (plan: any, perfil?: any) => {
     const fullPlan = plan && perfil ? { ...plan, perfil } : plan
@@ -388,7 +408,7 @@ export default function DashboardPage() {
              {/* Large title or scroll transition space */}
           </div>
             <div className="flex items-center gap-4 md:gap-6">
-              {(profile?.is_admin || user?.user_metadata?.is_admin) && (
+              {(isAdmin || user?.user_metadata?.is_admin) && (
                 <Button 
                   variant="ghost" 
                   size="icon" 

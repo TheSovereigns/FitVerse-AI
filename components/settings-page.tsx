@@ -7,6 +7,7 @@ import { motion } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Switch } from "./switch"
+import { supabase } from "@/lib/supabase"
 import {
   Moon,
   Sun,
@@ -59,12 +60,35 @@ const SettingRow = ({
 
 export function SettingsPage({ onBack }: { onBack?: () => void }) {
   const { t, locale, setLocale } = useTranslation()
-  const { signOut, profile } = useAuth()
+  const { signOut, profile: authProfile, user } = useAuth()
   const router = useRouter()
   const { theme, setTheme } = useTheme()
   const [userSubscription, setUserSubscription] = useState("free")
   const [notificationsEnabled, setNotificationsEnabled] = useState(true)
   const [adsEnabled, setAdsEnabled] = useState(true)
+  const [isAdmin, setIsAdmin] = useState(false)
+
+  // Check admin status directly from database
+  useEffect(() => {
+    if (user?.id) {
+      supabase
+        .from('profiles')
+        .select('is_admin')
+        .eq('id', user.id)
+        .single()
+        .then(({ data }) => {
+          setIsAdmin(data?.is_admin || false)
+        })
+    }
+  }, [user])
+
+  // Also check from user metadata as fallback
+  useEffect(() => {
+    const userMetaAdmin = user?.user_metadata?.is_admin === true
+    if (userMetaAdmin) {
+      setIsAdmin(true)
+    }
+  }, [user])
 
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user") || '{"subscription":"free"}')
@@ -216,7 +240,7 @@ export function SettingsPage({ onBack }: { onBack?: () => void }) {
         </div>
 
         {/* Admin Panel */}
-        {profile?.is_admin && (
+        {isAdmin && (
           <div>
             <div className="flex items-center gap-3 px-5 md:px-10 mb-4 md:mb-6">
               <ShieldCheck className="w-4 h-4 text-orange-500" />
