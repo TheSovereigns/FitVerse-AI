@@ -41,7 +41,7 @@ export function FloatingCTAMobile() {
         >
           <CTAButton
             label={t("cta_floating")}
-            href={user ? "/" : "/auth/login"}
+            href={user ? "/?view=planner" : "/auth/login"}
             variant="floating"
             size="md"
             dataCta="floating-mobile"

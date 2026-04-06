@@ -90,7 +90,7 @@ export function HowItWorksSection({ id }: HowItWorksSectionProps) {
         >
           <CTAButton
             label={t("cta_mid_how")}
-            href={user ? "/" : "/auth/login"}
+            href={user ? "/?view=planner" : "/auth/login"}
             variant="primary"
             size="lg"
             dataCta="mid-how-it-works"

@@ -81,7 +81,7 @@ export function BenefitsSection({ id }: BenefitsSectionProps) {
         >
           <CTAButton
             label={t("cta_mid_benefits")}
-            href={user ? "/" : "/auth/login"}
+            href={user ? "/?view=planner" : "/auth/login"}
             variant="primary"
             size="lg"
             dataCta="mid-benefits"

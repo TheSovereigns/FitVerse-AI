@@ -104,7 +104,7 @@ export function HeroSection() {
         >
           <CTAButton
             label={t("hero_cta_primary")}
-            href={user ? "/" : "/auth/login"}
+            href={user ? "/?view=planner" : "/auth/login"}
             variant="primary"
             size="lg"
             dataCta="hero-primary"

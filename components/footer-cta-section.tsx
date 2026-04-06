@@ -45,7 +45,7 @@ export function FooterCTASection({ id }: FooterCTASectionProps) {
 
           <CTAButton
             label={t("cta_footer")}
-            href={user ? "/" : "/auth/login"}
+            href={user ? "/?view=planner" : "/auth/login"}
             variant="primary"
             size="lg"
             dataCta="footer-final"

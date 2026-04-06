@@ -96,6 +96,14 @@ export default function DashboardPage() {
   }, [user, authLoading, authTimedOut, router])
 
   useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const view = params.get("view")
+    if (view) {
+      setCurrentView(view as View)
+    }
+  }, [])
+
+  useEffect(() => {
     const handleScroll = () => {
       setIsDocked(window.scrollY > 80)
     }
