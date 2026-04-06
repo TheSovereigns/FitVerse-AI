@@ -37,12 +37,50 @@ const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
 export default function DashboardPage() {
   const router = useRouter()
   const { user, isLoading: authLoading } = useAuth()
+  const { t, locale } = useTranslation()
   const [currentView, setCurrentView] = useState<View>("home")
   const [islandState, setIslandState] = useState<IslandState>("idle")
   const [isDocked, setIsDocked] = useState(false)
   const [isMenuExpanded, setIsMenuExpanded] = useState(false)
   const [authTimedOut, setAuthTimedOut] = useState(false)
-  const { t, locale } = useTranslation()
+  const [isAnalyzing, setIsAnalyzing] = useState(false)
+  const [analysisResult, setAnalysisResult] = useState<ProductAnalysis | null>(null)
+  const [dailyActivity, setDailyActivity] = useState<any>({
+    date: new Date().toISOString().split('T')[0],
+    scannedProducts: [],
+    generatedDiets: [],
+    generatedWorkouts: [],
+  })
+  const [scanHistory, setScanHistory] = useState<any[]>([
+    {
+      id: "1",
+      name: "Whey Protein Isolate",
+      scannedAt: new Date(Date.now() - 10 * 60 * 1000).toISOString(),
+      score: 92,
+      image: "/placeholder.svg?height=80&width=80",
+      status: "healthy",
+    },
+    {
+      id: "2",
+      name: "Barra de Cereal",
+      scannedAt: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
+      score: 45,
+      image: "/placeholder.svg?height=80&width=80",
+      status: "avoid",
+    },
+    {
+      id: "3",
+      name: "Iogurte Natural",
+      scannedAt: new Date(Date.now() - 25 * 60 * 60 * 1000).toISOString(),
+      score: 88,
+      image: "/placeholder.svg?height=80&width=80",
+      status: "healthy",
+    },
+  ])
+  const [userMetabolicPlanState, setUserMetabolicPlanState] = useState<any>(null)
+  const [loadingStripe, setLoadingStripe] = useState(false)
+  const [isPremium, setIsPremium] = useState(false)
+  const bottomNavInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -57,19 +95,6 @@ export default function DashboardPage() {
     }
   }, [user, authLoading, authTimedOut, router])
 
-  if (authLoading && !authTimedOut) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-[#1a0f00] via-[#0d0705] to-[#1a0f00] flex items-center justify-center">
-        <Loader2 className="w-8 h-8 text-primary animate-spin" />
-      </div>
-    )
-  }
-
-  if (!user) {
-    return null
-  }
-
-  // Monitora o scroll para "encaixar" o cabeçalho na Ilha Dinâmica
   useEffect(() => {
     const handleScroll = () => {
       setIsDocked(window.scrollY > 80)
@@ -77,6 +102,51 @@ export default function DashboardPage() {
     window.addEventListener("scroll", handleScroll)
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
+
+  useEffect(() => {
+    const savedActivity = localStorage.getItem("dailyActivity")
+    const today = new Date().toISOString().split('T')[0]
+    if (savedActivity) {
+      try {
+        const activity = JSON.parse(savedActivity)
+        if (activity.date === today) {
+          setDailyActivity(activity)
+        } else {
+          const newDailyActivity = { date: today, scannedProducts: [], generatedDiets: [], generatedWorkouts: [] }
+          setDailyActivity(newDailyActivity)
+          localStorage.setItem("dailyActivity", JSON.stringify(newDailyActivity))
+        }
+      } catch {
+        console.error("Falha ao carregar atividade diária")
+      }
+    }
+
+    if (user) {
+      setIsPremium(user.user_metadata?.plan === "premium" || user.user_metadata?.subscription === "premium")
+    }
+  }, [user])
+
+  const setUserMetabolicPlan = (plan: any, perfil?: any) => {
+    const fullPlan = plan && perfil ? { ...plan, perfil } : plan
+    setUserMetabolicPlanState(fullPlan)
+    if (fullPlan) {
+      localStorage.setItem("userMetabolicPlan", JSON.stringify(fullPlan))
+      if (plan?.diet) {
+        setDailyActivity((prev: any) => {
+          const updatedActivity = {
+            ...prev,
+            generatedDiets: prev.generatedDiets.some((d: any) => d.title === plan.diet.title)
+              ? prev.generatedDiets
+              : [...prev.generatedDiets, plan.diet]
+          }
+          localStorage.setItem("dailyActivity", JSON.stringify(updatedActivity))
+          return updatedActivity
+        })
+      }
+    } else {
+      localStorage.removeItem("userMetabolicPlan")
+    }
+  }
 
   const getViewTitle = () => {
     switch (currentView) {
@@ -91,125 +161,30 @@ export default function DashboardPage() {
       default: return t("view_fitverse")
     }
   }
-  const [isAnalyzing, setIsAnalyzing] = useState(false)
-  const [analysisResult, setAnalysisResult] = useState<ProductAnalysis | null>(null)
-  const [dailyActivity, setDailyActivity] = useState<any>({
-    date: new Date().toISOString().split('T')[0],
-    scannedProducts: [],
-    generatedDiets: [],
-    generatedWorkouts: [],
-  });
-  const [scanHistory, setScanHistory] = useState<any[]>([
-    {
-      id: "1", // O componente ScanHistory espera 'name' e 'scannedAt'
-      name: "Whey Protein Isolate",
-      scannedAt: new Date(Date.now() - 10 * 60 * 1000).toISOString(), // Simula 10 min atrás
-      score: 92,
-      image: "/placeholder.svg?height=80&width=80",
-      status: "healthy",
-    },
-    {
-      id: "2", // O componente ScanHistory espera 'name' e 'scannedAt'
-      name: "Barra de Cereal",
-      scannedAt: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(), // Simula 1 dia atrás
-      score: 45,
-      image: "/placeholder.svg?height=80&width=80",
-      status: "avoid",
-    },
-    {
-      id: "3", // O componente ScanHistory espera 'name' e 'scannedAt'
-      name: "Iogurte Natural",
-      scannedAt: new Date(Date.now() - 25 * 60 * 60 * 1000).toISOString(), // Simula 25h atrás
-      score: 88,
-      image: "/placeholder.svg?height=80&width=80",
-      status: "healthy",
-    },
-  ])
-
-  const [userMetabolicPlan, setUserMetabolicPlanState] = useState<any>(null)
-
-  // Função wrapper para salvar o plano no localStorage sempre que for atualizado
-  const setUserMetabolicPlan = (plan: any, perfil?: any) => {
-    // Combina o plano e o perfil para ter o contexto completo
-    const fullPlan = plan && perfil ? { ...plan, perfil } : plan;
-    setUserMetabolicPlanState(fullPlan);
-    if (fullPlan) {
-      // Salva o plano completo para a memória do chatbot
-      localStorage.setItem("userMetabolicPlan", JSON.stringify(fullPlan));
-      // Salva a dieta gerada na atividade do dia
-      if (plan?.diet) {
-        setDailyActivity((prev: any) => {
-          const updatedActivity = {
-            ...prev,
-            generatedDiets: prev.generatedDiets.some((d: any) => d.title === plan.diet.title)
-              ? prev.generatedDiets
-              : [...prev.generatedDiets, plan.diet]
-          };
-          localStorage.setItem("dailyActivity", JSON.stringify(updatedActivity));
-          return updatedActivity;
-        });
-      }
-    } else {
-      // Limpa se o plano for nulo
-      localStorage.removeItem("userMetabolicPlan");
-    }
-  }
-
-  const [loadingStripe, setLoadingStripe] = useState(false)
-  const [isPremium, setIsPremium] = useState(false)
-  const bottomNavInputRef = useRef<HTMLInputElement>(null)
-
-  useEffect(() => {
-    const savedActivity = localStorage.getItem("dailyActivity");
-    const today = new Date().toISOString().split('T')[0];
-    if (savedActivity) {
-      try {
-        const activity = JSON.parse(savedActivity);
-        if (activity.date === today) {
-          setDailyActivity(activity);
-        } else {
-          const newDailyActivity = { date: today, scannedProducts: [], generatedDiets: [], generatedWorkouts: [] };
-          setDailyActivity(newDailyActivity);
-          localStorage.setItem("dailyActivity", JSON.stringify(newDailyActivity));
-        }
-      } catch (e) {
-        console.error("Falha ao carregar atividade diária", e);
-      }
-    }
-
-    const savedPlan = localStorage.getItem("userMetabolicPlan");
-
-    if (user) {
-      setIsPremium(user.user_metadata?.plan === "premium" || user.user_metadata?.subscription === "premium")
-    }
-  }, [user])
 
   const handleCheckout = async (priceId: string) => {
     setLoadingStripe(true)
     try {
-      console.log("Iniciando checkout com priceId:", priceId);
       const response = await fetch('/api/stripe/checkout', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ priceId }),
-      });
+      })
 
       if (!response.ok) {
         try {
-          const errorData = await response.json();
-          throw new Error(errorData.message || 'Erro no checkout');
+          const errorData = await response.json()
+          throw new Error(errorData.message || 'Erro no checkout')
         } catch {
-          throw new Error('Erro ao processar pagamento');
+          throw new Error('Erro ao processar pagamento')
         }
       }
 
       const data = await response.json()
-      const stripe = await stripePromise;
+      const stripe = await stripePromise
       if (stripe) {
-        const { error } = await stripe.redirectToCheckout({ sessionId: data.sessionId });
-        if (error) console.error(error);
+        const { error } = await stripe.redirectToCheckout({ sessionId: data.sessionId })
+        if (error) console.error(error)
       }
     } catch (error) {
       console.error("Erro no checkout:", error)
@@ -220,91 +195,87 @@ export default function DashboardPage() {
   }
 
   const handleScan = async (fileOrUrl?: File | string): Promise<void> => {
-    setIsAnalyzing(true);
-    setIslandState("scanning");
-    setCurrentView("result");
-    setAnalysisResult(null); // Limpa o resultado anterior para evitar mostrar dados antigos
+    setIsAnalyzing(true)
+    setIslandState("scanning")
+    setCurrentView("result")
+    setAnalysisResult(null)
 
-    let displayImage = "/placeholder.svg?height=80&width=80";
+    let displayImage = "/placeholder.svg?height=80&width=80"
 
-    // A API /api/analyze espera uma string base64 da imagem.
     const toBase64 = (file: File): Promise<string> =>
       new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = () => resolve(reader.result as string);
-        reader.onerror = (error) => reject(error);
-      });
+        const reader = new FileReader()
+        reader.readAsDataURL(file)
+        reader.onload = () => resolve(reader.result as string)
+        reader.onerror = (error) => reject(error)
+      })
 
     try {
-      let imageData: string | undefined;
+      let imageData: string | undefined
 
       if (fileOrUrl instanceof File) {
-        displayImage = URL.createObjectURL(fileOrUrl);
-        imageData = await toBase64(fileOrUrl);
+        displayImage = URL.createObjectURL(fileOrUrl)
+        imageData = await toBase64(fileOrUrl)
       } else if (typeof fileOrUrl === "string") {
-        displayImage = fileOrUrl;
-        imageData = fileOrUrl; // Assume que a string já é uma URL ou base64
+        displayImage = fileOrUrl
+        imageData = fileOrUrl
       }
 
       if (!imageData) {
-        throw new Error("Nenhuma imagem ou URL fornecida para análise.");
+        throw new Error("Nenhuma imagem ou URL fornecida para análise.")
       }
 
-      // ✅ CHAMADA REAL À API: Substitui a simulação por uma chamada real ao seu backend.
-      console.log("Enviando imagem para análise...", { hasImage: !!imageData });
       const response = await fetch('/api/analyze-product', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           imageData: imageData,
-          metabolicPlan: userMetabolicPlan,
+          metabolicPlan: userMetabolicPlanState,
           locale,
         }),
-      });
+      })
 
       if (!response.ok) {
         try {
-          const errorData = await response.json();
-          throw new Error(errorData.error || 'Falha na análise da IA');
+          const errorData = await response.json()
+          throw new Error(errorData.error || 'Falha na análise da IA')
         } catch {
-          throw new Error('Falha na análise da IA (Erro de servidor)');
+          throw new Error('Falha na análise da IA (Erro de servidor)')
         }
       }
 
-      const analysis: ProductAnalysis = await response.json();
+      const analysis: ProductAnalysis = await response.json()
 
-      // Salva o produto analisado na atividade do dia
       setDailyActivity((prev: any) => {
         const updatedActivity = {
           ...prev,
           scannedProducts: [...prev.scannedProducts, analysis]
-        };
-        localStorage.setItem("dailyActivity", JSON.stringify(updatedActivity));
-        return updatedActivity;
-      });
+        }
+        localStorage.setItem("dailyActivity", JSON.stringify(updatedActivity))
+        return updatedActivity
+      })
 
-      setAnalysisResult(analysis);
-      setIslandState("success");
-      setTimeout(() => setIslandState("idle"), 2000);
+      setAnalysisResult(analysis)
+      setIslandState("success")
+      setTimeout(() => setIslandState("idle"), 2000)
       setScanHistory(prev => [
         {
           id: `${prev.length + 1}`,
-          name: analysis.productName, // Corrigido de productName para name
-          scannedAt: new Date().toISOString(), // Corrigido de date para scannedAt e usando ISO string
+          name: analysis.productName,
+          scannedAt: new Date().toISOString(),
           score: analysis.longevityScore,
           image: displayImage,
         },
         ...prev
-      ]);
+      ])
     } catch (error) {
-      console.error("Erro durante a análise:", error);
-      setIslandState("error");
-      setTimeout(() => setIslandState("idle"), 3000);
-      alert(error instanceof Error ? error.message : "Ocorreu um erro ao analisar o produto. Tente novamente.");
-      setCurrentView("dashboard"); // Retorna ao dashboard em caso de erro
+      console.error("Erro durante a análise:", error)
+      setIslandState("error")
+      setTimeout(() => setIslandState("idle"), 3000)
+      alert(error instanceof Error ? error.message : "Ocorreu um erro ao analisar o produto. Tente novamente.")
+      setCurrentView("dashboard")
     } finally {
-      setIsAnalyzing(false);
+      setIsAnalyzing(false)
     }
   }
 
@@ -319,7 +290,19 @@ export default function DashboardPage() {
     }
   }
 
-  const currentAnalysis = analysisResult;
+  const currentAnalysis = analysisResult
+
+  if (authLoading && !authTimedOut) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-[#1a0f00] via-[#0d0705] to-[#1a0f00] flex items-center justify-center">
+        <Loader2 className="w-8 h-8 text-primary animate-spin" />
+      </div>
+    )
+  }
+
+  if (!user) {
+    return null
+  }
 
   return (
     <div className={cn(
@@ -399,17 +382,17 @@ export default function DashboardPage() {
         </header>
 
         <main className="flex-1 p-4 md:p-6 lg:p-8 overflow-y-auto pb-24 md:pb-8">
-          {currentView === "home" && <HomeDashboard userMetabolicPlan={userMetabolicPlan} dailyActivity={dailyActivity} onNavigate={setCurrentView} />}
+          {currentView === "home" && <HomeDashboard userMetabolicPlan={userMetabolicPlanState} dailyActivity={dailyActivity} onNavigate={setCurrentView} />}
           {currentView === "dashboard" && <ScanDashboard onScan={handleScan} />}
           {currentView === "result" && (isAnalyzing || !currentAnalysis ? <ProductSkeleton /> : <ProductResult result={currentAnalysis} onBack={() => setCurrentView("dashboard")} />)}
           {currentView === "recipes" && <RecipesTab />}
           {currentView === "training" && <TrainingTab />}
           {currentView === "planner" && (
-            userMetabolicPlan && userMetabolicPlan.macros && localStorage.getItem("userMetabolicPlan") !== null
+            userMetabolicPlanState && userMetabolicPlanState.macros && localStorage.getItem("userMetabolicPlan") !== null
               ? <div className="space-y-4">
                   <MetabolicDashboard 
-                    plan={userMetabolicPlan} 
-                    perfil={userMetabolicPlan.perfil} 
+                    plan={userMetabolicPlanState} 
+                    perfil={userMetabolicPlanState.perfil} 
                     onBack={() => setCurrentView("home")} 
                   />
                   <Button 
