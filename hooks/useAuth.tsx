@@ -198,13 +198,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signOut = async () => {
     try {
       await supabase.auth.signOut()
+    } catch {
+      // ignore — might not have a session (demo user)
+    } finally {
       setUser(null)
       setProfile(null)
       setIsAdmin(false)
       hasRedirectedRef.current = false
+      localStorage.clear()
       router.push("/auth/login")
-    } catch {
-      // ignore
     }
   }
 

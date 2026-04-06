@@ -105,6 +105,8 @@ export function SettingsPage({ onBack }: { onBack?: () => void }) {
   }
 
   const handleLogout = async () => {
+    localStorage.clear()
+    toast.success(t("settings_toast_logout"))
     await signOut()
   }
 
