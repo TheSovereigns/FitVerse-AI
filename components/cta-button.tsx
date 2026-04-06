@@ -67,6 +67,7 @@ export function CTAButton({
       whileTap={{ scale: 0.98 }}
       transition={{ duration: 0.15 }}
     >
+      <span>{label}</span>
       {variant === "primary" && showArrow && (
         <ArrowRight className="w-4 h-4 ml-2" />
       )}
