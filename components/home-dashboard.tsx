@@ -97,6 +97,7 @@ export function HomeDashboard({
       <motion.div
         whileHover={{ scale: 1.01 }}
         className="relative glass-strong border-white/20 p-6 md:p-12 lg:p-20 rounded-[2.5rem] md:rounded-[3.5rem] overflow-hidden shadow-[0_40px_100px_rgba(0,0,0,0.4)] group cursor-pointer"
+        onClick={() => onNavigate("dashboard")}
       >
         <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-purple-500/5 opacity-50" />
         <div className="relative z-10 flex flex-col sm:flex-row items-center justify-between gap-6 md:gap-12">
@@ -131,6 +132,13 @@ export function HomeDashboard({
             </div>
           </div>
         </div>
+
+        {/* CTA Button */}
+        <div className="relative z-10 mt-6 md:mt-8 flex justify-center">
+          <div className="flex items-center gap-2 py-3 px-6 bg-primary/20 rounded-2xl border border-primary/30">
+            <span className="text-primary font-black text-xs md:text-sm uppercase tracking-wider">{t("home_start_btn")} →</span>
+          </div>
+        </div>
       </motion.div>
 
       {/* Widget Grid */}
@@ -138,40 +146,61 @@ export function HomeDashboard({
         {/* Water Widget */}
         <motion.div
           whileTap={{ scale: 0.95 }}
-          className="relative h-36 md:h-48 glass-strong border-white/20 rounded-[1.5rem] md:rounded-[2.5rem] overflow-hidden group cursor-pointer flex flex-col justify-end p-4 md:p-6 shadow-xl"
+          className="relative h-44 md:h-56 glass-strong border-white/20 rounded-[1.5rem] md:rounded-[2.5rem] overflow-hidden group cursor-pointer flex flex-col justify-between p-4 md:p-6 shadow-xl"
+          onClick={() => setWaterCups(prev => prev + 1)}
         >
+          <div className="absolute inset-0 bg-gradient-to-b from-blue-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
           <div className="relative z-10">
-            <Droplet className="w-5 h-5 md:w-8 md:h-8 text-white mb-1 md:mb-2 drop-shadow-[0_0_10px_rgba(10,132,255,1)]" />
-            <h3 className="text-lg md:text-2xl font-black text-white tracking-tight">{t("home_water")}</h3>
-            <p className="text-white/60 font-bold uppercase tracking-widest text-[8px] md:text-xs mt-0.5">{waterCups * 250}ml / 3000ml</p>
+            <Droplet className="w-6 h-6 md:w-8 md:h-8 text-[#0A84FF] mb-1 md:mb-2 drop-shadow-[0_0_10px_rgba(10,132,255,0.8)]" />
+            <h3 className="text-lg md:text-xl font-black text-foreground tracking-tight">{t("home_water")}</h3>
+            <p className="text-muted-foreground font-bold text-[10px] md:text-xs mt-0.5">{waterCups * 250}ml / 3000ml</p>
           </div>
-          <div className="absolute top-3 right-3 md:top-6 md:right-6 z-10 glass-strong w-7 h-7 md:w-10 md:h-10 rounded-full flex items-center justify-center text-lg md:text-xl font-black shadow-lg">+</div>
+          <div className="relative z-10 w-full h-2 bg-white/5 rounded-full overflow-hidden border border-white/10 mb-3">
+            <motion.div
+              initial={{ width: 0 }}
+              animate={{ width: `${Math.min((waterCups * 250 / 3000) * 100, 100)}%` }}
+              className="h-full bg-[#0A84FF]"
+            />
+          </div>
+          <div className="relative z-10 flex items-center justify-center gap-2 py-2 bg-[#0A84FF]/20 rounded-xl border border-[#0A84FF]/30">
+            <span className="text-[#0A84FF] font-black text-xs uppercase tracking-wider">Registrar +250ml</span>
+          </div>
         </motion.div>
 
         {/* Protein Widget */}
-        <div className="relative h-44 md:h-72 glass-strong border-white/20 rounded-[2.5rem] md:rounded-[3.5rem] p-5 md:p-8 flex flex-col justify-between group overflow-hidden shadow-2xl">
+        <div className="relative h-44 md:h-56 glass-strong border-white/20 rounded-[1.5rem] md:rounded-[2.5rem] p-5 md:p-6 flex flex-col justify-between group overflow-hidden shadow-2xl cursor-pointer"
+          onClick={() => onNavigate("planner")}
+        >
           <div className="absolute inset-0 bg-gradient-to-t from-[#0A84FF]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
           <div className="relative z-10">
-            <Zap className="w-7 h-7 md:w-10 md:h-10 text-[#0A84FF] mb-2 md:mb-4" />
-            <h3 className="text-xl md:text-3xl font-black text-foreground tracking-tight">{t("home_protein")}</h3>
-            <p className="text-muted-foreground font-bold uppercase tracking-widest text-[9px] md:text-xs mt-1">{Math.round(dailyTotals.protein)}g / {goals?.proteinGrams}g</p>
+            <Zap className="w-6 h-6 md:w-8 md:h-8 text-[#0A84FF] mb-2" />
+            <h3 className="text-lg md:text-xl font-black text-foreground tracking-tight">{t("home_protein")}</h3>
+            <p className="text-muted-foreground font-bold text-[10px] md:text-xs mt-0.5">{Math.round(dailyTotals.protein)}g / {goals?.proteinGrams}g</p>
           </div>
-          <div className="relative z-10 w-full h-2 md:h-3 bg-white/5 rounded-full overflow-hidden border border-white/10">
+          <div className="relative z-10 w-full h-2 bg-white/5 rounded-full overflow-hidden border border-white/10 mb-3">
             <motion.div
               initial={{ width: 0 }}
               animate={{ width: `${Math.min((dailyTotals.protein / goals?.proteinGrams) * 100, 100)}%` }}
               className="h-full bg-[#0A84FF] shadow-[0_0_20px_rgba(10,132,255,0.6)]"
             />
           </div>
+          <div className="relative z-10 flex items-center justify-center gap-2 py-2 bg-[#0A84FF]/20 rounded-xl border border-[#0A84FF]/30">
+            <span className="text-[#0A84FF] font-black text-xs uppercase tracking-wider">Ver Plano →</span>
+          </div>
         </div>
 
         {/* Longevity Score - spans full width on mobile if 3rd item */}
-        <div className="relative h-44 md:h-72 mesh-gradient rounded-[2.5rem] md:rounded-[3.5rem] p-5 md:p-8 flex flex-col items-center justify-center text-center text-white haptic-press glass-reflection shadow-2xl overflow-hidden col-span-2 md:col-span-1">
+        <div className="relative h-44 md:h-56 mesh-gradient rounded-[1.5rem] md:rounded-[2.5rem] p-5 md:p-6 flex flex-col items-center justify-between text-center text-white haptic-press glass-reflection shadow-2xl overflow-hidden col-span-2 md:col-span-1 cursor-pointer"
+          onClick={() => onNavigate("dashboard")}
+        >
           <div className="absolute inset-0 bg-black/10 backdrop-blur-[2px]" />
-          <div className="relative z-10">
-            <Trophy className="w-10 h-10 md:w-16 md:h-16 mb-3 md:mb-4 animate-bounce text-yellow-300" />
-            <h3 className="text-xs font-black uppercase tracking-[0.4em] opacity-80">{t("home_longevity")}</h3>
-            <span className="text-[4rem] md:text-[6rem] font-black tracking-tighter leading-none drop-shadow-2xl">{averageLongevityScore}</span>
+          <div className="relative z-10 flex flex-col items-center">
+            <Trophy className="w-8 h-8 md:w-10 md:h-10 mb-1 text-yellow-300" />
+            <h3 className="text-[9px] font-black uppercase tracking-[0.4em] opacity-80">{t("home_longevity")}</h3>
+            <span className="text-4xl md:text-5xl font-black tracking-tighter leading-none drop-shadow-2xl">{averageLongevityScore}</span>
+          </div>
+          <div className="relative z-10 flex items-center justify-center gap-2 py-2 bg-white/20 rounded-xl border border-white/30">
+            <span className="text-white font-black text-xs uppercase tracking-wider">Escanear Agora →</span>
           </div>
         </div>
       </div>
@@ -224,7 +253,13 @@ export function HomeDashboard({
               <div className="w-16 h-16 md:w-20 md:h-20 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-4 md:mb-6">
                 <Target className="w-8 h-8 md:w-10 md:h-10 opacity-20" />
               </div>
-              <span className="text-xs font-black opacity-20 uppercase tracking-[0.5em]">{t("home_no_record")}</span>
+              <span className="text-xs font-black opacity-20 uppercase tracking-[0.5em] block mb-4">{t("home_no_records")}</span>
+              <button
+                onClick={() => onNavigate("dashboard")}
+                className="inline-flex items-center gap-2 py-3 px-6 bg-primary text-white rounded-2xl font-black text-xs uppercase tracking-wider hover:bg-primary/90 transition-all active:scale-95"
+              >
+                {t("home_start_btn")} →
+              </button>
             </div>
           )}
         </div>
