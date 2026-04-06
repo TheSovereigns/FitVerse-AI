@@ -73,14 +73,25 @@ export function SettingsPage({ onBack }: { onBack?: () => void }) {
     console.log("[Settings] Checking admin, user:", user)
     let adminFound = false
     
-    // Check 1: user_metadata (most reliable)
+    // Check 1: user.email - allow list fallback (temporary for development)
+    const adminEmails = [
+      'seu-email@exemplo.com', // Replace with your email
+      'admin@fitverse.ai',
+    ]
+    if (user?.email && adminEmails.includes(user.email.toLowerCase())) {
+      console.log("[Settings] Admin from email allowlist")
+      setIsAdmin(true)
+      adminFound = true
+    }
+    
+    // Check 2: user_metadata (most reliable)
     if (user?.user_metadata?.is_admin === true) {
       console.log("[Settings] Admin from metadata")
       setIsAdmin(true)
       adminFound = true
     }
     
-    // Check 2: profiles table
+    // Check 3: profiles table
     if (user?.id && !adminFound) {
       supabase
         .from('profiles')
