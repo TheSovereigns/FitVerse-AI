@@ -4,9 +4,11 @@ import { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { useTranslation } from "@/lib/i18n"
 import { CTAButton } from "@/components/cta-button"
+import { useAuth } from "@/hooks/useAuth"
 
 export function FloatingCTAMobile() {
   const { t } = useTranslation()
+  const { user } = useAuth()
   const [isVisible, setIsVisible] = useState(false)
   const [hasReachedBottom, setHasReachedBottom] = useState(false)
 
@@ -39,7 +41,7 @@ export function FloatingCTAMobile() {
         >
           <CTAButton
             label={t("cta_floating")}
-            href="/auth/login"
+            href={user ? "/" : "/auth/login"}
             variant="floating"
             size="md"
             dataCta="floating-mobile"
