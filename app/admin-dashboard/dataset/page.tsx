@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect, useCallback } from "react"
+import { useRouter } from "next/navigation"
 import { motion } from "framer-motion"
 import {
   Database,
@@ -23,12 +24,14 @@ import {
   X,
   Save,
   FileText,
+  ArrowLeft,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
 import { supabase } from "@/lib/supabase"
+import { useAuth } from "@/hooks/useAuth"
 import {
   LineChart,
   Line,
@@ -120,6 +123,53 @@ const STATUS_COLORS: Record<string, string> = {
 const DATASET_GOAL = 10000
 
 export default function DatasetPage() {
+  const router = useRouter()
+  const { user, isLoading: authLoading, profile } = useAuth()
+  const [accessDenied, setAccessDenied] = useState(false)
+
+  useEffect(() => {
+    if (!authLoading) {
+      if (!user) {
+        router.push("/auth/login")
+        return
+      }
+      if (profile && !profile.is_admin) {
+        setAccessDenied(true)
+      } else if (!profile) {
+        supabase
+          .from('profiles')
+          .select('is_admin')
+          .eq('id', user.id)
+          .single()
+          .then(({ data }) => {
+            if (!data?.is_admin) setAccessDenied(true)
+          })
+      }
+    }
+  }, [user, authLoading, profile, router])
+
+  if (authLoading || !user) {
+    return (
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <Loader2 className="w-8 h-8 text-orange-500 animate-spin" />
+      </div>
+    )
+  }
+
+  if (accessDenied) {
+    return (
+      <div className="min-h-screen bg-black flex flex-col items-center justify-center p-6">
+        <div className="text-center max-w-md">
+          <h1 className="text-3xl font-black text-white mb-4">Acesso Negado</h1>
+          <p className="text-zinc-400 mb-8">Você não tem permissão para acessar esta página.</p>
+          <Button onClick={() => router.push("/")} className="bg-orange-500 hover:bg-orange-600 text-black font-bold">
+            <ArrowLeft className="w-4 h-4 mr-2" />Voltar ao Início
+          </Button>
+        </div>
+      </div>
+    )
+  }
+
   const [messages, setMessages] = useState<MessageRecord[]>([])
   const [stats, setStats] = useState<StatsRecord[]>([])
   const [growthData, setGrowthData] = useState<GrowthPoint[]>([])

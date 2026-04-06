@@ -3,6 +3,7 @@
 export const dynamic = 'force-dynamic'
 
 import { useState, useEffect, useMemo, useCallback } from "react"
+import { useRouter } from "next/navigation"
 import { motion } from "framer-motion"
 import { 
   Users, 
@@ -13,7 +14,9 @@ import {
   UserPlus,
   UserCheck,
   Crown,
-  Sparkles
+  Sparkles,
+  Loader2,
+  ArrowLeft
 } from "lucide-react"
 import { useTranslation } from "@/lib/i18n"
 import { supabase } from "@/lib/supabase"
@@ -23,6 +26,8 @@ import { ActivityFeed } from "@/components/admin/activity-feed"
 import { PlansDonut } from "@/components/admin/plans-donut"
 import { GrowthChart } from "@/components/admin/growth-chart"
 import { useAdminRealtime } from "@/hooks/useAdminRealtime"
+import { useAuth } from "@/hooks/useAuth"
+import { Button } from "@/components/ui/button"
 
 interface Stats {
   totalUsers: number
@@ -53,6 +58,8 @@ interface TopUser {
 export default function AdminDashboardPage() {
   const { t, locale } = useTranslation()
   const { onlineCount, recentEvents, isConnected } = useAdminRealtime()
+  const router = useRouter()
+  const { user, isLoading: authLoading, profile } = useAuth()
   
   const [stats, setStats] = useState<Stats>({
     totalUsers: 0,
@@ -68,6 +75,70 @@ export default function AdminDashboardPage() {
   const [dailyData, setDailyData] = useState<DailyData[]>([])
   const [topUsers, setTopUsers] = useState<TopUser[]>([])
   const [loading, setLoading] = useState(true)
+  const [accessDenied, setAccessDenied] = useState(false)
+
+  // Access control - only admins can access
+  useEffect(() => {
+    if (!authLoading) {
+      if (!user) {
+        router.push("/auth/login")
+        return
+      }
+      
+      if (profile && !profile.is_admin) {
+        setAccessDenied(true)
+      } else if (!profile) {
+        // Profile not loaded yet, check directly
+        supabase
+          .from('profiles')
+          .select('is_admin')
+          .eq('id', user.id)
+          .single()
+          .then(({ data }) => {
+            if (!data?.is_admin) {
+              setAccessDenied(true)
+            }
+          })
+      }
+    }
+  }, [user, authLoading, profile, router])
+
+  // Show loading while checking auth
+  if (authLoading || !user) {
+    return (
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <Loader2 className="w-8 h-8 text-orange-500 animate-spin" />
+      </div>
+    )
+  }
+
+  // Show access denied
+  if (accessDenied) {
+    return (
+      <div className="min-h-screen bg-black flex flex-col items-center justify-center p-6">
+        <div className="text-center max-w-md">
+          <div className="w-20 h-20 rounded-full bg-red-500/20 flex items-center justify-center mx-auto mb-6">
+            <Sparkles className="w-10 h-10 text-red-500" />
+          </div>
+          <h1 className="text-3xl font-black text-white mb-4">
+            {locale === "en-US" ? "Access Denied" : "Acesso Negado"}
+          </h1>
+          <p className="text-zinc-400 mb-8">
+            {locale === "en-US" 
+              ? "You don't have permission to access this page. Only administrators can view this dashboard."
+              : "Você não tem permissão para acessar esta página. Apenas administradores podem visualizar este dashboard."}
+          </p>
+          <Button 
+            onClick={() => router.push("/")}
+            className="bg-orange-500 hover:bg-orange-600 text-black font-bold"
+          >
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            {locale === "en-US" ? "Back to Home" : "Voltar ao Início"}
+          </Button>
+        </div>
+      </div>
+    )
+  }
 
   const fetchDashboardData = useCallback(async () => {
     try {

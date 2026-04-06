@@ -3,6 +3,7 @@
 export const dynamic = 'force-dynamic'
 
 import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
 import { motion } from "framer-motion"
 import { 
   Search, 
@@ -13,21 +14,84 @@ import {
   Crown,
   Download,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Loader2,
+  ArrowLeft
 } from "lucide-react"
 import { useTranslation } from "@/lib/i18n"
 import { supabase, Profile } from "@/lib/supabase"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
+import { useAuth } from "@/hooks/useAuth"
 
 type FilterType = "all" | "free" | "pro" | "premium" | "canceled"
 
 export default function AdminUsersPage() {
   const { t, locale } = useTranslation()
+  const router = useRouter()
+  const { user, isLoading: authLoading, profile } = useAuth()
   const [users, setUsers] = useState<Profile[]>([])
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState("")
+  const [accessDenied, setAccessDenied] = useState(false)
+
+  // Access control
+  useEffect(() => {
+    if (!authLoading) {
+      if (!user) {
+        router.push("/auth/login")
+        return
+      }
+      
+      if (profile && !profile.is_admin) {
+        setAccessDenied(true)
+      } else if (!profile) {
+        supabase
+          .from('profiles')
+          .select('is_admin')
+          .eq('id', user.id)
+          .single()
+          .then(({ data }) => {
+            if (!data?.is_admin) {
+              setAccessDenied(true)
+            }
+          })
+      }
+    }
+  }, [user, authLoading, profile, router])
+
+  if (authLoading || !user) {
+    return (
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <Loader2 className="w-8 h-8 text-orange-500 animate-spin" />
+      </div>
+    )
+  }
+
+  if (accessDenied) {
+    return (
+      <div className="min-h-screen bg-black flex flex-col items-center justify-center p-6">
+        <div className="text-center max-w-md">
+          <h1 className="text-3xl font-black text-white mb-4">
+            {locale === "en-US" ? "Access Denied" : "Acesso Negado"}
+          </h1>
+          <p className="text-zinc-400 mb-8">
+            {locale === "en-US" 
+              ? "You don't have permission to access this page."
+              : "Você não tem permissão para acessar esta página."}
+          </p>
+          <Button 
+            onClick={() => router.push("/")}
+            className="bg-orange-500 hover:bg-orange-600 text-black font-bold"
+          >
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            {locale === "en-US" ? "Back to Home" : "Voltar ao Início"}
+          </Button>
+        </div>
+      </div>
+    )
+  }
   const [filter, setFilter] = useState<FilterType>("all")
   const [currentPage, setCurrentPage] = useState(1)
   const [totalCount, setTotalCount] = useState(0)
