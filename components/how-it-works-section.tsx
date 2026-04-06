@@ -11,7 +11,7 @@ interface HowItWorksSectionProps {
 }
 
 export function HowItWorksSection({ id }: HowItWorksSectionProps) {
-  const { t } = useTranslation()
+  const { t, locale } = useTranslation()
   const { user } = useAuth()
 
   const steps = [
@@ -37,7 +37,7 @@ export function HowItWorksSection({ id }: HowItWorksSectionProps) {
 
   return (
     <section id={id} className="py-20 px-4 md:px-6 lg:px-8">
-      <div className="max-w-5xl mx-auto">
+      <div className="max-w-5xl xl:max-w-6xl mx-auto">
         {/* Section Title */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -50,7 +50,7 @@ export function HowItWorksSection({ id }: HowItWorksSectionProps) {
             {t("onboard_how_title") || "Como funciona"}
           </h2>
           <p className="text-muted-foreground opacity-60 max-w-xl mx-auto">
-            three simples passos para sua transformação
+            {locale === "en-US" ? "Three simple steps to your transformation" : "Três simples passos para sua transformação"}
           </p>
         </motion.div>
 
@@ -63,7 +63,7 @@ export function HowItWorksSection({ id }: HowItWorksSectionProps) {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
-              className="relative glass-strong border border-white/10 rounded-2xl p-6"
+              className="relative glass-strong border border-white/10 rounded-2xl p-6 lg:p-8"
             >
               <span className="text-4xl font-black text-primary/20 mb-4 block">{step.num}</span>
               <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
@@ -72,7 +72,7 @@ export function HowItWorksSection({ id }: HowItWorksSectionProps) {
               <h3 className="text-lg font-black text-foreground mb-2">{step.title}</h3>
               <p className="text-sm text-muted-foreground opacity-60">{step.desc}</p>
               {index < steps.length - 1 && (
-                <div className="hidden md:block absolute -right-3 top-1/2 -translate-y-1/2 text-primary/20">
+                <div className="hidden md:block absolute -right-4 lg:-right-5 top-1/2 -translate-y-1/2 text-primary/20 z-10">
                   →
                 </div>
               )}

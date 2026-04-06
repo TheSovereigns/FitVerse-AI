@@ -4,6 +4,7 @@ import { useState } from "react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Camera, Upload, Loader2 } from "lucide-react"
+import { useTranslation } from "@/lib/i18n"
 
 interface ScanModalProps {
   open: boolean
@@ -12,6 +13,7 @@ interface ScanModalProps {
 }
 
 export function ScanModal({ open, onOpenChange, onScanComplete }: ScanModalProps) {
+  const { t } = useTranslation()
   const [isScanning, setIsScanning] = useState(false)
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -25,7 +27,7 @@ export function ScanModal({ open, onOpenChange, onScanComplete }: ScanModalProps
       try {
         await onScanComplete(base64String)
       } catch (error) {
-        console.error("Erro na análise:", error)
+        console.error(t("scan_error"), error)
       } finally {
         setIsScanning(false)
         onOpenChange(false)
@@ -38,13 +40,13 @@ export function ScanModal({ open, onOpenChange, onScanComplete }: ScanModalProps
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Escanear Produto</DialogTitle>
+          <DialogTitle>{t("scan_modal_title")}</DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
           {isScanning ? (
             <div className="flex flex-col items-center justify-center py-8">
               <Loader2 className="w-12 h-12 text-primary animate-spin mb-4" />
-              <p className="text-sm text-muted-foreground">Analisando produto...</p>
+              <p className="text-sm text-muted-foreground">{t("scan_modal_analyzing")}</p>
             </div>
           ) : (
             <div className="grid gap-3">
@@ -54,14 +56,14 @@ export function ScanModal({ open, onOpenChange, onScanComplete }: ScanModalProps
                 onClick={() => document.getElementById("file-upload")?.click()}
               >
                 <Upload className="w-4 h-4 mr-2" />
-                Carregar da Galeria
+                {t("scan_modal_gallery")}
               </Button>
               <Button
                 className="w-full"
                 onClick={() => document.getElementById("camera-upload")?.click()}
               >
                 <Camera className="w-4 h-4 mr-2" />
-                Usar Câmera
+                {t("scan_modal_camera")}
               </Button>
               <input
                 id="file-upload"

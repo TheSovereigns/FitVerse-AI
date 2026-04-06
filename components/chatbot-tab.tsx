@@ -144,7 +144,7 @@ export function ChatbotTab() {
   }
 
   return (
-    <div className="relative flex flex-col h-[calc(100dvh-10rem)] md:h-[80vh] w-full max-w-5xl mx-auto glass-strong border-white/20 rounded-[2.5rem] md:rounded-[3.5rem] shadow-[0_40px_100px_rgba(0,0,0,0.3)] overflow-hidden animate-in zoom-in duration-700">
+    <div className="relative flex flex-col h-[calc(100dvh-12rem)] md:h-[calc(100vh-8rem)] lg:h-[calc(100vh-10rem)] max-h-[800px] xl:max-h-[900px] w-full max-w-5xl xl:max-w-6xl mx-auto glass-strong border-white/20 rounded-[2.5rem] md:rounded-[3.5rem] shadow-[0_40px_100px_rgba(0,0,0,0.3)] overflow-hidden animate-in zoom-in duration-700">
 
       {/* Siri loading glow */}
       <AnimatePresence>
@@ -173,7 +173,7 @@ export function ChatbotTab() {
         </div>
         <div className="flex items-center gap-2">
           <div className="text-[10px] font-bold text-muted-foreground opacity-40">
-            {messageCount} msgs
+            {messageCount}{t("chatbot_msg_count")}
           </div>
           <div className="flex -space-x-2">
             <div className="w-7 h-7 md:w-8 md:h-8 rounded-full border-2 border-background bg-primary/20" />
@@ -195,7 +195,7 @@ export function ChatbotTab() {
               className={cn('flex items-start gap-3', msg.role === 'user' ? 'justify-end' : 'justify-start')}
             >
               <div className={cn(
-                'max-w-[88%] md:max-w-lg shadow-xl',
+                'max-w-[88%] md:max-w-lg lg:max-w-xl xl:max-w-2xl shadow-xl',
                 msg.role === 'user'
                   ? 'mesh-gradient text-white rounded-[1.5rem] rounded-br-[0.25rem]'
                   : 'glass-strong text-foreground rounded-[1.5rem] rounded-bl-[0.25rem] border border-white/10'
@@ -251,7 +251,7 @@ export function ChatbotTab() {
                     <button
                       key={star}
                       onClick={() => handleRating(star)}
-                      className="p-1 hover:scale-125 transition-transform active:scale-90"
+                      className="p-2 min-w-[44px] min-h-[44px] flex items-center justify-center hover:scale-125 transition-transform active:scale-90"
                     >
                       <Star className="w-7 h-7 text-amber-400 fill-amber-400 hover:text-amber-300" />
                     </button>

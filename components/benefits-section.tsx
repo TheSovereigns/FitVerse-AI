@@ -11,14 +11,14 @@ interface BenefitsSectionProps {
 }
 
 export function BenefitsSection({ id }: BenefitsSectionProps) {
-  const { t } = useTranslation()
+  const { t, locale } = useTranslation()
   const { user } = useAuth()
 
   const benefits = [
     {
       icon: ScanLine,
       title: t("onboard_benefit1_title") || "Bio-Scan IA",
-      desc: t("onboard_benefit1_desc") || "Escaneie qualquer alimento e a IA analisa，立刻",
+      desc: t("onboard_benefit1_desc") || "Escaneie qualquer alimento e a IA analisa instantaneamente",
     },
     {
       icon: Dumbbell,
@@ -34,7 +34,7 @@ export function BenefitsSection({ id }: BenefitsSectionProps) {
 
   return (
     <section id={id} className="py-20 px-4 md:px-6 lg:px-8">
-      <div className="max-w-5xl mx-auto">
+      <div className="max-w-5xl xl:max-w-6xl mx-auto">
         {/* Section Title */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -47,7 +47,7 @@ export function BenefitsSection({ id }: BenefitsSectionProps) {
             {t("onboard_benefits_title") || "Por que FitVerse AI?"}
           </h2>
           <p className="text-muted-foreground opacity-60 max-w-xl mx-auto">
-            Tecnologia de ponta para transformar sua saúde
+            {locale === "en-US" ? "Cutting-edge technology to transform your health" : "Tecnologia de ponta para transformar sua saúde"}
           </p>
         </motion.div>
 
@@ -60,7 +60,7 @@ export function BenefitsSection({ id }: BenefitsSectionProps) {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
-              className="glass-strong border border-white/10 rounded-2xl p-6 text-center hover:border-primary/30 transition-all"
+              className="glass-strong border border-white/10 rounded-2xl p-6 lg:p-8 text-center hover:border-primary/30 transition-all"
             >
               <div className="w-14 h-14 rounded-2xl bg-primary/20 flex items-center justify-center mx-auto mb-4">
                 <benefit.icon className="w-7 h-7 text-primary" />

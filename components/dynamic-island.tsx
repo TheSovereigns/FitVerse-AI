@@ -34,7 +34,7 @@ export function DynamicIsland({
 
   const getIslandWidth = () => {
     if (isDocked && !isHovered) return "w-48"
-    if (isHovered || islandState === "expanded") return "w-64 md:w-80"
+    if (isHovered || islandState === "expanded") return "w-64 md:w-80 lg:w-96 xl:w-[28rem]"
     if (islandState === "scanning") return "w-48"
     if (islandState === "success" || islandState === "error") return "w-40"
     return "w-32"
@@ -116,7 +116,7 @@ function IslandMiniButton({ icon: Icon, onClick, label }: { icon: any, onClick?:
   return (
     <button
       onClick={onClick}
-      className="group flex flex-col items-center justify-center p-2 hover:bg-white/10 rounded-full transition-all duration-300 hover:scale-110 active:scale-95"
+      className="group flex flex-col items-center justify-center p-3 min-w-[44px] min-h-[44px] lg:min-w-[48px] lg:min-h-[48px] hover:bg-white/10 rounded-full transition-all duration-300 hover:scale-110 active:scale-95"
       title={label}
     >
       <Icon className="w-5 h-5 text-white/60 group-hover:text-white transition-colors" />

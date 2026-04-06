@@ -53,7 +53,7 @@ import { useTranslation } from "@/lib/i18n"
 export function WorkoutGenerator({ onGenerate, isLoading }: WorkoutGeneratorProps) {
   const { t } = useTranslation()
   const [level, setLevel] = useState(t("wg_intermediate"))
-  const [duration, setDuration] = useState("45 min")
+  const [duration, setDuration] = useState(t("wg_default_duration"))
   const [focus, setFocus] = useState(t("wg_gain"))
   const [location, setLocation] = useState(t("wg_gym"))
   const [observations, setObservations] = useState("")
@@ -84,7 +84,7 @@ export function WorkoutGenerator({ onGenerate, isLoading }: WorkoutGeneratorProp
             <SelectionGroup 
               label={t("wg_duration")} 
               icon={Clock}
-              options={["30 min", "45 min", "60+ min"]}
+              options={[t("wg_duration_30"), t("wg_duration_45"), t("wg_duration_60")]}
               value={duration}
               onChange={setDuration}
             />

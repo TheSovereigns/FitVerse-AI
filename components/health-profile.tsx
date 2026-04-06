@@ -48,7 +48,7 @@ export function HealthProfile({ scanHistory, onNavigateToSettings, onNavigateToS
   const { user, signOut } = useAuth()
   const [localScanHistory, setLocalScanHistory] = useState<ScanHistoryItem[]>(scanHistory)
   const [selectedPeriod, setSelectedPeriod] = useState<"week" | "month">("week")
-  const [displayName, setDisplayName] = useState("Usuário FitVerse")
+  const [displayName, setDisplayName] = useState("")
   const [isEditing, setIsEditing] = useState(false)
   const [editName, setEditName] = useState("")
   const [isSaving, setIsSaving] = useState(false)
@@ -56,7 +56,7 @@ export function HealthProfile({ scanHistory, onNavigateToSettings, onNavigateToS
 
   useEffect(() => {
     if (user) {
-      const name = user.user_metadata?.full_name || user.user_metadata?.name || user.email?.split('@')[0] || "Usuário FitVerse"
+      const name = user.user_metadata?.full_name || user.user_metadata?.name || user.email?.split('@')[0] || t("profile_default_name")
       setDisplayName(name)
       setEditName(name)
     }
@@ -151,7 +151,7 @@ export function HealthProfile({ scanHistory, onNavigateToSettings, onNavigateToS
     : "free"
 
   return (
-    <div className="w-full max-w-5xl mx-auto space-y-6 md:space-y-10 pb-safe-nav animate-in fade-in duration-500">
+    <div className="w-full max-w-5xl xl:max-w-6xl mx-auto space-y-6 md:space-y-10 pb-safe-nav animate-in fade-in duration-500">
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 md:gap-6 mt-4 md:mt-8">
         <div className="flex items-center gap-4 md:gap-8">
@@ -214,9 +214,9 @@ export function HealthProfile({ scanHistory, onNavigateToSettings, onNavigateToS
             )}
             <div className="flex items-center gap-2 mt-1 md:mt-2">
               <Activity className="w-3 h-3 md:w-4 md:h-4 text-emerald-400 animate-pulse" />
-              <p className="text-xs md:text-sm font-bold text-muted-foreground opacity-50 uppercase tracking-[0.2em]">
-                {user?.email || ""}
-              </p>
+               <p className="text-xs md:text-sm font-bold text-muted-foreground opacity-50 uppercase tracking-[0.2em] truncate max-w-[200px] md:max-w-none">
+                 {user?.email || ""}
+               </p>
             </div>
           </div>
         </div>
@@ -227,8 +227,8 @@ export function HealthProfile({ scanHistory, onNavigateToSettings, onNavigateToS
               <button
                 key={p}
                 onClick={() => setSelectedPeriod(p)}
-                className={cn(
-                  "px-3 md:px-6 py-1.5 md:py-2 rounded-full text-[10px] font-black uppercase tracking-widest transition-all duration-500",
+                  className={cn(
+                  "px-3 md:px-6 py-2.5 md:py-2 min-h-[44px] rounded-full text-[10px] font-black uppercase tracking-widest transition-all duration-500",
                   selectedPeriod === p ? "mesh-gradient text-white shadow-xl scale-105" : "text-muted-foreground opacity-40 hover:opacity-100"
                 )}
               >
@@ -290,7 +290,7 @@ export function HealthProfile({ scanHistory, onNavigateToSettings, onNavigateToS
         </motion.div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-3 gap-3 md:gap-6">
+        <div className="grid grid-cols-3 gap-3 md:gap-4 lg:gap-6 xl:gap-8">
           {/* Average Score Ring */}
           <motion.div
             whileHover={{ scale: 1.02 }}
@@ -324,7 +324,7 @@ export function HealthProfile({ scanHistory, onNavigateToSettings, onNavigateToS
             <div className="w-10 h-10 md:w-20 md:h-20 rounded-[1rem] md:rounded-[2rem] bg-rose-500/10 flex items-center justify-center text-rose-500 mb-2 md:mb-6 shadow-inner">
               <TrendingUp className="w-5 h-5 md:w-10 md:h-10" />
             </div>
-            <p className="text-3xl md:text-7xl font-black tracking-tighter text-foreground leading-none mb-1 md:mb-2">{streak}</p>
+            <p className="text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-black tracking-tighter text-foreground leading-none mb-1 md:mb-2">{streak}</p>
             <h3 className="text-[7px] md:text-[10px] font-black text-muted-foreground uppercase tracking-[0.3em] opacity-40">{t("profile_streak")}</h3>
           </motion.div>
 
@@ -336,7 +336,7 @@ export function HealthProfile({ scanHistory, onNavigateToSettings, onNavigateToS
             <div className="w-10 h-10 md:w-20 md:h-20 rounded-[1rem] md:rounded-[2rem] bg-blue-500/10 flex items-center justify-center text-blue-500 mb-2 md:mb-6 shadow-inner">
               <Sparkles className="w-5 h-5 md:w-10 md:h-10" />
             </div>
-            <p className="text-3xl md:text-7xl font-black tracking-tighter text-foreground leading-none mb-1 md:mb-2">{distribution.total}</p>
+            <p className="text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-black tracking-tighter text-foreground leading-none mb-1 md:mb-2">{distribution.total}</p>
             <h3 className="text-[7px] md:text-[10px] font-black text-muted-foreground uppercase tracking-[0.3em] opacity-40">{t("profile_total_scans")}</h3>
           </motion.div>
         </div>

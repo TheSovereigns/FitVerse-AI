@@ -20,7 +20,7 @@ export function FooterCTASection({ id }: FooterCTASectionProps) {
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
         transition={{ duration: 0.6 }}
-        className="max-w-3xl mx-auto text-center glass-strong border border-primary/20 rounded-[3rem] p-8 md:p-12 relative overflow-hidden"
+        className="max-w-3xl lg:max-w-4xl xl:max-w-5xl mx-auto text-center glass-strong border border-primary/20 rounded-[3rem] p-8 md:p-10 lg:p-12 xl:p-16 relative overflow-hidden"
       >
         {/* Background gradient */}
         <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-transparent to-purple-500/10" />
@@ -52,7 +52,7 @@ export function FooterCTASection({ id }: FooterCTASectionProps) {
           />
           
           <p className="text-xs text-muted-foreground opacity-40 mt-4">
-            ✓ Sem cartão de crédito • ✓ Plano 100% gratuito disponível
+            {t("cta_footer_disclaimer")}
           </p>
         </div>
       </motion.div>

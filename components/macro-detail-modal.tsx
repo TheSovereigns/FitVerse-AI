@@ -24,12 +24,15 @@ interface MacroDetailModalProps {
   onClose: () => void;
 }
 
+import { useTranslation } from "@/lib/i18n"
+
 export function MacroDetailModal({ macroType, products, onClose }: MacroDetailModalProps) {
+  const { t, locale } = useTranslation()
   const macroInfo = {
-    calories: { label: "Calorias", unit: "kcal", icon: Flame, color: "text-primary", bg: "bg-primary/20" },
-    protein: { label: "Proteína", unit: "g", icon: Beef, color: "text-blue-400", bg: "bg-blue-400/20" },
-    carbs: { label: "Carboidratos", unit: "g", icon: Cookie, color: "text-amber-400", bg: "bg-amber-400/20" },
-    fat: { label: "Gordura", unit: "g", icon: Droplet, color: "text-rose-400", bg: "bg-rose-400/20" },
+    calories: { label: t("home_calorie_label"), unit: "kcal", icon: Flame, color: "text-primary", bg: "bg-primary/20" },
+    protein: { label: t("md_protein"), unit: "g", icon: Beef, color: "text-blue-400", bg: "bg-blue-400/20" },
+    carbs: { label: t("md_carbs"), unit: "g", icon: Cookie, color: "text-amber-400", bg: "bg-amber-400/20" },
+    fat: { label: t("md_fat"), unit: "g", icon: Droplet, color: "text-rose-400", bg: "bg-rose-400/20" },
   };
 
   const currentMacro = macroInfo[macroType];
@@ -58,7 +61,7 @@ export function MacroDetailModal({ macroType, products, onClose }: MacroDetailMo
                 <div className={cn("w-10 h-10 rounded-2xl flex items-center justify-center shadow-inner", currentMacro.bg)}>
                    <Icon className={cn("w-5 h-5", currentMacro.color)} />
                 </div>
-                <span className="text-[10px] font-black uppercase tracking-[0.5em] opacity-40">Bio-Analysis Engine</span>
+                <span className="text-[10px] font-black uppercase tracking-[0.5em] opacity-40">{t("lp_bio_modules")}</span>
              </div>
              <Button variant="ghost" onClick={onClose} className="rounded-full hover:bg-white/10 text-foreground/40 hover:text-foreground">
                 <X className="w-6 h-6" />
@@ -71,7 +74,7 @@ export function MacroDetailModal({ macroType, products, onClose }: MacroDetailMo
                <div className="text-center space-y-6">
                   <div className="flex items-center justify-center gap-3">
                      <Activity className="w-4 h-4 text-primary animate-pulse" />
-                     <h2 className="text-xl font-bold text-muted-foreground opacity-50 uppercase tracking-[0.3em]">Concentração de {currentMacro.label}</h2>
+                      <h2 className="text-xl font-bold text-muted-foreground opacity-50 uppercase tracking-[0.3em]">{locale === "en-US" ? "Concentration of" : "Concentração de"} {currentMacro.label}</h2>
                   </div>
                   <div className="relative inline-block">
                      <div className={cn("absolute inset-0 blur-[40px] opacity-20 rounded-full", currentMacro.bg)} />
@@ -83,7 +86,7 @@ export function MacroDetailModal({ macroType, products, onClose }: MacroDetailMo
 
                {/* Product Breakdown List */}
                <div className="space-y-6">
-                  <h3 className="text-[10px] font-black uppercase tracking-[0.4em] opacity-30 px-4">Fontes Identificadas</h3>
+                   <h3 className="text-[10px] font-black uppercase tracking-[0.4em] opacity-30 px-4">{locale === "en-US" ? "Identified Sources" : "Fontes Identificadas"}</h3>
                   <div className="grid gap-4">
                     {relevantProducts.length > 0 ? (
                       relevantProducts.map((product, index) => (
@@ -100,7 +103,7 @@ export function MacroDetailModal({ macroType, products, onClose }: MacroDetailMo
                             </div>
                             <div>
                                <p className="text-lg font-black text-foreground tracking-tight leading-tight mb-1">{product.productName}</p>
-                               <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest opacity-40">Mapeado via Scan</p>
+                                <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest opacity-40">{locale === "en-US" ? "Mapped via Scan" : "Mapeado via Scan"}</p>
                             </div>
                           </div>
                           <div className="text-right">
@@ -120,7 +123,7 @@ export function MacroDetailModal({ macroType, products, onClose }: MacroDetailMo
                     ) : (
                       <div className="text-center py-20 glass border-white/5 rounded-[3.5rem] opacity-20">
                          <Target className="w-12 h-12 mx-auto mb-4" />
-                         <p className="text-xs font-black uppercase tracking-widest">Nenhum dado captado</p>
+                          <p className="text-xs font-black uppercase tracking-widest">{locale === "en-US" ? "No data captured" : "Nenhum dado captado"}</p>
                       </div>
                     )}
                   </div>
@@ -134,7 +137,7 @@ export function MacroDetailModal({ macroType, products, onClose }: MacroDetailMo
               onClick={onClose} 
               className="w-full max-w-sm h-16 rounded-3xl mesh-gradient text-white font-black text-xs uppercase tracking-widest shadow-2xl haptic-press scale-animation"
             >
-              RETORNAR AO DASHBOARD
+              {locale === "en-US" ? "RETURN TO DASHBOARD" : "RETORNAR AO DASHBOARD"}
               <ArrowRight className="ml-4 w-4 h-4" />
             </Button>
           </div>

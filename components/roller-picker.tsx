@@ -49,7 +49,7 @@ export function RollerPicker({ min, max, value, onChange, unit, label }: RollerP
   return (
     <div className="flex flex-col items-center gap-2">
       {label && <span className="text-[10px] font-black uppercase tracking-[0.3em] opacity-40">{label}</span>}
-      <div className="relative w-24 h-40 glass-strong border border-white/10 rounded-2xl overflow-hidden shadow-inner">
+      <div className="relative w-20 md:w-24 h-40 glass-strong border border-white/10 rounded-2xl overflow-hidden shadow-inner">
         {/* Selection Highlight */}
         <div className="absolute top-1/2 left-0 right-0 h-10 -translate-y-1/2 bg-primary/20 border-y border-primary/30 pointer-events-none z-10" />
         

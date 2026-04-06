@@ -107,7 +107,7 @@ export function RecipesTab({ metabolicPlan }: RecipesTabProps) {
           >
             {isGenerating ? (
               [...Array(3)].map((_, i) => (
-                <div key={i} className="h-48 md:h-64 glass-strong rounded-[1.5rem] md:rounded-[2rem] animate-pulse relative overflow-hidden">
+                <div key={i} className="h-48 md:h-56 lg:h-60 xl:h-64 glass-strong rounded-[1.5rem] md:rounded-[2rem] animate-pulse relative overflow-hidden">
                   <div className="absolute inset-0 mesh-gradient opacity-10" />
                 </div>
               ))
@@ -117,7 +117,7 @@ export function RecipesTab({ metabolicPlan }: RecipesTabProps) {
                   key={index}
                   whileHover={{ y: -4, scale: 1.01 }}
                   whileTap={{ scale: 0.98 }}
-                  className="relative h-48 md:h-64 glass-strong border-white/20 rounded-[1.5rem] md:rounded-[2rem] p-4 md:p-5 flex flex-col justify-between overflow-hidden cursor-pointer shadow-xl group ios-active"
+                  className="relative h-48 md:h-56 lg:h-60 xl:h-64 glass-strong border-white/20 rounded-[1.5rem] md:rounded-[2rem] p-4 md:p-5 flex flex-col justify-between overflow-hidden cursor-pointer shadow-xl group ios-active"
                   onClick={() => setSelectedRecipe(recipe)}
                 >
                   <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -156,7 +156,7 @@ export function RecipesTab({ metabolicPlan }: RecipesTabProps) {
       {savedRecipes.length > 0 && (
         <div className="mt-6 md:mt-10">
           <h3 className="text-lg md:text-2xl font-black tracking-tighter text-foreground mb-4 md:mb-6 px-1 md:px-2">{t("recipes_saved_title")}</h3>
-          <div className="glass-strong border-white/20 rounded-[1.5rem] md:rounded-[2.5rem] overflow-hidden shadow-xl p-2 md:p-3">
+          <div className="glass-strong border-white/20 rounded-[1.5rem] md:rounded-[2.5rem] overflow-hidden shadow-xl p-2 md:p-3 lg:p-4 xl:p-6">
             {savedRecipes.map((r, i) => (
               <motion.div
                 key={i}

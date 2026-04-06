@@ -26,7 +26,7 @@ export function ScanDashboard({ onScan, isScanning = false }: ScanDashboardProps
   }
 
   return (
-    <div className="w-full max-w-5xl mx-auto space-y-8 md:space-y-12 p-2 md:p-6 animate-in fade-in duration-1000">
+    <div className="w-full max-w-5xl xl:max-w-6xl mx-auto space-y-8 md:space-y-12 p-2 md:p-6 animate-in fade-in duration-1000">
 
       {/* Header */}
       <div className="flex flex-col gap-2 md:gap-4 relative">
@@ -40,7 +40,7 @@ export function ScanDashboard({ onScan, isScanning = false }: ScanDashboardProps
             {t("scan_title")} <span className="text-primary italic">2.0</span>
           </motion.h1>
           <Badge className="bg-primary text-white font-black uppercase tracking-[0.2em] px-3 md:px-5 py-1.5 md:py-2 rounded-full text-[9px] md:text-xs shadow-xl shadow-primary/20 haptic-press">
-            Neural
+            {t("scan_dashboard_neural")}
           </Badge>
         </div>
         <p className="text-sm md:text-lg font-bold text-muted-foreground max-w-2xl opacity-60">
@@ -53,7 +53,7 @@ export function ScanDashboard({ onScan, isScanning = false }: ScanDashboardProps
         <motion.div
           whileHover={{ scale: 1.01 }}
           className={cn(
-            "relative glass-strong border-white/20 border-2 rounded-[1.5rem] md:rounded-[3rem] h-[200px] md:h-[300px] lg:h-[400px] flex flex-col items-center justify-center transition-all duration-1000 overflow-hidden shadow-[0_0_40px_rgba(0,0,0,0.3)] haptic-press glass-reflection",
+            "relative glass-strong border-white/20 border-2 rounded-[1.5rem] md:rounded-[3rem] h-[200px] md:h-[280px] lg:h-[320px] xl:h-[360px] flex flex-col items-center justify-center transition-all duration-1000 overflow-hidden shadow-[0_0_40px_rgba(0,0,0,0.3)] haptic-press glass-reflection",
             isDragging ? "border-primary bg-primary/5 scale-[1.02]" : "hover:border-white/30",
             isScanning && "ring-4 ring-primary/20"
           )}
@@ -131,7 +131,7 @@ export function ScanDashboard({ onScan, isScanning = false }: ScanDashboardProps
                     </div>
                   </motion.div>
 
-                  <div className="space-y-2 md:space-y-4 max-w-xs md:max-w-sm px-4 md:px-6">
+                  <div className="space-y-2 md:space-y-4 max-w-xs md:max-w-sm lg:max-w-md xl:max-w-lg px-4 md:px-6">
                     <h3 className="text-2xl md:text-4xl font-black text-foreground tracking-tighter">{t("scan_ready")}</h3>
                     <p className="text-muted-foreground text-base md:text-lg font-bold">{t("scan_instruction")}</p>
                   </div>
@@ -156,7 +156,7 @@ export function ScanDashboard({ onScan, isScanning = false }: ScanDashboardProps
       </div>
 
       {/* Smart History */}
-      <div className="mt-8 md:mt-16">
+      <div className="mt-8 md:mt-12 lg:mt-16">
         <h3 className="text-2xl md:text-[2rem] font-black tracking-tighter text-foreground mb-5 md:mb-8 px-2 md:px-4">
           {t("scan_history_title")}
         </h3>

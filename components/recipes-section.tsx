@@ -31,7 +31,7 @@ interface RecipesSectionProps {
 }
 
 export function RecipesSection({ productName, dietProfile }: RecipesSectionProps) {
-  const { locale } = useTranslation()
+  const { t, locale } = useTranslation()
   const [recipes, setRecipes] = useState<Recipe[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null)
@@ -55,7 +55,7 @@ export function RecipesSection({ productName, dietProfile }: RecipesSectionProps
       setRecipes(data.recipes)
     } catch (error) {
       console.error("[Fitverse] Error generating recipes:", error)
-      alert("Erro ao gerar receitas. Tente novamente.")
+      alert(locale === "en-US" ? "Error generating recipes. Please try again." : "Erro ao gerar receitas. Tente novamente.")
     } finally {
       setIsLoading(false)
     }
@@ -69,14 +69,24 @@ export function RecipesSection({ productName, dietProfile }: RecipesSectionProps
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {
       case "Fácil":
+      case "Easy":
         return "bg-success/10 text-success border-success/20"
       case "Médio":
+      case "Medium":
         return "bg-warning/10 text-warning border-warning/20"
       case "Difícil":
+      case "Hard":
         return "bg-destructive/10 text-destructive border-destructive/20"
       default:
         return "bg-muted"
     }
+  }
+
+  const getDifficultyLabel = (difficulty: string) => {
+    if (difficulty === "Fácil" || difficulty === "Easy") return locale === "en-US" ? "Easy" : "Fácil"
+    if (difficulty === "Médio" || difficulty === "Medium") return locale === "en-US" ? "Medium" : "Médio"
+    if (difficulty === "Difícil" || difficulty === "Hard") return locale === "en-US" ? "Hard" : "Difícil"
+    return difficulty
   }
 
   return (
@@ -84,7 +94,7 @@ export function RecipesSection({ productName, dietProfile }: RecipesSectionProps
       <Card className="p-4">
         <div className="flex items-center gap-2 mb-3">
           <ChefHat className="w-5 h-5 text-primary" />
-          <h3 className="font-semibold">Receitas Inteligentes</h3>
+          <h3 className="font-semibold">{locale === "en-US" ? "Smart Recipes" : "Receitas Inteligentes"}</h3>
         </div>
 
         {recipes.length === 0 ? (
@@ -93,18 +103,20 @@ export function RecipesSection({ productName, dietProfile }: RecipesSectionProps
               <ChefHat className="w-8 h-8 text-primary" />
             </div>
             <p className="text-sm text-muted-foreground mb-4">
-              Gere receitas saudáveis usando {productName} como ingrediente
+              {locale === "en-US"
+                ? `Generate healthy recipes using ${productName} as an ingredient`
+                : `Gere receitas saudáveis usando ${productName} como ingrediente`}
             </p>
             <Button onClick={handleGenerateRecipes} disabled={isLoading} className="w-full">
               {isLoading ? (
                 <>
                   <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin mr-2" />
-                  Gerando receitas...
+                  {locale === "en-US" ? "Generating recipes..." : "Gerando receitas..."}
                 </>
               ) : (
                 <>
                   <Sparkles className="w-4 h-4 mr-2" />
-                  Gerar Receitas Fit
+                  {locale === "en-US" ? "Generate Fit Recipes" : "Gerar Receitas Fit"}
                 </>
               )}
             </Button>
@@ -120,7 +132,7 @@ export function RecipesSection({ productName, dietProfile }: RecipesSectionProps
                 <div className="flex items-start justify-between gap-3 mb-2">
                   <h4 className="font-semibold text-sm flex-1">{recipe.name}</h4>
                   <Badge variant="outline" className={getDifficultyColor(recipe.difficulty)}>
-                    {recipe.difficulty}
+                    {getDifficultyLabel(recipe.difficulty)}
                   </Badge>
                 </div>
                 <p className="text-xs text-muted-foreground mb-3 line-clamp-2">{recipe.description}</p>
@@ -163,12 +175,12 @@ export function RecipesSection({ productName, dietProfile }: RecipesSectionProps
               {isLoading ? (
                 <>
                   <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin mr-2" />
-                  Gerando...
+                  {locale === "en-US" ? "Generating..." : "Gerando..."}
                 </>
               ) : (
                 <>
                   <Sparkles className="w-4 h-4 mr-2" />
-                  Gerar Novas Receitas
+                  {locale === "en-US" ? "Generate New Recipes" : "Gerar Novas Receitas"}
                 </>
               )}
             </Button>

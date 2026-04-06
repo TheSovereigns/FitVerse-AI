@@ -31,12 +31,12 @@ export function UserProfile({ onNavigateToSettings, onNavigateToSubscription }: 
     ]
 
     return (
-        <div className="space-y-12 pb-32 max-w-2xl mx-auto animate-in fade-in zoom-in duration-1000">
+        <div className="space-y-12 pb-32 md:pb-16 lg:pb-12 max-w-2xl md:max-w-3xl lg:max-w-4xl mx-auto animate-in fade-in zoom-in duration-1000">
             {/* Apple ID Style Hero */}
             <div className="flex flex-col items-center text-center pt-8">
                 <motion.div 
                     whileHover={{ scale: 1.05 }}
-                    className="relative w-40 h-40 mb-6"
+                    className="relative w-28 h-28 md:w-40 md:h-40 mb-6"
                 >
                     <div className="absolute inset-0 mesh-gradient rounded-full blur-2xl opacity-40 animate-pulse" />
                     <div className="relative w-full h-full rounded-full glass-strong border-4 border-white/20 flex items-center justify-center shadow-2xl overflow-hidden group">

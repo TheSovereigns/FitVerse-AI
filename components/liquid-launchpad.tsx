@@ -49,19 +49,19 @@ export function LiquidLaunchpad({ isOpen, onClose, onNavigate, currentView }: La
           {/* Top Indicator / Close handle */}
           <div className="pt-2 pb-6 flex flex-col items-center gap-1 group cursor-pointer" onClick={onClose}>
              <div className="w-10 h-1.5 rounded-full bg-white/20 group-hover:bg-white/40 transition-colors" />
-             <span className="text-[8px] font-black uppercase tracking-[0.3em] opacity-20 group-hover:opacity-40 transition-opacity">
-               {t("nav_pull_down_to_close") || "Pull down"}
-             </span>
+              <span className="text-[8px] font-black uppercase tracking-[0.3em] opacity-20 group-hover:opacity-40 transition-opacity">
+                {t("nav_pull_down_to_close")}
+              </span>
           </div>
 
-          <div className="flex-1 px-8 pt-4 pb-32 space-y-10 overflow-y-auto scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent">
+           <div className="flex-1 px-4 pt-4 pb-32 space-y-10 overflow-y-auto scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent">
 
 
             {/* Modules Grid */}
             <div className="space-y-6">
-               <h3 className="text-[10px] font-black uppercase tracking-[0.4em] opacity-30 ml-4">
-                 Bio-Modules
-               </h3>
+                <h3 className="text-[10px] font-black uppercase tracking-[0.4em] opacity-30 ml-4">
+                  {t("lp_bio_modules")}
+                </h3>
                <div className="grid grid-cols-3 gap-4">
                  {menuItems.map((item) => {
                    const isActive = currentView === item.id
@@ -106,15 +106,15 @@ export function LiquidLaunchpad({ isOpen, onClose, onNavigate, currentView }: La
                   <div className="w-10 h-10 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
                     <Calculator className="w-5 h-5" />
                   </div>
-                  <h4 className="font-black text-sm uppercase tracking-tighter">Bio-Stats</h4>
-                  <p className="text-[9px] font-bold opacity-40 uppercase tracking-widest">Protocol V4.2</p>
+                   <h4 className="font-black text-sm uppercase tracking-tighter">{t("lp_bio_stats")}</h4>
+                   <p className="text-[9px] font-bold opacity-40 uppercase tracking-widest">{t("lp_protocol")}</p>
                </div>
                <div className="glass-strong border-white/10 rounded-[2.5rem] p-6 flex flex-col gap-2">
                   <div className="w-10 h-10 rounded-2xl bg-cyan-500/10 flex items-center justify-center text-cyan-500">
                     <ScanLine className="w-5 h-5" />
                   </div>
-                  <h4 className="font-black text-sm uppercase tracking-tighter">AI Sync</h4>
-                  <p className="text-[9px] font-bold opacity-40 uppercase tracking-widest">Stabilized</p>
+                   <h4 className="font-black text-sm uppercase tracking-tighter">{t("lp_ai_sync")}</h4>
+                   <p className="text-[9px] font-bold opacity-40 uppercase tracking-widest">{t("lp_stabilized")}</p>
                </div>
             </div>
           </div>

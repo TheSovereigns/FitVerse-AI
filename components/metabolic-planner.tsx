@@ -109,15 +109,15 @@ export function MetabolicPlanner({ onPlanCreated }: MetabolicPlannerProps) {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || `Erro na API: ${response.statusText}`);
+        throw new Error(errorData.error || t("mp_error_api").replace("{status}", response.statusText));
       }
 
       const plan = await response.json();
       onPlanCreated(plan, profileData);
 
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Ocorreu um erro desconhecido.';
-      console.error("Erro ao calcular plano:", errorMessage);
+      const errorMessage = err instanceof Error ? err.message : t("mp_error_unknown");
+      console.error(t("mp_error_calc"), errorMessage);
       setError(errorMessage);
     } finally {
       setIsLoading(false);
@@ -139,7 +139,7 @@ export function MetabolicPlanner({ onPlanCreated }: MetabolicPlannerProps) {
   ];
 
   return (
-    <div className="w-full max-w-4xl mx-auto space-y-5 animate-fade-in px-2 md:px-4">
+    <div className="w-full max-w-4xl lg:max-w-5xl xl:max-w-6xl mx-auto space-y-5 animate-fade-in px-2 md:px-4">
       {/* Header */}
       <div className="text-center space-y-2 mb-6 group cursor-default">
         <div className="inline-flex items-center justify-center p-4 rounded-full glass-strong mb-1 apple-glow transition-transform duration-700 group-hover:scale-105">
@@ -167,7 +167,7 @@ export function MetabolicPlanner({ onPlanCreated }: MetabolicPlannerProps) {
               onClick={() => setManualInput(!manualInput)}
               className="text-[10px] md:text-xs font-black uppercase tracking-widest px-3 py-1.5 rounded-full border border-white/20 hover:border-primary/50 transition-all"
             >
-              {manualInput ? 'Rolagem' : 'Manual'}
+              {manualInput ? t("mp_toggle_scroll") : t("mp_toggle_manual")}
             </button>
           </div>
 
@@ -257,7 +257,7 @@ export function MetabolicPlanner({ onPlanCreated }: MetabolicPlannerProps) {
             </div>
             {t('mp_activity')}
           </h2>
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-2 md:gap-3">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2 md:gap-3">
             {activityOptions.map((option) => (
               <button
                 key={option.value}

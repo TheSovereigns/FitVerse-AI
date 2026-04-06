@@ -18,22 +18,22 @@ export function MetabolicDashboard({ plan, perfil, onBack }: MetabolicDashboardP
   const { t } = useTranslation()
   
   const macrosData = [
-    { name: "Proteínas", value: plan.macros.protein, color: "#FF6B6B", grams: plan.macros.proteinGrams },
-    { name: "Carbos", value: plan.macros.carbs, color: "#4ECDC4", grams: plan.macros.carbsGrams },
-    { name: "Gorduras", value: plan.macros.fat, color: "#FFE66D", grams: plan.macros.fatGrams },
+    { name: t("md_proteins"), value: plan.macros.protein, color: "#FF6B6B", grams: plan.macros.proteinGrams },
+    { name: t("md_carbs"), value: plan.macros.carbs, color: "#4ECDC4", grams: plan.macros.carbsGrams },
+    { name: t("md_fats"), value: plan.macros.fat, color: "#FFE66D", grams: plan.macros.fatGrams },
   ]
 
   const goalConfig: Record<string, { label: string, icon: any, color: string }> = {
-    lose_weight: { label: "Perder Peso", icon: TrendingDown, color: "text-rose-400" },
-    gain_muscle: { label: "Ganhar Massa", icon: TrendingUp, color: "text-emerald-400" },
-    maintain: { label: "Manter", icon: Minus, color: "text-blue-400" },
+    lose_weight: { label: t("md_lose_weight"), icon: TrendingDown, color: "text-rose-400" },
+    gain_muscle: { label: t("md_gain_mass"), icon: TrendingUp, color: "text-emerald-400" },
+    maintain: { label: t("md_maintain"), icon: Minus, color: "text-blue-400" },
   }
 
   const goal = goalConfig[perfil.goal] || goalConfig.maintain
   const GoalIcon = goal.icon
 
   return (
-    <div className="w-full max-w-4xl mx-auto space-y-4 md:space-y-6 pb-safe-nav animate-in fade-in duration-500">
+    <div className="w-full max-w-4xl lg:max-w-5xl xl:max-w-6xl mx-auto space-y-4 md:space-y-6 pb-safe-nav animate-in fade-in duration-500">
       {/* Header */}
       <motion.div 
         initial={{ opacity: 0, y: -20 }}
@@ -53,7 +53,7 @@ export function MetabolicDashboard({ plan, perfil, onBack }: MetabolicDashboardP
             {t('mp_title')}
           </h1>
           <p className="text-[10px] md:text-xs font-black text-primary uppercase tracking-[0.3em] opacity-60">
-            Seu plano personalizado
+            {t("md_personalized_plan")}
           </p>
         </div>
       </motion.div>
@@ -71,13 +71,13 @@ export function MetabolicDashboard({ plan, perfil, onBack }: MetabolicDashboardP
         <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="text-center md:text-left">
             <span className="text-[10px] font-black uppercase tracking-[0.4em] text-primary opacity-60">
-              Meta Diária
+              {t("md_daily_goal")}
             </span>
             <div className="flex items-baseline gap-2 justify-center md:justify-start mt-2">
               <span className="text-5xl md:text-7xl font-black text-foreground tracking-tighter">
                 {Math.round(plan.macros.calories)}
               </span>
-              <span className="text-lg md:text-xl font-bold text-muted-foreground opacity-40">KCAL</span>
+              <span className="text-lg md:text-xl font-bold text-muted-foreground opacity-40">{t("home_kcal")}</span>
             </div>
             <div className="flex items-center gap-2 mt-3 justify-center md:justify-start">
               <div className={`flex items-center gap-2 px-4 py-2 rounded-full glass-strong ${goal.color}`}>
@@ -111,7 +111,7 @@ export function MetabolicDashboard({ plan, perfil, onBack }: MetabolicDashboardP
         transition={{ delay: 0.2 }}
       >
         <h2 className="text-xs font-black uppercase tracking-[0.3em] text-muted-foreground opacity-40 mb-3 px-2">
-          Macros
+          {t("md_macros")}
         </h2>
         
         <div className="grid grid-cols-3 gap-3 md:gap-4">
@@ -124,7 +124,7 @@ export function MetabolicDashboard({ plan, perfil, onBack }: MetabolicDashboardP
               <Beef className="w-5 h-5 md:w-6 md:h-5 text-rose-400" />
             </div>
             <p className="text-2xl md:text-3xl font-black text-foreground">{plan.macros.proteinGrams}g</p>
-            <p className="text-[10px] md:text-xs font-black text-muted-foreground uppercase tracking-widest opacity-40 mt-1">Proteína</p>
+            <p className="text-[10px] md:text-xs font-black text-muted-foreground uppercase tracking-widest opacity-40 mt-1">{t("md_protein")}</p>
             <div className="mt-3 h-1.5 md:h-2 bg-white/10 rounded-full overflow-hidden">
               <motion.div 
                 initial={{ width: 0 }}
@@ -147,7 +147,7 @@ export function MetabolicDashboard({ plan, perfil, onBack }: MetabolicDashboardP
               <Cookie className="w-5 h-5 md:w-6 md:h-5 text-teal-400" />
             </div>
             <p className="text-2xl md:text-3xl font-black text-foreground">{plan.macros.carbsGrams}g</p>
-            <p className="text-[10px] md:text-xs font-black text-muted-foreground uppercase tracking-widest opacity-40 mt-1">Carbos</p>
+            <p className="text-[10px] md:text-xs font-black text-muted-foreground uppercase tracking-widest opacity-40 mt-1">{t("md_carbs")}</p>
             <div className="mt-3 h-1.5 md:h-2 bg-white/10 rounded-full overflow-hidden">
               <motion.div 
                 initial={{ width: 0 }}
@@ -170,7 +170,7 @@ export function MetabolicDashboard({ plan, perfil, onBack }: MetabolicDashboardP
               <Droplet className="w-5 h-5 md:w-6 md:h-5 text-yellow-400" />
             </div>
             <p className="text-2xl md:text-3xl font-black text-foreground">{plan.macros.fatGrams}g</p>
-            <p className="text-[10px] md:text-xs font-black text-muted-foreground uppercase tracking-widest opacity-40 mt-1">Gordura</p>
+            <p className="text-[10px] md:text-xs font-black text-muted-foreground uppercase tracking-widest opacity-40 mt-1">{t("md_fat")}</p>
             <div className="mt-3 h-1.5 md:h-2 bg-white/10 rounded-full overflow-hidden">
               <motion.div 
                 initial={{ width: 0 }}
@@ -195,7 +195,7 @@ export function MetabolicDashboard({ plan, perfil, onBack }: MetabolicDashboardP
           className="space-y-3"
         >
           <h2 className="text-xs font-black uppercase tracking-[0.3em] text-muted-foreground opacity-40 px-2">
-            Plano Alimentar
+            {t("md_meal_plan")}
           </h2>
           
           <div className="glass-strong border-white/10 rounded-[1.5rem] md:rounded-[2rem] p-4 md:p-6 shadow-lg">
@@ -252,16 +252,16 @@ export function MetabolicDashboard({ plan, perfil, onBack }: MetabolicDashboardP
               <Sparkles className="w-5 h-5 md:w-6 md:h-5 text-primary" />
             </div>
             <div>
-              <h3 className="text-lg md:text-xl font-black text-foreground">Previsão IA</h3>
-              <p className="text-[10px] md:text-xs text-muted-foreground opacity-60">Powered by Gemini</p>
+              <h3 className="text-lg md:text-xl font-black text-foreground">{t("md_ai_forecast")}</h3>
+              <p className="text-[10px] md:text-xs text-muted-foreground opacity-60">{t("md_powered_by")}</p>
             </div>
           </div>
 
           <div className="flex items-center gap-4 p-4 bg-primary/10 rounded-xl md:rounded-2xl mb-4">
             <Zap className="w-8 h-8 text-primary" />
             <div>
-              <p className="text-2xl md:text-3xl font-black text-primary">{plan.prediction.weeks} semanas</p>
-              <p className="text-[10px] md:text-xs text-muted-foreground">para atingir seu objetivo</p>
+              <p className="text-2xl md:text-3xl font-black text-primary">{plan.prediction.weeks}{t("md_weeks")}</p>
+              <p className="text-[10px] md:text-xs text-muted-foreground">{t("md_to_reach_goal")}</p>
             </div>
           </div>
 
@@ -274,7 +274,7 @@ export function MetabolicDashboard({ plan, perfil, onBack }: MetabolicDashboardP
       {/* Footer */}
       <div className="p-4">
         <p className="text-[8px] md:text-[10px] text-muted-foreground text-center opacity-40">
-          * Valores estimados baseados em fórmulas científicas. Consulte um profissional.
+          {t("md_disclaimer")}
         </p>
       </div>
     </div>

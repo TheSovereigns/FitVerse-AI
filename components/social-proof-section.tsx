@@ -74,7 +74,7 @@ function TestimonialCard({ initials, name, text, result, stars, delay, inView }:
       animate={inView ? { opacity: 1, y: 0 } : {}}
       transition={{ duration: 0.5, delay }}
       whileHover={{ scale: 1.02 }}
-      className="glass-strong border border-white/10 rounded-2xl p-6 relative"
+      className="glass-strong border border-white/10 rounded-2xl p-6 lg:p-8 relative"
     >
       <Quote className="absolute top-4 left-4 w-6 h-6 text-primary/20" />
 
@@ -132,7 +132,7 @@ export function SocialProofSection() {
   const testimonials = [
     {
       initials: "CM",
-      name: isEnglish ? "Carlos M., 28 — São Paulo, Brazil" : "Carlos M., 28 anos — São Paulo",
+      name: isEnglish ? "Carlos M., 28 — São Paulo, BR" : "Carlos M., 28 anos — São Paulo",
       text: isEnglish
         ? "Lost 15lbs in 2 months. The AI plan adapted to my work schedule and I never felt overwhelmed."
         : "Perdi 7kg em 2 meses. O plano da IA se adaptou à minha rotina de trabalho e nunca me senti sobrecarregado.",
@@ -140,8 +140,26 @@ export function SocialProofSection() {
       stars: 5,
     },
     {
+      initials: "JT",
+      name: isEnglish ? "Jessica T., 34 — Austin, TX" : "Jessica T., 34 anos — Austin, TX",
+      text: isEnglish
+        ? "As a busy mom of 3, I never thought I could meal prep. FitVerse made it so simple — the AI even accounts for my kids' picky eating!"
+        : "Como mãe de 3, nunca pensei que conseguiria preparar refeições. O FitVerse tornou tudo simples — a IA considera até a preferência dos meus filhos!",
+      result: isEnglish ? "-22lbs in 4 months" : "-10kg em 4 meses",
+      stars: 5,
+    },
+    {
+      initials: "MK",
+      name: isEnglish ? "Marcus K., 26 — Miami, FL" : "Marcus K., 26 anos — Miami, FL",
+      text: isEnglish
+        ? "The food scanner is insane. I scanned a protein bar and it told me it had 3x more sugar than I thought. Game changer for my cutting phase."
+        : "O scanner de alimentos é insano. Escaneei uma barra de proteína e descobri que tinha 3x mais açúcar do que eu pensava. Mudou meu cutting.",
+      result: isEnglish ? "+12lbs lean mass" : "+5.5kg massa magra",
+      stars: 5,
+    },
+    {
       initials: "AP",
-      name: isEnglish ? "Ana P., 33 — Rio de Janeiro, Brazil" : "Ana P., 33 anos — Rio de Janeiro",
+      name: isEnglish ? "Ana P., 33 — Rio de Janeiro, BR" : "Ana P., 33 anos — Rio de Janeiro",
       text: isEnglish
         ? "First time I actually stuck to a diet. The suggestions are practical and fit into my daily life."
         : "Pela primeira vez consegui manter uma dieta. As sugestões são práticas e encaixam no meu dia a dia.",
@@ -149,8 +167,17 @@ export function SocialProofSection() {
       stars: 5,
     },
     {
+      initials: "DR",
+      name: isEnglish ? "David R., 31 — New York, NY" : "David R., 31 anos — Nova York, NY",
+      text: isEnglish
+        ? "I've tried every fitness app out there. FitVerse is the first one that actually feels personalized. The AI coach knows my limits better than I do."
+        : "Já tentei todos os apps de fitness. FitVerse é o primeiro que realmente parece personalizado. O coach IA conhece meus limites melhor que eu.",
+      result: isEnglish ? "Running my first 5K!" : "Correndo meu primeiro 5K!",
+      stars: 5,
+    },
+    {
       initials: "RS",
-      name: isEnglish ? "Rafael S., 22 — Belo Horizonte, Brazil" : "Rafael S., 22 anos — Belo Horizonte",
+      name: isEnglish ? "Rafael S., 22 — Belo Horizonte, BR" : "Rafael S., 22 anos — Belo Horizonte",
       text: isEnglish
         ? "The AI Chat answers any question instantly. It's like having a personal trainer in my pocket 24/7."
         : "O Chat com IA responde qualquer dúvida na hora. É como ter um personal no bolso 24h.",
@@ -219,7 +246,7 @@ export function SocialProofSection() {
             </p>
           </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {testimonials.map((testimonial, index) => (
               <TestimonialCard
                 key={index}
@@ -245,7 +272,7 @@ export function SocialProofSection() {
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={trustInView ? { opacity: 1, scale: 1 } : {}}
                 transition={{ duration: 0.4, delay: index * 0.1 }}
-                className="flex flex-col items-center text-center p-4 rounded-xl bg-white/5"
+                className="flex flex-col items-center text-center p-4 lg:p-6 rounded-xl bg-white/5"
               >
                 <div className={cn("mb-3", badge.color)}>
                   <badge.icon className="w-8 h-8" />
@@ -270,7 +297,7 @@ export function SocialProofSection() {
 
             {/* Phone Mockup */}
             <div className="flex justify-center">
-              <div className="relative w-64 md:w-72 h-[500px] md:h-[550px] rounded-[3rem] border-4 border-white/20 bg-background overflow-hidden shadow-2xl">
+              <div className="relative w-56 md:w-64 lg:w-72 xl:w-80 h-[440px] md:h-[480px] lg:h-[550px] xl:h-[640px] rounded-[3rem] border-4 border-white/20 bg-background overflow-hidden shadow-2xl">
                 {/* Notch */}
                 <div className="absolute top-0 left-1/2 -translate-x-1/2 w-24 h-6 bg-background rounded-b-xl z-10" />
 
@@ -332,7 +359,7 @@ export function SocialProofSection() {
                       <span className="text-[8px] font-black text-purple-400 uppercase">Sugestão IA</span>
                     </div>
                     <p className="text-[10px] text-muted-foreground">
-                      {isEnglish ? "Great breakfast: oatmeal + banana + honey 🍯" : "Caféトップ: aveia + banana + mel"}
+                      {isEnglish ? "Great breakfast: oatmeal + banana + honey 🍯" : "Ótimo café da manhã: aveia + banana + mel"}
                     </p>
                   </div>
                 </div>

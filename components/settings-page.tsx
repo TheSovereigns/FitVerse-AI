@@ -38,7 +38,7 @@ const SettingRow = ({
   <motion.div
     whileHover={{ backgroundColor: "rgba(255, 255, 255, 0.05)" }}
     className={cn(
-      "flex items-center justify-between py-4 md:py-6 px-5 md:px-10 border-white/5 transition-all",
+      "flex items-center justify-between py-4 md:py-5 lg:py-6 px-5 md:px-6 lg:px-8 border-white/5 transition-all",
       !isLast && "border-b"
     )}
   >
@@ -115,7 +115,7 @@ export function SettingsPage({ onBack }: { onBack?: () => void }) {
   }
 
   return (
-    <div className="w-full max-w-3xl mx-auto space-y-10 md:space-y-16 pb-safe-nav animate-in fade-in duration-1000">
+    <div className="w-full max-w-3xl md:max-w-4xl lg:max-w-5xl mx-auto space-y-10 md:space-y-16 pb-safe-nav animate-in fade-in duration-1000">
       {/* Header */}
       <div className="flex flex-col items-center justify-center pt-8 md:pt-12 pb-4 md:pb-6 text-center">
         <div className="w-12 h-12 md:w-20 md:h-20 rounded-[1.25rem] md:rounded-[2rem] glass-strong border-white/20 mb-3 md:mb-6 flex items-center justify-center shadow-xl relative group">
@@ -220,7 +220,7 @@ export function SettingsPage({ onBack }: { onBack?: () => void }) {
           <Button
             variant="ghost"
             onClick={handleLogout}
-            className="w-full h-18 md:h-24 rounded-[2rem] md:rounded-[2.5rem] glass-strong border-white/10 font-black text-xl md:text-2xl uppercase tracking-[0.2em] text-rose-500 hover:bg-rose-500 hover:text-white transition-all shadow-xl flex items-center justify-center ios-active py-6"
+            className="w-full h-16 md:h-24 rounded-[2rem] md:rounded-[2.5rem] glass-strong border-white/10 font-black text-xl md:text-2xl uppercase tracking-[0.2em] text-rose-500 hover:bg-rose-500 hover:text-white transition-all shadow-xl flex items-center justify-center ios-active py-6"
           >
             {t("settings_logout")}
             <LogOut className="ml-3 md:ml-4 w-6 h-6 md:w-8 md:h-8" />

@@ -146,7 +146,7 @@ export function ExerciseDetailModal({ exercise, topProducts, onClose, onFeedback
       }
       return name
     }
-    return name + " exercício como fazer"
+    return name + t("em_search_suffix")
   }
 
   useEffect(() => {
@@ -220,7 +220,7 @@ export function ExerciseDetailModal({ exercise, topProducts, onClose, onFeedback
           }
         }
       } catch (error) {
-        console.error("Erro ao carregar GIF:", error)
+        console.error(t("em_error_gif"), error)
       } finally {
         setIsLoadingGif(false)
       }
@@ -273,7 +273,7 @@ export function ExerciseDetailModal({ exercise, topProducts, onClose, onFeedback
           <div className="flex items-center justify-between px-4 py-2 shrink-0 border-b border-white/10">
              <div className="flex items-center gap-2">
                 <Activity className="w-4 h-4 text-primary animate-pulse" />
-                <span className="text-[8px] font-black uppercase tracking-[0.2em] opacity-40">Exercício</span>
+                 <span className="text-[8px] font-black uppercase tracking-[0.2em] opacity-40">{t("em_exercise")}</span>
              </div>
              <Button variant="ghost" onClick={onClose} className="rounded-full hover:bg-white/10 h-8 w-8 p-0">
                 <X className="w-4 h-4" />
@@ -320,7 +320,7 @@ export function ExerciseDetailModal({ exercise, topProducts, onClose, onFeedback
               <div className="p-4 glass border-white/10 rounded-xl">
                  <div className="flex items-center gap-2 mb-2">
                     <Sparkles className="w-4 h-4 text-primary" />
-                    <span className="text-[8px] font-black uppercase tracking-wider opacity-40">Insight IA</span>
+                    <span className="text-[8px] font-black uppercase tracking-wider opacity-40">{t("em_ai_insight")}</span>
                  </div>
                  <p className="text-sm font-bold text-foreground/80 italic">"{exercise.aiInsight}"</p>
               </div>
@@ -329,7 +329,7 @@ export function ExerciseDetailModal({ exercise, topProducts, onClose, onFeedback
               <div className="space-y-2">
                  <h3 className="text-sm font-black uppercase tracking-wider flex items-center gap-2">
                     <ShieldCheck className="w-4 h-4 text-emerald-400" />
-                    Segurança
+                     {t("em_safety_label")}
                  </h3>
                  <div className="space-y-1">
                     {exercise.safetyTips.map((tip, i) => (
@@ -345,7 +345,7 @@ export function ExerciseDetailModal({ exercise, topProducts, onClose, onFeedback
               <div className="space-y-2">
                  <h3 className="text-sm font-black uppercase tracking-wider flex items-center gap-2">
                     <AlertTriangle className="w-4 h-4 text-rose-400" />
-                    Erros Comuns
+                     {t("em_mistakes_label")}
                  </h3>
                  <div className="space-y-1">
                     {exercise.commonMistakes.map((mistake, i) => (
@@ -360,7 +360,7 @@ export function ExerciseDetailModal({ exercise, topProducts, onClose, onFeedback
               {/* Tracker Simples */}
               <div className="p-4 glass-strong border-white/10 rounded-xl">
                  <div className="flex items-center justify-between mb-3">
-                    <span className="text-xs font-black uppercase tracking-wider">Séries: {currentSet}/{sets}</span>
+                     <span className="text-xs font-black uppercase tracking-wider">{t("em_tracker_label").replace("{currentSet}", String(currentSet)).replace("{sets}", String(sets))}</span>
                     <div className="flex gap-2">
                        <button onClick={() => setSets(s => Math.max(1, s - 1))} className="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center text-xs">-</button>
                        <button onClick={() => setSets(s => s + 1)} className="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center text-xs">+</button>
@@ -375,7 +375,7 @@ export function ExerciseDetailModal({ exercise, topProducts, onClose, onFeedback
                    onClick={handleStartRest}
                    className="w-full h-10 rounded-lg mesh-gradient text-white font-black text-xs uppercase tracking-wider"
                  >
-                   {currentSet < sets ? "Próxima Série" : "Finalizar"}
+                    {currentSet < sets ? t("em_next_set") : t("em_finish")}
                  </Button>
               </div>
             </div>

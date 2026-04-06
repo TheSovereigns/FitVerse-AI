@@ -70,7 +70,7 @@ export function ActiveWorkoutSession({ workout, onClose, onComplete }: ActiveWor
       }
       return name
     }
-    return name + " exercício como fazer"
+    return name + t("em_search_suffix")
   }
 
   // --- Persistência Local (Carregar) ---
@@ -87,7 +87,7 @@ export function ActiveWorkoutSession({ workout, onClose, onComplete }: ActiveWor
           setRpeValues(data.rpeValues)
         }
       } catch (e) {
-        console.error("Erro ao carregar progresso", e)
+        console.error(t("aw_error_progress"), e)
       }
     }
   }, [workout.name])
@@ -211,7 +211,7 @@ export function ActiveWorkoutSession({ workout, onClose, onComplete }: ActiveWor
         if (Array.isArray(data) && data.length > 0) {
           // Filtro de Equipamento: Tenta encontrar a variante correta (ex: body weight vs dumbbell)
           const location = workout.criteria?.location || ""
-          const targetEquipment = location.includes("Sem Equipamento") ? "body weight" : location.includes("Halteres") ? "dumbbell" : null
+          const targetEquipment = location.includes(t("aw_no_equipment")) ? "body weight" : location.includes(t("aw_dumbbells")) ? "dumbbell" : null
           
           const match = targetEquipment ? data.find((ex: any) => ex.equipment === targetEquipment) : data[0]
           const gifUrl = match ? match.gifUrl : data[0].gifUrl
@@ -224,7 +224,7 @@ export function ActiveWorkoutSession({ workout, onClose, onComplete }: ActiveWor
           if (fallback) setExerciseGif(fallback)
         }
       } catch (error) {
-        console.error("Erro ao carregar GIF:", error)
+        console.error(t("aw_error_gif"), error)
         const fallback = getFallbackGif(originalName)
         if (fallback) setExerciseGif(fallback)
       } finally {
@@ -305,7 +305,7 @@ export function ActiveWorkoutSession({ workout, onClose, onComplete }: ActiveWor
             <Card className="bg-card border-border p-4">
               <div className="flex flex-col items-center">
                 <Flame className="w-6 h-6 text-red-500 mb-2" />
-                <span className="text-2xl font-bold text-foreground">~200</span>
+                <span className="text-2xl font-bold text-foreground">{t("aw_kcal_estimate")}</span>
                 <span className="text-xs text-muted-foreground uppercase">{t("aw_kcal_est")}</span>
               </div>
             </Card>
@@ -335,7 +335,7 @@ export function ActiveWorkoutSession({ workout, onClose, onComplete }: ActiveWor
           <h3 className="font-bold text-foreground text-sm uppercase tracking-wider truncate max-w-[200px]">{workout.name}</h3>
           <span className="text-xs text-primary font-mono">{formatTime(elapsedTime)}</span>
         </div>
-        <Button variant="ghost" size="icon" onClick={onClose} className="text-muted-foreground hover:text-foreground" aria-label="Fechar treino">
+        <Button variant="ghost" size="icon" onClick={onClose} className="text-muted-foreground hover:text-foreground" aria-label={t("aw_close_workout")}>
           <X className="w-6 h-6" />
         </Button>
       </div>
@@ -417,7 +417,7 @@ export function ActiveWorkoutSession({ workout, onClose, onComplete }: ActiveWor
                   className="flex-1"
                   onClick={() => setRestTimer(prev => prev + 10)}
                 >
-                  +10s
+                  {t("aw_add_time")}
                 </Button>
                 <Button 
                   className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90"

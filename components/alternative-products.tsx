@@ -116,7 +116,7 @@ export function AlternativeProducts({ currentScore, onAnalyze }: { currentScore?
               </div>
               <div className="flex items-center justify-between">
                 <Badge className="bg-success/10 text-success border-success/20 text-lg px-3 py-1">
-                  Score: {selectedProduct.score}
+                  {t("alt_score_label")}{selectedProduct.score}
                 </Badge>
                 <span className="text-xl font-bold text-primary">{selectedProduct.price}</span>
               </div>

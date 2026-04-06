@@ -20,6 +20,11 @@ import {
   Target,
   Trophy,
   ChevronRight,
+  ScanLine,
+  Dumbbell,
+  ChefHat,
+  Flame,
+  Sparkles,
 } from "lucide-react"
 
 type View = "home" | "dashboard" | "result" | "recipes" | "training" | "profile" | "planner" | "settings" | "store" | "chatbot"
@@ -79,6 +84,58 @@ export function HomeDashboard({
 
   return (
     <div className="space-y-6 md:space-y-10 pb-safe-nav">
+      {/* Gamification Bar - Streak & XP */}
+      <motion.div
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="flex items-center justify-between gap-4 p-4 glass-strong rounded-2xl border border-primary/20 bg-gradient-to-r from-primary/5 to-transparent"
+      >
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-orange-500/20 flex items-center justify-center">
+            <span className="text-xl">{t("dopamine_streak_fire")}</span>
+          </div>
+          <div>
+            <p className="text-xs font-black text-muted-foreground uppercase tracking-wider">{t("dopamine_streak_text").replace(" dias seguidos!", "")} 3{t("dopamine_streak_text").slice(-1)}</p>
+            <p className="text-xs text-primary font-bold">{t("dopamine_level")} 5</p>
+          </div>
+        </div>
+        <div className="flex-1 max-w-[150px]">
+          <div className="h-2 bg-white/10 rounded-full overflow-hidden">
+            <motion.div 
+              initial={{ width: 0 }}
+              animate={{ width: "65%" }}
+              className="h-full bg-gradient-to-r from-primary to-yellow-500"
+            />
+          </div>
+          <p className="text-[9px] text-muted-foreground opacity-50 mt-1 text-right">{t("dopamine_xp_to_next")}</p>
+        </div>
+      </motion.div>
+
+      {/* AI Insight of the Day */}
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ delay: 0.2 }}
+        className="relative p-4 md:p-6 glass-strong border border-purple-500/20 bg-purple-500/5 rounded-2xl md:rounded-3xl overflow-hidden cursor-pointer"
+        onClick={() => onNavigate("chatbot")}
+      >
+        <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-transparent" />
+        <div className="relative z-10 flex items-start gap-4">
+          <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-purple-500/20 flex items-center justify-center shrink-0">
+            <Sparkles className="w-5 h-5 md:w-6 md:h-6 text-purple-400" />
+          </div>
+          <div className="flex-1">
+            <p className="text-[10px] font-black text-purple-400 uppercase tracking-wider mb-1">{t("dopamine_ai_insight_title")}</p>
+            <p className="text-sm md:text-base font-bold text-foreground leading-relaxed">
+              {locale === "en-US" 
+                ? "Today is protein day! Your muscles need fuel. Consider adding chicken breast or eggs to your next meal."
+                : "Hoje é dia de proteína! Seus músculos precisam de combustível. Queijo adicionar frango ou ovos na próxima refeição."}
+            </p>
+          </div>
+          <ChevronRight className="w-5 h-5 text-purple-400 opacity-50" />
+        </div>
+      </motion.div>
+
       {/* Hero Header */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -96,7 +153,7 @@ export function HomeDashboard({
       {/* Main Calorie Ring - mobile-optimized */}
       <motion.div
         whileHover={{ scale: 1.01 }}
-        className="relative glass-strong border-white/20 p-6 md:p-12 lg:p-20 rounded-[2.5rem] md:rounded-[3.5rem] overflow-hidden shadow-[0_40px_100px_rgba(0,0,0,0.4)] group cursor-pointer"
+        className="relative glass-strong border-white/20 p-6 md:p-8 lg:p-12 xl:p-16 rounded-[2.5rem] md:rounded-[3.5rem] overflow-hidden shadow-[0_40px_100px_rgba(0,0,0,0.4)] group cursor-pointer"
         onClick={() => onNavigate("dashboard")}
       >
         <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-purple-500/5 opacity-50" />
@@ -142,11 +199,11 @@ export function HomeDashboard({
       </motion.div>
 
       {/* Widget Grid */}
-      <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-5">
+      <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-5">
         {/* Water Widget */}
         <motion.div
           whileTap={{ scale: 0.95 }}
-          className="relative h-44 md:h-56 glass-strong border-white/20 rounded-[1.5rem] md:rounded-[2.5rem] overflow-hidden group cursor-pointer flex flex-col justify-between p-4 md:p-6 shadow-xl"
+          className="relative h-40 md:h-56 glass-strong border-white/20 rounded-[1.5rem] md:rounded-[2.5rem] overflow-hidden group cursor-pointer flex flex-col justify-between p-4 md:p-6 shadow-xl"
           onClick={() => setWaterCups(prev => prev + 1)}
         >
           <div className="absolute inset-0 bg-gradient-to-b from-blue-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
@@ -163,12 +220,12 @@ export function HomeDashboard({
             />
           </div>
           <div className="relative z-10 flex items-center justify-center gap-2 py-2 bg-[#0A84FF]/20 rounded-xl border border-[#0A84FF]/30">
-            <span className="text-[#0A84FF] font-black text-xs uppercase tracking-wider">Registrar +250ml</span>
+            <span className="text-[#0A84FF] font-black text-xs uppercase tracking-wider">{t("home_water_cta")}</span>
           </div>
         </motion.div>
 
         {/* Protein Widget */}
-        <div className="relative h-44 md:h-56 glass-strong border-white/20 rounded-[1.5rem] md:rounded-[2.5rem] p-5 md:p-6 flex flex-col justify-between group overflow-hidden shadow-2xl cursor-pointer"
+        <div className="relative h-40 md:h-48 lg:h-52 xl:h-56 glass-strong border-white/20 rounded-[1.5rem] md:rounded-[2.5rem] p-5 md:p-6 flex flex-col justify-between group overflow-hidden shadow-2xl cursor-pointer"
           onClick={() => onNavigate("planner")}
         >
           <div className="absolute inset-0 bg-gradient-to-t from-[#0A84FF]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
@@ -185,12 +242,12 @@ export function HomeDashboard({
             />
           </div>
           <div className="relative z-10 flex items-center justify-center gap-2 py-2 bg-[#0A84FF]/20 rounded-xl border border-[#0A84FF]/30">
-            <span className="text-[#0A84FF] font-black text-xs uppercase tracking-wider">Ver Plano →</span>
+            <span className="text-[#0A84FF] font-black text-xs uppercase tracking-wider">{t("home_protein_cta")}</span>
           </div>
         </div>
 
         {/* Longevity Score - spans full width on mobile if 3rd item */}
-        <div className="relative h-44 md:h-56 mesh-gradient rounded-[1.5rem] md:rounded-[2.5rem] p-5 md:p-6 flex flex-col items-center justify-between text-center text-white haptic-press glass-reflection shadow-2xl overflow-hidden col-span-2 md:col-span-1 cursor-pointer"
+        <div className="relative h-40 md:h-48 lg:h-52 xl:h-56 mesh-gradient rounded-[1.5rem] md:rounded-[2.5rem] p-5 md:p-6 flex flex-col items-center justify-between text-center text-white haptic-press glass-reflection shadow-2xl overflow-hidden col-span-2 md:col-span-1 cursor-pointer"
           onClick={() => onNavigate("dashboard")}
         >
           <div className="absolute inset-0 bg-black/10 backdrop-blur-[2px]" />
@@ -200,13 +257,59 @@ export function HomeDashboard({
             <span className="text-4xl md:text-5xl font-black tracking-tighter leading-none drop-shadow-2xl">{averageLongevityScore}</span>
           </div>
           <div className="relative z-10 flex items-center justify-center gap-2 py-2 bg-white/20 rounded-xl border border-white/30">
-            <span className="text-white font-black text-xs uppercase tracking-wider">Escanear Agora →</span>
+            <span className="text-white font-black text-xs uppercase tracking-wider">{t("home_longevity_cta")}</span>
           </div>
         </div>
       </div>
 
+      {/* Quick Actions Bento Grid */}
+      <div>
+        <h3 className="text-xs md:text-sm font-black text-muted-foreground uppercase tracking-[0.3em] mb-4">{t("dopamine_quick_scan_title")}</h3>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+          {/* Scan */}
+          <motion.div whileTap={{ scale: 0.95 }} className="relative p-4 md:p-5 glass-strong border border-blue-500/20 rounded-2xl cursor-pointer group overflow-hidden" onClick={() => onNavigate("dashboard")}>
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+            <div className="relative z-10">
+              <ScanLine className="w-6 h-6 md:w-8 md:h-8 text-blue-400 mb-2" />
+              <p className="text-xs md:text-sm font-black text-foreground">{t("dopamine_quick_scan")}</p>
+              <p className="text-[9px] text-muted-foreground opacity-50">{t("dopamine_quick_scan_desc")}</p>
+            </div>
+          </motion.div>
+          
+          {/* Workout */}
+          <motion.div whileTap={{ scale: 0.95 }} className="relative p-4 md:p-5 glass-strong border border-orange-500/20 rounded-2xl cursor-pointer group overflow-hidden" onClick={() => onNavigate("training")}>
+            <div className="absolute inset-0 bg-gradient-to-br from-orange-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+            <div className="relative z-10">
+              <Dumbbell className="w-6 h-6 md:w-8 md:h-8 text-orange-400 mb-2" />
+              <p className="text-xs md:text-sm font-black text-foreground">{t("dopamine_quick_workout")}</p>
+              <p className="text-[9px] text-muted-foreground opacity-50">{t("dopamine_quick_workout_desc")}</p>
+            </div>
+          </motion.div>
+          
+          {/* Recipes */}
+          <motion.div whileTap={{ scale: 0.95 }} className="relative p-4 md:p-5 glass-strong border border-emerald-500/20 rounded-2xl cursor-pointer group overflow-hidden" onClick={() => onNavigate("recipes")}>
+            <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+            <div className="relative z-10">
+              <ChefHat className="w-6 h-6 md:w-8 md:h-8 text-emerald-400 mb-2" />
+              <p className="text-xs md:text-sm font-black text-foreground">{t("dopamine_quick_recipe")}</p>
+              <p className="text-[9px] text-muted-foreground opacity-50">{t("dopamine_quick_recipe_desc")}</p>
+            </div>
+          </motion.div>
+          
+          {/* My Plan */}
+          <motion.div whileTap={{ scale: 0.95 }} className="relative p-4 md:p-5 glass-strong border border-purple-500/20 rounded-2xl cursor-pointer group overflow-hidden" onClick={() => onNavigate("planner")}>
+            <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+            <div className="relative z-10">
+              <Flame className="w-6 h-6 md:w-8 md:h-8 text-purple-400 mb-2" />
+              <p className="text-xs md:text-sm font-black text-foreground">{t("dopamine_quick_plan")}</p>
+              <p className="text-[9px] text-muted-foreground opacity-50">{t("dopamine_quick_plan_desc")}</p>
+            </div>
+          </motion.div>
+        </div>
+      </div>
+
       {/* Bio-Logs Recent */}
-      <div className="mt-10 md:mt-20">
+      <div className="mt-10 md:mt-12 lg:mt-16 xl:mt-20">
         <div className="flex items-center justify-between mb-5 md:mb-8 px-2 md:px-6">
           <div className="flex flex-col">
             <h3 className="text-xl md:text-3xl font-black text-foreground tracking-tighter">{t("home_bio_logs")}</h3>
@@ -250,16 +353,22 @@ export function HomeDashboard({
             </div>
           ) : (
             <div className="py-16 md:py-24 text-center">
-              <div className="w-16 h-16 md:w-20 md:h-20 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-4 md:mb-6">
-                <Target className="w-8 h-8 md:w-10 md:h-10 opacity-20" />
-              </div>
-              <span className="text-xs font-black opacity-20 uppercase tracking-[0.5em] block mb-4">{t("home_no_records")}</span>
+              <motion.div 
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                className="w-20 h-20 md:w-24 md:h-24 bg-gradient-to-br from-primary/20 to-purple-500/20 rounded-full flex items-center justify-center mx-auto mb-4 md:mb-6"
+              >
+                <Sparkles className="w-10 h-10 md:w-12 md:h-12 text-primary" />
+              </motion.div>
+              <h4 className="text-lg md:text-2xl font-black text-foreground mb-2">{t("dopamine_empty_title")}</h4>
+              <p className="text-sm text-muted-foreground opacity-60 mb-6 max-w-xs mx-auto">{t("dopamine_empty_subtitle")}</p>
               <button
                 onClick={() => onNavigate("dashboard")}
-                className="inline-flex items-center gap-2 py-3 px-6 bg-primary text-white rounded-2xl font-black text-xs uppercase tracking-wider hover:bg-primary/90 transition-all active:scale-95"
+                className="inline-flex items-center gap-2 py-3 px-6 bg-primary text-white rounded-2xl font-black text-xs uppercase tracking-wider hover:bg-primary/90 transition-all active:scale-95 mb-3"
               >
-                {t("home_start_btn")} →
+                {t("dopamine_empty_cta")}
               </button>
+              <p className="text-[10px] text-muted-foreground opacity-40">{t("dopamine_empty_xp_hint")}</p>
             </div>
           )}
         </div>

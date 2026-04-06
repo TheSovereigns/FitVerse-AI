@@ -119,9 +119,10 @@ export function TrainingTab({ metabolicPlan, scanHistory, userGoal }: TrainingTa
   const handleGenerateWorkouts = async (criteria: any) => {
     setIsGenerating(true)
     setShowGeneratorModal(false)
-    if (criteria.location === "Academia") setActiveFilter("gym")
-    else if (criteria.location === "Casa (Halteres)") setActiveFilter("dumbbells")
-    else if (criteria.location === "Casa (Sem Equipamento)") setActiveFilter("bodyweight")
+    if (criteria.location === "Academia" || criteria.location === "Gym") setActiveFilter("gym")
+    else if (criteria.location === "Casa (Halteres)" || criteria.location.includes("Halteres") || criteria.location.includes("Dumbbell")) setActiveFilter("dumbbells")
+    else if (criteria.location === "Casa (Sem Equipamento)" || criteria.location.includes("Sem Equipamento") || criteria.location.includes("Bodyweight")) setActiveFilter("bodyweight")
+    else setActiveFilter("home")
 
     try {
       const response = await fetch("/api/generate-workouts", {
@@ -134,7 +135,7 @@ export function TrainingTab({ metabolicPlan, scanHistory, userGoal }: TrainingTa
       setGeneratedWorkouts(data.workouts.map((w: any) => ({ ...w, criteria })))
     } catch (error) {
       console.error("Error generating workouts:", error)
-      toast.error("Error connecting to AI.")
+      toast.error(t("training_error_ai"))
     } finally {
       setIsGenerating(false)
     }
@@ -152,10 +153,10 @@ export function TrainingTab({ metabolicPlan, scanHistory, userGoal }: TrainingTa
     if (activeFilter === "all") return true
     const location = (workout.criteria?.location || "").toLowerCase()
     switch (activeFilter) {
-      case "gym": return location === "academia"
-      case "home": return location.includes("casa")
-      case "dumbbells": return location === "casa (halteres)"
-      case "bodyweight": return location === "casa (sem equipamento)"
+      case "gym": return location === "academia" || location === "gym"
+      case "home": return location.includes("casa") || location.includes("home")
+      case "dumbbells": return location === "casa (halteres)" || location === "casa (halteres)" || location.includes("dumbbell")
+      case "bodyweight": return location === "casa (sem equipamento)" || location.includes("sem equipamento") || location.includes("bodyweight") || location.includes("body weight")
       default: return false
     }
   })
@@ -217,7 +218,7 @@ export function TrainingTab({ metabolicPlan, scanHistory, userGoal }: TrainingTa
                       <Zap className="w-6 h-6 md:w-8 md:h-8 ml-3 md:ml-4" />
                     </Button>
                   </DialogTrigger>
-                  <DialogContent className="glass-strong text-foreground sm:max-w-2xl rounded-[3rem] md:rounded-[4rem] border-white/10 p-0 shadow-2xl overflow-hidden backdrop-blur-3xl mx-3 md:mx-0">
+                  <DialogContent className="glass-strong text-foreground sm:max-w-2xl lg:max-w-3xl xl:max-w-4xl rounded-[3rem] md:rounded-[4rem] border-white/10 p-0 shadow-2xl overflow-hidden backdrop-blur-3xl mx-3 md:mx-0">
                     <div className="p-8 md:p-12 pb-0">
                       <h2 className="text-3xl md:text-4xl font-black tracking-tighter">{t("training_generator_title")}</h2>
                       <p className="text-muted-foreground text-sm md:text-lg font-bold opacity-40 uppercase tracking-widest mt-2">{t("training_generator_subtitle")}</p>
@@ -242,7 +243,7 @@ export function TrainingTab({ metabolicPlan, scanHistory, userGoal }: TrainingTa
               onClick={() => setShowGeneratorModal(true)}
               className="h-10 px-4 rounded-full glass border border-white/10 text-xs font-black uppercase tracking-widest"
             >
-              + Novo Treino
+              {t("training_new_workout")}
             </Button>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-8">
@@ -256,7 +257,7 @@ export function TrainingTab({ metabolicPlan, scanHistory, userGoal }: TrainingTa
       )}
 
       <Dialog open={showGeneratorModal} onOpenChange={setShowGeneratorModal}>
-        <DialogContent className="glass-strong text-foreground sm:max-w-2xl rounded-[3rem] md:rounded-[4rem] border-white/10 p-0 shadow-2xl overflow-hidden backdrop-blur-3xl mx-3 md:mx-0">
+        <DialogContent className="glass-strong text-foreground sm:max-w-2xl lg:max-w-3xl xl:max-w-4xl rounded-[3rem] md:rounded-[4rem] border-white/10 p-0 shadow-2xl overflow-hidden backdrop-blur-3xl mx-3 md:mx-0">
           <div className="p-8 md:p-12 pb-0">
             <h2 className="text-3xl md:text-4xl font-black tracking-tighter">{t("training_generator_title")}</h2>
             <p className="text-muted-foreground text-sm md:text-lg font-bold opacity-40 uppercase tracking-widest mt-2">{t("training_generator_subtitle")}</p>
@@ -277,7 +278,7 @@ export function TrainingTab({ metabolicPlan, scanHistory, userGoal }: TrainingTa
 
       {selectedExerciseDetail && (
         <ExerciseDetailModal
-          exercise={{ ...selectedExerciseDetail, id: selectedExerciseDetail.name, stepByStepImages: [], safetyTips: [], commonMistakes: [], aiInsight: "Great exercise." }}
+          exercise={{ ...selectedExerciseDetail, id: selectedExerciseDetail.name, stepByStepImages: [], safetyTips: [], commonMistakes: [], aiInsight: t("training_ai_insight") }}
           topProducts={[]}
           onClose={() => setSelectedExerciseDetail(null)}
           onFeedback={() => {}}
@@ -313,7 +314,7 @@ function WorkoutCard({ workout, onStart, onExerciseClick }: { workout: Workout; 
           <h3 className="text-2xl md:text-3xl font-black tracking-tight text-foreground group-hover:text-primary transition-colors">{workout.name}</h3>
           <div className="flex items-center gap-3 md:gap-4 mt-2 md:mt-3 text-[10px] md:text-xs font-black uppercase tracking-widest opacity-40">
             <span className="flex items-center gap-1"><Clock className="w-3 h-3 md:w-4 md:h-4" /> {workout.duration}</span>
-            <span className="flex items-center gap-1"><Flame className="w-3 h-3 md:w-4 md:h-4" /> {workout.calories} KCAL</span>
+            <span className="flex items-center gap-1"><Flame className="w-3 h-3 md:w-4 md:h-4" /> {workout.calories}{t("training_kcal_unit")}</span>
           </div>
         </div>
 

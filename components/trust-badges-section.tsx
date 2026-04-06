@@ -17,7 +17,7 @@ export function TrustBadgesSection() {
   ]
 
   return (
-    <section className="py-8 px-4">
+    <section className="py-8 px-4 md:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -33,7 +33,7 @@ export function TrustBadgesSection() {
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
               transition={{ duration: 0.4, delay: index * 0.1 }}
-              className={cn("flex items-center gap-2 px-4 py-2 rounded-full", badge.bg)}
+              className={cn("flex items-center gap-2 px-4 py-2 lg:px-6 lg:py-3 rounded-full", badge.bg)}
             >
               <badge.icon className={cn("w-5 h-5", badge.color)} />
               <span className="text-xs font-medium text-muted-foreground">{badge.label}</span>

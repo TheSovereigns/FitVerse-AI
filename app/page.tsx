@@ -104,6 +104,26 @@ export default function DashboardPage() {
   }, [])
 
   useEffect(() => {
+    const handleRouteChange = () => {
+      const params = new URLSearchParams(window.location.search)
+      const view = params.get("view")
+      if (view) {
+        setCurrentView(view as View)
+      }
+    }
+    window.addEventListener("popstate", handleRouteChange)
+    const origPush = window.history.pushState
+    window.history.pushState = function(...args) {
+      origPush.apply(window.history, args)
+      handleRouteChange()
+    }
+    return () => {
+      window.removeEventListener("popstate", handleRouteChange)
+      window.history.pushState = origPush
+    }
+  }, [])
+
+  useEffect(() => {
     const handleScroll = () => {
       setIsDocked(window.scrollY > 80)
     }
@@ -125,7 +145,7 @@ export default function DashboardPage() {
           localStorage.setItem("dailyActivity", JSON.stringify(newDailyActivity))
         }
       } catch {
-        console.error("Falha ao carregar atividade diária")
+        console.error(t("page_error_load_activity"))
       }
     }
 
@@ -182,9 +202,9 @@ export default function DashboardPage() {
       if (!response.ok) {
         try {
           const errorData = await response.json()
-          throw new Error(errorData.message || 'Erro no checkout')
+          throw new Error(t("page_error_checkout"))
         } catch {
-          throw new Error('Erro ao processar pagamento')
+          throw new Error(t("page_error_payment"))
         }
       }
 
@@ -196,7 +216,7 @@ export default function DashboardPage() {
       }
     } catch (error) {
       console.error("Erro no checkout:", error)
-      alert("Erro ao iniciar o pagamento. Verifique suas chaves do Stripe.")
+      alert(t("page_error_stripe_keys"))
     } finally {
       setLoadingStripe(false)
     }
@@ -230,7 +250,7 @@ export default function DashboardPage() {
       }
 
       if (!imageData) {
-        throw new Error("Nenhuma imagem ou URL fornecida para análise.")
+        throw new Error(t("page_error_no_image"))
       }
 
       const response = await fetch('/api/analyze-product', {
@@ -246,9 +266,9 @@ export default function DashboardPage() {
       if (!response.ok) {
         try {
           const errorData = await response.json()
-          throw new Error(errorData.error || 'Falha na análise da IA')
+          throw new Error(errorData.error || t("page_error_ai_fail"))
         } catch {
-          throw new Error('Falha na análise da IA (Erro de servidor)')
+          throw new Error(t("page_error_ai_server"))
         }
       }
 
@@ -280,7 +300,7 @@ export default function DashboardPage() {
       console.error("Erro durante a análise:", error)
       setIslandState("error")
       setTimeout(() => setIslandState("idle"), 3000)
-      alert(error instanceof Error ? error.message : "Ocorreu um erro ao analisar o produto. Tente novamente.")
+      alert(error instanceof Error ? error.message : t("page_error_retry"))
       setCurrentView("dashboard")
     } finally {
       setIsAnalyzing(false)
@@ -332,12 +352,12 @@ export default function DashboardPage() {
       />
 
       {/* Floating Sidebar (Desktop) */}
-      <aside className="hidden md:flex flex-col w-16 lg:w-20 hover:w-56 lg:hover:w-64 fixed top-1/2 -translate-y-1/2 left-4 lg:left-6 glass-strong border-white/20 z-50 rounded-[2rem] lg:rounded-[3rem] transition-all duration-700 ease-in-out group overflow-hidden shadow-[0_0_60px_rgba(0,0,0,0.3)]">
+      <aside className="hidden md:flex flex-col w-20 lg:w-24 hover:w-64 lg:hover:w-72 fixed top-1/2 -translate-y-1/2 left-4 lg:left-6 glass-strong border-white/20 z-50 rounded-[2rem] lg:rounded-[3rem] transition-all duration-700 ease-in-out group overflow-hidden shadow-[0_0_60px_rgba(0,0,0,0.3)]">
         <div className="p-4 lg:p-6 flex items-center justify-start gap-3 font-black text-xl tracking-tighter text-foreground mb-6 lg:mb-8 overflow-hidden">
           <div className="w-6 h-6 flex items-center justify-center shrink-0">
             <ScanLine className="text-primary size-5 lg:size-6" />
           </div>
-          <span className="opacity-0 group-hover:opacity-100 transition-all duration-500 translate-x-2 group-hover:translate-x-0 text-sm lg:text-base">FitVerse</span>
+            <span className="opacity-0 group-hover:opacity-100 transition-all duration-500 translate-x-2 group-hover:translate-x-0 text-sm lg:text-base">{t("home_brand")}</span>
         </div>
 
         <nav className="flex-1 px-1 lg:px-2 space-y-1 lg:space-y-2 flex flex-col">
@@ -357,12 +377,12 @@ export default function DashboardPage() {
       </aside>
 
       {/* Main Content */}
-      <div className="flex-1 md:pl-24 lg:pl-28 flex flex-col min-h-screen relative transition-all duration-500 max-w-[1400px] mx-auto w-full">
+      <div className="flex-1 md:pl-24 lg:pl-32 xl:pl-36 flex flex-col min-h-screen relative transition-all duration-500 max-w-[1600px] xl:max-w-[1800px] mx-auto w-full">
         {/* Header - Visible on all screens */}
-        <header className="sticky top-0 z-40 bg-transparent px-4 md:px-6 h-14 md:h-20 flex items-center justify-between">
+        <header className="sticky top-0 z-40 bg-transparent px-4 md:px-6 h-14 md:h-16 lg:h-14 flex items-center justify-between">
           <div className="md:hidden font-black text-2xl flex items-center gap-2 text-foreground">
             <ScanLine className="text-primary size-7" />
-            <span>FitVerse</span>
+            <span>{t("home_brand")}</span>
           </div>
           <div className="hidden md:block">
              {/* Large title or scroll transition space */}
@@ -373,7 +393,7 @@ export default function DashboardPage() {
               size="icon" 
               onClick={() => router.push("/admin-dashboard")} 
               className="w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl hover:bg-white/10 active:scale-90 haptic-press transition-all font-sans text-foreground/60 hover:text-foreground"
-              aria-label="Acessar painel admin"
+              aria-label={t("home_access_admin")}
             >
               <Shield className="w-5 h-5 md:w-6 md:h-6" />
             </Button>
@@ -382,14 +402,14 @@ export default function DashboardPage() {
               size="icon" 
               onClick={() => setCurrentView("profile")}
               className="w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl hover:bg-white/10 active:scale-90 haptic-press transition-all font-sans text-foreground/60 hover:text-foreground"
-              aria-label="Ver perfil do usuário"
+              aria-label={t("home_view_profile")}
             >
               <User className="w-5 h-5 md:w-6 md:h-6" />
             </Button>
           </div>
         </header>
 
-        <main className="flex-1 p-4 md:p-6 lg:p-8 overflow-y-auto pb-24 md:pb-8">
+        <main className="flex-1 p-4 md:p-6 lg:p-8 xl:p-12 overflow-y-auto pb-24 md:pb-8">
           {currentView === "home" && <HomeDashboard userMetabolicPlan={userMetabolicPlanState} dailyActivity={dailyActivity} onNavigate={setCurrentView} />}
           {currentView === "dashboard" && <ScanDashboard onScan={handleScan} />}
           {currentView === "result" && (isAnalyzing || !currentAnalysis ? <ProductSkeleton /> : <ProductResult result={currentAnalysis} onBack={() => setCurrentView("dashboard")} />)}
@@ -410,7 +430,7 @@ export default function DashboardPage() {
                     }}
                     className="w-full h-12 glass-strong border border-white/20 text-muted-foreground font-black text-xs uppercase tracking-widest rounded-full"
                   >
-                    Criar Novo Plano
+                    {t("home_new_plan")}
                   </Button>
                 </div>
               : <MetabolicPlanner onPlanCreated={setUserMetabolicPlan} />
@@ -418,7 +438,7 @@ export default function DashboardPage() {
           {currentView === "store" && <StoreTab />}
           {currentView === "settings" && <SettingsPage onBack={() => setCurrentView("profile")} />}
           {currentView === "chatbot" && <ChatbotTab />}
-          {currentView === "profile" && (<div className="pt-4"><HealthProfile scanHistory={scanHistory} onNavigateToSettings={() => setCurrentView("settings")} onNavigateToSubscription={() => router.push('/subscription')} /></div>)}
+          {currentView === "profile" && (<div className="pt-4 md:pt-8 lg:pt-12"><HealthProfile scanHistory={scanHistory} onNavigateToSettings={() => setCurrentView("settings")} onNavigateToSubscription={() => router.push('/subscription')} /></div>)}
         </main>
       </div>
 
@@ -433,10 +453,10 @@ export default function DashboardPage() {
       {/* Floating Action Button */}
       <Button 
         onClick={handleNavScan} 
-        className="fixed bottom-32 right-8 md:bottom-10 md:right-10 z-50 h-20 w-20 rounded-full glass-strong bg-primary text-white shadow-2xl transition-all duration-500 hover:scale-110 active:scale-75 border border-white/30"
-        aria-label="Escanear produto"
+        className="fixed bottom-28 right-8 md:bottom-10 md:right-10 xl:bottom-12 xl:right-12 z-50 h-16 w-16 md:h-16 md:w-16 lg:h-14 lg:w-14 rounded-full glass-strong bg-primary text-white shadow-2xl transition-all duration-500 hover:scale-110 active:scale-75 border border-white/30"
+          aria-label={t("home_scan_product")}
       >
-        <ScanLine className="h-10 w-10 text-white" />
+        <ScanLine className="h-8 w-8 md:h-10 md:w-10 text-white" />
       </Button>
 
       {/* Mobile Bottom Nav - Opens menu on swipe up */}

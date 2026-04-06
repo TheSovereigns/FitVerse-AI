@@ -61,7 +61,7 @@ export function ProductResult({ result, onBack, imageData }: ProductResultProps)
   }
 
   return (
-    <div className="w-full max-w-4xl mx-auto space-y-12 pb-32 animate-in fade-in zoom-in duration-1000">
+    <div className="w-full max-w-4xl lg:max-w-5xl xl:max-w-6xl mx-auto space-y-12 pb-32 animate-in fade-in zoom-in duration-1000">
       {/* Revolutionary Header */}
       <div className="flex items-center justify-between mb-8">
         <Button variant="ghost" size="icon" onClick={onBack} className="w-14 h-14 rounded-2xl glass-strong border-white/10 haptic-press" aria-label="Voltar para scan">
@@ -77,7 +77,7 @@ export function ProductResult({ result, onBack, imageData }: ProductResultProps)
       <motion.div 
         initial={{ y: 40, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        className="relative glass-strong border-white/20 rounded-[4rem] p-12 shadow-[0_50px_100px_rgba(0,0,0,0.4)] overflow-hidden group"
+        className="relative glass-strong border-white/20 rounded-3xl md:rounded-[4rem] p-6 md:p-12 shadow-[0_50px_100px_rgba(0,0,0,0.4)] overflow-hidden group"
       >
         <div className="absolute inset-0 mesh-gradient opacity-10 group-hover:opacity-20 transition-opacity" />
         
@@ -85,16 +85,16 @@ export function ProductResult({ result, onBack, imageData }: ProductResultProps)
            {/* High-Fidelity Score Ring */}
            <div className="relative shrink-0">
               <div className="absolute inset-0 bg-primary/20 blur-[40px] rounded-full" />
-              <div className="relative w-48 h-48 rounded-full border-8 border-white/10 flex flex-col items-center justify-center bg-background/50 shadow-2xl backdrop-blur-xl">
-                 <span className="text-7xl font-black text-foreground tracking-tighter leading-none">{score}</span>
-                 <span className="text-[10px] font-black text-primary uppercase tracking-[0.3em] mt-2">Score Bio</span>
-              </div>
-              <svg className="absolute inset-0 w-full h-full -rotate-90">
-                 <circle 
-                   cx="96" cy="96" r="88" 
-                   className="fill-none stroke-primary/30 stroke-[8]" 
-                   strokeDasharray="552" 
-                   strokeDashoffset={552 - (552 * score) / 100}
+         <div className="relative w-36 h-36 md:w-48 md:h-48 rounded-full border-8 border-white/10 flex flex-col items-center justify-center bg-background/50 shadow-2xl backdrop-blur-xl">
+                  <span className="text-5xl md:text-7xl font-black text-foreground tracking-tighter leading-none">{score}</span>
+                  <span className="text-[10px] font-black text-primary uppercase tracking-[0.3em] mt-2">{t("pr_score_bio")}</span>
+               </div>
+               <svg className="absolute inset-0 w-full h-full -rotate-90" viewBox="0 0 144 144">
+                  <circle 
+                    cx="72" cy="72" r="64" 
+                    className="fill-none stroke-primary/30 stroke-[8]" 
+                    strokeDasharray="402" 
+                    strokeDashoffset={402 - (402 * score) / 100}
                    strokeLinecap="round"
                  />
               </svg>
@@ -104,9 +104,9 @@ export function ProductResult({ result, onBack, imageData }: ProductResultProps)
               <Badge className="bg-primary/20 text-primary border-none font-black text-[10px] tracking-widest px-4 py-2 rounded-full mb-6">
                  {t("pr_complete_synthesis")}
               </Badge>
-              <h1 className="text-5xl md:text-6xl font-black text-foreground tracking-[-0.06em] leading-tight mb-4">
-                 {result.productName}
-              </h1>
+               <h1 className="text-4xl sm:text-5xl md:text-6xl font-black text-foreground tracking-[-0.06em] leading-tight mb-4 break-words">
+                  {result.productName}
+               </h1>
               <p className="text-2xl font-bold text-muted-foreground opacity-40 uppercase tracking-widest">{result.brand || t("pr_generic")}</p>
            </div>
         </div>
@@ -124,7 +124,7 @@ export function ProductResult({ result, onBack, imageData }: ProductResultProps)
              <motion.div 
                key={i}
                whileHover={{ y: -10 }}
-               className="glass-strong border-white/20 rounded-[3rem] p-8 flex flex-col items-center justify-center gap-4 shadow-xl"
+                className="glass-strong border-white/20 rounded-[3rem] p-4 md:p-6 lg:p-8 flex flex-col items-center justify-center gap-4 shadow-xl"
              >
                 <div className={cn("w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center", m.color)}>
                    <m.icon className="w-7 h-7" />
@@ -140,7 +140,7 @@ export function ProductResult({ result, onBack, imageData }: ProductResultProps)
 
       {/* Neural Alignment Protocol */}
       {result.fitnessAlignment && result.fitnessAlignment[0] && (
-         <div className="glass-strong border-white/20 rounded-[4rem] p-12 shadow-2xl relative overflow-hidden group">
+         <div className="glass-strong border-white/20 rounded-3xl md:rounded-[4rem] p-6 md:p-12 shadow-2xl relative overflow-hidden group">
             <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity" />
             <div className="flex flex-col md:flex-row gap-10 items-start">
                <div className="w-20 h-20 rounded-[2.5rem] bg-primary/10 flex items-center justify-center text-primary shrink-0">
@@ -171,7 +171,7 @@ export function ProductResult({ result, onBack, imageData }: ProductResultProps)
                   <motion.div 
                     key={i}
                     whileHover={{ x: 10 }}
-                    className="p-8 rounded-[3rem] glass-strong border-rose-500/20 bg-rose-500/5 flex items-start gap-6"
+                    className="p-4 md:p-8 rounded-3xl glass-strong border-rose-500/20 bg-rose-500/5 flex items-start gap-4 md:gap-6"
                   >
                      <AlertCircle className="w-8 h-8 text-rose-500 shrink-0" />
                      <div>
@@ -191,11 +191,11 @@ export function ProductResult({ result, onBack, imageData }: ProductResultProps)
                   <motion.div 
                     key={i}
                     whileHover={{ x: 10 }}
-                    className="p-8 rounded-[3rem] glass-strong border-emerald-500/20 bg-emerald-500/5 flex items-start gap-6"
+                    className="p-4 md:p-8 rounded-3xl glass-strong border-emerald-500/20 bg-emerald-500/5 flex items-start gap-4 md:gap-6"
                   >
                      <Check className="w-8 h-8 text-emerald-500 shrink-0" />
                      <div>
-                        <h4 className="text-xl font-black text-emerald-500 tracking-tight mb-1">{ins.title || "Bio-Insight"}</h4>
+                        <h4 className="text-xl font-black text-emerald-500 tracking-tight mb-1">{ins.title || t("pr_bio_insight")}</h4>
                         <p className="text-sm font-bold text-emerald-500/60">{ins.description}</p>
                      </div>
                   </motion.div>

@@ -155,8 +155,8 @@ export function AdminDashboard() {
           setFinancials({ totalRevenue: total, monthlyData, recentTransactions: recent });
         }
       } catch (error) {
-        console.error("Erro ao buscar usuários:", error);
-        toast.error("Erro ao carregar dados.");
+        console.error("Error fetching users:", error);
+        toast.error("Error loading data.");
       } finally {
         setIsLoading(false);
       }

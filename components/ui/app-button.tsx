@@ -3,6 +3,7 @@
 import * as React from "react"
 import { Loader2 } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { useTranslation } from "@/lib/i18n"
 
 interface AppButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   label: string
@@ -30,6 +31,7 @@ export function AppButton({
   children,
   ...props
 }: AppButtonProps) {
+  const { locale } = useTranslation()
   const isDisabled = disabled || loading || comingSoon
   
   const baseStyles = "inline-flex items-center justify-center gap-2 font-black uppercase tracking-wider transition-all duration-300 rounded-full focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-neutral-900 disabled:pointer-events-none disabled:opacity-50"
@@ -61,7 +63,7 @@ export function AppButton({
       disabled={isDisabled}
       aria-disabled={isDisabled}
       aria-label={props["aria-label"] || label}
-      title={comingSoon ? "Em breve" : undefined}
+      title={comingSoon ? (locale === "en-US" ? "Coming soon" : "Em breve") : undefined}
       {...props}
     >
       {loading && <Loader2 className="w-4 h-4 animate-spin" />}
@@ -70,7 +72,7 @@ export function AppButton({
       {icon && iconPosition === "right" && !loading && icon}
       {comingSoon && (
         <span className="ml-2 text-[10px] bg-white/20 px-2 py-0.5 rounded-full">
-          Em breve
+          {locale === "en-US" ? "Soon" : "Em breve"}
         </span>
       )}
     </button>
