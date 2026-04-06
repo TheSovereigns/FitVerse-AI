@@ -33,12 +33,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (userProfile) {
         setProfile(userProfile)
         setIsAdmin(userProfile.is_admin || false)
+        console.log("[Auth] Profile loaded, is_admin:", userProfile.is_admin)
       } else {
         setProfile(null)
         setIsAdmin(false)
+        // Try direct query as fallback
+        const { data } = await supabase
+          .from('profiles')
+          .select('is_admin')
+          .eq('id', userId)
+          .single()
+        if (data?.is_admin) {
+          setIsAdmin(true)
+          console.log("[Auth] Admin from direct query")
+        }
       }
       return userProfile
-    } catch {
+    } catch (e) {
+      console.error("[Auth] Profile load error:", e)
       setProfile(null)
       setIsAdmin(false)
       return null

@@ -68,16 +68,33 @@ export function SettingsPage({ onBack }: { onBack?: () => void }) {
   const [adsEnabled, setAdsEnabled] = useState(true)
   const [isAdmin, setIsAdmin] = useState(false)
 
-  // Check admin status directly from database
+  // Check admin status from multiple sources
   useEffect(() => {
-    if (user?.id) {
+    console.log("[Settings] Checking admin, user:", user)
+    let adminFound = false
+    
+    // Check 1: user_metadata (most reliable)
+    if (user?.user_metadata?.is_admin === true) {
+      console.log("[Settings] Admin from metadata")
+      setIsAdmin(true)
+      adminFound = true
+    }
+    
+    // Check 2: profiles table
+    if (user?.id && !adminFound) {
       supabase
         .from('profiles')
         .select('is_admin')
         .eq('id', user.id)
         .single()
         .then(({ data }) => {
-          setIsAdmin(data?.is_admin || false)
+          console.log("[Settings] Admin from profiles:", data)
+          if (data?.is_admin) {
+            setIsAdmin(true)
+          }
+        })
+        .catch((err) => {
+          console.error("[Settings] Admin query error:", err)
         })
     }
   }, [user])
