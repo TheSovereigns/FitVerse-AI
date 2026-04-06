@@ -35,6 +35,12 @@ export default function LoginPage() {
       setError(locale === "en-US" ? "Invalid email or password" : "Email ou senha inválidos")
       setIsLoading(false)
     }
+    // If no error but still loading after 5s, force redirect
+    setTimeout(() => {
+      if (isLoading) {
+        router.push("/")
+      }
+    }, 5000)
   }
 
   const handleGoogleLogin = async () => {

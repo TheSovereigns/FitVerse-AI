@@ -122,18 +122,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           // ignore
         }
 
+        // Always redirect - don't wait for profile
         if (!hasRedirectedRef.current) {
           hasRedirectedRef.current = true
-          try {
-            const p = await getUserProfile(data.user.id)
-            if (p?.is_admin) {
-              router.push("/admin-dashboard")
-            } else {
-              router.push("/")
-            }
-          } catch {
-            router.push("/")
-          }
+          router.push("/")
         }
       }
 

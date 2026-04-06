@@ -105,6 +105,30 @@ export default function DashboardPage() {
     }
   }, [])
 
+  // Check admin status - don't block on this
+  useEffect(() => {
+    if (user) {
+      const userMetaAdmin = user.user_metadata?.is_admin === true
+      if (userMetaAdmin) {
+        setIsAdmin(true)
+      }
+      supabase
+        .from('profiles')
+        .select('is_admin')
+        .eq('id', user.id)
+        .single()
+        .then(({ data }) => {
+          if (data?.is_admin) {
+            setIsAdmin(true)
+          }
+        })
+        .catch(() => {
+          // Ignore profile fetch errors
+        })
+    }
+  }, [user])
+
+  // Handle view from URL params
   useEffect(() => {
     const handleRouteChange = () => {
       const params = new URLSearchParams(window.location.search)
