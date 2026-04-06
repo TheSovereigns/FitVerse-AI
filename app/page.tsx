@@ -85,7 +85,7 @@ export default function DashboardPage() {
   useEffect(() => {
     const timer = setTimeout(() => {
       setAuthTimedOut(true)
-    }, 5000)
+    }, 8000)
     return () => clearTimeout(timer)
   }, [])
 
