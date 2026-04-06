@@ -75,36 +75,44 @@ FROM ai_messages
 GROUP BY category;
 
 -- RLS
-ALTER TABLE ai_conversations ENABLE ROW LEVEL SECURITY;
-ALTER TABLE ai_messages ENABLE ROW LEVEL SECURITY;
-ALTER TABLE dataset_exports ENABLE ROW LEVEL SECURITY;
+ALTER TABLE IF EXISTS ai_conversations ENABLE ROW LEVEL SECURITY;
+ALTER TABLE IF EXISTS ai_messages ENABLE ROW LEVEL SECURITY;
+ALTER TABLE IF EXISTS dataset_exports ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Users see own conversations" ON ai_conversations;
 CREATE POLICY "Users see own conversations" ON ai_conversations
   FOR SELECT USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users insert own conversations" ON ai_conversations;
 CREATE POLICY "Users insert own conversations" ON ai_conversations
   FOR INSERT WITH CHECK (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users see own messages" ON ai_messages;
 CREATE POLICY "Users see own messages" ON ai_messages
   FOR SELECT USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users insert own messages" ON ai_messages;
 CREATE POLICY "Users insert own messages" ON ai_messages
   FOR INSERT WITH CHECK (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users update own messages feedback" ON ai_messages;
 CREATE POLICY "Users update own messages feedback" ON ai_messages
   FOR UPDATE USING (auth.uid() = user_id)
   WITH CHECK (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Admins see all conversations" ON ai_conversations;
 CREATE POLICY "Admins see all conversations" ON ai_conversations
   FOR ALL USING (
     EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND is_admin = true)
   );
 
+DROP POLICY IF EXISTS "Admins see all messages" ON ai_messages;
 CREATE POLICY "Admins see all messages" ON ai_messages
   FOR ALL USING (
     EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND is_admin = true)
   );
 
+DROP POLICY IF EXISTS "Admins manage exports" ON dataset_exports;
 CREATE POLICY "Admins manage exports" ON dataset_exports
   FOR ALL USING (
     EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND is_admin = true)

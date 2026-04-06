@@ -135,116 +135,146 @@ ALTER TABLE public.recipes ENABLE ROW LEVEL SECURITY;
 -- ═══════════════════════════════════════════════════════════════════════════
 
 -- PROFILES
+DROP POLICY IF EXISTS "Users can view own profile" ON public.profiles;
 CREATE POLICY "Users can view own profile" ON public.profiles
   FOR SELECT USING (auth.uid() = id);
 
+DROP POLICY IF EXISTS "Users can update own profile" ON public.profiles;
 CREATE POLICY "Users can update own profile" ON public.profiles
   FOR UPDATE USING (auth.uid() = id);
 
+DROP POLICY IF EXISTS "Admins can view all profiles" ON public.profiles;
 CREATE POLICY "Admins can view all profiles" ON public.profiles
   FOR SELECT USING (
     EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND is_admin = true)
   );
 
+DROP POLICY IF EXISTS "Admins can update profiles" ON public.profiles;
 CREATE POLICY "Admins can update profiles" ON public.profiles
   FOR ALL USING (
     EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND is_admin = true)
   );
 
+DROP POLICY IF EXISTS "Service can insert profiles" ON public.profiles;
 CREATE POLICY "Service can insert profiles" ON public.profiles
   FOR INSERT WITH CHECK (true);
 
 -- SCANS
+DROP POLICY IF EXISTS "Users can view own scans" ON public.scans;
 CREATE POLICY "Users can view own scans" ON public.scans
   FOR SELECT USING (user_id = (SELECT id FROM public.profiles WHERE id = auth.uid()));
 
+DROP POLICY IF EXISTS "Users can insert scans" ON public.scans;
 CREATE POLICY "Users can insert scans" ON public.scans
   FOR INSERT WITH CHECK (user_id = (SELECT id FROM public.profiles WHERE id = auth.uid()));
 
+DROP POLICY IF EXISTS "Admins can view all scans" ON public.scans;
 CREATE POLICY "Admins can view all scans" ON public.scans
   FOR SELECT USING (
     EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND is_admin = true)
   );
 
 -- METABOLIC PLANS
+DROP POLICY IF EXISTS "Users can view own plans" ON public.metabolic_plans;
 CREATE POLICY "Users can view own plans" ON public.metabolic_plans
   FOR SELECT USING (user_id = (SELECT id FROM public.profiles WHERE id = auth.uid()));
 
+DROP POLICY IF EXISTS "Users can insert plans" ON public.metabolic_plans;
 CREATE POLICY "Users can insert plans" ON public.metabolic_plans
   FOR INSERT WITH CHECK (user_id = (SELECT id FROM public.profiles WHERE id = auth.uid()));
 
+DROP POLICY IF EXISTS "Users can update own plans" ON public.metabolic_plans;
 CREATE POLICY "Users can update own plans" ON public.metabolic_plans
   FOR UPDATE USING (user_id = (SELECT id FROM public.profiles WHERE id = auth.uid()));
 
+DROP POLICY IF EXISTS "Admins can view all plans" ON public.metabolic_plans;
 CREATE POLICY "Admins can view all plans" ON public.metabolic_plans
   FOR SELECT USING (
     EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND is_admin = true)
   );
 
 -- SUBSCRIPTIONS
+DROP POLICY IF EXISTS "Users can view own subscription" ON public.subscriptions;
 CREATE POLICY "Users can view own subscription" ON public.subscriptions
   FOR SELECT USING (user_id = (SELECT id FROM public.profiles WHERE id = auth.uid()));
 
+DROP POLICY IF EXISTS "Users can insert own subscription" ON public.subscriptions;
 CREATE POLICY "Users can insert own subscription" ON public.subscriptions
   FOR INSERT WITH CHECK (user_id = (SELECT id FROM public.profiles WHERE id = auth.uid()));
 
+DROP POLICY IF EXISTS "Users can update own subscription" ON public.subscriptions;
 CREATE POLICY "Users can update own subscription" ON public.subscriptions
   FOR UPDATE USING (user_id = (SELECT id FROM public.profiles WHERE id = auth.uid()));
 
+DROP POLICY IF EXISTS "Admins can view all subscriptions" ON public.subscriptions;
 CREATE POLICY "Admins can view all subscriptions" ON public.subscriptions
   FOR SELECT USING (
     EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND is_admin = true)
   );
 
 -- EVENTS (feed público para admins)
+DROP POLICY IF EXISTS "Users can view own events" ON public.events;
 CREATE POLICY "Users can view own events" ON public.events
   FOR SELECT USING (user_id = (SELECT id FROM public.profiles WHERE id = auth.uid()));
 
+DROP POLICY IF EXISTS "Users can insert events" ON public.events;
 CREATE POLICY "Users can insert events" ON public.events
   FOR INSERT WITH CHECK (user_id = (SELECT id FROM public.profiles WHERE id = auth.uid()) OR user_id IS NULL);
 
+DROP POLICY IF EXISTS "Admins can view all events" ON public.events;
 CREATE POLICY "Admins can view all events" ON public.events
   FOR SELECT USING (
     EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND is_admin = true)
   );
 
 -- AI_USAGE
+DROP POLICY IF EXISTS "Users can view own usage" ON public.ai_usage;
 CREATE POLICY "Users can view own usage" ON public.ai_usage
   FOR SELECT USING (user_id = (SELECT id FROM public.profiles WHERE id = auth.uid()));
 
+DROP POLICY IF EXISTS "Users can insert own usage" ON public.ai_usage;
 CREATE POLICY "Users can insert own usage" ON public.ai_usage
   FOR INSERT WITH CHECK (user_id = (SELECT id FROM public.profiles WHERE id = auth.uid()));
 
+DROP POLICY IF EXISTS "Users can update own usage" ON public.ai_usage;
 CREATE POLICY "Users can update own usage" ON public.ai_usage
   FOR UPDATE USING (user_id = (SELECT id FROM public.profiles WHERE id = auth.uid()));
 
+DROP POLICY IF EXISTS "Admins can view all usage" ON public.ai_usage;
 CREATE POLICY "Admins can view all usage" ON public.ai_usage
   FOR SELECT USING (
     EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND is_admin = true)
   );
 
 -- WORKOUTS
+DROP POLICY IF EXISTS "Users can view own workouts" ON public.workouts;
 CREATE POLICY "Users can view own workouts" ON public.workouts
   FOR SELECT USING (user_id = (SELECT id FROM public.profiles WHERE id = auth.uid()));
 
+DROP POLICY IF EXISTS "Users can insert workouts" ON public.workouts;
 CREATE POLICY "Users can insert workouts" ON public.workouts
   FOR INSERT WITH CHECK (user_id = (SELECT id FROM public.profiles WHERE id = auth.uid()));
 
+DROP POLICY IF EXISTS "Users can update own workouts" ON public.workouts;
 CREATE POLICY "Users can update own workouts" ON public.workouts
   FOR UPDATE USING (user_id = (SELECT id FROM public.profiles WHERE id = auth.uid()));
 
+DROP POLICY IF EXISTS "Admins can view all workouts" ON public.workouts;
 CREATE POLICY "Admins can view all workouts" ON public.workouts
   FOR SELECT USING (
     EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND is_admin = true)
   );
 
 -- RECIPES
+DROP POLICY IF EXISTS "Users can view own recipes" ON public.recipes;
 CREATE POLICY "Users can view own recipes" ON public.recipes
   FOR SELECT USING (user_id = (SELECT id FROM public.profiles WHERE id = auth.uid()));
 
+DROP POLICY IF EXISTS "Users can insert recipes" ON public.recipes;
 CREATE POLICY "Users can insert recipes" ON public.recipes
   FOR INSERT WITH CHECK (user_id = (SELECT id FROM public.profiles WHERE id = auth.uid()));
 
+DROP POLICY IF EXISTS "Admins can view all recipes" ON public.recipes;
 CREATE POLICY "Admins can view all recipes" ON public.recipes
   FOR SELECT USING (
     EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND is_admin = true)
