@@ -1,10 +1,7 @@
 "use client"
 
-// FitVerse AI - Authentication Context v2
-// Handles login, signup, Google OAuth, and session management
-
-import { createContext, useContext, useState, useEffect, ReactNode } from "react"
-import { User, Session } from "@supabase/supabase-js"
+import { createContext, useContext, useState, useEffect, useRef, ReactNode } from "react"
+import { User } from "@supabase/supabase-js"
 import { supabase, getUserProfile, Profile } from "@/lib/supabase"
 import { useRouter } from "next/navigation"
 
@@ -28,7 +25,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [profile, setProfile] = useState<Profile | null>(null)
   const [isAdmin, setIsAdmin] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
-  const [hasRedirected, setHasRedirected] = useState(false)
+  const hasRedirectedRef = useRef(false)
 
   const loadProfile = async (userId: string) => {
     try {
@@ -41,7 +38,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setIsAdmin(false)
       }
       return userProfile
-    } catch (e) {
+    } catch {
       setProfile(null)
       setIsAdmin(false)
       return null
@@ -49,67 +46,56 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   useEffect(() => {
+    let mounted = true
+
     const initializeAuth = async () => {
       try {
         const { data: { session } } = await supabase.auth.getSession()
-        
-        if (session?.user) {
+
+        if (session?.user && mounted) {
           setUser(session.user)
-          const p = await loadProfile(session.user.id)
-          
+          await loadProfile(session.user.id)
+
           try {
             await supabase
               .from('profiles')
               .update({ last_seen: new Date().toISOString() })
               .eq('id', session.user.id)
-          } catch (e) {
+          } catch {
             // ignore
           }
-
-          if (!hasRedirected) {
-            setHasRedirected(true)
-            if (p?.is_admin) {
-              router.push("/admin-dashboard")
-            } else {
-              router.push("/")
-            }
-          }
         }
-      } catch (error) {
+      } catch {
         // ignore
       } finally {
-        setIsLoading(false)
+        if (mounted) {
+          setIsLoading(false)
+        }
       }
     }
 
-    initializeAuth()
+    void initializeAuth()
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
+      async (_event, session) => {
+        if (!mounted) return
+
         setUser(session?.user || null)
-        
+
         if (session?.user) {
-          const p = await loadProfile(session.user.id)
-          
-          if (!hasRedirected) {
-            setHasRedirected(true)
-            if (p?.is_admin) {
-              router.push("/admin-dashboard")
-            } else {
-              router.push("/")
-            }
-          }
+          await loadProfile(session.user.id)
         } else {
           setProfile(null)
           setIsAdmin(false)
-          setHasRedirected(false)
+          hasRedirectedRef.current = false
         }
-        
+
         setIsLoading(false)
       }
     )
 
     return () => {
+      mounted = false
       subscription.unsubscribe()
     }
   }, [])
@@ -117,7 +103,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signIn = async (email: string, password: string) => {
     try {
       setIsLoading(true)
-      
+
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
@@ -132,20 +118,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             p_user_id: data.user.id,
             p_metadata: { email }
           })
-        } catch (e) {
+        } catch {
           // ignore
         }
 
-        // Redirect directly - don't rely on onAuthStateChange
-        try {
-          const p = await getUserProfile(data.user.id)
-          if (p?.is_admin) {
-            router.push("/admin-dashboard")
-          } else {
+        if (!hasRedirectedRef.current) {
+          hasRedirectedRef.current = true
+          try {
+            const p = await getUserProfile(data.user.id)
+            if (p?.is_admin) {
+              router.push("/admin-dashboard")
+            } else {
+              router.push("/")
+            }
+          } catch {
             router.push("/")
           }
-        } catch (e) {
-          router.push("/")
         }
       }
 
@@ -181,7 +169,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             p_user_id: data.user.id,
             p_metadata: { email }
           })
-        } catch (e) {
+        } catch {
           // ignore
         }
       }
@@ -190,12 +178,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return { error: null }
       }
 
-      // No session - try auto-login
       const { error: signInError } = await supabase.auth.signInWithPassword({
         email,
         password,
       })
-      
+
       if (!signInError) {
         return { error: null }
       }
@@ -214,9 +201,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser(null)
       setProfile(null)
       setIsAdmin(false)
-      setHasRedirected(false)
-      router.push("/")
-    } catch (error) {
+      hasRedirectedRef.current = false
+      router.push("/auth/login")
+    } catch {
       // ignore
     }
   }
