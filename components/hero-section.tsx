@@ -4,9 +4,11 @@ import { motion } from "framer-motion"
 import { useTranslation } from "@/lib/i18n"
 import { CTAButton } from "@/components/cta-button"
 import { cn } from "@/lib/utils"
+import { useAuth } from "@/hooks/useAuth"
 
 export function HeroSection() {
   const { t, locale } = useTranslation()
+  const { user } = useAuth()
 
   const isEnglish = locale === "en-US"
 
@@ -102,7 +104,7 @@ export function HeroSection() {
         >
           <CTAButton
             label={t("hero_cta_primary")}
-            href="/auth/login"
+            href={user ? "/" : "/auth/login"}
             variant="primary"
             size="lg"
             dataCta="hero-primary"

@@ -4,6 +4,7 @@ import { motion } from "framer-motion"
 import { useTranslation } from "@/lib/i18n"
 import { CTAButton } from "@/components/cta-button"
 import { Zap, ScanLine, ChefHat, CheckCircle } from "lucide-react"
+import { useAuth } from "@/hooks/useAuth"
 
 interface HowItWorksSectionProps {
   id?: string
@@ -11,6 +12,7 @@ interface HowItWorksSectionProps {
 
 export function HowItWorksSection({ id }: HowItWorksSectionProps) {
   const { t } = useTranslation()
+  const { user } = useAuth()
 
   const steps = [
     {
@@ -88,7 +90,7 @@ export function HowItWorksSection({ id }: HowItWorksSectionProps) {
         >
           <CTAButton
             label={t("cta_mid_how")}
-            href="/auth/login"
+            href={user ? "/" : "/auth/login"}
             variant="primary"
             size="lg"
             dataCta="mid-how-it-works"

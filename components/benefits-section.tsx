@@ -4,6 +4,7 @@ import { motion } from "framer-motion"
 import { useTranslation } from "@/lib/i18n"
 import { CTAButton } from "@/components/cta-button"
 import { ScanLine, Dumbbell, ChefHat } from "lucide-react"
+import { useAuth } from "@/hooks/useAuth"
 
 interface BenefitsSectionProps {
   id?: string
@@ -11,6 +12,7 @@ interface BenefitsSectionProps {
 
 export function BenefitsSection({ id }: BenefitsSectionProps) {
   const { t } = useTranslation()
+  const { user } = useAuth()
 
   const benefits = [
     {
@@ -79,7 +81,7 @@ export function BenefitsSection({ id }: BenefitsSectionProps) {
         >
           <CTAButton
             label={t("cta_mid_benefits")}
-            href="/auth/login"
+            href={user ? "/" : "/auth/login"}
             variant="primary"
             size="lg"
             dataCta="mid-benefits"

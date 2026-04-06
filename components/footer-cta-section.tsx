@@ -3,6 +3,7 @@
 import { motion } from "framer-motion"
 import { useTranslation } from "@/lib/i18n"
 import { CTAButton } from "@/components/cta-button"
+import { useAuth } from "@/hooks/useAuth"
 
 interface FooterCTASectionProps {
   id?: string
@@ -10,6 +11,7 @@ interface FooterCTASectionProps {
 
 export function FooterCTASection({ id }: FooterCTASectionProps) {
   const { t } = useTranslation()
+  const { user } = useAuth()
 
   return (
     <section id={id} className="py-20 px-4 md:px-6 lg:px-8">
@@ -43,7 +45,7 @@ export function FooterCTASection({ id }: FooterCTASectionProps) {
 
           <CTAButton
             label={t("cta_footer")}
-            href="/auth/login"
+            href={user ? "/" : "/auth/login"}
             variant="primary"
             size="lg"
             dataCta="footer-final"
