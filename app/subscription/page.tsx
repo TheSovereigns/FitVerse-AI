@@ -236,7 +236,12 @@ export default function SubscriptionPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#1a0f00] via-[#0d0705] to-[#1a0f00] text-white">
+    <div className="min-h-screen bg-gradient-to-br from-[#1a0f00] via-[#0d0705] to-[#1a0f00] text-white relative overflow-hidden">
+      {/* Background Effects */}
+      <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-primary/10 rounded-full blur-[150px] pointer-events-none" />
+      <div className="absolute bottom-0 right-0 w-[400px] h-[400px] bg-purple-500/10 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-radial from-primary/5 to-transparent rounded-full pointer-events-none" />
+      
       {/* Header */}
       <header className="sticky top-0 z-50 glass-strong border-b border-white/10 backdrop-blur-xl">
         <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
@@ -263,7 +268,23 @@ export default function SubscriptionPage() {
         </div>
       </header>
 
-      <main className="max-w-6xl mx-auto px-4 py-8">
+      <main className="max-w-6xl mx-auto px-4 py-8 relative z-10">
+        {/* Title Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center mb-10"
+        >
+          <h2 className="text-3xl md:text-4xl font-black mb-3">
+            {isEnglish ? "Choose Your" : "Escolha Seu"}{" "}
+            <span className="text-primary">{isEnglish ? "Plan" : "Plano"}</span>
+          </h2>
+          <p className="text-muted-foreground max-w-md mx-auto">
+            {isEnglish 
+              ? "Unlock the full potential of your fitness journey with AI-powered tools"
+              : "Desbloqueie o máximo do seu progresso fitness com ferramentas alimentadas por IA"}
+          </p>
+        </motion.div>
         {/* Ads Toggle for Paid Plans */}
         {(currentPlan === "pro" || currentPlan === "premium") && (
           <motion.div 
