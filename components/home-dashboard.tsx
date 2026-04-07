@@ -260,7 +260,6 @@ export function HomeDashboard({
             <span className="text-white font-black text-[9px] uppercase tracking-wider">{t("home_longevity_cta")}</span>
           </div>
         </div>
-        </div>
       </div>
 
       {/* Quick Actions Bento Grid */}
