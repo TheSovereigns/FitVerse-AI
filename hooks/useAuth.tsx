@@ -204,15 +204,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       await supabase.auth.signOut()
     } catch {
       // ignore
-    } finally {
-      setUser(null)
-      setProfile(null)
-      setIsAdmin(false)
-      hasRedirectedRef.current = false
-      localStorage.clear()
-      // Force redirect with reload
-      window.location.href = "/auth/login"
     }
+    setUser(null)
+    setProfile(null)
+    setIsAdmin(false)
+    hasRedirectedRef.current = false
+    localStorage.clear()
+    window.location.href = "/auth/login"
   }
 
   const signInWithGoogle = async () => {
