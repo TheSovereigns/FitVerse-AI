@@ -1,10 +1,10 @@
 "use client"
 
-import { useEffect } from "react"
+import { useEffect, Suspense } from "react"
 import { usePathname, useSearchParams } from "next/navigation"
 import { useAuth } from "@/hooks/useAuth"
 
-export function Analytics() {
+function AnalyticsContent() {
   const pathname = usePathname()
   const searchParams = useSearchParams()
   const { user, profile } = useAuth()
@@ -25,6 +25,14 @@ export function Analytics() {
   }, [pathname, searchParams, user, profile])
 
   return null
+}
+
+export function Analytics() {
+  return (
+    <Suspense fallback={null}>
+      <AnalyticsContent />
+    </Suspense>
+  )
 }
 
 declare global {

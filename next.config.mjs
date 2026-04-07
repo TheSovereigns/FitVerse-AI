@@ -6,9 +6,6 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
-  experimental: {
-    optimizeCss: true,
-  },
   async headers() {
     return [
       {
@@ -26,7 +23,6 @@ const nextConfig = {
       }
     ]
   },
-  compression: true,
 }
 
 export default nextConfig
