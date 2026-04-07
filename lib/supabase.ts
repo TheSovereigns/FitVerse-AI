@@ -103,14 +103,43 @@ export async function getCurrentUser() {
 
 // Helper function to get user profile
 export async function getUserProfile(userId: string): Promise<Profile | null> {
-  const { data, error } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('id', userId)
-    .single()
+  try {
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', userId)
+      .single()
 
-  if (error) return null
-  return data
+    // If profile doesn't exist, try to create it
+    if (error?.code === 'PGRST116' || !data) {
+      const { data: newProfile, error: insertError } = await supabase
+        .from('profiles')
+        .upsert({
+          id: userId,
+          email: '',
+          plan: 'free',
+          is_admin: false,
+          country: 'BR',
+          ads_enabled: true,
+        }, { onConflict: 'id' })
+        .select('*')
+        .single()
+
+      if (!insertError && newProfile) {
+        return newProfile
+      }
+    }
+
+    if (error) {
+      console.warn("[Supabase] Profile fetch error:", error.message)
+      return null
+    }
+    
+    return data
+  } catch (e) {
+    console.warn("[Supabase] Profile fetch exception:", e)
+    return null
+  }
 }
 
 // Helper function to check if user is admin
