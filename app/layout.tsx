@@ -6,6 +6,7 @@ import { ThemeProvider } from "@/components/theme-provider"
 import { I18nProvider } from "@/lib/i18n"
 import { LiquidUniverse } from "@/components/liquid-universe"
 import { AuthProvider } from "@/hooks/useAuth"
+import { Analytics } from "@/components/analytics"
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" })
 
@@ -40,12 +41,20 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <meta name="mobile-web-app-capable" content="yes" />
+        {process.env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN && (
+          <script
+            defer
+            data-domain={process.env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN}
+            src="https://plausible.io/js/script.js"
+          />
+        )}
       </head>
       <body
         className={`${inter.className} antialiased text-foreground min-h-screen relative overflow-x-hidden`}
       >
         <LiquidUniverse />
         <div className="relative z-10 min-h-screen min-h-dvh">
+          <Analytics />
           <ThemeProvider
             attribute="class"
             defaultTheme="dark"
