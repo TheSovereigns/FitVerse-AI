@@ -18,19 +18,23 @@ export function usePlanLimits() {
     if (!user) return
     
     try {
-      const { data } = await supabase
+      console.log("[usePlanLimits] Refreshing plan for user:", user.id)
+      const { data, error } = await supabase
         .from('profiles')
         .select('plan')
         .eq('id', user.id)
         .single()
 
+      console.log("[usePlanLimits] Refresh result:", { data, error })
+
       if (data?.plan) {
         const userPlan = data.plan as Plan
         setPlan(userPlan)
         setLimits(getPlanLimits(userPlan))
+        console.log("[usePlanLimits] Plan refreshed to:", userPlan)
       }
     } catch (e) {
-      // ignore
+      console.error("[usePlanLimits] Refresh error:", e)
     }
   }, [user])
 
@@ -43,19 +47,22 @@ export function usePlanLimits() {
 
     const fetchPlan = async () => {
       try {
-        const { data } = await supabase
+        const { data, error } = await supabase
           .from('profiles')
           .select('plan')
           .eq('id', user.id)
           .single()
 
+        console.log("[usePlanLimits] Fetch result:", { data, error })
+
         if (data?.plan) {
           const userPlan = data.plan as Plan
           setPlan(userPlan)
           setLimits(getPlanLimits(userPlan))
+          console.log("[usePlanLimits] Plan set to:", userPlan)
         }
       } catch (e) {
-        // ignore
+        console.error("[usePlanLimits] Error:", e)
       } finally {
         setIsLoading(false)
       }
