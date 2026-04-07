@@ -260,54 +260,6 @@ export function HomeDashboard({
             <span className="text-white font-black text-[9px] uppercase tracking-wider">{t("home_longevity_cta")}</span>
           </div>
         </div>
-      </div>
-          <div className="relative z-10 w-full h-2 bg-white/5 rounded-full overflow-hidden border border-white/10 mb-3">
-            <motion.div
-              initial={{ width: 0 }}
-              animate={{ width: `${Math.min((waterCups * 250 / 3000) * 100, 100)}%` }}
-              className="h-full bg-[#0A84FF]"
-            />
-          </div>
-          <div className="relative z-10 flex items-center justify-center gap-2 py-2 bg-[#0A84FF]/20 rounded-xl border border-[#0A84FF]/30">
-            <span className="text-[#0A84FF] font-black text-xs uppercase tracking-wider">{t("home_water_cta")}</span>
-          </div>
-        </motion.div>
-
-        {/* Protein Widget */}
-        <div className="relative h-40 md:h-48 lg:h-52 xl:h-56 glass-strong border-white/20 rounded-[1.5rem] md:rounded-[2.5rem] p-5 md:p-6 flex flex-col justify-between group overflow-hidden shadow-2xl cursor-pointer"
-          onClick={() => onNavigate("planner")}
-        >
-          <div className="absolute inset-0 bg-gradient-to-t from-[#0A84FF]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
-          <div className="relative z-10">
-            <Zap className="w-6 h-6 md:w-8 md:h-8 text-[#0A84FF] mb-2" />
-            <h3 className="text-lg md:text-xl font-black text-foreground tracking-tight">{t("home_protein")}</h3>
-            <p className="text-muted-foreground font-bold text-[10px] md:text-xs mt-0.5">{Math.round(dailyTotals.protein)}g / {goals?.proteinGrams}g</p>
-          </div>
-          <div className="relative z-10 w-full h-2 bg-white/5 rounded-full overflow-hidden border border-white/10 mb-3">
-            <motion.div
-              initial={{ width: 0 }}
-              animate={{ width: `${Math.min((dailyTotals.protein / goals?.proteinGrams) * 100, 100)}%` }}
-              className="h-full bg-[#0A84FF] shadow-[0_0_20px_rgba(10,132,255,0.6)]"
-            />
-          </div>
-          <div className="relative z-10 flex items-center justify-center gap-2 py-2 bg-[#0A84FF]/20 rounded-xl border border-[#0A84FF]/30">
-            <span className="text-[#0A84FF] font-black text-xs uppercase tracking-wider">{t("home_protein_cta")}</span>
-          </div>
-        </div>
-
-        {/* Longevity Score - spans full width on mobile if 3rd item */}
-        <div className="relative h-40 md:h-48 lg:h-52 xl:h-56 mesh-gradient rounded-[1.5rem] md:rounded-[2.5rem] p-5 md:p-6 flex flex-col items-center justify-between text-center text-white haptic-press glass-reflection shadow-2xl overflow-hidden col-span-2 md:col-span-1 cursor-pointer"
-          onClick={() => onNavigate("dashboard")}
-        >
-          <div className="absolute inset-0 bg-black/10 backdrop-blur-[2px]" />
-          <div className="relative z-10 flex flex-col items-center">
-            <Trophy className="w-8 h-8 md:w-10 md:h-10 mb-1 text-yellow-300" />
-            <h3 className="text-[9px] font-black uppercase tracking-[0.4em] opacity-80">{t("home_longevity")}</h3>
-            <span className="text-4xl md:text-5xl font-black tracking-tighter leading-none drop-shadow-2xl">{averageLongevityScore}</span>
-          </div>
-          <div className="relative z-10 flex items-center justify-center gap-2 py-2 bg-white/20 rounded-xl border border-white/30">
-            <span className="text-white font-black text-xs uppercase tracking-wider">{t("home_longevity_cta")}</span>
-          </div>
         </div>
       </div>
 
