@@ -10,7 +10,7 @@ export function TrustBadgesSection() {
   const isEnglish = locale === "en-US"
 
   const trustBadges = [
-    { icon: Brain, label: isEnglish ? "Powered by AI" : "Desenvolvido com IA", color: "text-purple-400", bg: "bg-purple-500/10" },
+    { icon: Brain, label: isEnglish ? "AI Scanning" : "Escaneamento por IA", color: "text-purple-400", bg: "bg-purple-500/10" },
     { icon: Shield, label: isEnglish ? "Data Protected" : "Dados protegidos", color: "text-emerald-400", bg: "bg-emerald-500/10" },
     { icon: Zap, label: isEnglish ? "Plan in 30 seconds" : "Plano em 30 segundos", color: "text-yellow-400", bg: "bg-yellow-500/10" },
     { icon: Globe, label: isEnglish ? "BR & US Support" : "PT & EN", color: "text-blue-400", bg: "bg-blue-500/10" },
