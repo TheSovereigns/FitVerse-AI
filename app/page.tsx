@@ -40,7 +40,7 @@ export default function DashboardPage() {
   const router = useRouter()
   const { user, isLoading: authLoading, profile } = useAuth()
   const { t, locale } = useTranslation()
-  const { plan, scansToday, canScan: checkCanScan, incrementScans } = usePlanLimits()
+  const { plan, scansToday, canScan: checkCanScan, incrementScans, isLoading: planLoading } = usePlanLimits()
   const [currentView, setCurrentView] = useState<View>("home")
   const [islandState, setIslandState] = useState<IslandState>("idle")
   const [isDocked, setIsDocked] = useState(false)
@@ -83,7 +83,6 @@ export default function DashboardPage() {
   ])
   const [userMetabolicPlanState, setUserMetabolicPlanState] = useState<any>(null)
   const [loadingStripe, setLoadingStripe] = useState(false)
-  const [isPremium, setIsPremium] = useState(false)
   const bottomNavInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
@@ -178,20 +177,19 @@ export default function DashboardPage() {
     }
 
     if (user) {
-      // Check premium status from profile table first (most accurate)
+      // Check admin from profile (this is stable)
       supabase
         .from('profiles')
-        .select('plan, is_admin')
+        .select('is_admin')
         .eq('id', user.id)
         .single()
         .then(({ data }) => {
           if (data) {
-            setIsPremium(data.plan === 'pro' || data.plan === 'premium')
             setIsAdmin(data.is_admin === true)
           }
         })
     }
-  }, [user, profile])
+  }, [user, profile, plan])
 
   const setUserMetabolicPlan = (plan: any, perfil?: any) => {
     const fullPlan = plan && perfil ? { ...plan, perfil } : plan
