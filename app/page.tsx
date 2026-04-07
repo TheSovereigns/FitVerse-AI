@@ -178,23 +178,16 @@ export default function DashboardPage() {
     }
 
     if (user) {
-      setIsPremium(user.user_metadata?.plan === "premium" || user.user_metadata?.subscription === "premium")
-      // Check admin status from metadata first
-      const userMetaAdmin = user.user_metadata?.is_admin === true
-      setIsAdmin(userMetaAdmin)
-      // Also check from profile if available
-      if (profile?.is_admin) {
-        setIsAdmin(true)
-      }
-      // Double check from database
+      // Check premium status from profile table first (most accurate)
       supabase
         .from('profiles')
-        .select('is_admin')
+        .select('plan, is_admin')
         .eq('id', user.id)
         .single()
         .then(({ data }) => {
-          if (data?.is_admin) {
-            setIsAdmin(true)
+          if (data) {
+            setIsPremium(data.plan === 'pro' || data.plan === 'premium')
+            setIsAdmin(data.is_admin === true)
           }
         })
     }
