@@ -104,14 +104,17 @@ export async function getCurrentUser() {
 // Helper function to get user profile
 export async function getUserProfile(userId: string): Promise<Profile | null> {
   try {
+    console.log("[Supabase] Fetching profile for userId:", userId)
+    
     const { data, error } = await supabase
       .from('profiles')
       .select('*')
       .eq('id', userId)
       .single()
 
-    // If profile doesn't exist, try to create it
+    // If profile doesn't exist, create it
     if (error?.code === 'PGRST116' || !data) {
+      console.log("[Supabase] Profile not found, creating one for:", userId)
       const { data: newProfile, error: insertError } = await supabase
         .from('profiles')
         .upsert({
@@ -126,7 +129,10 @@ export async function getUserProfile(userId: string): Promise<Profile | null> {
         .single()
 
       if (!insertError && newProfile) {
+        console.log("[Supabase] Profile created:", newProfile)
         return newProfile
+      } else if (insertError) {
+        console.warn("[Supabase] Profile creation error:", insertError.message)
       }
     }
 
@@ -135,6 +141,7 @@ export async function getUserProfile(userId: string): Promise<Profile | null> {
       return null
     }
     
+    console.log("[Supabase] Profile found:", data)
     return data
   } catch (e) {
     console.warn("[Supabase] Profile fetch exception:", e)
