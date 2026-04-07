@@ -34,6 +34,7 @@ const plans = [
     id: "free" as Plan,
     name: "FREE",
     subtitle: "Para começar",
+    subtitleEn: "To get started",
     price: "R$ 0",
     priceUsd: "$0",
     period: "/sempre",
@@ -51,8 +52,9 @@ const plans = [
     id: "pro" as Plan,
     name: "PRO",
     subtitle: "Para evoluir",
+    subtitleEn: "To evolve",
     price: "R$ 19,90",
-    priceUsd: "$3.90",
+    priceUsd: "$4.99",
     period: "/mês",
     periodEn: "/month",
     icon: Star,
@@ -71,16 +73,17 @@ const plans = [
     id: "premium" as Plan,
     name: "PREMIUM",
     subtitle: "Performance máxima",
+    subtitleEn: "Maximum performance",
     price: "R$ 29,90",
-    priceUsd: "$5.90",
+    priceUsd: "$7.99",
     period: "/mês",
     periodEn: "/month",
     icon: Crown,
     color: "orange",
     features: [
       { text: "Scans ILIMITADOS", textEn: "UNLIMITED scans" },
-      { text: "Análise de longevidade", textEn: "Longevity analysis" },
-      { text: "Histórico completo", textEn: "Complete history" },
+      { text: "Análise VIP com IA", textEn: "VIP AI analysis" },
+      { text: "Histórico ILIMITADO", textEn: "UNLIMITED history" },
       { text: "Treinos ILIMITADOS", textEn: "UNLIMITED workouts" },
       { text: "Dietas ILIMITADAS", textEn: "UNLIMITED diets" },
       { text: "Suporte prioritário", textEn: "Priority support" },
@@ -99,6 +102,10 @@ export default function SubscriptionPage() {
   const { refreshPlan } = usePlanLimits()
   const { t, locale } = useTranslation()
   const isEnglish = locale === "en-US"
+  
+  // Detect country from locale
+  const isBrazil = locale === "pt-BR"
+  const isUSA = locale === "en-US"
 
   useEffect(() => {
     if (user?.id) {
@@ -375,7 +382,9 @@ export default function SubscriptionPage() {
                   )}>
                     {plan.name}
                   </h2>
-                  <p className="text-sm text-muted-foreground">{plan.subtitle}</p>
+                  <p className="text-sm text-muted-foreground">
+                      {isEnglish ? (plan as any).subtitleEn : plan.subtitle}
+                    </p>
                   
                   <div className="mt-3 flex items-baseline gap-1">
                     <span className="text-3xl font-black">
