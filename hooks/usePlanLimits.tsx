@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { supabase } from "@/lib/supabase"
 import { useAuth } from "@/hooks/useAuth"
 import type { Plan } from "@/lib/plan-limits"
@@ -12,8 +12,29 @@ export function usePlanLimits() {
   const [limits, setLimits] = useState(PLAN_LIMITS.free)
   const [scansToday, setScansToday] = useState(0)
   const [isLoading, setIsLoading] = useState(true)
+  const [, forceRefresh] = useState(0)
 
-  // Fetch plan from database
+  const refreshPlan = useCallback(async () => {
+    if (!user) return
+    
+    try {
+      const { data } = await supabase
+        .from('profiles')
+        .select('plan')
+        .eq('id', user.id)
+        .single()
+
+      if (data?.plan) {
+        const userPlan = data.plan as Plan
+        setPlan(userPlan)
+        setLimits(getPlanLimits(userPlan))
+      }
+    } catch (e) {
+      // ignore
+    }
+  }, [user])
+
+  // Fetch plan from database on mount and when user changes
   useEffect(() => {
     if (!user) {
       setIsLoading(false)
@@ -22,30 +43,46 @@ export function usePlanLimits() {
 
     const fetchPlan = async () => {
       try {
-        let { data, error } = await supabase
+        const { data } = await supabase
           .from('profiles')
           .select('plan')
           .eq('id', user.id)
           .single()
 
         if (data?.plan) {
-          const userPlan = (data.plan as Plan) || 'free'
+          const userPlan = data.plan as Plan
           setPlan(userPlan)
           setLimits(getPlanLimits(userPlan))
-        } else {
-          setPlan('free')
-          setLimits(getPlanLimits('free'))
         }
       } catch (e) {
-        console.warn("[PlanLimits] Error fetching plan:", e)
-        setPlan('free')
-        setLimits(getPlanLimits('free'))
+        // ignore
       } finally {
         setIsLoading(false)
       }
     }
 
     fetchPlan()
+
+    // Listen for profile changes
+    const channel = supabase
+      .channel('plan-refresh')
+      .on('postgres_changes', {
+        event: 'UPDATE',
+        schema: 'public',
+        table: 'profiles',
+        filter: `id=eq.${user.id}`
+      }, (payload) => {
+        if (payload.new?.plan) {
+          const newPlan = payload.new.plan as Plan
+          setPlan(newPlan)
+          setLimits(getPlanLimits(newPlan))
+        }
+      })
+      .subscribe()
+
+    return () => {
+      supabase.removeChannel(channel)
+    }
   }, [user])
 
   useEffect(() => {
@@ -80,6 +117,7 @@ export function usePlanLimits() {
     limits,
     scansToday,
     isLoading,
+    refreshPlan,
     canScan: () => canScanToday(plan, scansToday),
     canGenerateWorkout: (count: number) => canGenerateWorkout(plan, count),
     canGenerateDiet: (count: number) => canGenerateDiet(plan, count),

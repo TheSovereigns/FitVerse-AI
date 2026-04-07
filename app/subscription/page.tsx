@@ -19,6 +19,7 @@ import {
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useAuth } from "@/hooks/useAuth"
+import { usePlanLimits } from "@/hooks/usePlanLimits"
 import { supabase } from "@/lib/supabase"
 import { useTranslation } from "@/lib/i18n"
 import { toast } from "sonner"
@@ -95,6 +96,7 @@ export default function SubscriptionPage() {
   const [adsLoading, setAdsLoading] = useState(false)
   const router = useRouter()
   const { user } = useAuth()
+  const { refreshPlan } = usePlanLimits()
   const { t, locale } = useTranslation()
   const isEnglish = locale === "en-US"
 
@@ -158,6 +160,7 @@ export default function SubscriptionPage() {
         setCurrentPlan(newPlan)
         setAdsEnabled(true)
         localStorage.setItem("userPlan", newPlan)
+        await refreshPlan()
         
         toast.success(isEnglish ? `Switched to ${newPlan}` : `Plano alterado para ${newPlan}`)
       } catch (error) {
@@ -228,6 +231,7 @@ export default function SubscriptionPage() {
       setCurrentPlan(newPlan)
       setAdsEnabled(newPlan !== "free")
       localStorage.setItem("userPlan", newPlan)
+      await refreshPlan()
       
       toast.success(isEnglish ? `Switched to ${newPlan} (demo)` : `Plano alterado para ${newPlan} (demo)`)
     } finally {

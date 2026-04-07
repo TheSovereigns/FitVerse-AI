@@ -203,14 +203,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       await supabase.auth.signOut()
     } catch {
-      // ignore — might not have a session (demo user)
+      // ignore
     } finally {
       setUser(null)
       setProfile(null)
       setIsAdmin(false)
       hasRedirectedRef.current = false
       localStorage.clear()
-      router.push("/auth/login")
+      // Force redirect with reload
+      window.location.href = "/auth/login"
     }
   }
 
