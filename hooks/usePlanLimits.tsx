@@ -55,7 +55,27 @@ export function usePlanLimits() {
 
         console.log("[usePlanLimits] Fetch result:", { data, error })
 
-        if (data?.plan) {
+        // If profile doesn't exist, create it
+        if (error?.code === 'PGRST116' || !data) {
+          console.log("[usePlanLimits] Creating profile for user:", user.id)
+          const { data: newProfile, error: insertError } = await supabase
+            .from('profiles')
+            .insert({
+              id: user.id,
+              email: user.email || '',
+              plan: 'free',
+              is_admin: false,
+              country: 'BR',
+              ads_enabled: true,
+            })
+            .select('plan')
+            .single()
+
+          if (!insertError && newProfile) {
+            setPlan('free')
+            setLimits(getPlanLimits('free'))
+          }
+        } else if (data?.plan) {
           const userPlan = data.plan as Plan
           setPlan(userPlan)
           setLimits(getPlanLimits(userPlan))

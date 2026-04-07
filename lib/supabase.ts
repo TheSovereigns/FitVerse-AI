@@ -110,6 +110,27 @@ export async function getUserProfile(userId: string): Promise<Profile | null> {
       .eq('id', userId)
       .single()
 
+    // If profile doesn't exist, create it
+    if (error?.code === 'PGRST116' || (!data && error?.code === 'PGRST116')) {
+      console.log("[Supabase] Creating profile for user:", userId)
+      const { data: newProfile, error: insertError } = await supabase
+        .from('profiles')
+        .insert({
+          id: userId,
+          email: '',
+          plan: 'free',
+          is_admin: false,
+          country: 'BR',
+          ads_enabled: true,
+        })
+        .select('*')
+        .single()
+
+      if (!insertError && newProfile) {
+        return newProfile
+      }
+    }
+    
     if (error) {
       console.warn("[Supabase] Profile fetch error:", error.message)
       return null

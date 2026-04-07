@@ -210,7 +210,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setIsAdmin(false)
     hasRedirectedRef.current = false
     localStorage.clear()
-    window.location.href = "/auth/login"
+    // Delay to ensure logout completes
+    setTimeout(() => {
+      window.location.href = "/auth/login"
+    }, 100)
   }
 
   const signInWithGoogle = async () => {
