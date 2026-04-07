@@ -29,6 +29,7 @@ import { LiquidLaunchpad } from "@/components/liquid-launchpad"
 import { useTranslation } from "@/lib/i18n"
 import { useAuth } from "@/hooks/useAuth"
 import { supabase } from "@/lib/supabase"
+import { usePlanLimits } from "@/hooks/usePlanLimits"
 
 type View = "home" | "dashboard" | "result" | "recipes" | "training" | "profile" | "planner" | "settings" | "store" | "chatbot"
 
@@ -39,6 +40,7 @@ export default function DashboardPage() {
   const router = useRouter()
   const { user, isLoading: authLoading, profile } = useAuth()
   const { t, locale } = useTranslation()
+  const { plan, scansToday, canScan: checkCanScan } = usePlanLimits()
   const [currentView, setCurrentView] = useState<View>("home")
   const [islandState, setIslandState] = useState<IslandState>("idle")
   const [isDocked, setIsDocked] = useState(false)
@@ -267,6 +269,13 @@ export default function DashboardPage() {
   }
 
   const handleScan = async (fileOrUrl?: File | string): Promise<void> => {
+    if (!checkCanScan()) {
+      setIslandState("error")
+      setTimeout(() => setIslandState("idle"), 3000)
+      alert(t("page_limit_reached") || "Limite diário de scans atingido. Atualize para um plano superior!")
+      return
+    }
+
     setIsAnalyzing(true)
     setIslandState("scanning")
     setCurrentView("result")

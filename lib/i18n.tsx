@@ -159,6 +159,7 @@ const translations = {
     pr_syncing: "Sincronização Neural...",
     pr_kcal: "KCAL", pr_prot: "PROT", pr_carb: "CARB", pr_fat: "GORD",
     pr_excelente: "Excelente", pr_bom: "Bom", pr_neutro: "Neutro", pr_ruim: "Ruim",
+    pr_health_benefits: "Benefícios para a Saúde", pr_vitamins: "Vitaminas", pr_minerals: "Minerais", pr_proteins: "Proteínas", pr_other_benefits: "Outros Benefícios",
     alt_title: "Troque por este", alt_healthier: "Mais saudável", alt_view: "Ver produto",
     alt_affiliate: "💚 Links podem conter afiliados", alt_highlights: "Destaques", alt_analyze_now: "Analise Este Produto Agora",
     // Store
@@ -402,6 +403,9 @@ const translations = {
     page_error_ai_fail: "Falha na análise da IA",
     page_error_ai_server: "Falha na análise da IA (Erro de servidor)",
     page_error_retry: "Ocorreu um erro ao analisar o produto. Tente novamente.",
+    page_limit_reached: "Limite diário de scans atingido. Atualize para um plano superior!",
+    page_limit_workout: "Limite mensal de treinos atingido. Atualize para um plano superior!",
+    page_limit_diet: "Limite mensal de dietas atingido. Atualize para um plano superior!",
   },
 
   "en-US": {
@@ -558,6 +562,7 @@ const translations = {
     pr_syncing: "Neural Sync...",
     pr_kcal: "KCAL", pr_prot: "PROT", pr_carb: "CARB", pr_fat: "FAT",
     pr_excelente: "Excellent", pr_bom: "Good", pr_neutro: "Neutral", pr_ruim: "Poor",
+    pr_health_benefits: "Health Benefits", pr_vitamins: "Vitamins", pr_minerals: "Minerals", pr_proteins: "Proteins", pr_other_benefits: "Other Benefits",
     alt_title: "Swap for this", alt_healthier: "Healthier", alt_view: "View product",
     alt_affiliate: "💚 Links may contain affiliates", alt_highlights: "Highlights", alt_analyze_now: "Analyze This Product Now",
     // Store
@@ -800,6 +805,9 @@ const translations = {
     page_error_ai_fail: "AI analysis failed",
     page_error_ai_server: "AI analysis failed (Server error)",
     page_error_retry: "An error occurred while analyzing the product. Please try again.",
+    page_limit_reached: "Daily scan limit reached. Upgrade to a higher plan!",
+    page_limit_workout: "Monthly workout limit reached. Upgrade to a higher plan!",
+    page_limit_diet: "Monthly diet limit reached. Upgrade to a higher plan!",
   },
 } as const
 

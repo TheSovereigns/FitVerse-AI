@@ -22,6 +22,9 @@ import { useAuth } from "@/hooks/useAuth"
 import { supabase } from "@/lib/supabase"
 import { useTranslation } from "@/lib/i18n"
 import { toast } from "sonner"
+import { loadStripe } from "@stripe/stripe-js"
+
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!)
 
 type Plan = "free" | "pro" | "premium"
 
@@ -140,9 +143,80 @@ export default function SubscriptionPage() {
 
   const handleSwitchPlan = async (newPlan: Plan) => {
     if (!user?.id) return
-    
+
+    if (newPlan === "free") {
+      setLoading(newPlan)
+      try {
+        await supabase
+          .from("profiles")
+          .update({ 
+            plan: newPlan,
+            ads_enabled: true
+          })
+          .eq("id", user.id)
+
+        setCurrentPlan(newPlan)
+        setAdsEnabled(true)
+        localStorage.setItem("userPlan", newPlan)
+        
+        toast.success(isEnglish ? `Switched to ${newPlan}` : `Plano alterado para ${newPlan}`)
+      } catch (error) {
+        toast.error(isEnglish ? "Failed" : "Falha ao trocar")
+      } finally {
+        setLoading(null)
+      }
+      return
+    }
+
     setLoading(newPlan)
     try {
+      const response = await fetch('/api/stripe/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          plan: newPlan,
+          userId: user.id,
+          email: user.email,
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error('Checkout failed')
+      }
+
+      const { url, error: stripeError } = await response.json()
+
+      if (stripeError) {
+        throw new Error(stripeError)
+      }
+
+      if (url) {
+        window.location.href = url
+      } else {
+        const stripe = await stripePromise
+        if (stripe) {
+          const { error: stripeLoadError } = await stripe.redirectToCheckout({ sessionId: (await response.json()).sessionId })
+          if (stripeLoadError) {
+            throw stripeLoadError
+          }
+        } else {
+          await supabase
+            .from("profiles")
+            .update({ 
+              plan: newPlan,
+              ads_enabled: newPlan === "free" ? true : false
+            })
+            .eq("id", user.id)
+
+          setCurrentPlan(newPlan)
+          setAdsEnabled(newPlan !== "free")
+          localStorage.setItem("userPlan", newPlan)
+          
+          toast.success(isEnglish ? `Switched to ${newPlan}` : `Plano alterado para ${newPlan}`)
+        }
+      }
+    } catch (error) {
+      console.error('Checkout error:', error)
       await supabase
         .from("profiles")
         .update({ 
@@ -155,9 +229,7 @@ export default function SubscriptionPage() {
       setAdsEnabled(newPlan !== "free")
       localStorage.setItem("userPlan", newPlan)
       
-      toast.success(isEnglish ? `Switched to ${newPlan}` : `Plano alterado para ${newPlan}`)
-    } catch (error) {
-      toast.error(isEnglish ? "Failed" : "Falha ao trocar")
+      toast.success(isEnglish ? `Switched to ${newPlan} (demo)` : `Plano alterado para ${newPlan} (demo)`)
     } finally {
       setLoading(null)
     }

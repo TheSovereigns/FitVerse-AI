@@ -13,6 +13,7 @@ import { ExerciseDetailModal } from "@/components/exercise-detail-modal"
 import { cn } from "@/lib/utils"
 import { toast } from "sonner"
 import { useTranslation } from "@/lib/i18n"
+import { usePlanLimits } from "@/hooks/usePlanLimits"
 
 interface Exercise {
   name: string
@@ -40,6 +41,7 @@ interface TrainingTabProps {
 
 export function TrainingTab({ metabolicPlan, scanHistory, userGoal }: TrainingTabProps) {
   const { t, locale } = useTranslation()
+  const { plan, canGenerateWorkout: checkCanGenerateWorkout } = usePlanLimits()
   const [isGenerating, setIsGenerating] = useState(false)
   const [generatedWorkouts, setGeneratedWorkouts] = useState<Workout[]>([])
   const [activeFilter, setActiveFilter] = useState("all")
@@ -117,6 +119,12 @@ export function TrainingTab({ metabolicPlan, scanHistory, userGoal }: TrainingTa
   }, [generatedWorkouts])
 
   const handleGenerateWorkouts = async (criteria: any) => {
+    const workoutsThisMonth = generatedWorkouts.length
+    if (!checkCanGenerateWorkout(workoutsThisMonth)) {
+      toast.error(t("page_limit_workout") || "Limite mensal de treinos atingido. Atualize para um plano superior!")
+      return
+    }
+
     setIsGenerating(true)
     setShowGeneratorModal(false)
     if (criteria.location === "Academia" || criteria.location === "Gym") setActiveFilter("gym")

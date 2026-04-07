@@ -9,6 +9,8 @@ import { RecipeModal } from "@/components/recipe-modal"
 import { ChefHat, Clock, Flame, Loader2, ArrowRight } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useTranslation } from "@/lib/i18n"
+import { usePlanLimits } from "@/hooks/usePlanLimits"
+import { toast } from "sonner"
 
 type Recipe = {
   name: string
@@ -28,6 +30,7 @@ type RecipesTabProps = {
 
 export function RecipesTab({ metabolicPlan }: RecipesTabProps) {
   const { t, locale } = useTranslation()
+  const { plan, canGenerateDiet: checkCanGenerateDiet } = usePlanLimits()
   const [ingredient, setIngredient] = useState("")
   const [isGenerating, setIsGenerating] = useState(false)
   const [recipes, setRecipes] = useState<Recipe[]>([])
@@ -36,6 +39,13 @@ export function RecipesTab({ metabolicPlan }: RecipesTabProps) {
 
   const handleGenerateRecipes = async () => {
     if (!ingredient.trim()) return
+    
+    const dietsThisMonth = recipes.length
+    if (!checkCanGenerateDiet(dietsThisMonth)) {
+      toast.error(t("page_limit_diet") || "Limite mensal de dietas atingido. Atualize para um plano superior!")
+      return
+    }
+
     setIsGenerating(true)
     try {
       const response = await fetch("/api/generate-recipes", {

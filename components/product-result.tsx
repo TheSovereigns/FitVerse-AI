@@ -1,7 +1,7 @@
 "use client"
 
 import { motion, AnimatePresence } from "framer-motion"
-import { ArrowLeft, AlertTriangle, Check, Activity, ShieldCheck, AlertCircle, Flame, Dumbbell, Wheat, Droplets, Target, BarChart, Sparkles, ChevronRight, Zap } from "lucide-react"
+import { ArrowLeft, AlertTriangle, Check, Activity, ShieldCheck, AlertCircle, Flame, Dumbbell, Wheat, Droplets, Target, BarChart, Sparkles, ChevronRight, Zap, Heart, Brain, Bone, Shield, Leaf, Droplet } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
@@ -19,6 +19,12 @@ export interface ProductAnalysis {
     suitability: "Excelente" | "Bom" | "Neutro" | "Ruim"
     justification: string
   }[]
+  benefits?: {
+    vitamins?: string[]
+    minerals?: string[]
+    proteins?: string[]
+    other?: string[]
+  }
 }
 
 interface ProductResultProps {
@@ -203,6 +209,116 @@ export function ProductResult({ result, onBack, imageData }: ProductResultProps)
             </div>
          </div>
       </div>
+      {/* Health Benefits Section */}
+      {result.benefits && (
+        <div className="space-y-8">
+          <h3 className="text-sm font-black uppercase tracking-[0.4em] opacity-30 ml-8">{t("pr_health_benefits") || "Benefícios para a Saúde"}</h3>
+          
+          {/* Vitamins */}
+          {result.benefits.vitamins && result.benefits.vitamins.length > 0 && (
+            <div className="glass-strong border-white/20 rounded-3xl p-6 md:p-10">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-12 h-12 rounded-2xl bg-amber-500/20 flex items-center justify-center">
+                  <Sparkles className="w-6 h-6 text-amber-400" />
+                </div>
+                <h4 className="text-xl font-black text-amber-400 uppercase tracking-wide">{t("pr_vitamins") || "Vitaminas"}</h4>
+              </div>
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {result.benefits.vitamins.map((v, i) => {
+                  const [name, benefit] = v.split(' - ')
+                  return (
+                    <motion.div
+                      key={i}
+                      whileHover={{ scale: 1.02 }}
+                      className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/20"
+                    >
+                      <p className="text-lg font-black text-amber-400">{name}</p>
+                      {benefit && <p className="text-sm font-bold text-amber-400/60 mt-1">{benefit}</p>}
+                    </motion.div>
+                  )
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* Minerals */}
+          {result.benefits.minerals && result.benefits.minerals.length > 0 && (
+            <div className="glass-strong border-white/20 rounded-3xl p-6 md:p-10">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-12 h-12 rounded-2xl bg-cyan-500/20 flex items-center justify-center">
+                  <Droplet className="w-6 h-6 text-cyan-400" />
+                </div>
+                <h4 className="text-xl font-black text-cyan-400 uppercase tracking-wide">{t("pr_minerals") || "Minerais"}</h4>
+              </div>
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {result.benefits.minerals.map((m, i) => {
+                  const [name, benefit] = m.split(' - ')
+                  return (
+                    <motion.div
+                      key={i}
+                      whileHover={{ scale: 1.02 }}
+                      className="p-4 rounded-2xl bg-cyan-500/10 border border-cyan-500/20"
+                    >
+                      <p className="text-lg font-black text-cyan-400">{name}</p>
+                      {benefit && <p className="text-sm font-bold text-cyan-400/60 mt-1">{benefit}</p>}
+                    </motion.div>
+                  )
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* Proteins */}
+          {result.benefits.proteins && result.benefits.proteins.length > 0 && (
+            <div className="glass-strong border-white/20 rounded-3xl p-6 md:p-10">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-12 h-12 rounded-2xl bg-blue-500/20 flex items-center justify-center">
+                  <Dumbbell className="w-6 h-6 text-blue-400" />
+                </div>
+                <h4 className="text-xl font-black text-blue-400 uppercase tracking-wide">{t("pr_proteins") || "Proteínas"}</h4>
+              </div>
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {result.benefits.proteins.map((p, i) => (
+                  <motion.div
+                    key={i}
+                    whileHover={{ scale: 1.02 }}
+                    className="p-4 rounded-2xl bg-blue-500/10 border border-blue-500/20"
+                  >
+                    <p className="text-lg font-black text-blue-400">{p}</p>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Other Benefits */}
+          {result.benefits.other && result.benefits.other.length > 0 && (
+            <div className="glass-strong border-white/20 rounded-3xl p-6 md:p-10">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 flex items-center justify-center">
+                  <Leaf className="w-6 h-6 text-emerald-400" />
+                </div>
+                <h4 className="text-xl font-black text-emerald-400 uppercase tracking-wide">{t("pr_other_benefits") || "Outros Benefícios"}</h4>
+              </div>
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {result.benefits.other.map((o, i) => {
+                  const [name, benefit] = o.split(' - ')
+                  return (
+                    <motion.div
+                      key={i}
+                      whileHover={{ scale: 1.02 }}
+                      className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20"
+                    >
+                      <p className="text-lg font-black text-emerald-400">{name}</p>
+                      {benefit && <p className="text-sm font-bold text-emerald-400/60 mt-1">{benefit}</p>}
+                    </motion.div>
+                  )
+                })}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   )
 }
