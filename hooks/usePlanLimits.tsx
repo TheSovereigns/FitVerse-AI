@@ -28,30 +28,13 @@ export function usePlanLimits() {
           .eq('id', user.id)
           .single()
 
-        // If profile doesn't exist, create it
-        if (error?.code === 'PGRST116' || !data) {
-          console.log("[PlanLimits] Creating profile for user:", user.id)
-          const { data: newProfile, error: insertError } = await supabase
-            .from('profiles')
-            .upsert({
-              id: user.id,
-              email: user.email || '',
-              plan: 'free',
-              is_admin: false,
-              country: 'BR',
-              ads_enabled: true,
-            }, { onConflict: 'id' })
-            .select('plan')
-            .single()
-
-          if (!insertError && newProfile) {
-            setPlan('free')
-            setLimits(getPlanLimits('free'))
-          }
-        } else if (data) {
+        if (data?.plan) {
           const userPlan = (data.plan as Plan) || 'free'
           setPlan(userPlan)
           setLimits(getPlanLimits(userPlan))
+        } else {
+          setPlan('free')
+          setLimits(getPlanLimits('free'))
         }
       } catch (e) {
         console.warn("[PlanLimits] Error fetching plan:", e)
@@ -63,27 +46,6 @@ export function usePlanLimits() {
     }
 
     fetchPlan()
-
-    // Subscribe to profile changes for real-time updates
-    const channel = supabase
-      .channel('profile-changes')
-      .on('postgres_changes', {
-        event: 'UPDATE',
-        schema: 'public',
-        table: 'profiles',
-        filter: `id=eq.${user.id}`
-      }, (payload) => {
-        if (payload.new?.plan) {
-          const newPlan = payload.new.plan as Plan
-          setPlan(newPlan)
-          setLimits(getPlanLimits(newPlan))
-        }
-      })
-      .subscribe()
-
-    return () => {
-      supabase.removeChannel(channel)
-    }
   }, [user])
 
   useEffect(() => {
