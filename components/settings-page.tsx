@@ -154,10 +154,12 @@ export function SettingsPage({ onBack }: { onBack?: () => void }) {
   }
 
   const handleLogout = async () => {
+    console.log("[Settings] Logging out...")
     localStorage.clear()
     toast.success(t("settings_toast_logout"))
     await signOut()
-    window.location.href = "/auth/login"
+    console.log("[Settings] Redirecting to login...")
+    window.location.replace("/auth/login")
   }
 
   const handleLanguageToggle = () => {
