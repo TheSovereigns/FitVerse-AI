@@ -26,6 +26,7 @@ import { toast } from "sonner"
 import { cn } from "@/lib/utils"
 import { useTranslation, type Locale } from "@/lib/i18n"
 import { useAuth } from "@/hooks/useAuth"
+import { usePlanLimits } from "@/hooks/usePlanLimits"
 
 const SettingRow = ({
   icon: Icon, title, description, children, isLast,
@@ -61,15 +62,41 @@ const SettingRow = ({
 export function SettingsPage({ onBack }: { onBack?: () => void }) {
   const { t, locale, setLocale } = useTranslation()
   const { signOut, user: authUser, profile: authProfile } = useAuth()
+  const { plan: planFromHook } = usePlanLimits()
   const router = useRouter()
   const { theme, setTheme } = useTheme()
-  const [userSubscription, setUserSubscription] = useState("free")
+  const [userSubscription, setUserSubscription] = useState<string>("free")
   const [notificationsEnabled, setNotificationsEnabled] = useState(true)
   const [adsEnabled, setAdsEnabled] = useState(true)
+  const [isAdsLoading, setAdsLoading] = useState(false)
   const [isAdmin, setIsAdmin] = useState(false)
 
-  // Get user from auth or fallback to localStorage
   const user = authUser
+
+  // Sync subscription and ads with plan from hook (database)
+  useEffect(() => {
+    if (planFromHook) {
+      setUserSubscription(planFromHook)
+    }
+  }, [planFromHook])
+
+  // Fetch ads_enabled from database
+  useEffect(() => {
+    if (user?.id) {
+      supabase
+        .from('profiles')
+        .select('ads_enabled, plan')
+        .eq('id', user.id)
+        .single()
+        .then(({ data }) => {
+          if (data) {
+            setUserSubscription(data.plan || "free")
+            setAdsEnabled(data.ads_enabled !== false)
+            localStorage.setItem("adsEnabled", JSON.stringify(data.ads_enabled !== false))
+          }
+        })
+    }
+  }, [user, planFromHook])
 
   // Check admin status from multiple sources
   useEffect(() => {
@@ -129,7 +156,7 @@ export function SettingsPage({ onBack }: { onBack?: () => void }) {
     if (storedNotifications) setNotificationsEnabled(JSON.parse(storedNotifications))
   }, [])
 
-  const handleAdsToggle = (checked: boolean) => {
+  const handleAdsToggle = async (checked: boolean) => {
     if (userSubscription === "free") {
       toast.error(t("settings_premium_locked"), {
         description: t("settings_upgrade_error"),
@@ -137,9 +164,22 @@ export function SettingsPage({ onBack }: { onBack?: () => void }) {
       })
       return
     }
-    setAdsEnabled(!checked)
-    localStorage.setItem("adsEnabled", JSON.stringify(!checked))
-    toast.success(`Protocol ${!checked ? t("settings_protocol_on") : t("settings_protocol_off")}.`)
+    
+    setAdsLoading(true)
+    try {
+      await supabase
+        .from('profiles')
+        .update({ ads_enabled: !checked })
+        .eq('id', user?.id)
+      
+      setAdsEnabled(!checked)
+      localStorage.setItem("adsEnabled", JSON.stringify(!checked))
+      toast.success(!checked ? t("settings_protocol_on") : t("settings_protocol_off"))
+    } catch (error) {
+      toast.error("Failed to update")
+    } finally {
+      setAdsLoading(false)
+    }
   }
 
   const handleNotificationsToggle = (checked: boolean) => {
@@ -153,8 +193,9 @@ export function SettingsPage({ onBack }: { onBack?: () => void }) {
     toast.success(t("settings_toast_cleared"))
   }
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     localStorage.clear()
+    await signOut()
     window.location.href = "/auth/login"
   }
 

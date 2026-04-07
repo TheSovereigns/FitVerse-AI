@@ -27,6 +27,7 @@ import { ScanHistory } from "@/components/scan-history"
 import { cn } from "@/lib/utils"
 import { useTranslation } from "@/lib/i18n"
 import { useAuth } from "@/hooks/useAuth"
+import { usePlanLimits } from "@/hooks/usePlanLimits"
 import { supabase } from "@/lib/supabase"
 
 interface ScanHistoryItem {
@@ -46,6 +47,7 @@ interface HealthProfileProps {
 export function HealthProfile({ scanHistory, onNavigateToSettings, onNavigateToSubscription }: HealthProfileProps) {
   const { t } = useTranslation()
   const { user, signOut } = useAuth()
+  const { plan: currentPlan } = usePlanLimits()
   const [localScanHistory, setLocalScanHistory] = useState<ScanHistoryItem[]>(scanHistory)
   const [selectedPeriod, setSelectedPeriod] = useState<"week" | "month">("week")
   const [displayName, setDisplayName] = useState("")
@@ -146,9 +148,7 @@ export function HealthProfile({ scanHistory, onNavigateToSettings, onNavigateToS
 
   const distribution = getQualityDistribution()
   const streak = getStreak()
-  const userSubscription = typeof window !== "undefined"
-    ? JSON.parse(localStorage.getItem("user") || '{"subscription":"free"}').subscription || "free"
-    : "free"
+  const userSubscription = currentPlan || "free"
 
   return (
     <div className="w-full max-w-5xl xl:max-w-6xl mx-auto space-y-6 md:space-y-10 pb-safe-nav animate-in fade-in duration-500">
