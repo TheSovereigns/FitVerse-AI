@@ -173,7 +173,7 @@ const translations = {
     store_cart_title: "Meu Carrinho", store_cart_empty: "Carrinho Vazio",
     store_subtotal: "Subtotal Global", store_checkout: "FINALIZAR SESSÃO",
     store_bio_seal: "Selo de Integridade Bio-Link",
-    store_bio_seal_desc: "Todas as transações são validadas via protocolos de criptografia biométrica e conformidade Apple Security 2026.",
+    store_bio_seal_desc: "Todas as transações são validadas via protocolos de criptografia biométrica e conformidade com padrões de segurança.",
     store_sync: "SINCRONIZAR", store_add_cart: "Comprar",
     // Exercise Modal
     em_live_demo: "Demonstração ao Vivo",
@@ -576,7 +576,7 @@ const translations = {
     store_cart_title: "My Cart", store_cart_empty: "Empty Cart",
     store_subtotal: "Global Subtotal", store_checkout: "CHECKOUT",
     store_bio_seal: "Bio-Link Integrity Seal",
-    store_bio_seal_desc: "All transactions are validated via biometric encryption protocols and Apple Security 2026 compliance.",
+    store_bio_seal_desc: "All transactions are validated via biometric encryption protocols and security standards compliance.",
     store_sync: "SYNC", store_add_cart: "Buy",
     // Exercise Modal
     em_live_demo: "Live Demonstration",
