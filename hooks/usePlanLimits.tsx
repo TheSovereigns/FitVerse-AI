@@ -13,6 +13,7 @@ export function usePlanLimits() {
   const [scansToday, setScansToday] = useState(0)
   const [isLoading, setIsLoading] = useState(true)
 
+  // Fetch plan from database
   useEffect(() => {
     if (!user) {
       setIsLoading(false)
@@ -28,7 +29,7 @@ export function usePlanLimits() {
           .single()
 
         if (data) {
-          const userPlan = data.plan as Plan
+          const userPlan = (data.plan as Plan) || 'free'
           setPlan(userPlan)
           setLimits(getPlanLimits(userPlan))
         }
@@ -40,6 +41,27 @@ export function usePlanLimits() {
     }
 
     fetchPlan()
+
+    // Subscribe to profile changes for real-time updates
+    const channel = supabase
+      .channel('profile-changes')
+      .on('postgres_changes', {
+        event: 'UPDATE',
+        schema: 'public',
+        table: 'profiles',
+        filter: `id=eq.${user.id}`
+      }, (payload) => {
+        if (payload.new?.plan) {
+          const newPlan = payload.new.plan as Plan
+          setPlan(newPlan)
+          setLimits(getPlanLimits(newPlan))
+        }
+      })
+      .subscribe()
+
+    return () => {
+      supabase.removeChannel(channel)
+    }
   }, [user])
 
   useEffect(() => {
