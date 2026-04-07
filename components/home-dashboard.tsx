@@ -176,7 +176,7 @@ export function HomeDashboard({
             </div>
           </div>
 
-          <div class className="relative w-24 h-24 md:w-40 md:h-40 flex items-center justify-center">
+          <div className="relative w-24 h-24 md:w-40 md:h-40 flex items-center justify-center">
             <div className="absolute inset-0 rounded-full border-[0.5rem] md:border-[0.75rem] border-white/5" />
             <motion.div
               animate={{ rotate: 360 }}
