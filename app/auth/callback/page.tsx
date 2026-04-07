@@ -60,7 +60,7 @@ export default function AuthCallbackPage() {
           })
         } else {
           router.replace("/auth/login")
-        })
+        }
       })
     }, 3000)
 
