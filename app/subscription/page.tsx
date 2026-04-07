@@ -99,9 +99,16 @@ export default function SubscriptionPage() {
   const [adsLoading, setAdsLoading] = useState(false)
   const router = useRouter()
   const { user } = useAuth()
-  const { refreshPlan } = usePlanLimits()
+  const { plan, refreshPlan } = usePlanLimits()
   const { t, locale } = useTranslation()
   const isEnglish = locale === "en-US"
+  
+  // Sync currentPlan with the plan from usePlanLimits
+  useEffect(() => {
+    if (plan) {
+      setCurrentPlan(plan)
+    }
+  }, [plan])
   
   // Detect country from locale
   const isBrazil = locale === "pt-BR"
