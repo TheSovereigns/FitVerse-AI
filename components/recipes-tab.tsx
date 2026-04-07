@@ -10,6 +10,7 @@ import { ChefHat, Clock, Flame, Loader2, ArrowRight } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useTranslation } from "@/lib/i18n"
 import { usePlanLimits } from "@/hooks/usePlanLimits"
+import { supabase } from "@/lib/supabase"
 import { toast } from "sonner"
 
 type Recipe = {
@@ -48,17 +49,25 @@ export function RecipesTab({ metabolicPlan }: RecipesTabProps) {
 
     setIsGenerating(true)
     try {
+      const { data: { session } } = await supabase.auth.getSession()
       const response = await fetch("/api/generate-recipes", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${session?.access_token || ''}`
+        },
         body: JSON.stringify({
           productName: ingredient,
           dietProfile: metabolicPlan?.goal || "Maintenance/Longevity",
           locale,
         }),
       })
-      if (!response.ok) throw new Error("Failed to generate recipes")
+
       const data = await response.json()
+      if (!response.ok) {
+        toast.error(data.error || "Erro ao gerar receitas")
+        return
+      }
       setRecipes(data.recipes)
     } catch (error) {
       console.error("Error generating recipes:", error)

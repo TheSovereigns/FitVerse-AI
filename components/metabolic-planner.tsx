@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent } from '@/components/ui/card';
 import { RollerPicker } from '@/components/roller-picker';
 import { useTranslation } from '@/lib/i18n';
+import { supabase } from '@/lib/supabase';
 import { cn } from '@/lib/utils';
 import {
   Loader2,
@@ -99,10 +100,17 @@ export function MetabolicPlanner({ onPlanCreated }: MetabolicPlannerProps) {
     };
 
     try {
+      let token = ''
+      try {
+        const { data: { session } } = await supabase.auth.getSession()
+        token = session?.access_token || ''
+      } catch {}
+
       const response = await fetch('/api/generate-metabolic-plan', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({ ...profileData, locale }),
       });

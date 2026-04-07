@@ -1,8 +1,28 @@
 import { NextResponse } from "next/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import { createClient } from '@supabase/supabase-js'
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
+const supabaseKey = process.env.SUPABASE_SERVICE_KEY!
+const supabase = createClient(supabaseUrl, supabaseKey)
 
 export async function POST(req: Request) {
   try {
+    const headers = {
+      'Access-Control-Allow-Origin': '*',
+    }
+
+    const authHeader = req.headers.get('Authorization')
+    let userId: string | null = null
+    
+    if (authHeader) {
+      const token = authHeader.replace('Bearer ', '')
+      const { data: { user }, error: authError } = await supabase.auth.getUser(token)
+      if (user && !authError) {
+        userId = user.id
+      }
+    }
+
     const apiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_GENERATIVE_AI_API_KEY;
     if (!apiKey) {
       return NextResponse.json({ error: "API Key não configurada" }, { status: 500 });

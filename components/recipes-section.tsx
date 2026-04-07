@@ -7,6 +7,8 @@ import { Badge } from "@/components/ui/badge"
 import { ChefHat, Clock, Users, Flame, Sparkles } from "lucide-react"
 import { RecipeModal } from "./recipe-modal"
 import { useTranslation } from "@/lib/i18n"
+import { supabase } from "@/lib/supabase"
+import { toast } from "sonner"
 
 interface Recipe {
   name: string
@@ -40,17 +42,21 @@ export function RecipesSection({ productName, dietProfile }: RecipesSectionProps
   const handleGenerateRecipes = async () => {
     setIsLoading(true)
     try {
+      const { data: { session } } = await supabase.auth.getSession()
       const response = await fetch("/api/generate-recipes", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${session?.access_token || ''}`
+        },
         body: JSON.stringify({ productName, dietProfile, locale }),
       })
 
-      if (!response.ok) {
-        throw new Error("Failed to generate recipes")
-      }
-
       const data = await response.json()
+      if (!response.ok) {
+        toast.error(data.error || (locale === "en-US" ? "Error generating recipes" : "Erro ao gerar receitas"))
+        return
+      }
       console.log("[Fitverse] Recipes generated:", data.recipes)
       setRecipes(data.recipes)
     } catch (error) {

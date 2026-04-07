@@ -53,7 +53,7 @@ export function ScanDashboard({ onScan, isScanning = false }: ScanDashboardProps
         <motion.div
           whileHover={{ scale: 1.01 }}
           className={cn(
-            "relative glass-strong border-white/20 border-2 rounded-[1.5rem] md:rounded-[3rem] h-[200px] md:h-[280px] lg:h-[320px] xl:h-[360px] flex flex-col items-center justify-center transition-all duration-1000 overflow-hidden shadow-[0_0_40px_rgba(0,0,0,0.3)] haptic-press glass-reflection",
+            "relative glass-strong border-white/20 border-2 rounded-[1.5rem] md:rounded-[2.5rem] h-[160px] md:h-[200px] lg:h-[240px] flex flex-col items-center justify-center transition-all duration-1000 overflow-hidden shadow-[0_0_40px_rgba(0,0,0,0.3)] haptic-press glass-reflection",
             isDragging ? "border-primary bg-primary/5 scale-[1.02]" : "hover:border-white/30",
             isScanning && "ring-4 ring-primary/20"
           )}
@@ -80,10 +80,10 @@ export function ScanDashboard({ onScan, isScanning = false }: ScanDashboardProps
           )}
 
           {/* Corner brackets */}
-          <div className="absolute top-4 left-4 w-8 h-8 md:top-6 md:left-6 md:w-12 md:h-12 border-t-2 border-l-2 border-white/40 rounded-tl-2xl md:rounded-tl-3xl transition-all duration-700 group-hover:w-10 group-hover:h-10 md:group-hover:w-16 md:group-hover:h-16" />
-          <div className="absolute top-4 right-4 w-8 h-8 md:top-6 md:right-6 md:w-12 md:h-12 border-t-2 border-r-2 border-white/40 rounded-tr-2xl md:rounded-tr-3xl transition-all duration-700 group-hover:w-10 group-hover:h-10 md:group-hover:w-16 md:group-hover:h-16" />
-          <div className="absolute bottom-4 left-4 w-8 h-8 md:bottom-6 md:left-6 md:w-12 md:h-12 border-b-2 border-l-2 border-white/40 rounded-bl-2xl md:rounded-bl-3xl transition-all duration-700 group-hover:w-10 group-hover:h-10 md:group-hover:w-16 md:group-hover:h-16" />
-          <div className="absolute bottom-4 right-4 w-8 h-8 md:bottom-6 md:right-6 md:w-12 md:h-12 border-b-2 border-r-2 border-white/40 rounded-tr-2xl md:rounded-tr-3xl transition-all duration-700 group-hover:w-10 group-hover:h-10 md:group-hover:w-16 md:group-hover:h-16" />
+          <div className="absolute top-3 left-3 w-6 h-6 md:top-5 md:left-5 md:w-10 md:h-10 border-t-2 border-l-2 border-white/40 rounded-tl-xl md:rounded-tl-2xl transition-all duration-700 group-hover:w-8 group-hover:h-8 md:group-hover:w-14 md:group-hover:h-14" />
+          <div className="absolute top-3 right-3 w-6 h-6 md:top-5 md:right-5 md:w-10 md:h-10 border-t-2 border-r-2 border-white/40 rounded-tr-xl md:rounded-tr-2xl transition-all duration-700 group-hover:w-8 group-hover:h-8 md:group-hover:w-14 md:group-hover:h-14" />
+          <div className="absolute bottom-3 left-3 w-6 h-6 md:bottom-5 md:left-5 md:w-10 md:h-10 border-b-2 border-l-2 border-white/40 rounded-bl-xl md:rounded-bl-2xl transition-all duration-700 group-hover:w-8 group-hover:h-8 md:group-hover:w-14 md:group-hover:h-14" />
+          <div className="absolute bottom-3 right-3 w-6 h-6 md:bottom-5 md:right-5 md:w-10 md:h-10 border-b-2 border-r-2 border-white/40 rounded-br-xl md:rounded-br-2xl transition-all duration-700 group-hover:w-8 group-hover:h-8 md:group-hover:w-14 md:group-hover:h-14" />
 
           {/* Content */}
           <div className="relative z-30 flex flex-col items-center gap-4 md:gap-6 p-4 md:p-8 text-center">
@@ -117,17 +117,17 @@ export function ScanDashboard({ onScan, isScanning = false }: ScanDashboardProps
                   className="flex flex-col items-center gap-6 md:gap-10"
                 >
                   <motion.div
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
+                    whileHover={{ scale: 1.08 }}
+                    whileTap={{ scale: 0.95 }}
                     className="relative cursor-pointer"
                     onClick={() => fileInputRef.current?.click()}
                   >
-                    <div className="w-32 h-32 md:w-48 md:h-48 rounded-[2.5rem] md:rounded-[3rem] glass-strong border border-white/30 flex items-center justify-center shadow-inner group-hover:border-primary transition-all duration-700 overflow-hidden">
-                      <Scan className="w-14 h-14 md:w-20 md:h-20 text-primary" />
+                    <div className="w-24 h-24 md:w-36 md:h-36 lg:w-40 lg:h-40 rounded-[2rem] md:rounded-[2.5rem] glass-strong border-2 border-white/30 flex items-center justify-center shadow-inner group-hover:border-primary transition-all duration-700 overflow-hidden">
+                      <Scan className="w-10 h-10 md:w-14 md:h-14 lg:w-16 lg:h-16 text-primary" />
                       <div className="absolute inset-0 mesh-gradient opacity-0 group-hover:opacity-10 transition-opacity" />
                     </div>
-                    <div className="absolute -bottom-3 -right-3 md:-bottom-4 md:-right-4 w-12 h-12 md:w-16 md:h-16 rounded-2xl md:rounded-3xl bg-primary flex items-center justify-center text-white shadow-2xl border-[4px] md:border-[6px] border-card">
-                      <Camera className="w-6 h-6 md:w-8 md:h-8" />
+                    <div className="absolute -bottom-2 -right-2 md:-bottom-3 md:-right-3 w-9 h-9 md:w-12 md:h-12 rounded-xl md:rounded-2xl bg-primary flex items-center justify-center text-white shadow-2xl border-[3px] border-card">
+                      <Camera className="w-4 h-4 md:w-5 md:h-5" />
                     </div>
                   </motion.div>
 

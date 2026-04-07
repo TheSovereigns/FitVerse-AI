@@ -2,12 +2,37 @@ import { NextResponse } from "next/server"
 import { createGoogleGenerativeAI } from "@ai-sdk/google"
 import { generateObject } from "ai"
 import { z } from "zod"
+import { createClient } from '@supabase/supabase-js'
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
+const supabaseKey = process.env.SUPABASE_SERVICE_KEY!
+const supabase = createClient(supabaseUrl, supabaseKey)
+
+const PLAN_LIMITS = {
+  free: { dietsPerMonth: 0 },
+  pro: { dietsPerMonth: 5 },
+  premium: { dietsPerMonth: Infinity },
+}
 
 const google = createGoogleGenerativeAI({
   apiKey: process.env.GEMINI_API_KEY || process.env.GOOGLE_GENERATIVE_AI_API_KEY,
 })
 
 export const maxDuration = 30
+
+async function checkDietLimit(userId: string, plan: string): Promise<boolean> {
+  const now = new Date()
+  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1)
+
+  const { count } = await supabase
+    .from('diets')
+    .select('*', { count: 'exact', head: true })
+    .eq('user_id', userId)
+    .gte('created_at', startOfMonth.toISOString())
+
+  const limit = PLAN_LIMITS[plan as keyof typeof PLAN_LIMITS]?.dietsPerMonth ?? 0
+  return (count ?? 0) < limit
+}
 
 const recipesSchema = z.object({
   recipes: z.array(
@@ -32,6 +57,37 @@ const recipesSchema = z.object({
 
 export async function POST(req: Request) {
   try {
+    const headers = {
+      'Access-Control-Allow-Origin': '*',
+    }
+
+    const authHeader = req.headers.get('Authorization')
+    if (!authHeader) {
+      return NextResponse.json({ error: 'Não autorizado.' }, { status: 401, headers })
+    }
+
+    const token = authHeader.replace('Bearer ', '')
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token)
+
+    if (!user || authError) {
+      return NextResponse.json({ error: 'Token inválido.' }, { status: 401, headers })
+    }
+
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('plan')
+      .eq('id', user.id)
+      .single()
+
+    const userPlan = profile?.plan || 'free'
+    const canProceed = await checkDietLimit(user.id, userPlan)
+
+    if (!canProceed) {
+      return NextResponse.json({ 
+        error: 'Limite mensal de receitas/dietas atingido. Atualize para um plano superior.' 
+      }, { status: 403, headers })
+    }
+
     const { productName, dietProfile, locale = "pt-BR" } = await req.json()
 
     if (!productName) {
@@ -100,6 +156,15 @@ Seja criativo mas prático. Priorize receitas que realmente as pessoas fariam no
       schema: recipesSchema,
       prompt,
       temperature: 0.8,
+    })
+
+    await supabase.from('diets').insert({
+      user_id: user.id,
+      name: object.recipes[0]?.name || 'Generated Diet',
+      calories: object.recipes[0]?.macros?.calories || 0,
+      protein: object.recipes[0]?.macros?.protein || 0,
+      carbs: object.recipes[0]?.macros?.carbs || 0,
+      fat: object.recipes[0]?.macros?.fat || 0,
     })
 
     return NextResponse.json({ recipes: object.recipes })

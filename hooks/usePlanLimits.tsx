@@ -65,6 +65,10 @@ export function usePlanLimits() {
     fetchScansToday()
   }, [user])
 
+  const incrementScans = () => {
+    setScansToday(prev => prev + 1)
+  }
+
   return {
     plan,
     limits,
@@ -73,6 +77,7 @@ export function usePlanLimits() {
     canScan: () => canScanToday(plan, scansToday),
     canGenerateWorkout: (count: number) => canGenerateWorkout(plan, count),
     canGenerateDiet: (count: number) => canGenerateDiet(plan, count),
+    incrementScans,
     remainingScans: limits.scansPerDay === 'unlimited' 
       ? 'Ilimitados' 
       : `${Math.max(0, (limits.scansPerDay as number) - scansToday)} de ${limits.scansPerDay}`,

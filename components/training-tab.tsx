@@ -11,6 +11,7 @@ import { WorkoutGenerator } from "@/components/workout-generator"
 import { ActiveWorkoutSession } from "@/components/active-workout-session"
 import { ExerciseDetailModal } from "@/components/exercise-detail-modal"
 import { cn } from "@/lib/utils"
+import { supabase } from "@/lib/supabase"
 import { toast } from "sonner"
 import { useTranslation } from "@/lib/i18n"
 import { usePlanLimits } from "@/hooks/usePlanLimits"
@@ -133,13 +134,20 @@ export function TrainingTab({ metabolicPlan, scanHistory, userGoal }: TrainingTa
     else setActiveFilter("home")
 
     try {
+      const { data: { session } } = await supabase.auth.getSession()
       const response = await fetch("/api/generate-workouts", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${session?.access_token || ''}`
+        },
         body: JSON.stringify({ ...criteria, goal: userGoal || "Hypertrophy & Definition", locale }),
       })
-      if (!response.ok) throw new Error("Failed to generate workouts")
       const data = await response.json()
+      if (!response.ok) {
+        toast.error(data.error || t("training_error_ai"))
+        return
+      }
       setGeneratedWorkouts(data.workouts.map((w: any) => ({ ...w, criteria })))
     } catch (error) {
       console.error("Error generating workouts:", error)

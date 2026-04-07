@@ -40,7 +40,7 @@ export default function DashboardPage() {
   const router = useRouter()
   const { user, isLoading: authLoading, profile } = useAuth()
   const { t, locale } = useTranslation()
-  const { plan, scansToday, canScan: checkCanScan } = usePlanLimits()
+  const { plan, scansToday, canScan: checkCanScan, incrementScans } = usePlanLimits()
   const [currentView, setCurrentView] = useState<View>("home")
   const [islandState, setIslandState] = useState<IslandState>("idle")
   const [isDocked, setIsDocked] = useState(false)
@@ -306,9 +306,18 @@ export default function DashboardPage() {
         throw new Error(t("page_error_no_image"))
       }
 
+      let token = ''
+      try {
+        const { data: { session } } = await supabase.auth.getSession()
+        token = session?.access_token || ''
+      } catch {}
+
       const response = await fetch('/api/analyze-product', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
         body: JSON.stringify({
           imageData: imageData,
           metabolicPlan: userMetabolicPlanState,
@@ -349,6 +358,7 @@ export default function DashboardPage() {
         },
         ...prev
       ])
+      incrementScans()
     } catch (error) {
       console.error("Erro durante a análise:", error)
       setIslandState("error")

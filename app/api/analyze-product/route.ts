@@ -1,5 +1,30 @@
 import { NextResponse } from 'next/server';
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import { createClient } from '@supabase/supabase-js';
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const supabaseKey = process.env.SUPABASE_SERVICE_KEY!;
+const supabase = createClient(supabaseUrl, supabaseKey);
+
+const PLAN_LIMITS = {
+  free: { scansPerDay: 5 },
+  pro: { scansPerDay: 50 },
+  premium: { scansPerDay: Infinity },
+};
+
+async function checkScanLimit(userId: string, plan: string): Promise<boolean> {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const { count } = await supabase
+    .from('scans')
+    .select('*', { count: 'exact', head: true })
+    .eq('user_id', userId)
+    .gte('created_at', today.toISOString());
+
+  const limit = PLAN_LIMITS[plan as keyof typeof PLAN_LIMITS]?.scansPerDay ?? 5;
+  return (count ?? 0) < limit;
+}
 
 export async function OPTIONS() {
   return NextResponse.json({}, {
@@ -24,6 +49,33 @@ export async function POST(req: Request) {
     'Access-Control-Allow-Methods': 'POST, OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type, Authorization',
   };
+
+  const authHeader = req.headers.get('Authorization');
+  if (!authHeader) {
+    return NextResponse.json({ error: 'Não autorizado.' }, { status: 401, headers });
+  }
+
+  const token = authHeader.replace('Bearer ', '');
+  const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+
+  if (!user || authError) {
+    return NextResponse.json({ error: 'Token inválido.' }, { status: 401, headers });
+  }
+
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('plan')
+    .eq('id', user.id)
+    .single();
+
+  const userPlan = profile?.plan || 'free';
+  const canProceed = await checkScanLimit(user.id, userPlan);
+
+  if (!canProceed) {
+    return NextResponse.json({ 
+      error: 'Limite diário de scans atingido. Atualize para um plano superior.' 
+    }, { status: 403, headers });
+  }
 
   if (!apiKey || !model) {
     return NextResponse.json({ error: 'Chave de API do Gemini não configurada.' }, { status: 500, headers });
@@ -102,6 +154,13 @@ export async function POST(req: Request) {
         description: desc
       })) || []
     };
+
+    await supabase.from('scans').insert({
+      user_id: user.id,
+      product_name: analysis.productName,
+      score: analysis.longevityScore,
+      image_url: null,
+    });
 
     return NextResponse.json(transformed, { headers });
 

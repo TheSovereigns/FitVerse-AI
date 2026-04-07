@@ -20,10 +20,10 @@ const model = genAI ? genAI.getGenerativeModel({
 }) : null;
 
 const generationConfig = {
-  temperature: 0.8,
+  temperature: 0.7,
   topK: 1,
   topP: 0.95,
-  maxOutputTokens: 2048,
+  maxOutputTokens: 500,
 };
 
 const safetySettings = [
@@ -112,17 +112,18 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Mensagem vazia.' }, { status: 400, headers });
     }
 
-    const systemPrompt = `Você é o FitVerse AI, um assistente especializado EXCLUSIVAMENTE em fitness, nutrição, saúde, emagrecimento, academia e uso da plataforma FitVerse.
-    
-    Seu objetivo é fornecer conselhos seguros, motivadores e baseados em evidências dentro dessas áreas.
-    
-    REGRAS RÍGIDAS:
-    1. Se o usuário perguntar sobre qualquer assunto que NÃO seja relacionado a saúde, fitness, nutrição, emagrecimento, academia ou sobre o site FitVerse, você deve recusar educadamente responder, dizendo que só pode ajudar com tópicos de saúde e fitness.
-    2. NUNCA forneça conselhos médicos. Se a pergunta parecer de natureza médica (diagnóstico, tratamento de doenças, etc.), recomende ao usuário que consulte um profissional de saúde.
-    3. Sempre que possível, personalize as respostas com base nos dados do usuário fornecidos abaixo.
-    
-    ${userMetabolicPlan ? `Aqui estão os dados do plano metabólico do usuário para contextualizar suas respostas: ${JSON.stringify(userMetabolicPlan, null, 2)}` : ''}
-    `;
+    const systemPrompt = `Você é o FitVerse AI, assistente de fitness e nutrição. 
+
+REGRAS:
+1. Seja ÚTIL, DIRETO e OBJETIVO - respostas curtas e práticas
+2. Máx 3-4 frases por resposta (nunca mais que 5)
+3. Quando der dicas, seja específico e acionável
+4. Se não souber, diga que não sabe - não invente
+5. Use dados do usuário quando disponível
+
+${userMetabolicPlan ? `Contexto do usuário: ${JSON.stringify(userMetabolicPlan, null, 2)}` : ''}
+
+Responda em português ou inglês conforme a pergunta.`;
 
     const limitedHistory = (history || []).slice(-MAX_HISTORY_LENGTH);
 
@@ -147,7 +148,11 @@ export async function POST(req: Request) {
 
     const startTime = Date.now();
     const chat = model.startChat({ generationConfig, safetySettings, history: chatHistory });
-    const fullMessage = `${systemPrompt}\n\nPERGUNTA: ${message}`;
+    const fullMessage = `${systemPrompt}
+
+PERGUNTA: ${message}
+
+LEMBRE-SE: Responda em NO MÁXIMO 3-4 frases curtas e objetivas. Sem textos longos.`;
     
     const result = await chat.sendMessage(fullMessage);
     const response = result.response;

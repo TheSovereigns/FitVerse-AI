@@ -5,17 +5,49 @@ import { useRouter } from "next/navigation"
 import { Loader2 } from "lucide-react"
 import { supabase } from "@/lib/supabase"
 
+async function ensureProfileExists(userId: string, email: string) {
+  const { data: existing } = await supabase
+    .from('profiles')
+    .select('id')
+    .eq('id', userId)
+    .single()
+
+  if (!existing) {
+    await supabase.from('profiles').insert({
+      id: userId,
+      email: email,
+      name: null,
+      plan: 'free',
+      is_admin: false,
+      country: 'BR',
+    })
+  }
+}
+
 export default function AuthCallbackPage() {
   const router = useRouter()
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
+    const handleCallback = async () => {
+      const { data: { session } } = await supabase.auth.getSession()
+      
+      if (session) {
+        await ensureProfileExists(session.user.id, session.user.email || '')
+        router.replace("/")
+      } else {
+        router.replace("/auth/login")
+      }
+    }
+
+    handleCallback()
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === "SIGNED_IN" || event === "INITIAL_SESSION") {
         if (session) {
-          router.replace("/")
-        } else {
-          router.replace("/auth/login")
+          ensureProfileExists(session.user.id, session.user.email || '').then(() => {
+            router.replace("/")
+          })
         }
       }
     })
@@ -23,10 +55,12 @@ export default function AuthCallbackPage() {
     const timer = setTimeout(() => {
       supabase.auth.getSession().then(({ data: { session } }) => {
         if (session) {
-          router.replace("/")
+          ensureProfileExists(session.user.id, session.user.email || '').then(() => {
+            router.replace("/")
+          })
         } else {
           router.replace("/auth/login")
-        }
+        })
       })
     }, 3000)
 
