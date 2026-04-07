@@ -154,9 +154,14 @@ export function SettingsPage({ onBack }: { onBack?: () => void }) {
   }
 
   const handleLogout = async () => {
-    localStorage.clear()
-    toast.success(t("settings_toast_logout"))
-    await signOut()
+    try {
+      localStorage.clear()
+      toast.success(t("settings_toast_logout"))
+      await signOut()
+      router.push("/auth/login")
+    } catch (error) {
+      console.error("Logout error:", error)
+    }
   }
 
   const handleLanguageToggle = () => {
