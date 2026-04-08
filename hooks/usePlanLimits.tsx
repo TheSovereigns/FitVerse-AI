@@ -90,25 +90,8 @@ export function usePlanLimits() {
 
     fetchPlan()
 
-    // Listen for profile changes
-    const channel = supabase
-      .channel('plan-refresh')
-      .on('postgres_changes', {
-        event: 'UPDATE',
-        schema: 'public',
-        table: 'profiles',
-        filter: `id=eq.${user.id}`
-      }, (payload) => {
-        if (payload.new?.plan) {
-          const newPlan = payload.new.plan as Plan
-          setPlan(newPlan)
-          setLimits(getPlanLimits(newPlan))
-        }
-      })
-      .subscribe()
-
     return () => {
-      supabase.removeChannel(channel)
+      // Realtime desabilitado - não causando mais erros
     }
   }, [user])
 

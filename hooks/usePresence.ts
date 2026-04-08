@@ -34,34 +34,9 @@ export function usePresence(options: UsePresenceOptions = {}): void {
     }
 
     const initializePresence = async () => {
-      try {
-        channelRef.current = supabase.channel(channelName)
-
-        channelRef.current.on("presence", { event: "sync" }, () => {
-          updateLastSeen(user.id)
-        })
-
-        await channelRef.current
-          .track({
-            user_id: user.id,
-            email: user.email,
-            online_at: new Date().toISOString(),
-          })
-          .then(() => {
-            updateLastSeen(user.id)
-          })
-          .catch((err) => {
-            console.error("[usePresence] Track error:", err)
-          })
-
-        const intervalId = setInterval(() => {
-          updateLastSeen(user.id)
-        }, updateIntervalMs)
-
-        return () => {
-          clearInterval(intervalId)
-          if (channelRef.current) {
-            supabase.removeChannel(channelRef.current).catch(() => {})
+      // Presence desabilitado temporariamente
+      return
+    }
           }
         }
       } catch (error) {

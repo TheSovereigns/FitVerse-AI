@@ -25,43 +25,8 @@ export function useAdminRealtime(): UseAdminRealtimeReturn {
   const [isConnected, setIsConnected] = useState(false)
 
   useEffect(() => {
-    let eventsChannel: ReturnType<typeof supabase.channel> | null = null
-    let presenceChannel: ReturnType<typeof supabase.channel> | null = null
-
-    const initializeRealtime = async () => {
+    const fetchData = async () => {
       try {
-        eventsChannel = supabase.channel("admin-events")
-          .on(
-            "postgres_changes",
-            {
-              event: "INSERT",
-              schema: "public",
-              table: "events",
-            },
-            (payload) => {
-              const newEvent = payload.new as AdminEvent
-              setRecentEvents((prev) => [newEvent, ...prev.slice(0, 14)])
-            }
-          )
-
-        eventsChannel.subscribe((status, err) => {
-          if (err) {
-            console.error("Admin events subscribe error:", err)
-          } else if (status === "SUBSCRIBED") {
-            setIsConnected(true)
-          }
-        })
-
-        presenceChannel = supabase.channel("admin-presence")
-          .on("presence", { event: "sync" }, () => {
-            if (!presenceChannel) return
-            const state = presenceChannel.presenceState()
-            const count = state ? Object.keys(state).length : 0
-            setOnlineCount(count)
-          })
-
-        presenceChannel.subscribe()
-
         const { data: eventsData } = await supabase
           .from("events")
           .select("*")
@@ -72,20 +37,11 @@ export function useAdminRealtime(): UseAdminRealtimeReturn {
           setRecentEvents(eventsData)
         }
       } catch (error) {
-        console.error("Error initializing admin realtime:", error)
+        console.error("Error fetching admin events:", error)
       }
     }
 
-    initializeRealtime()
-
-    return () => {
-      if (eventsChannel) {
-        supabase.removeChannel(eventsChannel)
-      }
-      if (presenceChannel) {
-        supabase.removeChannel(presenceChannel)
-      }
-    }
+    fetchData()
   }, [])
 
   return {
