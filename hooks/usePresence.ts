@@ -37,21 +37,7 @@ export function usePresence(options: UsePresenceOptions = {}): void {
       // Presence desabilitado temporariamente
       return
     }
-          }
-        }
-      } catch (error) {
-        console.error("Error setting up presence:", error)
-      }
-    }
 
     initializePresence()
-
-    return () => {
-      if (channelRef.current) {
-        supabase.removeChannel(channelRef.current).then(() => {
-          channelRef.current = null
-        })
-      }
-    }
   }, [enabled, user?.id, user?.email, channelName, updateIntervalMs, updateLastSeen])
 }
