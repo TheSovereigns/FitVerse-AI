@@ -16,7 +16,7 @@ async function checkScanLimit(userId: string, plan: string): Promise<boolean> {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
-  const { count } = await supabase
+  const { count } = await supabase!
     .from('scans')
     .select('*', { count: 'exact', head: true })
     .eq('user_id', userId)
@@ -56,13 +56,13 @@ export async function POST(req: Request) {
   }
 
   const token = authHeader.replace('Bearer ', '');
-  const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+  const { data: { user }, error: authError } = await supabase!.auth.getUser(token);
 
   if (!user || authError) {
     return NextResponse.json({ error: 'Token inválido.' }, { status: 401, headers });
   }
 
-  const { data: profile } = await supabase
+  const { data: profile } = await supabase!
     .from('profiles')
     .select('plan')
     .eq('id', user.id)
@@ -155,7 +155,7 @@ export async function POST(req: Request) {
       })) || []
     };
 
-    await supabase.from('scans').insert({
+    await supabase!.from('scans').insert({
       user_id: user.id,
       product_name: analysis.productName,
       score: analysis.longevityScore,

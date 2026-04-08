@@ -24,7 +24,7 @@ async function checkWorkoutLimit(userId: string, plan: string): Promise<boolean>
   const now = new Date()
   const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1)
 
-  const { count } = await supabase
+  const { count } = await supabase!
     .from('workouts')
     .select('*', { count: 'exact', head: true })
     .eq('user_id', userId)
@@ -78,13 +78,13 @@ export async function POST(req: Request) {
     }
 
     const token = authHeader.replace('Bearer ', '')
-    const { data: { user }, error: authError } = await supabase.auth.getUser(token)
+    const { data: { user }, error: authError } = await supabase!.auth.getUser(token)
 
     if (!user || authError) {
       return NextResponse.json({ error: 'Token inválido.' }, { status: 401, headers })
     }
 
-    const { data: profile } = await supabase
+    const { data: profile } = await supabase!
       .from('profiles')
       .select('plan')
       .eq('id', user.id)
@@ -164,7 +164,7 @@ Seja específico, técnico e focado em resultados. Os treinos devem ser prático
       temperature: 0.7,
     })
 
-    await supabase.from('workouts').insert({
+    await supabase!.from('workouts').insert({
       user_id: user.id,
       name: object.workouts[0]?.name || 'Generated Workout',
       category: object.workouts[0]?.category || 'Força',

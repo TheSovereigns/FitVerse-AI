@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { ArrowLeft, Flame, Beef, Cookie, Droplet, Utensils, Sparkles, Target, TrendingDown, TrendingUp, Minus, Zap } from "lucide-react"
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts"
-import type { BioPerfil, MetabolicPlan } from "./metabolic-planner"
+import { BioPerfil, MetabolicPlan } from "./metabolic-planner"
 import { useTranslation } from "@/lib/i18n"
 
 interface MetabolicDashboardProps {

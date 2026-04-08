@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect } from "next/error"
+import { useEffect } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Home, AlertTriangle } from "lucide-react"

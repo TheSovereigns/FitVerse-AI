@@ -17,7 +17,7 @@ export async function POST(req: Request) {
     
     if (authHeader) {
       const token = authHeader.replace('Bearer ', '')
-      const { data: { user }, error: authError } = await supabase.auth.getUser(token)
+      const { data: { user }, error: authError } = await supabase!.auth.getUser(token)
       if (user && !authError) {
         userId = user.id
       }

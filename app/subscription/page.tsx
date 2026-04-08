@@ -160,7 +160,10 @@ export default function SubscriptionPage() {
   const handleSwitchPlan = async (newPlan: Plan) => {
     if (!user?.id) return
 
-    if (newPlan === "free") {
+    const planString = newPlan as string
+    const isFreePlan = planString === "free"
+
+    if (isFreePlan) {
       setLoading(newPlan)
       try {
         await supabase
@@ -210,27 +213,19 @@ export default function SubscriptionPage() {
       if (url) {
         window.location.href = url
       } else {
-        const stripe = await stripePromise
-        if (stripe) {
-          const { error: stripeLoadError } = await stripe.redirectToCheckout({ sessionId: (await response.json()).sessionId })
-          if (stripeLoadError) {
-            throw stripeLoadError
-          }
-        } else {
-          await supabase
-            .from("profiles")
-            .update({ 
-              plan: newPlan,
-              ads_enabled: newPlan === "free" ? true : false
-            })
-            .eq("id", user.id)
+        await supabase
+          .from("profiles")
+          .update({ 
+            plan: newPlan,
+            ads_enabled: false
+          })
+          .eq("id", user.id)
 
-          setCurrentPlan(newPlan)
-          setAdsEnabled(newPlan !== "free")
-          localStorage.setItem("userPlan", newPlan)
-          
-          toast.success(isEnglish ? `Switched to ${newPlan}` : `Plano alterado para ${newPlan}`)
-        }
+        setCurrentPlan(newPlan)
+        setAdsEnabled(false)
+        localStorage.setItem("userPlan", newPlan)
+        
+        toast.success(isEnglish ? `Switched to ${newPlan}` : `Plano alterado para ${newPlan}`)
       }
     } catch (error) {
       console.error('Checkout error:', error)
@@ -238,12 +233,12 @@ export default function SubscriptionPage() {
         .from("profiles")
         .update({ 
           plan: newPlan,
-          ads_enabled: newPlan === "free" ? true : false
+          ads_enabled: false
         })
         .eq("id", user.id)
 
       setCurrentPlan(newPlan)
-      setAdsEnabled(newPlan !== "free")
+      setAdsEnabled(false)
       localStorage.setItem("userPlan", newPlan)
       await refreshPlan()
       

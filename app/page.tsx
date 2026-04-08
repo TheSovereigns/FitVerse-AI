@@ -123,9 +123,6 @@ export default function DashboardPage() {
             setIsAdmin(true)
           }
         })
-        .catch(() => {
-          // Ignore profile fetch errors
-        })
     }
   }, [user])
 
