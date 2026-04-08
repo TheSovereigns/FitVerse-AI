@@ -50,6 +50,9 @@ export function usePresence(options: UsePresenceOptions = {}): void {
           .then(() => {
             updateLastSeen(user.id)
           })
+          .catch((err) => {
+            console.error("[usePresence] Track error:", err)
+          })
 
         const intervalId = setInterval(() => {
           updateLastSeen(user.id)
@@ -58,7 +61,7 @@ export function usePresence(options: UsePresenceOptions = {}): void {
         return () => {
           clearInterval(intervalId)
           if (channelRef.current) {
-            supabase.removeChannel(channelRef.current)
+            supabase.removeChannel(channelRef.current).catch(() => {})
           }
         }
       } catch (error) {

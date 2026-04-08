@@ -90,7 +90,7 @@ export function usePlanLimits() {
 
     fetchPlan()
 
-    // Listen for profile changes
+    // Listen for profile changes - with error handling
     const channel = supabase.channel('plan-refresh')
     
     channel.on('postgres_changes', {
@@ -106,8 +106,10 @@ export function usePlanLimits() {
       }
     })
 
-    channel.subscribe((status) => {
-      if (status === 'SUBSCRIBED') {
+    channel.subscribe((status, err) => {
+      if (err) {
+        console.error('[usePlanLimits] Subscribe error:', err)
+      } else if (status === 'SUBSCRIBED') {
         console.log('[usePlanLimits] Realtime subscribed')
       }
     })

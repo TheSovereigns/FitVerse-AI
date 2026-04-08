@@ -44,8 +44,10 @@ export function useAdminRealtime(): UseAdminRealtimeReturn {
             }
           )
 
-        eventsChannel.subscribe((status) => {
-          if (status === "SUBSCRIBED") {
+        eventsChannel.subscribe((status, err) => {
+          if (err) {
+            console.error("Admin events subscribe error:", err)
+          } else if (status === "SUBSCRIBED") {
             setIsConnected(true)
           }
         })
@@ -57,7 +59,8 @@ export function useAdminRealtime(): UseAdminRealtimeReturn {
             const count = state ? Object.keys(state).length : 0
             setOnlineCount(count)
           })
-          .subscribe()
+
+        presenceChannel.subscribe()
 
         const { data: eventsData } = await supabase
           .from("events")
