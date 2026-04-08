@@ -90,7 +90,9 @@ export function usePlanLimits() {
 
     fetchPlan()
 
-    // Listen for profile changes - with error handling
+    // Disable realtime for now - can be enabled when Supabase Realtime is properly configured
+    // The realtime subscription is causing errors
+    /*
     const channel = supabase.channel('plan-refresh')
     
     channel.on('postgres_changes', {
@@ -113,9 +115,10 @@ export function usePlanLimits() {
         console.log('[usePlanLimits] Realtime subscribed')
       }
     })
+    */
 
     return () => {
-      supabase.removeChannel(channel)
+      // No cleanup needed without realtime
     }
   }, [user])
 
