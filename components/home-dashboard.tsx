@@ -11,6 +11,7 @@ import { HowItWorksSection } from "@/components/how-it-works-section"
 import { SocialProofSection } from "@/components/social-proof-section"
 import { FooterCTASection } from "@/components/footer-cta-section"
 import { FloatingCTAMobile } from "@/components/floating-cta-mobile"
+import { Gamification } from "@/components/gamification"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { useTranslation } from "@/lib/i18n"
@@ -260,6 +261,11 @@ export function HomeDashboard({
             <span className="text-white font-black text-[9px] uppercase tracking-wider">{t("home_longevity_cta")}</span>
           </div>
         </div>
+      </div>
+
+      {/* Gamification Widget */}
+      <div className="mt-6">
+        <Gamification />
       </div>
 
       {/* Quick Actions Bento Grid */}

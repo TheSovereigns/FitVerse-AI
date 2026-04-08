@@ -21,6 +21,7 @@ import { TrainingTab } from "@/components/training-tab"
 import { SettingsPage } from "@/components/settings-page"
 import { StoreTab } from "@/components/store-tab"
 import { ChatbotTab } from "@/components/chatbot-tab"
+import { MealPlate } from "@/components/meal-plate"
 import { ScanLine, User, Calculator, ChefHat, Dumbbell, Loader2, ShoppingBag, Settings, Bot, Home, ChevronUp, Shield } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { HomeDashboard } from "@/components/home-dashboard"
@@ -31,7 +32,7 @@ import { useAuth } from "@/hooks/useAuth"
 import { supabase } from "@/lib/supabase"
 import { usePlanLimits } from "@/hooks/usePlanLimits"
 
-type View = "home" | "dashboard" | "result" | "recipes" | "training" | "profile" | "planner" | "settings" | "store" | "chatbot"
+type View = "home" | "dashboard" | "result" | "recipes" | "training" | "profile" | "planner" | "settings" | "store" | "chatbot" | "plate"
 
 // Inicialize o Stripe fora do componente para evitar recriação
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
@@ -419,6 +420,7 @@ export default function DashboardPage() {
           <NavButton icon={ChefHat} label={t("nav_recipes")} active={currentView === "recipes"} onClick={() => setCurrentView("recipes")} />
           <NavButton icon={ShoppingBag} label={t("nav_store")} active={currentView === "store"} onClick={() => setCurrentView("store")} />
           <NavButton icon={Bot} label={t("nav_aichat")} active={currentView === "chatbot"} onClick={() => setCurrentView("chatbot")} />
+          <NavButton icon={Calculator} label={t("nav_plate")} active={currentView === "plate"} onClick={() => setCurrentView("plate")} />
         </nav>
 
         <div className="p-2 lg:p-3 mb-3 lg:mb-4 space-y-2 border-t border-white/10 pt-4 flex flex-col items-center">
@@ -491,6 +493,7 @@ export default function DashboardPage() {
           {currentView === "store" && <StoreTab />}
           {currentView === "settings" && <SettingsPage onBack={() => setCurrentView("profile")} />}
           {currentView === "chatbot" && <ChatbotTab />}
+          {currentView === "plate" && <MealPlate onBack={() => setCurrentView("home")} />}
           {currentView === "profile" && (<div className="pt-4 md:pt-8 lg:pt-12"><HealthProfile scanHistory={scanHistory} onNavigateToSettings={() => setCurrentView("settings")} onNavigateToSubscription={() => router.push('/subscription')} /></div>)}
         </main>
       </div>
