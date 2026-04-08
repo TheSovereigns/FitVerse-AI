@@ -90,7 +90,7 @@ export function usePlanLimits() {
 
     fetchPlan()
 
-    // Listen for profile changes
+    // Listen for profile changes - must be BEFORE subscribe
     const channel = supabase
       .channel('plan-refresh')
       .on('postgres_changes', {
@@ -105,7 +105,8 @@ export function usePlanLimits() {
           setLimits(getPlanLimits(newPlan))
         }
       })
-      .subscribe()
+
+    channel.subscribe()
 
     return () => {
       supabase.removeChannel(channel)

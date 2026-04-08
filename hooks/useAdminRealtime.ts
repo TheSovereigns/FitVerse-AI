@@ -31,8 +31,6 @@ export function useAdminRealtime(): UseAdminRealtimeReturn {
     const initializeRealtime = async () => {
       try {
         eventsChannel = supabase.channel("admin-events")
-
-        eventsChannel
           .on(
             "postgres_changes",
             {
@@ -45,15 +43,14 @@ export function useAdminRealtime(): UseAdminRealtimeReturn {
               setRecentEvents((prev) => [newEvent, ...prev.slice(0, 14)])
             }
           )
-          .subscribe((status) => {
-            if (status === "SUBSCRIBED") {
-              setIsConnected(true)
-            }
-          })
+
+        eventsChannel.subscribe((status) => {
+          if (status === "SUBSCRIBED") {
+            setIsConnected(true)
+          }
+        })
 
         presenceChannel = supabase.channel("admin-presence")
-
-        presenceChannel
           .on("presence", { event: "sync" }, () => {
             if (!presenceChannel) return
             const state = presenceChannel.presenceState()
