@@ -404,7 +404,7 @@ export default function DashboardPage() {
       />
 
       {/* Floating Sidebar (Desktop) */}
-      <aside className="hidden md:flex flex-col w-20 lg:w-24 group-hover:w-64 lg:group-hover:w-72 fixed top-1/2 -translate-y-1/2 left-4 lg:left-6 glass-strong border-white/20 z-50 rounded-[2rem] lg:rounded-[3rem] transition-all duration-700 ease-in-out group overflow-hidden shadow-[0_0_60px_rgba(0,0,0,0.3)]">
+      <aside className="hidden md:flex flex-col w-20 lg:w-24 hover:w-64 lg:hover:w-72 fixed top-1/2 -translate-y-1/2 left-4 lg:left-6 glass-strong border-white/20 z-50 rounded-[2rem] lg:rounded-[3rem] transition-all duration-700 ease-in-out group overflow-hidden shadow-[0_0_60px_rgba(0,0,0,0.3)]">
         <div className="p-4 lg:p-6 flex items-center justify-start gap-3 font-black text-xl tracking-tighter text-foreground mb-6 lg:mb-8 overflow-hidden">
           <div className="w-6 h-6 flex items-center justify-center shrink-0">
             <ScanLine className="text-primary size-5 lg:size-6" />
@@ -553,13 +553,13 @@ function NavButton({ icon: Icon, label, active, onClick }: { icon: any, label: s
     <button 
       onClick={onClick}
       className={cn(
-        "flex items-center justify-center lg:justify-start w-full h-10 lg:h-12 px-2 lg:px-3 rounded-xl lg:rounded-[1.25rem] transition-all duration-500 group relative haptic-press",
+        "flex items-center justify-center lg:justify-start w-full h-10 lg:h-12 px-2 lg:px-3 rounded-xl lg:rounded-[1.25rem] transition-all duration-500 relative haptic-press",
         active ? "text-primary bg-white/10" : "text-foreground/50 hover:text-foreground hover:bg-white/5"
       )}
     >
       {active && <div className="absolute left-0 w-1 h-4 lg:h-6 bg-primary rounded-full" />}
       <Icon className={cn("w-5 h-5 lg:w-6 lg:h-6 shrink-0", active && "drop-shadow-[0_0_6px_rgba(255,149,0,0.4)]")} />
-      <span className="hidden lg:block font-black text-[10px] uppercase tracking-[0.15em] group-hover:opacity-100 opacity-0 transition-all duration-300 whitespace-nowrap overflow-hidden text-xs absolute left-10">
+      <span className="hidden lg:block font-black text-[10px] uppercase tracking-[0.15em] whitespace-nowrap text-xs">
         {label}
       </span>
     </button>
