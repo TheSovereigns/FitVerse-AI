@@ -90,23 +90,27 @@ export function usePlanLimits() {
 
     fetchPlan()
 
-    // Listen for profile changes - must be BEFORE subscribe
-    const channel = supabase
-      .channel('plan-refresh')
-      .on('postgres_changes', {
-        event: 'UPDATE',
-        schema: 'public',
-        table: 'profiles',
-        filter: `id=eq.${user.id}`
-      }, (payload) => {
-        if (payload.new?.plan) {
-          const newPlan = payload.new.plan as Plan
-          setPlan(newPlan)
-          setLimits(getPlanLimits(newPlan))
-        }
-      })
+    // Listen for profile changes
+    const channel = supabase.channel('plan-refresh')
+    
+    channel.on('postgres_changes', {
+      event: 'UPDATE',
+      schema: 'public',
+      table: 'profiles',
+      filter: `id=eq.${user.id}`
+    }, (payload) => {
+      if (payload.new?.plan) {
+        const newPlan = payload.new.plan as Plan
+        setPlan(newPlan)
+        setLimits(getPlanLimits(newPlan))
+      }
+    })
 
-    channel.subscribe()
+    channel.subscribe((status) => {
+      if (status === 'SUBSCRIBED') {
+        console.log('[usePlanLimits] Realtime subscribed')
+      }
+    })
 
     return () => {
       supabase.removeChannel(channel)

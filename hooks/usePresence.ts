@@ -37,6 +37,10 @@ export function usePresence(options: UsePresenceOptions = {}): void {
       try {
         channelRef.current = supabase.channel(channelName)
 
+        channelRef.current.on("presence", { event: "sync" }, () => {
+          updateLastSeen(user.id)
+        })
+
         await channelRef.current
           .track({
             user_id: user.id,
@@ -50,10 +54,6 @@ export function usePresence(options: UsePresenceOptions = {}): void {
         const intervalId = setInterval(() => {
           updateLastSeen(user.id)
         }, updateIntervalMs)
-
-        channelRef.current.on("presence", { event: "sync" }, () => {
-          updateLastSeen(user.id)
-        })
 
         return () => {
           clearInterval(intervalId)
