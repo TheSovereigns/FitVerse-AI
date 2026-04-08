@@ -35,9 +35,13 @@ interface ProductResultProps {
 }
 
 import { useTranslation } from "@/lib/i18n"
+import { usePlanLimits } from "@/hooks/usePlanLimits"
+import { Lock } from "lucide-react"
 
 export function ProductResult({ result, onBack, imageData }: ProductResultProps) {
   const { t } = useTranslation()
+  const { plan } = usePlanLimits()
+  const isPremium = plan === "pro" || plan === "premium"
   
   const defaultGrams = result?.servingSize ? parseInt(result.servingSize.replace(/\D/g, '')) || 100 : 100
   const [grams, setGrams] = useState(defaultGrams)
@@ -136,65 +140,84 @@ export function ProductResult({ result, onBack, imageData }: ProductResultProps)
         </div>
       </motion.div>
 
-      {/* Gram Adjustment */}
+      {/* Gram Adjustment - Only for Pro/Premium */}
       {result.macros && (
-        <motion.div 
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          className="glass-strong border-white/20 rounded-[3rem] p-4 md:p-6 flex flex-col items-center gap-4"
-        >
-          <div className="flex items-center gap-3">
-            <Scale className="w-6 h-6 text-primary" />
-            <span className="text-sm font-bold text-muted-foreground uppercase tracking-widest">
-              {t("pr_weight") || "Peso"}
-            </span>
-          </div>
-          
-          <div className="flex items-center gap-6">
-            <button 
-              onClick={decrementGrams}
-              className="w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors"
-              aria-label="Diminuir 10g"
-            >
-              <Minus className="w-6 h-6" />
-            </button>
-            
-            <div className="text-center min-w-[100px]">
-              <p className="text-4xl font-black text-foreground tracking-tighter">{grams}g</p>
-              <p className="text-xs font-bold text-primary opacity-60 uppercase tracking-widest">
-                {grams === defaultGrams ? `(padrão ${defaultGrams}g)` : `(original ${defaultGrams}g)`}
-              </p>
+        isPremium ? (
+          <motion.div 
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            className="glass-strong border-white/20 rounded-[3rem] p-4 md:p-6 flex flex-col items-center gap-4"
+          >
+            <div className="flex items-center gap-3">
+              <Scale className="w-6 h-6 text-primary" />
+              <span className="text-sm font-bold text-muted-foreground uppercase tracking-widest">
+                {t("pr_weight") || "Peso"}
+              </span>
             </div>
             
-            <button 
-              onClick={incrementGrams}
-              className="w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors"
-              aria-label="Aumentar 10g"
-            >
-              <Plus className="w-6 h-6" />
-            </button>
-          </div>
+            <div className="flex items-center gap-6">
+              <button 
+                onClick={decrementGrams}
+                className="w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors"
+                aria-label="Diminuir 10g"
+              >
+                <Minus className="w-6 h-6" />
+              </button>
+              
+              <div className="text-center min-w-[100px]">
+                <p className="text-4xl font-black text-foreground tracking-tighter">{grams}g</p>
+                <p className="text-xs font-bold text-primary opacity-60 uppercase tracking-widest">
+                  {grams === defaultGrams ? `(padrão ${defaultGrams}g)` : `(original ${defaultGrams}g)`}
+                </p>
+              </div>
+              
+              <button 
+                onClick={incrementGrams}
+                className="w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors"
+                aria-label="Aumentar 10g"
+              >
+                <Plus className="w-6 h-6" />
+              </button>
+            </div>
 
-          <input 
-            type="range" 
-            min="10" 
-            max="500" 
-            step="10"
-            value={grams}
-            onChange={(e) => setGrams(parseInt(e.target.value))}
-            className="w-full max-w-xs accent-primary"
-          />
-        </motion.div>
+            <input 
+              type="range" 
+              min="10" 
+              max="500" 
+              step="10"
+              value={grams}
+              onChange={(e) => setGrams(parseInt(e.target.value))}
+              className="w-full max-w-xs accent-primary"
+            />
+          </motion.div>
+        ) : (
+          <motion.div 
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            className="glass-strong border-primary/30 rounded-[3rem] p-4 md:p-6 flex flex-col items-center gap-4"
+          >
+            <div className="flex items-center gap-3">
+              <Lock className="w-6 h-6 text-primary" />
+              <span className="text-sm font-bold text-primary uppercase tracking-widest">
+                {t("pr_weight_locked") || "Ajustar Peso"}
+              </span>
+            </div>
+            
+            <p className="text-sm text-muted-foreground text-center">
+              {t("pr_weight_desc") || "Disponível nos planos Pro e Premium"}
+            </p>
+          </motion.div>
+        )
       )}
 
       {/* Macros Bento Grid */}
       {result.macros && (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
            {[
-             { label: t("pr_kcal"), val: adjustedMacros?.calories || result.macros.calories, icon: Flame, color: "text-[#FF453A]" },
-             { label: t("pr_prot"), val: (adjustedMacros?.protein || result.macros.protein) + "g", icon: Dumbbell, color: "text-[#0A84FF]" },
-             { label: t("pr_carb"), val: (adjustedMacros?.carbs || result.macros.carbs) + "g", icon: Wheat, color: "text-[#FFD60A]" },
-             { label: t("pr_fat"), val: (adjustedMacros?.fat || result.macros.fat) + "g", icon: Droplets, color: "text-[#FF375F]" }
+             { label: t("pr_kcal"), val: (isPremium && adjustedMacros) ? adjustedMacros.calories : result.macros.calories, icon: Flame, color: "text-[#FF453A]" },
+             { label: t("pr_prot"), val: ((isPremium && adjustedMacros) ? adjustedMacros.protein : result.macros.protein) + "g", icon: Dumbbell, color: "text-[#0A84FF]" },
+             { label: t("pr_carb"), val: ((isPremium && adjustedMacros) ? adjustedMacros.carbs : result.macros.carbs) + "g", icon: Wheat, color: "text-[#FFD60A]" },
+             { label: t("pr_fat"), val: ((isPremium && adjustedMacros) ? adjustedMacros.fat : result.macros.fat) + "g", icon: Droplets, color: "text-[#FF375F]" }
            ].map((m, i) => (
              <motion.div 
                key={i}
