@@ -553,13 +553,13 @@ function NavButton({ icon: Icon, label, active, onClick }: { icon: any, label: s
     <button 
       onClick={onClick}
       className={cn(
-        "flex items-center justify-center lg:justify-start gap-3 w-full h-10 lg:h-12 px-2 lg:px-3 rounded-xl lg:rounded-[1.25rem] transition-all duration-500 group relative haptic-press",
+        "flex items-center justify-center lg:justify-start w-full h-10 lg:h-12 px-2 lg:px-3 rounded-xl lg:rounded-[1.25rem] transition-all duration-500 group relative haptic-press",
         active ? "text-primary bg-white/10" : "text-foreground/50 hover:text-foreground hover:bg-white/5"
       )}
     >
-      {active && <div className="absolute left-0 w-1 h-4 lg:h-6 bg-primary rounded-full animate-in fade-in slide-in-from-left-4 duration-500 shadow-[0_0_10px_rgba(255,149,0,0.6)]" />}
-      <Icon className={cn("w-5 h-5 lg:w-6 lg:h-6 shrink-0 transition-all duration-500", active && "drop-shadow-[0_0_6px_rgba(255,149,0,0.4)]")} />
-      <span className="font-black text-[10px] uppercase tracking-[0.15em] whitespace-nowrap text-xs">
+      {active && <div className="absolute left-0 w-1 h-4 lg:h-6 bg-primary rounded-full" />}
+      <Icon className={cn("w-5 h-5 lg:w-6 lg:h-6 shrink-0", active && "drop-shadow-[0_0_6px_rgba(255,149,0,0.4)]")} />
+      <span className="hidden lg:block font-black text-[10px] uppercase tracking-[0.15em] opacity-0 group-hover:opacity-100 transition-all duration-300 whitespace-nowrap overflow-hidden text-xs absolute left-10">
         {label}
       </span>
     </button>
