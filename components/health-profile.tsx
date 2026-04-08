@@ -24,6 +24,7 @@ import {
   LogOut,
 } from "lucide-react"
 import { ScanHistory } from "@/components/scan-history"
+import { DailySummary } from "@/components/daily-summary"
 import { cn } from "@/lib/utils"
 import { useTranslation } from "@/lib/i18n"
 import { useAuth } from "@/hooks/useAuth"
@@ -356,6 +357,14 @@ export function HealthProfile({ scanHistory, onNavigateToSettings, onNavigateToS
             </div>
             <ScanHistory items={localScanHistory} showAll />
           </div>
+        </div>
+
+        {/* Daily Summary Section */}
+        <div className="glass-strong border-white/10 rounded-[2rem] p-5 md:p-8">
+          <h3 className="text-lg font-black uppercase tracking-widest opacity-40 mb-4">
+            {t("summary_title") || "Resumo do Dia"}
+          </h3>
+          <DailySummary />
         </div>
       </div>
     </div>
