@@ -9,7 +9,7 @@ const translations = {
     // Nav
     nav_home: "Início", nav_bioscan: "BioScan", nav_workouts: "Treinos",
     nav_diet: "Dieta", nav_recipes: "Receitas", nav_store: "Loja",
-    nav_aichat: "IA Chat", nav_profile: "Perfil", nav_settings: "Ajustes", nav_plate: "Prato",
+    nav_aichat: "IA Chat", nav_profile: "Perfil", nav_settings: "Ajustes", nav_plate: "Prato", nav_summary: "Resumo",
     nav_pull_down_to_close: "Deslize para fechar", nav_search_placeholder: "Buscar Módulo Bio...",
     // Views
     view_home: "Dashboard", view_bioscan: "BioScan", view_recipes: "IA Chef",
@@ -163,6 +163,10 @@ const translations = {
     plate_saved: "Pratos Salvos", plate_no_saved: "Nenhum prato salvo ainda",
     gam_points: "pontos", gam_days: "dias", gam_view_badges: "Ver badges", gam_badges: "Badges", gam_total_scans: "Scans", gam_best_streak: "Melhor série",
     gam_unlock_more: "Desbloqueie mais badges escaneando alimentos!", gam_badge_unlocked: "Badge解锁!",
+    summary_scans: "Scans", summary_kcal: "KCAL", summary_score: "Score", summary_generated: "Gerados",
+    summary_macros: "Macros", summary_week: "Últimos 7 dias", summary_items: "Itens Escaneados",
+    summary_no_scans: "Nenhum scan neste dia", summary_premium: "Disponível no Premium",
+    summary_premium_desc: "Exportar resumo em JSON",
     pr_excelente: "Excelente", pr_bom: "Bom", pr_neutro: "Neutro", pr_ruim: "Ruim",
     pr_health_benefits: "Benefícios para a Saúde", pr_vitamins: "Vitaminas", pr_minerals: "Minerais", pr_proteins: "Proteínas", pr_other_benefits: "Outros Benefícios",
     alt_title: "Troque por este", alt_healthier: "Mais saudável", alt_view: "Ver produto",
@@ -417,7 +421,7 @@ const translations = {
     // Nav
     nav_home: "Home", nav_bioscan: "BioScan", nav_workouts: "Workouts",
     nav_diet: "Diet", nav_recipes: "Recipes", nav_store: "Store",
-    nav_aichat: "AI Chat", nav_profile: "Profile", nav_settings: "Settings", nav_plate: "Plate",
+    nav_aichat: "AI Chat", nav_profile: "Profile", nav_settings: "Settings", nav_plate: "Plate", nav_summary: "Summary",
     nav_pull_down_to_close: "Pull down to close", nav_search_placeholder: "Search Bio-Module...",
     // Views
     view_home: "Dashboard", view_bioscan: "BioScan", view_recipes: "AI Chef",
@@ -571,6 +575,10 @@ const translations = {
     plate_saved: "Saved Plates", plate_no_saved: "No plates saved yet",
     gam_points: "points", gam_days: "days", gam_view_badges: "View badges", gam_badges: "Badges", gam_total_scans: "Scans", gam_best_streak: "Best streak",
     gam_unlock_more: "Unlock more badges by scanning food!", gam_badge_unlocked: "Badge Unlocked!",
+    summary_scans: "Scans", summary_kcal: "KCAL", summary_score: "Score", summary_generated: "Generated",
+    summary_macros: "Macros", summary_week: "Last 7 days", summary_items: "Scanned Items",
+    summary_no_scans: "No scans on this day", summary_premium: "Available on Premium",
+    summary_premium_desc: "Export summary in JSON",
     pr_excelente: "Excellent", pr_bom: "Good", pr_neutro: "Neutral", pr_ruim: "Poor",
     pr_health_benefits: "Health Benefits", pr_vitamins: "Vitamins", pr_minerals: "Minerals", pr_proteins: "Proteins", pr_other_benefits: "Other Benefits",
     alt_title: "Swap for this", alt_healthier: "Healthier", alt_view: "View product",
