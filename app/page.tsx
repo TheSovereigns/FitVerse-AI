@@ -409,7 +409,7 @@ export default function DashboardPage() {
           <div className="w-6 h-6 flex items-center justify-center shrink-0">
             <ScanLine className="text-primary size-5 lg:size-6" />
           </div>
-            <span className="opacity-0 group-hover:opacity-100 transition-all duration-500 translate-x-2 group-hover:translate-x-0 text-sm lg:text-base">{t("home_brand")}</span>
+            <span className="sidebar-brand-label text-sm lg:text-base">{t("home_brand")}</span>
         </div>
 
         <nav className="flex-1 px-1 lg:px-2 space-y-1 lg:space-y-2 flex flex-col">

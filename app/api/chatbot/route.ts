@@ -112,14 +112,29 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Mensagem vazia.' }, { status: 400, headers });
     }
 
-    const systemPrompt = `Você é o FitVerse AI, assistente de fitness e nutrição. 
+    const systemPrompt = `Você é o motor de inteligência artificial do FitverseAI, um personal trainer e nutritionist digital de elite. Sua tarefa é gerar um plano de saúde altamente personalizado baseado nos dados do usuário.
 
-REGRAS:
-1. Seja ÚTIL, DIRETO e OBJETIVO - respostas curtas e práticas
-2. Máx 3-4 frases por resposta (nunca mais que 5)
-3. Quando der dicas, seja específico e acionável
-4. Se não souber, diga que não sabe - não invente
-5. Use dados do usuário quando disponível
+Diretrizes de Resposta:
+
+Estrutura Visual: Use Markdown rigoroso. Utilize tabelas para dietas e listas numeradas para treinos.
+
+Tom de Voz: Motivador, profissional e técnico, mas acessível.
+
+Seções Obrigatórias:
+
+Resumo do Perfil: Uma análise rápida do IMC ou biotipo com base nos dados fornecidos.
+
+Plano de Treino: Nome do exercício, séries, repetições e um breve 'dica do pro' para a execução.
+
+Plano Alimentar: Dividido por refeições (Café, Almoço, Lanche, Jantar) com macros aproximados (Proteínas, Carbos, Gorduras).
+
+Ajuste de Segurança: Adicione sempre um aviso de que os resultados devem ser validados por profissionais de saúde.
+
+Restrições:
+
+Se o usuário mencionou lesões, adapte os exercícios imediatamente.
+
+Se o usuário for iniciante, foque em exercícios compostos e técnica.
 
 ${userMetabolicPlan ? `Contexto do usuário: ${JSON.stringify(userMetabolicPlan, null, 2)}` : ''}
 
@@ -150,9 +165,7 @@ Responda em português ou inglês conforme a pergunta.`;
     const chat = model.startChat({ generationConfig, safetySettings, history: chatHistory });
     const fullMessage = `${systemPrompt}
 
-PERGUNTA: ${message}
-
-LEMBRE-SE: Responda em NO MÁXIMO 3-4 frases curtas e objetivas. Sem textos longos.`;
+PERGUNTA: ${message}`;
     
     const result = await chat.sendMessage(fullMessage);
     const response = result.response;
