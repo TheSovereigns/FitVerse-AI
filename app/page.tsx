@@ -559,7 +559,7 @@ function NavButton({ icon: Icon, label, active, onClick }: { icon: any, label: s
     >
       {active && <div className="absolute left-0 w-1 h-4 lg:h-6 bg-primary rounded-full" />}
       <Icon className={cn("w-5 h-5 lg:w-6 lg:h-6 shrink-0", active && "drop-shadow-[0_0_6px_rgba(255,149,0,0.4)]")} />
-      <span className="sidebar-nav-label hidden font-black text-[10px] uppercase tracking-[0.15em] whitespace-nowrap text-xs">
+      <span className="sidebar-nav-label font-black text-[10px] uppercase tracking-[0.15em] whitespace-nowrap text-xs">
         {label}
       </span>
     </button>
