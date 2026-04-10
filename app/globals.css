@@ -65,20 +65,19 @@
 
 .sidebar-brand-label {
   opacity: 0;
-  transform: translateX(10px);
+  margin-left: 12px;
   transition: all 0.5s ease;
 }
 
 .sidebar-nav-label {
   opacity: 0;
-  transform: translateX(-10px);
+  margin-left: 14px;
   transition: all 0.5s ease;
 }
 
 aside.group:hover .sidebar-brand-label,
 aside.group:hover .sidebar-nav-label {
   opacity: 1;
-  transform: translateX(0);
 }
 
 .dark {
