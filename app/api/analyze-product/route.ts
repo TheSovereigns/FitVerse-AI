@@ -51,12 +51,17 @@ export async function POST(req: Request) {
   };
 
   const authHeader = req.headers.get('Authorization');
+  console.log('Analyze-product: auth header:', authHeader ? 'present' : 'missing');
+  
   if (!authHeader) {
     return NextResponse.json({ error: 'Não autorizado.' }, { status: 401, headers });
   }
 
   const token = authHeader.replace('Bearer ', '');
+  console.log('Analyze-product: token:', token.substring(0, 20) + '...');
+  
   const { data: { user }, error: authError } = await supabase!.auth.getUser(token);
+  console.log('Analyze-product: user:', user ? user.id : authError);
 
   if (!user || authError) {
     return NextResponse.json({ error: 'Token inválido.' }, { status: 401, headers });
@@ -69,7 +74,10 @@ export async function POST(req: Request) {
     .single();
 
   const userPlan = profile?.plan || 'free';
+  console.log('Analyze-product: userPlan:', userPlan);
+  
   const canProceed = await checkScanLimit(user.id, userPlan);
+  console.log('Analyze-product: canProceed:', canProceed);
 
   if (!canProceed) {
     return NextResponse.json({ 
@@ -93,6 +101,8 @@ export async function POST(req: Request) {
       ? imageData.split('base64,')[1] 
       : imageData;
 
+    console.log('Analyze-product: calling Gemini API...');
+    
     const isEnglish = locale === "en-US"
     const lang = isEnglish ? "English" : "Portuguese"
 
@@ -136,6 +146,8 @@ export async function POST(req: Request) {
         },
       },
     ]);
+    
+    console.log('Analyze-product: Gemini response received');
 
     const response = await result.response;
     let text = response.text();

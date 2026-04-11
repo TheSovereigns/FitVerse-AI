@@ -310,6 +310,7 @@ export default function DashboardPage() {
 
       let response
       try {
+        console.log('handleScan: starting fetch to /api/analyze-product');
         response = await fetch('/api/analyze-product', {
           method: 'POST',
           headers: { 
@@ -338,6 +339,8 @@ export default function DashboardPage() {
       }
       clearTimeout(timeoutId)
 
+      console.log('handleScan: response received, status:', response.status);
+      
       if (!response.ok) {
         try {
           const errorData = await response.json()
