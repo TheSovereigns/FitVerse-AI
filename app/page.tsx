@@ -260,7 +260,6 @@ export default function DashboardPage() {
   }
 
   const handleScan = async (fileOrUrl?: File | string): Promise<void> => {
-    console.log('handleScan: STARTED, fileOrUrl:', typeof fileOrUrl);
     if (!checkCanScan()) {
       setIslandState("error")
       setTimeout(() => setIslandState("idle"), 3000)
@@ -287,10 +286,8 @@ export default function DashboardPage() {
       let imageData: string | undefined
 
       if (fileOrUrl instanceof File) {
-        console.log('handleScan: converting file to base64...');
         displayImage = URL.createObjectURL(fileOrUrl)
         imageData = await toBase64(fileOrUrl)
-        console.log('handleScan: base64 length:', imageData?.length);
       } else if (typeof fileOrUrl === "string") {
         displayImage = fileOrUrl
         imageData = fileOrUrl
@@ -302,14 +299,9 @@ export default function DashboardPage() {
 
       let token = ''
       try {
-        console.log('handleScan: getting session...');
         const { data: { session } } = await supabase.auth.getSession()
-        console.log('handleScan: session:', session ? 'found' : 'not found');
         token = session?.access_token || ''
-        console.log('handleScan: token:', token ? token.substring(0, 10) : 'empty');
-      } catch (e) {
-        console.log('handleScan: session error:', e);
-      }
+      } catch {}
 
       const controller = new AbortController()
       const timeoutId = setTimeout(() => {
@@ -318,7 +310,6 @@ export default function DashboardPage() {
 
       let response
       try {
-        console.log('handleScan: starting fetch to /api/analyze-product');
         response = await fetch('/api/analyze-product', {
           method: 'POST',
           headers: { 
@@ -347,8 +338,6 @@ export default function DashboardPage() {
       }
       clearTimeout(timeoutId)
 
-      console.log('handleScan: response received, status:', response.status);
-      
       if (!response.ok) {
         try {
           const errorData = await response.json()
@@ -399,10 +388,8 @@ export default function DashboardPage() {
   }
 
   const handleBottomNavFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    console.log('handleBottomNavFileChange: triggered, files:', e.target.files?.length);
     const file = e.target.files?.[0]
     if (file) {
-      console.log('handleBottomNavFileChange: file found:', file.name);
       handleScan(file)
     }
   }
