@@ -96,6 +96,27 @@ export async function POST(req: Request) {
     const isEnglish = locale === "en-US"
     const lang = isEnglish ? "English" : "Portuguese"
 
+    const testMode = true;
+    
+    if (testMode) {
+      return NextResponse.json({
+        productName: "Food Item",
+        brand: "Generic",
+        macros: { calories: 200, protein: 10, carbs: 25, fat: 8 },
+        longevityScore: 75,
+        positivePoints: ["Good protein source", "Contains vitamins"],
+        negativePoints: ["Moderate sugar"],
+        alerts: [{ title: "Sugar", description: "Contains moderate sugar" }],
+        insights: [{ description: "Good for muscle building" }],
+        benefits: {
+          vitamins: ["Vitamina C"],
+          minerals: ["Ferro"],
+          proteins: ["Muscle building"],
+          other: ["Fiber"]
+        }
+      }, { headers });
+    }
+
     const prompt = isEnglish
       ? `Analyze this food or product image. Return a strict JSON (no markdown) with:
     - productName: product name
