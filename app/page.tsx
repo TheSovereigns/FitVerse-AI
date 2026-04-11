@@ -28,6 +28,7 @@ import { HomeDashboard } from "@/components/home-dashboard"
 import { DynamicIsland, type IslandState } from "@/components/dynamic-island"
 import { LiquidLaunchpad } from "@/components/liquid-launchpad"
 import { useTranslation } from "@/lib/i18n"
+import { toast } from "sonner"
 import { useAuth } from "@/hooks/useAuth"
 import { supabase } from "@/lib/supabase"
 import { usePlanLimits } from "@/hooks/usePlanLimits"
@@ -41,6 +42,7 @@ export default function DashboardPage() {
   const router = useRouter()
   const { user, isLoading: authLoading, profile } = useAuth()
   const { t, locale } = useTranslation()
+  const isEnglish = locale === "en-US"
   const { plan, scansToday, canScan: checkCanScan, incrementScans, isLoading: planLoading } = usePlanLimits()
   const [currentView, setCurrentView] = useState<View>("home")
   const [islandState, setIslandState] = useState<IslandState>("idle")
@@ -301,6 +303,9 @@ export default function DashboardPage() {
         token = session?.access_token || ''
       } catch {}
 
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => controller.abort(), 30000)
+
       const response = await fetch('/api/analyze-product', {
         method: 'POST',
         headers: { 
@@ -312,7 +317,9 @@ export default function DashboardPage() {
           metabolicPlan: userMetabolicPlanState,
           locale,
         }),
+        signal: controller.signal,
       })
+      clearTimeout(timeoutId)
 
       if (!response.ok) {
         try {
@@ -352,7 +359,12 @@ export default function DashboardPage() {
       console.error("Erro durante a análise:", error)
       setIslandState("error")
       setTimeout(() => setIslandState("idle"), 3000)
-      alert(error instanceof Error ? error.message : t("page_error_retry"))
+      const errorMsg = error instanceof Error ? error.message : t("page_error_retry")
+      if (error instanceof Error && error.name === 'AbortError') {
+        toast.error(isEnglish ? "Request timed out. Please try again." : "Tempo limite excedido. Tente novamente.")
+      } else {
+        toast.error(errorMsg)
+      }
       setCurrentView("dashboard")
     } finally {
       setIsAnalyzing(false)
