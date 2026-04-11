@@ -287,8 +287,10 @@ export default function DashboardPage() {
       let imageData: string | undefined
 
       if (fileOrUrl instanceof File) {
+        console.log('DEBUG: before toBase64');
         displayImage = URL.createObjectURL(fileOrUrl)
         imageData = await toBase64(fileOrUrl)
+        console.log('DEBUG: after toBase64, length:', imageData?.length);
       } else if (typeof fileOrUrl === "string") {
         displayImage = fileOrUrl
         imageData = fileOrUrl
@@ -300,10 +302,16 @@ export default function DashboardPage() {
 
       let token = ''
       try {
+        console.log('DEBUG: getting session');
         const { data: { session } } = await supabase.auth.getSession()
+        console.log('DEBUG: session done, has token:', !!session?.access_token);
         token = session?.access_token || ''
-      } catch {}
+      } catch (e) {
+        console.log('DEBUG: session error:', e);
+      }
 
+      console.log('DEBUG: token ready, length:', token.length);
+      
       const controller = new AbortController()
       const timeoutId = setTimeout(() => {
         controller.abort()
