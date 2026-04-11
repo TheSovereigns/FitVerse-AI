@@ -260,6 +260,7 @@ export default function DashboardPage() {
   }
 
   const handleScan = async (fileOrUrl?: File | string): Promise<void> => {
+    console.log('handleScan: STARTED, fileOrUrl:', typeof fileOrUrl);
     if (!checkCanScan()) {
       setIslandState("error")
       setTimeout(() => setIslandState("idle"), 3000)
@@ -391,8 +392,10 @@ export default function DashboardPage() {
   }
 
   const handleBottomNavFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    console.log('handleBottomNavFileChange: triggered, files:', e.target.files?.length);
     const file = e.target.files?.[0]
     if (file) {
+      console.log('handleBottomNavFileChange: file found:', file.name);
       handleScan(file)
     }
   }

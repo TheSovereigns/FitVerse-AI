@@ -137,6 +137,28 @@ export async function POST(req: Request) {
     
     Se não for alimento, retorne erro. Todo o saída deve ser em ${lang}.`
 
+    const testMode = process.env.TEST_MODE === 'true';
+    
+    if (testMode) {
+      console.log('Analyze-product: TEST MODE - returning mock data');
+      return NextResponse.json({
+        productName: "Test Product",
+        brand: "Test Brand",
+        macros: { calories: 200, protein: 10, carbs: 25, fat: 8 },
+        longevityScore: 75,
+        positivePoints: ["Good source of protein", "Contains vitamins"],
+        negativePoints: ["Some sugar"],
+        alerts: [{ title: "Sugar", description: "Contains some sugar" }],
+        insights: [{ description: "Good for muscle building" }],
+        benefits: {
+          vitamins: ["Vitamin C"],
+          minerals: ["Iron"],
+          proteins: ["Muscle building"],
+          other: ["Fiber"]
+        }
+      }, { headers });
+    }
+
     const result = await model.generateContent([
       prompt,
       {
