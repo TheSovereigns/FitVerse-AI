@@ -137,7 +137,7 @@ export async function POST(req: Request) {
     
     Se não for alimento, retorne erro. Todo o saída deve ser em ${lang}.`
 
-    const testMode = process.env.TEST_MODE === 'true';
+    const testMode = true; // process.env.TEST_MODE === 'true';
     
     if (testMode) {
       console.log('Analyze-product: TEST MODE - returning mock data');
