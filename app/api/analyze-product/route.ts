@@ -33,7 +33,101 @@ export async function OPTIONS() {
       'Access-Control-Allow-Methods': 'POST, OPTIONS',
       'Access-Control-Allow-Headers': 'Content-Type, Authorization',
     },
-});
+  });
+}
+
+const apiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_GENERATIVE_AI_API_KEY;
+const genAI = apiKey ? new GoogleGenerativeAI(apiKey) : null;
+
+const model = genAI ? genAI.getGenerativeModel({
+  model: 'gemini-2.5-flash',
+}) : null;
+
+export async function POST(req: Request) {
+  const headers = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+  };
+
+  const authHeader = req.headers.get('Authorization');
+  if (!authHeader) {
+    return NextResponse.json({ error: 'Não autorizado.' }, { status: 401, headers });
+  }
+
+  const token = authHeader.replace('Bearer ', '');
+  const { data: { user }, error: authError } = await supabase!.auth.getUser(token);
+
+  if (!user || authError) {
+    return NextResponse.json({ error: 'Token inválido.' }, { status: 401, headers });
+  }
+
+  const { data: profile } = await supabase!
+    .from('profiles')
+    .select('plan')
+    .eq('id', user.id)
+    .single();
+
+  const userPlan = profile?.plan || 'free';
+  const canProceed = await checkScanLimit(user.id, userPlan);
+
+  if (!canProceed) {
+    return NextResponse.json({ 
+      error: 'Limite diário de scans atingido. Atualize para um plano superior.' 
+    }, { status: 403, headers });
+  }
+
+  if (!apiKey || !model) {
+    return NextResponse.json({ error: 'Chave de API do Gemini não configurada.' }, { status: 500, headers });
+  }
+
+  try {
+    const body = await req.json();
+    const { imageData, locale = "pt-BR" } = body;
+
+    if (!imageData) {
+      return NextResponse.json({ error: 'Imagem não fornecida.' }, { status: 400, headers });
+    }
+
+    const base64Data = imageData.includes('base64,') 
+      ? imageData.split('base64,')[1] 
+      : imageData;
+
+    const isEnglish = locale === "en-US"
+    const lang = isEnglish ? "English" : "Portuguese"
+
+    const prompt = isEnglish
+      ? `Analyze this food or product image. Return a strict JSON (no markdown) with:
+    - productName: product name
+    - brand: brand or 'Generic'
+    - macros: object with calories, protein, carbs, fat (approximate numbers)
+    - longevityScore: score from 0 to 100 based on how healthy it is
+    - positivePoints: array of strings with HEALTH BENEFITS
+    - negativePoints: array of strings with health concerns
+    - benefits: object with vitamins, minerals, proteins, other
+    
+    If it's not food, return error. All output must be in ${lang}.`
+      : `Analise esta imagem de alimento ou produto. 
+    Retorne um JSON estrito (sem markdown) com:
+    - productName: nome do produto
+    - brand: marca ou 'Genérico'
+    - macros: objeto com calories, protein, carbs, fat (números aproximados)
+    - longevityScore: nota de 0 a 100 baseada em quão saudável é
+    - positivePoints: array de strings com BENEFÍCIOS ESPECÍFICOS PARA A SAÚDE
+    - negativePoints: array de strings com preocupações de saúde
+    - benefits: objeto com vitaminas, minerais, proteínas, outros
+    
+    Se não for alimento, retorne erro. Todo o saída deve ser em ${lang}.`
+
+    const result = await model.generateContent([
+      prompt,
+      {
+        inlineData: {
+          data: base64Data,
+          mimeType: "image/jpeg",
+        },
+      },
+    ]);
     
     const response = await result.response;
     let text = response.text();
