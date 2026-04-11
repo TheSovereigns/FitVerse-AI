@@ -304,21 +304,38 @@ export default function DashboardPage() {
       } catch {}
 
       const controller = new AbortController()
-      const timeoutId = setTimeout(() => controller.abort(), 30000)
+      const timeoutId = setTimeout(() => {
+        controller.abort()
+      }, 15000)
 
-      const response = await fetch('/api/analyze-product', {
-        method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          imageData: imageData,
-          metabolicPlan: userMetabolicPlanState,
-          locale,
-        }),
-        signal: controller.signal,
-      })
+      let response
+      try {
+        response = await fetch('/api/analyze-product', {
+          method: 'POST',
+          headers: { 
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            imageData: imageData,
+            metabolicPlan: userMetabolicPlanState,
+            locale,
+          }),
+          signal: controller.signal,
+        })
+      } catch (fetchError) {
+        clearTimeout(timeoutId)
+        if (fetchError instanceof Error && fetchError.name === 'AbortError') {
+          toast.error(isEnglish ? "Request timed out. Please try again." : "Tempo limite excedido. Tente novamente.")
+        } else {
+          toast.error(isEnglish ? "Connection error. Please check your internet." : "Erro de conexão. Verifique sua internet.")
+        }
+        setIslandState("error")
+        setTimeout(() => setIslandState("idle"), 3000)
+        setCurrentView("dashboard")
+        setIsAnalyzing(false)
+        return
+      }
       clearTimeout(timeoutId)
 
       if (!response.ok) {
@@ -359,12 +376,7 @@ export default function DashboardPage() {
       console.error("Erro durante a análise:", error)
       setIslandState("error")
       setTimeout(() => setIslandState("idle"), 3000)
-      const errorMsg = error instanceof Error ? error.message : t("page_error_retry")
-      if (error instanceof Error && error.name === 'AbortError') {
-        toast.error(isEnglish ? "Request timed out. Please try again." : "Tempo limite excedido. Tente novamente.")
-      } else {
-        toast.error(errorMsg)
-      }
+      toast.error(error instanceof Error ? error.message : t("page_error_retry"))
       setCurrentView("dashboard")
     } finally {
       setIsAnalyzing(false)
