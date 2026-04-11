@@ -283,6 +283,7 @@ export default function DashboardPage() {
       })
 
     try {
+      console.log('DEBUG: entering try block');
       let imageData: string | undefined
 
       if (fileOrUrl instanceof File) {
@@ -310,6 +311,7 @@ export default function DashboardPage() {
 
       let response
       try {
+        console.log('DEBUG: before fetch');
         response = await fetch('/api/analyze-product', {
           method: 'POST',
           headers: { 
@@ -323,7 +325,9 @@ export default function DashboardPage() {
           }),
           signal: controller.signal,
         })
+        console.log('DEBUG: after fetch');
       } catch (fetchError) {
+        console.log('DEBUG: fetch error:', fetchError);
         clearTimeout(timeoutId)
         if (fetchError instanceof Error && fetchError.name === 'AbortError') {
           toast.error(isEnglish ? "Request timed out. Please try again." : "Tempo limite excedido. Tente novamente.")
