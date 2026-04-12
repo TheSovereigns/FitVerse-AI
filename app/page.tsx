@@ -300,15 +300,16 @@ export default function DashboardPage() {
         throw new Error(t("page_error_no_image"))
       }
 
-      console.log('DEBUG: user object:', JSON.stringify(user, null, 2));
-      console.log('DEBUG: before getSession');
-      const { data, error: sessionError } = await supabase.auth.getSession()
-      console.log('DEBUG: getSession result:', { hasSession: !!data?.session, sessionError });
-      const token = data?.session?.access_token || ''
-      const { data: { session } } = await supabase.auth.getSession()
-      console.log('DEBUG: session object:', session);
-      const token = session?.access_token || ''
-      
+      console.log('DEBUG: scanning with user:', user?.id);
+      let token = ''
+      try {
+        const { data: sessionData, error: err } = await supabase.auth.getSession()
+        token = sessionData?.session?.access_token || ''
+console.log('DEBUG: session result:', { hasToken: !!token, error: err?.message })
+      } catch (e) {
+        console.log('DEBUG: session exception:', e)
+      }
+
       const controller = new AbortController()
       const timeoutId = setTimeout(() => {
         controller.abort()
