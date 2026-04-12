@@ -167,7 +167,7 @@ Para cada exercício no treino:
 Seja específico, técnico e focado em resultados. Os treinos devem ser práticos e eficientes.`
 
     const { object } = await generateObject({
-      model: google("gemini-2.5-flash"),
+      model: google("gemini-2.0-flash"),
       schema: workoutsSchema,
       prompt,
       temperature: 0.7,

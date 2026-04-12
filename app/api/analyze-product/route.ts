@@ -44,7 +44,7 @@ const apiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_GENERATIVE_AI_AP
 const genAI = apiKey ? new GoogleGenerativeAI(apiKey) : null;
 
 const model = genAI ? genAI.getGenerativeModel({
-  model: 'gemini-2.5-flash',
+  model: 'gemini-2.0-flash',
 }) : null;
 
 export async function POST(req: Request) {
