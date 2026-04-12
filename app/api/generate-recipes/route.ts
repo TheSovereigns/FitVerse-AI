@@ -6,7 +6,9 @@ import { createClient } from '@supabase/supabase-js'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY;
-const supabase = supabaseUrl && supabaseKey ? createClient(supabaseUrl, supabaseKey) : null;
+const supabase = (supabaseUrl && supabaseKey && !supabaseUrl.includes('placeholder') && !supabaseKey.includes('placeholder'))
+  ? createClient(supabaseUrl, supabaseKey)
+  : null;
 
 const PLAN_LIMITS = {
   free: { dietsPerMonth: 0 },
@@ -21,10 +23,12 @@ const google = createGoogleGenerativeAI({
 export const maxDuration = 30
 
 async function checkDietLimit(userId: string, plan: string): Promise<boolean> {
+  if (!supabase) return true;
+  
   const now = new Date()
   const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1)
 
-  const { count } = await supabase!
+  const { count } = await supabase
     .from('diets')
     .select('*', { count: 'exact', head: true })
     .eq('user_id', userId)
@@ -67,13 +71,18 @@ export async function POST(req: Request) {
     }
 
     const token = authHeader.replace('Bearer ', '')
-    const { data: { user }, error: authError } = await supabase!.auth.getUser(token)
+    
+    if (!supabase) {
+      return NextResponse.json({ error: 'Configuração do servidor incompleta.' }, { status: 500, headers })
+    }
+    
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token)
 
     if (!user || authError) {
       return NextResponse.json({ error: 'Token inválido.' }, { status: 401, headers })
     }
 
-    const { data: profile } = await supabase!
+    const { data: profile } = await supabase
       .from('profiles')
       .select('plan')
       .eq('id', user.id)
@@ -158,7 +167,7 @@ Seja criativo mas prático. Priorize receitas que realmente as pessoas fariam no
       temperature: 0.8,
     })
 
-    await supabase!.from('diets').insert({
+    await supabase.from('diets').insert({
       user_id: user.id,
       name: object.recipes[0]?.name || 'Generated Diet',
       calories: object.recipes[0]?.macros?.calories || 0,

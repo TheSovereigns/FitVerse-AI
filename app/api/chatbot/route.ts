@@ -1,6 +1,12 @@
 import { NextResponse } from 'next/server';
 import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold, Content } from '@google/generative-ai';
-import { supabaseAdmin } from '@/lib/supabase';
+import { createClient } from '@supabase/supabase-js';
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY;
+const supabaseAdmin = (supabaseUrl && supabaseKey && !supabaseUrl.includes('placeholder') && !supabaseKey.includes('placeholder'))
+  ? createClient(supabaseUrl, supabaseKey, { auth: { autoRefreshToken: false, persistSession: false } })
+  : null;
 
 export async function OPTIONS() {
   return NextResponse.json({}, {
@@ -95,7 +101,7 @@ export async function POST(req: Request) {
   }
 
   if (!supabaseAdmin) {
-    return NextResponse.json({ error: 'Supabase admin client not configured.' }, { status: 500, headers });
+    return NextResponse.json({ error: 'Supabase não configurado. Configure as chaves no .env.local.' }, { status: 500, headers });
   }
 
   try {
