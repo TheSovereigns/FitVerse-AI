@@ -105,7 +105,7 @@ export async function POST(req: Request) {
     const isEnglish = locale === "en-US"
     const lang = isEnglish ? "English" : "Portuguese"
 
-    const testMode = true;
+    const testMode = false;
     
     if (testMode) {
       return NextResponse.json({
