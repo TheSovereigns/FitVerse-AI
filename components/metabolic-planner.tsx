@@ -101,10 +101,20 @@ export function MetabolicPlanner({ onPlanCreated }: MetabolicPlannerProps) {
 
     try {
       let token = ''
-      try {
-        const { data: { session } } = await supabase.auth.getSession()
-        token = session?.access_token || ''
-      } catch {}
+      // Get token from localStorage directly
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i)
+        if (key && key.includes('sb-') && key.includes('-auth-token')) {
+          const storedSession = localStorage.getItem(key)
+          if (storedSession) {
+            const parsed = JSON.parse(storedSession)
+            if (parsed?.access_token) {
+              token = parsed.access_token
+              break
+            }
+          }
+        }
+      }
 
       const response = await fetch('/api/generate-metabolic-plan', {
         method: 'POST',

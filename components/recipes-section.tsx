@@ -42,12 +42,27 @@ export function RecipesSection({ productName, dietProfile }: RecipesSectionProps
   const handleGenerateRecipes = async () => {
     setIsLoading(true)
     try {
-      const { data: { session } } = await supabase.auth.getSession()
+      // Get token from localStorage directly
+      let token = ''
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i)
+        if (key && key.includes('sb-') && key.includes('-auth-token')) {
+          const storedSession = localStorage.getItem(key)
+          if (storedSession) {
+            const parsed = JSON.parse(storedSession)
+            if (parsed?.access_token) {
+              token = parsed.access_token
+              break
+            }
+          }
+        }
+      }
+      
       const response = await fetch("/api/generate-recipes", {
         method: "POST",
         headers: { 
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${session?.access_token || ''}`
+          "Authorization": `Bearer ${token}`
         },
         body: JSON.stringify({ productName, dietProfile, locale }),
       })

@@ -186,11 +186,11 @@ PERGUNTA: ${message}`;
     const { category, subcategory } = detectCategory(message);
 
     // Save to dataset — non-blocking, never break the chat
-    const savePromise = (async () => {
-      try {
-        let conversationId: string | null = null;
+    if (supabaseAdmin && userId) {
+      (async () => {
+        try {
+          let conversationId: string | null = null;
 
-        if (userId) {
           const { data: existingConv } = await supabaseAdmin
             .from('ai_conversations')
             .select('id')
@@ -209,40 +209,33 @@ PERGUNTA: ${message}`;
               .single();
             if (newConv) conversationId = newConv.id;
           }
+
+          if (conversationId) {
+            await supabaseAdmin
+              .from('ai_messages')
+              .insert({
+                conversation_id: conversationId,
+                user_id: userId,
+                user_message: message,
+                user_message_lang: userMessageLang,
+                user_context: userContext || {},
+                ai_response: reply,
+                ai_response_lang: aiResponseLang,
+                model_used: 'gemini-2.5-flash',
+                tokens_used: tokensUsed,
+                response_time_ms: responseTimeMs,
+                category,
+                subcategory,
+                training_status: 'raw',
+              })
+          }
+        } catch (error) {
+          console.error('Failed to save AI message to dataset:', error);
         }
+      })();
+    }
 
-        if (conversationId) {
-          const { data: inserted } = await supabaseAdmin
-            .from('ai_messages')
-            .insert({
-              conversation_id: conversationId,
-              user_id: userId,
-              user_message: message,
-              user_message_lang: userMessageLang,
-              user_context: userContext || {},
-              ai_response: reply,
-              ai_response_lang: aiResponseLang,
-              model_used: 'gemini-2.5-flash',
-              tokens_used: tokensUsed,
-              response_time_ms: responseTimeMs,
-              category,
-              subcategory,
-              training_status: 'raw',
-            })
-            .select('id')
-            .single();
-
-          return inserted?.id ?? null;
-        }
-      } catch (error) {
-        console.error('Failed to save AI message to dataset:', error);
-      }
-      return null;
-    })();
-
-    const messageId = await savePromise;
-
-    return NextResponse.json({ reply, messageId, tokensUsed, responseTimeMs }, { headers });
+    return NextResponse.json({ reply, tokensUsed, responseTimeMs }, { headers });
 
   } catch (error) {
     console.error('Erro detalhado no chatbot:', error);

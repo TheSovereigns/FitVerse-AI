@@ -117,13 +117,36 @@ export function ChatbotTab() {
       }))
 
       const storedPlan = typeof window !== 'undefined' ? localStorage.getItem('userMetabolicPlan') : null
+      
+      // Get token from localStorage directly
+      let token = ''
+      if (typeof window !== 'undefined') {
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i)
+          if (key && key.includes('sb-') && key.includes('-auth-token')) {
+            const storedSession = localStorage.getItem(key)
+            if (storedSession) {
+              const parsed = JSON.parse(storedSession)
+              if (parsed?.access_token) {
+                token = parsed.access_token
+                break
+              }
+            }
+          }
+        }
+      }
+      
       const response = await fetch('/api/chatbot', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
         body: JSON.stringify({
           message: userText,
           history,
           userMetabolicPlan: storedPlan ? JSON.parse(storedPlan) : null,
+          userId: user?.id,
         }),
       })
       if (!response.ok) throw new Error(t("chatbot_net_error"))
