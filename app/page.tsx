@@ -300,17 +300,7 @@ export default function DashboardPage() {
         throw new Error(t("page_error_no_image"))
       }
 
-      let token = ''
-      try {
-        console.log('DEBUG: getting session');
-        const { data: { session } } = await supabase.auth.getSession()
-        console.log('DEBUG: session done, has token:', !!session?.access_token);
-        token = session?.access_token || ''
-      } catch (e) {
-        console.log('DEBUG: session error:', e);
-      }
-
-      console.log('DEBUG: token ready, length:', token.length);
+      const token = user.accessToken
       
       const controller = new AbortController()
       const timeoutId = setTimeout(() => {
