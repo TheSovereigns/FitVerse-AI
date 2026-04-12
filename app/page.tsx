@@ -300,15 +300,10 @@ export default function DashboardPage() {
         throw new Error(t("page_error_no_image"))
       }
 
-      console.log('DEBUG: scanning with user:', user?.id);
-      let token = ''
-      try {
-        const { data: sessionData, error: err } = await supabase.auth.getSession()
-        token = sessionData?.session?.access_token || ''
-console.log('DEBUG: session result:', { hasToken: !!token, error: err?.message })
-      } catch (e) {
-        console.log('DEBUG: session exception:', e)
-      }
+      console.log('DEBUG: getting session...');
+      const { data: sessionData, error: err } = await supabase.auth.getSession()
+      console.log('DEBUG: session result:', { hasToken: !!sessionData?.session?.access_token, error: err?.message });
+      const token = sessionData?.session?.access_token || ''
 
       const controller = new AbortController()
       const timeoutId = setTimeout(() => {
