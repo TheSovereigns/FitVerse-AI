@@ -161,7 +161,7 @@ Na descrição, SEMPRE explique os benefícios nutricionais específicos e por q
 Seja criativo mas prático. Priorize receitas que realmente as pessoas fariam no dia a dia.`
 
     const { object } = await generateObject({
-      model: google("gemini-2.0-flash"),
+      model: google("gemini-2.5-flash"),
       schema: recipesSchema,
       prompt,
       temperature: 0.8,
