@@ -300,7 +300,9 @@ export default function DashboardPage() {
         throw new Error(t("page_error_no_image"))
       }
 
+      console.log('DEBUG: before getSession');
       const { data: { session } } = await supabase.auth.getSession()
+      console.log('DEBUG: after getSession, has token:', !!session?.access_token);
       const token = session?.access_token || ''
       
       const controller = new AbortController()
