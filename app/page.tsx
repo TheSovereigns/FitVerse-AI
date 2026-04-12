@@ -301,9 +301,23 @@ export default function DashboardPage() {
       }
 
       console.log('DEBUG: getting session...');
-      const { data: sessionData, error: err } = await supabase.auth.getSession()
-      console.log('DEBUG: session result:', { hasToken: !!sessionData?.session?.access_token, error: err?.message });
-      const token = sessionData?.session?.access_token || ''
+      
+      const sessionPromise = supabase.auth.getSession()
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Session timeout')), 10000)
+      )
+      
+      let sessionData
+      try {
+        sessionData = await Promise.race([sessionPromise, timeoutPromise])
+      } catch (sessionError) {
+        console.error('Session error:', sessionError)
+        // Continue without token - let the API handle auth
+        sessionData = { data: { session: null }, error: null }
+      }
+      
+      console.log('DEBUG: session result:', { hasToken: !!sessionData?.data?.session?.access_token, error: sessionData?.error?.message });
+      const token = sessionData?.data?.session?.access_token || ''
 
       const controller = new AbortController()
       const timeoutId = setTimeout(() => {

@@ -26,15 +26,27 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     storage: {
       getItem: (key: string) => {
         if (typeof window === 'undefined') return null
-        return localStorage.getItem(key)
+        try {
+          return localStorage.getItem(key)
+        } catch {
+          return null
+        }
       },
       setItem: (key: string, value: string) => {
         if (typeof window === 'undefined') return
-        localStorage.setItem(key, value)
+        try {
+          localStorage.setItem(key, value)
+        } catch {
+          // Ignore storage errors
+        }
       },
       removeItem: (key: string) => {
         if (typeof window === 'undefined') return
-        localStorage.removeItem(key)
+        try {
+          localStorage.removeItem(key)
+        } catch {
+          // Ignore storage errors
+        }
       },
     },
   },
