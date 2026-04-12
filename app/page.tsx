@@ -300,7 +300,7 @@ export default function DashboardPage() {
         throw new Error(t("page_error_no_image"))
       }
 
-      const token = user.accessToken
+      const token = user.access_token
       
       const controller = new AbortController()
       const timeoutId = setTimeout(() => {
