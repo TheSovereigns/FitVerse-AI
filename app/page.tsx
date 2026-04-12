@@ -302,22 +302,47 @@ export default function DashboardPage() {
 
       console.log('DEBUG: getting session...');
       
-      const sessionPromise = supabase.auth.getSession()
-      const timeoutPromise = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('Session timeout')), 10000)
-      )
+      // Try to get token directly from localStorage
+      let token = ''
       
-      let sessionData
       try {
-        sessionData = await Promise.race([sessionPromise, timeoutPromise])
-      } catch (sessionError) {
-        console.error('Session error:', sessionError)
-        // Continue without token - let the API handle auth
-        sessionData = { data: { session: null }, error: null }
+        // Find Supabase auth token in localStorage
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i)
+          if (key && key.includes('sb-') && key.includes('-auth-token')) {
+            const storedSession = localStorage.getItem(key)
+            if (storedSession) {
+              const parsed = JSON.parse(storedSession)
+              if (parsed?.access_token) {
+                token = parsed.access_token
+                console.log('DEBUG: got token from localStorage')
+                break
+              }
+            }
+          }
+        }
+        
+        // If no token, try supabase.auth.getSession() with timeout
+        if (!token) {
+          console.log('DEBUG: trying getSession...')
+          const sessionPromise = supabase.auth.getSession()
+          const timeoutPromise = new Promise((_, reject) => 
+            setTimeout(() => reject(new Error('Timeout')), 8000)
+          )
+          
+          try {
+            const sessionData = await Promise.race([sessionPromise, timeoutPromise])
+            token = sessionData?.session?.access_token || ''
+            console.log('DEBUG: getSession completed')
+          } catch (getSessionError) {
+            console.error('DEBUG: getSession failed:', getSessionError)
+          }
+        }
+      } catch (e) {
+        console.error('Error getting token:', e)
       }
       
-      console.log('DEBUG: session result:', { hasToken: !!sessionData?.data?.session?.access_token, error: sessionData?.error?.message });
-      const token = sessionData?.data?.session?.access_token || ''
+      console.log('DEBUG: session result:', { hasToken: !!token });
 
       const controller = new AbortController()
       const timeoutId = setTimeout(() => {
