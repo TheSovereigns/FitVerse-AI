@@ -302,6 +302,9 @@ export default function DashboardPage() {
 
       console.log('DEBUG: user object:', JSON.stringify(user, null, 2));
       console.log('DEBUG: before getSession');
+      const { data, error: sessionError } = await supabase.auth.getSession()
+      console.log('DEBUG: getSession result:', { hasSession: !!data?.session, sessionError });
+      const token = data?.session?.access_token || ''
       const { data: { session } } = await supabase.auth.getSession()
       console.log('DEBUG: session object:', session);
       const token = session?.access_token || ''
