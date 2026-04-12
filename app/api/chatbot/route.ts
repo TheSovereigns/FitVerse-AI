@@ -96,12 +96,17 @@ export async function POST(req: Request) {
     'Access-Control-Allow-Headers': 'Content-Type, Authorization',
   };
 
+  console.log('[Chatbot] API called, apiKey exists:', !!apiKey, 'model exists:', !!model);
+
   if (!apiKey || !model) {
+    console.error('[Chatbot] Gemini API not configured');
     return NextResponse.json({ reply: "Erro: Chave de API do Gemini não configurada." }, { status: 500, headers });
   }
 
+  console.log('[Chatbot] Supabase admin configured:', !!supabaseAdmin);
+
   if (!supabaseAdmin) {
-    return NextResponse.json({ error: 'Supabase não configurado. Configure as chaves no .env.local.' }, { status: 500, headers });
+    console.warn('[Chatbot] Supabase not configured, will skip saving to database');
   }
 
   try {
