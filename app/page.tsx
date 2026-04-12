@@ -300,7 +300,8 @@ export default function DashboardPage() {
         throw new Error(t("page_error_no_image"))
       }
 
-      const token = user.access_token
+      const { data: { session } } = await supabase.auth.getSession()
+      const token = session?.access_token || ''
       
       const controller = new AbortController()
       const timeoutId = setTimeout(() => {
