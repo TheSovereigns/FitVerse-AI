@@ -1,0 +1,27 @@
+﻿app/page.tsx(316,56): error TS2322: Type '{ onBack: () => void; }' is not assignable to type 'IntrinsicAttributes'.
+  Property 'onBack' does not exist on type 'IntrinsicAttributes'.
+components/active-workout-session.tsx(301,59): error TS2322: Type '{ value: number; className: string; indicatorClassName: string; }' is not assignable to type 'IntrinsicAttributes & ProgressProps & RefAttributes<HTMLDivElement>'.
+  Property 'indicatorClassName' does not exist on type 'IntrinsicAttributes & ProgressProps & RefAttributes<HTMLDivElement>'.
+components/admob-banner.tsx(13,17): error TS2339: Property 'AdMob' does not exist on type '{ default: typeof import("C:/Users/Victor Hugo/Downloads/FitVerse-AI-main (1)/FitVerse-AI-main/node_modules/@admob-plus/capacitor/dist/esm/index"); AdMobPlus: AdMobPlusPlugin; ... 5 more ...; TrackingAuthorizationStatus: typeof TrackingAuthorizationStatus; }'.
+components/health-profile.tsx(207,69): error TS2322: Type '{ value: number; className: string; indicatorClassName: string; }' is not assignable to type 'IntrinsicAttributes & ProgressProps & RefAttributes<HTMLDivElement>'.
+  Property 'indicatorClassName' does not exist on type 'IntrinsicAttributes & ProgressProps & RefAttributes<HTMLDivElement>'.
+components/home-dashboard.tsx(76,13): error TS2322: Type '{ value: any; target: any; label: string; unit: string; color: string; }' is not assignable to type 'IntrinsicAttributes & ProgressCircleProps'.
+  Property 'target' does not exist on type 'IntrinsicAttributes & ProgressCircleProps'.
+components/home-dashboard.tsx(83,13): error TS2322: Type '{ value: any; target: any; label: string; unit: string; color: string; }' is not assignable to type 'IntrinsicAttributes & ProgressCircleProps'.
+  Property 'target' does not exist on type 'IntrinsicAttributes & ProgressCircleProps'.
+components/home-dashboard.tsx(90,13): error TS2322: Type '{ value: any; target: any; label: string; unit: string; color: string; }' is not assignable to type 'IntrinsicAttributes & ProgressCircleProps'.
+  Property 'target' does not exist on type 'IntrinsicAttributes & ProgressCircleProps'.
+components/home-dashboard.tsx(103,13): error TS2322: Type 'number' is not assignable to type 'string'.
+components/home-dashboard.tsx(114,13): error TS2322: Type 'number' is not assignable to type 'string'.
+components/metabolic-dashboard.tsx(9,15): error TS2305: Module '"./metabolic-planner"' has no exported member 'BioPerfil'.
+components/metabolic-dashboard.tsx(9,26): error TS2724: '"./metabolic-planner"' has no exported member named 'MetabolicPlan'. Did you mean 'MetabolicPlanner'?
+components/metabolic-dashboard.tsx(56,74): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ lose_weight: string; gain_muscle: string; maintenance: string; }'.
+components/metabolic-dashboard.tsx(146,37): error TS7006: Parameter 'meal' implicitly has an 'any' type.
+components/metabolic-dashboard.tsx(146,43): error TS7006: Parameter 'index' implicitly has an 'any' type.
+components/metabolic-dashboard.tsx(150,38): error TS7006: Parameter 'item' implicitly has an 'any' type.
+components/metabolic-dashboard.tsx(150,44): error TS7006: Parameter 'itemIndex' implicitly has an 'any' type.
+components/metabolic-dashboard.tsx(189,49): error TS7006: Parameter 'tip' implicitly has an 'any' type.
+components/metabolic-dashboard.tsx(189,54): error TS7006: Parameter 'index' implicitly has an 'any' type.
+components/metabolic-dashboard.tsx(199,66): error TS2322: Type '{ value: number; className: string; indicatorClassName: string; }' is not assignable to type 'IntrinsicAttributes & ProgressProps & RefAttributes<HTMLDivElement>'.
+  Property 'indicatorClassName' does not exist on type 'IntrinsicAttributes & ProgressProps & RefAttributes<HTMLDivElement>'.
+components/product-result.tsx(163,197): error TS2532: Object is possibly 'undefined'.
