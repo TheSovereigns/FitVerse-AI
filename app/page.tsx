@@ -1,4 +1,4 @@
-﻿"use client"
+"use client"
 
 // FitVerse AI - Main Dashboard
 // Auth-protected dashboard with BioScan, training, diet, and more
