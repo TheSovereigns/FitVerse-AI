@@ -1,8 +1,5 @@
 "use client"
 
-// FitVerse AI - Main Dashboard
-// Auth-protected dashboard with BioScan, training, diet, and more
-
 import { useState, useEffect, useRef } from "react"
 import { useRouter } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
@@ -34,7 +31,6 @@ import { usePlanLimits } from "@/hooks/usePlanLimits"
 
 type View = "home" | "dashboard" | "result" | "recipes" | "training" | "profile" | "planner" | "settings" | "store" | "chatbot"
 
-// Inicialize o Stripe fora do componente para evitar recriação
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
 export default function DashboardPage() {
@@ -57,32 +53,7 @@ export default function DashboardPage() {
     generatedDiets: [],
     generatedWorkouts: [],
   })
-  const [scanHistory, setScanHistory] = useState<any[]>([
-    {
-      id: "1",
-      name: "Whey Protein Isolate",
-      scannedAt: new Date(Date.now() - 10 * 60 * 1000).toISOString(),
-      score: 92,
-      image: "/placeholder.svg?height=80&width=80",
-      status: "healthy",
-    },
-    {
-      id: "2",
-      name: "Barra de Cereal",
-      scannedAt: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
-      score: 45,
-      image: "/placeholder.svg?height=80&width=80",
-      status: "avoid",
-    },
-    {
-      id: "3",
-      name: "Iogurte Natural",
-      scannedAt: new Date(Date.now() - 25 * 60 * 60 * 1000).toISOString(),
-      score: 88,
-      image: "/placeholder.svg?height=80&width=80",
-      status: "healthy",
-    },
-  ])
+  const [scanHistory, setScanHistory] = useState<any[]>([])
   const [userMetabolicPlanState, setUserMetabolicPlanState] = useState<any>(null)
   const [loadingStripe, setLoadingStripe] = useState(false)
   const bottomNavInputRef = useRef<HTMLInputElement>(null)
@@ -108,13 +79,8 @@ export default function DashboardPage() {
     }
   }, [])
 
-  // Check admin status - don't block on this
   useEffect(() => {
     if (user) {
-      const userMetaAdmin = user.user_metadata?.is_admin === true
-      if (userMetaAdmin) {
-        setIsAdmin(true)
-      }
       supabase
         .from('profiles')
         .select('is_admin')
@@ -128,7 +94,6 @@ export default function DashboardPage() {
     }
   }, [user])
 
-  // Handle view from URL params
   useEffect(() => {
     const handleRouteChange = () => {
       const params = new URLSearchParams(window.location.search)
@@ -139,7 +104,7 @@ export default function DashboardPage() {
     }
     window.addEventListener("popstate", handleRouteChange)
     const origPush = window.history.pushState
-    window.history.pushState = function(...args) {
+    window.history.pushState = function(...args: any[]) {
       origPush.apply(window.history, args)
       handleRouteChange()
     }
@@ -176,7 +141,6 @@ export default function DashboardPage() {
     }
 
     if (user) {
-      // Check admin from profile (this is stable)
       supabase
         .from('profiles')
         .select('is_admin')
@@ -262,7 +226,7 @@ export default function DashboardPage() {
     if (!checkCanScan()) {
       setIslandState("error")
       setTimeout(() => setIslandState("idle"), 3000)
-      alert(t("page_limit_reached") || "Limite diário de scans atingido. Atualize para um plano superior!")
+      alert(t("page_limit_reached") || "Daily scan limit reached. Upgrade to a higher plan!")
       return
     }
 
@@ -282,14 +246,11 @@ export default function DashboardPage() {
       })
 
     try {
-      console.log('DEBUG: entering try block');
       let imageData: string | undefined
 
       if (fileOrUrl instanceof File) {
-        console.log('DEBUG: before toBase64');
         displayImage = URL.createObjectURL(fileOrUrl)
         imageData = await toBase64(fileOrUrl)
-        console.log('DEBUG: after toBase64, length:', imageData?.length);
       } else if (typeof fileOrUrl === "string") {
         displayImage = fileOrUrl
         imageData = fileOrUrl
@@ -299,13 +260,9 @@ export default function DashboardPage() {
         throw new Error(t("page_error_no_image"))
       }
 
-      console.log('DEBUG: getting session...');
-      
-      // Try to get token directly from localStorage
       let token = ''
       
       try {
-        // Find Supabase auth token in localStorage
         for (let i = 0; i < localStorage.length; i++) {
           const key = localStorage.key(i)
           if (key && key.includes('sb-') && key.includes('-auth-token')) {
@@ -314,34 +271,19 @@ export default function DashboardPage() {
               const parsed = JSON.parse(storedSession)
               if (parsed?.access_token) {
                 token = parsed.access_token
-                console.log('DEBUG: got token from localStorage')
                 break
               }
             }
           }
         }
         
-        // If no token, try supabase.auth.getSession() with timeout
         if (!token) {
-          console.log('DEBUG: trying getSession...')
-          const sessionPromise = supabase.auth.getSession()
-          const timeoutPromise = new Promise((_, reject) => 
-            setTimeout(() => reject(new Error('Timeout')), 8000)
-          )
-          
-          try {
-            const sessionData = await Promise.race([sessionPromise, timeoutPromise])
-            token = sessionData?.session?.access_token || ''
-            console.log('DEBUG: getSession completed')
-          } catch (getSessionError) {
-            console.error('DEBUG: getSession failed:', getSessionError)
-          }
+          const sessionData = await supabase.auth.getSession()
+          token = sessionData?.session?.access_token || ''
         }
       } catch (e) {
         console.error('Error getting token:', e)
       }
-      
-      console.log('DEBUG: session result:', { hasToken: !!token });
 
       const controller = new AbortController()
       const timeoutId = setTimeout(() => {
@@ -350,7 +292,6 @@ export default function DashboardPage() {
 
       let response
       try {
-        console.log('DEBUG: before fetch');
         response = await fetch('/api/analyze-product', {
           method: 'POST',
           headers: { 
@@ -364,14 +305,12 @@ export default function DashboardPage() {
           }),
           signal: controller.signal,
         })
-        console.log('DEBUG: after fetch');
       } catch (fetchError) {
-        console.log('DEBUG: fetch error:', fetchError);
         clearTimeout(timeoutId)
         if (fetchError instanceof Error && fetchError.name === 'AbortError') {
           toast.error(isEnglish ? "Request timed out. Please try again." : "Tempo limite excedido. Tente novamente.")
         } else {
-          toast.error(isEnglish ? "Connection error. Please check your internet." : "Erro de conexão. Verifique sua internet.")
+          toast.error(isEnglish ? "Connection error. Please check your internet." : "Erro de conexao. Verifique sua internet.")
         }
         setIslandState("error")
         setTimeout(() => setIslandState("idle"), 3000)
@@ -416,7 +355,7 @@ export default function DashboardPage() {
       ])
       incrementScans()
     } catch (error) {
-      console.error("Erro durante a análise:", error)
+      console.error("Erro durante a analise:", error)
       setIslandState("error")
       setTimeout(() => setIslandState("idle"), 3000)
       toast.error(error instanceof Error ? error.message : t("page_error_retry"))
@@ -470,7 +409,6 @@ export default function DashboardPage() {
         currentView={currentView}
       />
 
-      {/* Floating Sidebar (Desktop) */}
       <aside className="hidden md:flex flex-col w-20 lg:w-24 hover:w-64 lg:hover:w-72 fixed top-1/2 -translate-y-1/2 left-4 lg:left-6 glass-strong border-white/20 z-50 rounded-[2rem] lg:rounded-[3rem] transition-all duration-700 ease-in-out group overflow-hidden shadow-[0_0_60px_rgba(0,0,0,0.3)]">
         <div className="p-4 lg:p-6 flex items-center justify-start gap-3 font-black text-xl tracking-tighter text-foreground mb-6 lg:mb-8 overflow-hidden">
           <div className="w-6 h-6 flex items-center justify-center shrink-0">
@@ -486,7 +424,7 @@ export default function DashboardPage() {
           <NavButton icon={Calculator} label={t("nav_diet")} active={currentView === "planner"} onClick={() => setCurrentView("planner")} />
           <NavButton icon={ChefHat} label={t("nav_recipes")} active={currentView === "recipes"} onClick={() => setCurrentView("recipes")} />
           <NavButton icon={ShoppingBag} label={t("nav_store")} active={currentView === "store"} onClick={() => setCurrentView("store")} />
-          <NavButton icon={Bot} label={t("nav_aichat")} active={currentView === "chatbot")} onClick={() => setCurrentView("chatbot")} />
+          <NavButton icon={Bot} label={t("nav_aichat")} active={currentView === "chatbot"} onClick={() => setCurrentView("chatbot")} />
         </nav>
 
         <div className="p-2 lg:p-3 mb-3 lg:mb-4 space-y-2 border-t border-white/10 pt-4 flex flex-col items-center">
@@ -495,16 +433,13 @@ export default function DashboardPage() {
         </div>
       </aside>
 
-      {/* Main Content */}
       <div className="flex-1 md:pl-24 lg:pl-32 xl:pl-36 flex flex-col min-h-screen relative transition-all duration-500 max-w-[1600px] xl:max-w-[1800px] mx-auto w-full">
-        {/* Header - Visible on all screens */}
         <header className="sticky top-0 z-40 bg-transparent px-4 md:px-6 h-14 md:h-16 lg:h-14 flex items-center justify-between">
           <div className="md:hidden font-black text-2xl flex items-center gap-2 text-foreground">
             <ScanLine className="text-primary size-7" />
             <span>{t("home_brand")}</span>
           </div>
           <div className="hidden md:block">
-             {/* Large title or scroll transition space */}
           </div>
             <div className="flex items-center gap-4 md:gap-6">
               {(isAdmin || user?.user_metadata?.is_admin) && (
@@ -571,7 +506,6 @@ export default function DashboardPage() {
         onChange={handleBottomNavFileChange}
       />
 
-      {/* Floating Action Button */}
       <Button 
         onClick={handleNavScan} 
         className="fixed bottom-28 right-8 md:bottom-10 md:right-10 xl:bottom-12 xl:right-12 z-50 h-16 w-16 md:h-16 md:w-16 lg:h-14 lg:w-14 rounded-full glass-strong bg-primary text-white shadow-2xl transition-all duration-500 hover:scale-110 active:scale-75 border border-white/30"
@@ -580,13 +514,12 @@ export default function DashboardPage() {
         <ScanLine className="h-8 w-8 md:h-10 md:w-10 text-white" />
       </Button>
 
-      {/* Mobile Bottom Nav - Opens menu on swipe up */}
       <motion.nav
         id="mobile-bottom-nav"
         drag="y"
         dragConstraints={{ top: 0, bottom: 0 }}
         dragElastic={0.2}
-        onDragEnd={(_, info) => {
+        onDragEnd={(_: any, info: any) => {
           if (info.offset.y < -30) setIsMenuExpanded(true)
         }}
         className="md:hidden fixed bottom-6 left-4 right-4 glass-strong rounded-[2rem] z-40 shadow-2xl border border-white/20 h-16 px-2 flex items-center justify-around max-w-md mx-auto active:cursor-grab"
