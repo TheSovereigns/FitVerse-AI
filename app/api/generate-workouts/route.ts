@@ -108,7 +108,18 @@ export async function POST(req: Request) {
       }, { status: 403, headers })
     }
 
-    const { level, duration, focus, biotype, locale = "pt-BR" } = await req.json()
+    let body;
+    try {
+      body = await req.json();
+    } catch {
+      return NextResponse.json({ error: 'Requisição inválida. Dados JSON mal formatados.' }, { status: 400, headers });
+    }
+
+    const { level, duration, focus, biotype, locale = "pt-BR" } = body;
+
+    if (!level || !duration || !focus) {
+      return NextResponse.json({ error: 'Parâmetros inválidos. Forneça: level, duration e focus.' }, { status: 400, headers });
+    }
 
     const isEnglish = locale === "en-US"
     const lang = isEnglish ? "English" : "Portuguese"

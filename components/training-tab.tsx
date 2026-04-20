@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from "@/components/ui/dialog"
 import { Dumbbell, Flame, Clock, Zap, Play, Home, Building2, User, ArrowRight, Swords, Activity } from "lucide-react"
 import { WorkoutGenerator } from "@/components/workout-generator"
 import { ActiveWorkoutSession } from "@/components/active-workout-session"
@@ -171,10 +171,20 @@ export function TrainingTab({ metabolicPlan, scanHistory, userGoal }: TrainingTa
           locale 
         }),
       })
-      const data = await response.json()
+      let data;
+      try {
+        data = await response.json();
+      } catch {
+        toast.error(t("training_error_ai"));
+        return;
+      }
       if (!response.ok) {
-        toast.error(data.error || t("training_error_ai"))
-        return
+        toast.error(data?.error || t("training_error_ai"));
+        return;
+      }
+      if (!data?.workouts) {
+        toast.error(t("training_error_ai"));
+        return;
       }
       setGeneratedWorkouts(data.workouts.map((w: any) => ({ ...w, criteria })))
     } catch (error) {
@@ -263,10 +273,10 @@ export function TrainingTab({ metabolicPlan, scanHistory, userGoal }: TrainingTa
                     </Button>
                   </DialogTrigger>
                   <DialogContent className="glass-strong text-foreground sm:max-w-2xl lg:max-w-3xl xl:max-w-4xl rounded-[3rem] md:rounded-[4rem] border-white/10 p-0 shadow-2xl overflow-hidden backdrop-blur-3xl mx-3 md:mx-0">
-                    <div className="p-8 md:p-12 pb-0">
-                      <h2 className="text-3xl md:text-4xl font-black tracking-tighter">{t("training_generator_title")}</h2>
-                      <p className="text-muted-foreground text-sm md:text-lg font-bold opacity-40 uppercase tracking-widest mt-2">{t("training_generator_subtitle")}</p>
-                    </div>
+                    <DialogHeader>
+                      <DialogTitle className="text-3xl md:text-4xl font-black tracking-tighter">{t("training_generator_title")}</DialogTitle>
+                      <DialogDescription className="text-muted-foreground text-sm md:text-lg font-bold opacity-40 uppercase tracking-widest mt-2">{t("training_generator_subtitle")}</DialogDescription>
+                    </DialogHeader>
                     <ScrollArea className="max-h-[70vh] p-8 md:p-12 pt-6 md:pt-8">
                       <WorkoutGenerator onGenerate={handleGenerateWorkouts} isLoading={isGenerating} />
                     </ScrollArea>
@@ -302,10 +312,10 @@ export function TrainingTab({ metabolicPlan, scanHistory, userGoal }: TrainingTa
 
       <Dialog open={showGeneratorModal} onOpenChange={setShowGeneratorModal}>
         <DialogContent className="glass-strong text-foreground sm:max-w-2xl lg:max-w-3xl xl:max-w-4xl rounded-[3rem] md:rounded-[4rem] border-white/10 p-0 shadow-2xl overflow-hidden backdrop-blur-3xl mx-3 md:mx-0">
-          <div className="p-8 md:p-12 pb-0">
-            <h2 className="text-3xl md:text-4xl font-black tracking-tighter">{t("training_generator_title")}</h2>
-            <p className="text-muted-foreground text-sm md:text-lg font-bold opacity-40 uppercase tracking-widest mt-2">{t("training_generator_subtitle")}</p>
-          </div>
+          <DialogHeader>
+            <DialogTitle className="text-3xl md:text-4xl font-black tracking-tighter">{t("training_generator_title")}</DialogTitle>
+            <DialogDescription className="text-muted-foreground text-sm md:text-lg font-bold opacity-40 uppercase tracking-widest mt-2">{t("training_generator_subtitle")}</DialogDescription>
+          </DialogHeader>
           <ScrollArea className="max-h-[70vh] p-8 md:p-12 pt-6 md:pt-8">
             <WorkoutGenerator onGenerate={handleGenerateWorkouts} isLoading={isGenerating} />
           </ScrollArea>
