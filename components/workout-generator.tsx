@@ -51,7 +51,7 @@ const SelectionGroup = ({
 import { useTranslation } from "@/lib/i18n"
 
 export function WorkoutGenerator({ onGenerate, isLoading }: WorkoutGeneratorProps) {
-  const { t } = useTranslation()
+  const { t, locale } = useTranslation()
   const [level, setLevel] = useState(t("wg_intermediate"))
   const [duration, setDuration] = useState(t("wg_default_duration"))
   const [focus, setFocus] = useState(t("wg_gain"))
@@ -125,57 +125,82 @@ export function WorkoutGenerator({ onGenerate, isLoading }: WorkoutGeneratorProp
 
         {/* Botão de Ação e Feedback Visual */}
         <div className="pt-4">
-          <Button
-            onClick={handleGenerateClick}
-            disabled={isLoading}
-            className={`
-              w-full h-14 text-lg font-bold uppercase tracking-widest transition-all duration-300 ease-in-out relative overflow-hidden
-              ${isLoading
-                ? "bg-gray-100 dark:bg-muted text-muted-foreground cursor-not-allowed border border-gray-200 dark:border-border"
-                : "bg-gradient-to-r from-primary to-primary/80 hover:shadow-primary/40 text-primary-foreground shadow-[0_0_20px_rgba(255,140,0,0.3)]"
-              }
-            `}
-          >
-            {/* Efeito de shimmer durante loading */}
+          {/* Container com animação de fundo durante loading */}
+          <div className={`relative ${isLoading ? 'animate-pulse' : ''}`}>
+            {/* Overlay brilhante durante loading */}
             {isLoading && (
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-shimmer" />
+              <div className="absolute -inset-2 bg-primary/20 rounded-[2rem] blur-xl animate-pulse" />
             )}
             
-            {isLoading ? (
-              <div className="flex items-center justify-center gap-3 relative z-10">
-                <div className="relative">
-                  <Loader2 className="w-6 h-6 animate-spin text-primary" />
-                  <span className="absolute inset-0 w-6 h-6 bg-primary/30 rounded-full animate-ping" />
+            <Button
+              onClick={handleGenerateClick}
+              disabled={isLoading}
+              className={`
+                w-full h-14 text-lg font-bold uppercase tracking-widest transition-all duration-300 ease-in-out relative overflow-hidden group
+                ${isLoading
+                  ? "bg-primary/80 text-white border-2 border-primary/50"
+                  : "bg-gradient-to-r from-primary to-orange-600 hover:shadow-[0_0_30px_rgba(255,140,0,0.5)] hover:scale-[1.02] active:scale-[0.98]"
+                }
+              `}
+            >
+              {/* Efeito shimmer e brilho durante loading */}
+              {isLoading && (
+                <>
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-shimmer" />
+                  <div className="absolute inset-0 bg-primary/50 animate-pulse" />
+                </>
+              )}
+              
+              {/* Ripple effect ao hover */}
+              {!isLoading && (
+                <div className="absolute inset-0 rounded-[2rem] overflow-hidden">
+                  <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-500" />
                 </div>
-                <div className="flex flex-col items-start">
-                  <span className="animate-pulse text-sm">{t("wg_generating")}</span>
-                  <span className="text-[10px] opacity-60 font-normal">•</span>
+              )}
+              
+              {isLoading ? (
+                <div className="flex items-center justify-center gap-3 relative z-10">
+                  {/* Loader duplo com efeko de pulsar */}
+                  <div className="relative">
+                    <div className="w-8 h-8 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    <div className="absolute inset-0 w-8 h-8 bg-white/30 rounded-full animate-ping" />
+                  </div>
+                  <div className="flex flex-col items-start">
+                    <span className="text-white font-black tracking-wider">{t("wg_generating")}</span>
+                    <span className="text-[10px] text-white/60 font-bold">⚡ AI Working...</span>
+                  </div>
                 </div>
-              </div>
-            ) : (
-              <div className="flex items-center justify-center gap-2">
-                <Zap className="w-5 h-5" />
-                {t("wg_generate")}
-              </div>
-            )}
-          </Button>
+              ) : (
+                <div className="flex items-center justify-center gap-2 relative z-10">
+                  <Zap className="w-5 h-5 group-hover:scale-125 transition-transform" />
+                  {t("wg_generate")}
+                </div>
+              )}
+            </Button>
+          </div>
           
-          {/* Barra de Progresso Decorativa (só aparece carregando) */}
+          {/* Barra de progresso animada e pontos pulsantes */}
           {isLoading && (
-            <div className="w-full h-1 bg-gray-100 dark:bg-muted mt-4 rounded-full overflow-hidden">
-              <div className="h-full bg-primary animate-progress-indeterminate" />
-            </div>
-          )}
-          
-          {/* Mensagem de status durante loading */}
-          {isLoading && (
-            <div className="flex items-center justify-center gap-2 mt-4 text-sm text-muted-foreground animate-pulse">
-              <div className="flex gap-1">
-                <span className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                <span className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                <span className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+            <div className="mt-4 space-y-3">
+              {/* Barra de progresso */}
+              <div className="w-full h-2 bg-white/10 rounded-full overflow-hidden">
+                <div className="h-full bg-gradient-to-r from-primary to-white rounded-full animate-progress-indeterminate" />
               </div>
-              <span className="text-xs">{t("wg_generating")}...</span>
+              
+              {/* Status com pontos e texto */}
+              <div className="flex items-center justify-center gap-3">
+                <div className="flex gap-1.5">
+                  <span className="w-2.5 h-2.5 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                  <span className="w-2.5 h-2.5 bg-primary rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                  <span className="w-2.5 h-2.5 bg-primary rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                </div>
+                <span className="text-sm font-bold text-primary animate-pulse">{t("wg_generating")}...</span>
+              </div>
+              
+              {/* Texto de detalhe */}
+              <p className="text-center text-xs text-muted-foreground/60 font-medium">
+                {locale === "en-US" ? "Creating your personalized workout..." : "Criando seu treino personalizado..."}
+              </p>
             </div>
           )}
         </div>
