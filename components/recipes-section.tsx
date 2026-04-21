@@ -67,10 +67,20 @@ export function RecipesSection({ productName, dietProfile }: RecipesSectionProps
         body: JSON.stringify({ productName, dietProfile, locale }),
       })
 
-      const data = await response.json()
+      let data;
+      try {
+        data = await response.json();
+      } catch {
+        toast.error(locale === "en-US" ? "Error generating recipes. Please try again." : "Erro ao gerar receitas. Tente novamente.");
+        return;
+      }
       if (!response.ok) {
-        toast.error(data.error || (locale === "en-US" ? "Error generating recipes" : "Erro ao gerar receitas"))
+        toast.error(data?.error || (locale === "en-US" ? "Error generating recipes" : "Erro ao gerar receitas"))
         return
+      }
+      if (!data?.recipes) {
+        toast.error(locale === "en-US" ? "Error generating recipes. Please try again." : "Erro ao gerar receitas. Tente novamente.");
+        return;
       }
       console.log("[Fitverse] Recipes generated:", data.recipes)
       setRecipes(data.recipes)

@@ -97,10 +97,17 @@ export async function POST(req: Request) {
       }, { status: 403, headers })
     }
 
-    const { productName, dietProfile, locale = "pt-BR" } = await req.json()
+    let body;
+    try {
+      body = await req.json();
+    } catch {
+      return NextResponse.json({ error: 'Requisição inválida. Dados JSON mal formatados.' }, { status: 400, headers });
+    }
+
+    const { productName, dietProfile, locale = "pt-BR" } = body;
 
     if (!productName) {
-      return NextResponse.json({ error: "Product name is required" }, { status: 400 })
+      return NextResponse.json({ error: "Nome do ingrediente é obrigatório." }, { status: 400, headers })
     }
 
     const isEnglish = locale === "en-US"

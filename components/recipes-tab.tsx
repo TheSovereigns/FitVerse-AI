@@ -88,11 +88,23 @@ export function RecipesTab({ metabolicPlan }: RecipesTabProps) {
         }),
       })
 
-      const data = await response.json()
+      let data;
+      try {
+        data = await response.json();
+      } catch {
+        toast.error("Erro ao gerar receitas. Tente novamente.");
+        setIsGenerating(false);
+        return;
+      }
       if (!response.ok) {
-        toast.error(data.error || "Erro ao gerar receitas")
+        toast.error(data?.error || "Erro ao gerar receitas")
         setIsGenerating(false)
         return
+      }
+      if (!data?.recipes) {
+        toast.error("Erro ao gerar receitas. Tente novamente.");
+        setIsGenerating(false);
+        return;
       }
       setRecipes(data.recipes)
     } catch (error) {
