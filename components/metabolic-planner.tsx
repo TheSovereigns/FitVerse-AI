@@ -352,18 +352,24 @@ export function MetabolicPlanner({ onPlanCreated }: MetabolicPlannerProps) {
           <Button
             onClick={handleCalculate}
             disabled={isLoading}
-            className="w-full h-12 md:h-16 text-base md:text-xl font-black rounded-full shadow-[0_15px_40px_rgba(255,140,0,0.3)] transition-all mesh-gradient text-white haptic-press luminous-edge glass-reflection border border-white/20 uppercase tracking-[0.2em] relative z-10"
+            className="w-full h-12 md:h-16 text-base md:text-xl font-black rounded-full shadow-[0_15px_40px_rgba(255,140,0,0.3)] transition-all mesh-gradient text-white haptic-press luminous-edge glass-reflection border border-white/20 uppercase tracking-[0.2em] relative z-10 overflow-hidden"
           >
+            {isLoading && (
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-shimmer" />
+            )}
             {isLoading ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 md:h-5 md:w-5 animate-spin" />
-                {t('mp_generating')}
-              </>
+              <div className="flex items-center justify-center gap-2 relative z-10">
+                <div className="relative">
+                  <Loader2 className="h-4 w-4 md:h-5 md:w-5 animate-spin" />
+                  <span className="absolute inset-0 h-4 w-4 md:h-5 md:w-5 bg-primary/30 rounded-full animate-ping" />
+                </div>
+                <span className="animate-pulse">{t('mp_generating')}</span>
+              </div>
             ) : (
-              <>
+              <div className="flex items-center justify-center gap-2">
                 {t('mp_generate')}
-                <Zap className="ml-2 h-4 w-4 md:h-5 md:w-5" />
-              </>
+                <Zap className="h-4 w-4 md:h-5 md:w-5" />
+              </div>
             )}
           </Button>
           <p className="text-[8px] text-center text-muted-foreground mt-3 uppercase tracking-widest opacity-60">

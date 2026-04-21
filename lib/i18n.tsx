@@ -108,6 +108,7 @@ const translations = {
     recipes_title: "BioCuisine", recipes_subtitle: "Gastronomia Molecular Inteligente",
     recipes_placeholder: "Explorar ingredientes (frango, ovos...)",
     recipes_generate_btn: "GERAR BIO-RECEITAS", recipes_saved_title: "Bio-Arquivo Pessoal",
+    recipes_generating: "GERANDO",
     // Recipe Modal  
     rm_ga_synthesis: "Síntese Gastronômica IA",
     rm_time: "Tempo", rm_energy: "Energia", rm_level: "Nível", rm_servings: "Porções",
@@ -520,6 +521,7 @@ const translations = {
     recipes_title: "BioCuisine", recipes_subtitle: "Intelligent Molecular Gastronomy",
     recipes_placeholder: "Explore ingredients (chicken, eggs...)",
     recipes_generate_btn: "GENERATE BIO-RECIPES", recipes_saved_title: "Personal Bio-Archive",
+    recipes_generating: "GENERATING",
     // Recipe Modal
     rm_ga_synthesis: "AI Gastronomic Synthesis",
     rm_time: "Time", rm_energy: "Energy", rm_level: "Level", rm_servings: "Servings",

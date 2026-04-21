@@ -147,9 +147,20 @@ export function RecipesTab({ metabolicPlan }: RecipesTabProps) {
           <Button
             type="submit"
             disabled={isGenerating || !ingredient.trim()}
-            className="h-12 px-5 md:px-8 rounded-[1.25rem] md:rounded-[1.5rem] mesh-gradient text-white font-black text-xs md:text-base shadow-lg shadow-primary/20 transition-all hover:scale-105 active:scale-95"
+            className="h-12 px-5 md:px-8 rounded-[1.25rem] md:rounded-[1.5rem] mesh-gradient text-white font-black text-xs md:text-base shadow-lg shadow-primary/20 transition-all hover:scale-105 active:scale-95 relative overflow-hidden"
           >
-            {isGenerating ? <Loader2 className="w-4 h-4 animate-spin" /> : t("recipes_generate_btn")}
+            {isGenerating && (
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-shimmer" />
+            )}
+            {isGenerating ? (
+              <div className="flex items-center justify-center gap-2 relative z-10">
+                <div className="relative">
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <span className="absolute inset-0 w-4 h-4 bg-primary/30 rounded-full animate-ping" />
+                </div>
+                <span className="animate-pulse">{t("recipes_generating")}</span>
+              </div>
+            ) : t("recipes_generate_btn")}
           </Button>
         </div>
       </motion.form>

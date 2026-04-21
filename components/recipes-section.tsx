@@ -201,18 +201,24 @@ export function RecipesSection({ productName, dietProfile }: RecipesSectionProps
               variant="outline"
               onClick={handleGenerateRecipes}
               disabled={isLoading}
-              className="w-full mt-2 bg-transparent"
+              className="w-full mt-2 bg-transparent relative overflow-hidden"
             >
+              {isLoading && (
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-shimmer" />
+              )}
               {isLoading ? (
-                <>
-                  <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin mr-2" />
-                  {locale === "en-US" ? "Generating..." : "Gerando..."}
-                </>
+                <div className="flex items-center justify-center gap-2 relative z-10">
+                  <div className="relative">
+                    <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                    <span className="absolute inset-0 w-4 h-4 bg-primary/30 rounded-full animate-ping" />
+                  </div>
+                  <span className="animate-pulse">{locale === "en-US" ? "Generating..." : "Gerando..."}</span>
+                </div>
               ) : (
-                <>
-                  <Sparkles className="w-4 h-4 mr-2" />
+                <div className="flex items-center justify-center gap-2">
+                  <Sparkles className="w-4 h-4" />
                   {locale === "en-US" ? "Generate New Recipes" : "Gerar Novas Receitas"}
-                </>
+                </div>
               )}
             </Button>
           </div>
