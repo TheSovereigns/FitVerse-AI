@@ -918,4 +918,37 @@ aside.group:hover .sidebar-nav-label {
       flex-shrink: 0;
     }
   }
+
+  /* ─── Workout Generator Loading Animations ─── */
+  @keyframes shimmer {
+    0% {
+      transform: translateX(-100%);
+    }
+    100% {
+      transform: translateX(100%);
+    }
+  }
+
+  @keyframes progress-indeterminate {
+    0% {
+      transform: translateX(-20%);
+      width: 20%;
+    }
+    50% {
+      transform: translateX(60%);
+      width: 40%;
+    }
+    100% {
+      transform: translateX(220%);
+      width: 20%;
+    }
+  }
+
+  .animate-shimmer {
+    animation: shimmer 1.5s infinite;
+  }
+
+  .animate-progress-indeterminate {
+    animation: progress-indeterminate 1.5s ease-in-out infinite;
+  }
 }

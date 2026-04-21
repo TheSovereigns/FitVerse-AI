@@ -129,17 +129,28 @@ export function WorkoutGenerator({ onGenerate, isLoading }: WorkoutGeneratorProp
             onClick={handleGenerateClick}
             disabled={isLoading}
             className={`
-              w-full h-14 text-lg font-bold uppercase tracking-widest transition-all duration-300 ease-in-out
+              w-full h-14 text-lg font-bold uppercase tracking-widest transition-all duration-300 ease-in-out relative overflow-hidden
               ${isLoading
                 ? "bg-gray-100 dark:bg-muted text-muted-foreground cursor-not-allowed border border-gray-200 dark:border-border"
                 : "bg-gradient-to-r from-primary to-primary/80 hover:shadow-primary/40 text-primary-foreground shadow-[0_0_20px_rgba(255,140,0,0.3)]"
               }
             `}
           >
+            {/* Efeito de shimmer durante loading */}
+            {isLoading && (
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-shimmer" />
+            )}
+            
             {isLoading ? (
-              <div className="flex items-center justify-center gap-3">
-                <Loader2 className="w-6 h-6 animate-spin text-primary" />
-                <span className="animate-pulse">{t("wg_generating")}</span>
+              <div className="flex items-center justify-center gap-3 relative z-10">
+                <div className="relative">
+                  <Loader2 className="w-6 h-6 animate-spin text-primary" />
+                  <span className="absolute inset-0 w-6 h-6 bg-primary/30 rounded-full animate-ping" />
+                </div>
+                <div className="flex flex-col items-start">
+                  <span className="animate-pulse text-sm">{t("wg_generating")}</span>
+                  <span className="text-[10px] opacity-60 font-normal">•</span>
+                </div>
               </div>
             ) : (
               <div className="flex items-center justify-center gap-2">
@@ -153,6 +164,18 @@ export function WorkoutGenerator({ onGenerate, isLoading }: WorkoutGeneratorProp
           {isLoading && (
             <div className="w-full h-1 bg-gray-100 dark:bg-muted mt-4 rounded-full overflow-hidden">
               <div className="h-full bg-primary animate-progress-indeterminate" />
+            </div>
+          )}
+          
+          {/* Mensagem de status durante loading */}
+          {isLoading && (
+            <div className="flex items-center justify-center gap-2 mt-4 text-sm text-muted-foreground animate-pulse">
+              <div className="flex gap-1">
+                <span className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                <span className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                <span className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+              </div>
+              <span className="text-xs">{t("wg_generating")}...</span>
             </div>
           )}
         </div>
