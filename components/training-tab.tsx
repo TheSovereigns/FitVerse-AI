@@ -14,7 +14,6 @@ import { cn } from "@/lib/utils"
 import { supabase } from "@/lib/supabase"
 import { toast } from "sonner"
 import { useTranslation } from "@/lib/i18n"
-import { usePlanLimits } from "@/hooks/usePlanLimits"
 
 interface Exercise {
   name: string
@@ -42,8 +41,8 @@ interface TrainingTabProps {
 
 export function TrainingTab({ metabolicPlan, scanHistory, userGoal }: TrainingTabProps) {
   const { t, locale } = useTranslation()
-  const { plan, canGenerateWorkout: checkCanGenerateWorkout } = usePlanLimits()
   const [isGenerating, setIsGenerating] = useState(false)
+  const [generationError, setGenerationError] = useState<string | null>(null)
   const [generatedWorkouts, setGeneratedWorkouts] = useState<Workout[]>([])
   const [activeFilter, setActiveFilter] = useState("all")
   const [showGeneratorModal, setShowGeneratorModal] = useState(false)
@@ -120,13 +119,8 @@ export function TrainingTab({ metabolicPlan, scanHistory, userGoal }: TrainingTa
   }, [generatedWorkouts])
 
   const handleGenerateWorkouts = async (criteria: any) => {
-    const workoutsThisMonth = generatedWorkouts.length
-    if (!checkCanGenerateWorkout(workoutsThisMonth)) {
-      toast.error(t("page_limit_workout") || "Limite mensal de treinos atingido. Atualize para um plano superior!")
-      return
-    }
-
     setIsGenerating(true)
+    setGenerationError(null)
     setShowGeneratorModal(false)
     if (criteria.location === "Academia" || criteria.location === "Gym") setActiveFilter("gym")
     else if (criteria.location === "Casa (Halteres)" || criteria.location.includes("Halteres") || criteria.location.includes("Dumbbell")) setActiveFilter("dumbbells")
@@ -150,6 +144,15 @@ export function TrainingTab({ metabolicPlan, scanHistory, userGoal }: TrainingTa
           }
         }
       }
+
+      if (!token) {
+        const { data: { session } } = await supabase.auth.getSession()
+        token = session?.access_token || ''
+      }
+
+      if (!token) {
+        throw new Error(locale === "en-US" ? "Please sign in again before generating a workout." : "Entre novamente antes de gerar um treino.")
+      }
       
       const response = await fetch("/api/generate-workouts", {
         method: "POST",
@@ -159,15 +162,26 @@ export function TrainingTab({ metabolicPlan, scanHistory, userGoal }: TrainingTa
         },
         body: JSON.stringify({ ...criteria, goal: userGoal || "Hypertrophy & Definition", locale }),
       })
-      const data = await response.json()
+      const data = await response.json().catch(() => null)
       if (!response.ok) {
-        toast.error(data.error || t("training_error_ai"))
+        const message = data?.error || t("training_error_ai")
+        setGenerationError(message)
+        toast.error(message)
         return
       }
+
+      if (!Array.isArray(data?.workouts) || data.workouts.length === 0) {
+        throw new Error(locale === "en-US" ? "The AI did not return a workout. Try different options." : "A IA nao retornou um treino. Tente outras opcoes.")
+      }
+
       setGeneratedWorkouts(data.workouts.map((w: any) => ({ ...w, criteria })))
+      setActiveFilter("all")
+      toast.success(locale === "en-US" ? "Workout generated!" : "Treino gerado!")
     } catch (error) {
       console.error("Error generating workouts:", error)
-      toast.error(t("training_error_ai"))
+      const message = error instanceof Error ? error.message : t("training_error_ai")
+      setGenerationError(message)
+      toast.error(message)
     } finally {
       setIsGenerating(false)
     }
@@ -228,6 +242,51 @@ export function TrainingTab({ metabolicPlan, scanHistory, userGoal }: TrainingTa
           )
         })}
       </div>
+
+      {isGenerating && (
+        <motion.div
+          initial={{ opacity: 0, y: -8 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="glass-strong border border-primary/20 rounded-2xl p-4 flex items-center gap-3"
+        >
+          <Activity className="w-5 h-5 text-primary animate-pulse" />
+          <div>
+            <p className="text-sm font-black text-foreground">
+              {locale === "en-US" ? "Generating your workout..." : "Gerando seu treino..."}
+            </p>
+            <p className="text-xs font-bold text-muted-foreground opacity-60">
+              {locale === "en-US" ? "This can take a few seconds." : "Isso pode levar alguns segundos."}
+            </p>
+          </div>
+        </motion.div>
+      )}
+
+      {!isGenerating && generationError && (
+        <motion.div
+          initial={{ opacity: 0, y: -8 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="glass-strong border border-red-500/20 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center gap-3 justify-between"
+        >
+          <div className="flex items-start gap-3">
+            <Activity className="w-5 h-5 text-red-400 shrink-0 mt-0.5" />
+            <div>
+              <p className="text-sm font-black text-foreground">
+                {locale === "en-US" ? "Could not generate workout" : "Nao foi possivel gerar o treino"}
+              </p>
+              <p className="text-xs font-bold text-muted-foreground opacity-70">{generationError}</p>
+            </div>
+          </div>
+          <Button
+            onClick={() => {
+              setGenerationError(null)
+              setShowGeneratorModal(true)
+            }}
+            className="h-10 rounded-full text-xs font-black uppercase tracking-widest"
+          >
+            {locale === "en-US" ? "Try again" : "Tentar novamente"}
+          </Button>
+        </motion.div>
+      )}
 
       {/* Empty State */}
       <AnimatePresence>

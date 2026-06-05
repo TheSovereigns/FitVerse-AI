@@ -11,7 +11,7 @@ const supabase = (supabaseUrl && supabaseKey && !supabaseUrl.includes('placehold
   : null;
 
 const PLAN_LIMITS = {
-  free: { workoutsPerMonth: 0 },
+  free: { workoutsPerMonth: 2 },
   pro: { workoutsPerMonth: 5 },
   premium: { workoutsPerMonth: Infinity },
   banned: { workoutsPerMonth: 0 },
