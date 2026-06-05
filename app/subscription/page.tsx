@@ -23,9 +23,6 @@ import { usePlanLimits } from "@/hooks/usePlanLimits"
 import { supabase } from "@/lib/supabase"
 import { useTranslation } from "@/lib/i18n"
 import { toast } from "sonner"
-import { loadStripe } from "@stripe/stripe-js"
-
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!)
 
 type Plan = "free" | "pro" | "premium" | "banned"
 
@@ -94,6 +91,7 @@ const plans = [
 
 export default function SubscriptionPage() {
   const [loading, setLoading] = useState<string | null>(null)
+  const [checkoutError, setCheckoutError] = useState<string | null>(null)
   const [currentPlan, setCurrentPlan] = useState<Plan>("free")
   const [adsEnabled, setAdsEnabled] = useState(true)
   const [adsLoading, setAdsLoading] = useState(false)
@@ -158,10 +156,17 @@ export default function SubscriptionPage() {
   }
 
   const handleSwitchPlan = async (newPlan: Plan) => {
-    if (!user?.id) return
+    if (!user?.id) {
+      const message = isEnglish ? "Sign in before subscribing." : "Entre na sua conta antes de assinar."
+      setCheckoutError(message)
+      toast.error(message)
+      router.push("/auth/login")
+      return
+    }
 
     const planString = newPlan as string
     const isFreePlan = planString === "free"
+    setCheckoutError(null)
 
     if (isFreePlan) {
       setLoading(newPlan)
@@ -198,11 +203,14 @@ export default function SubscriptionPage() {
     }
 
     setLoading(newPlan)
+    const controller = new AbortController()
+    const timeout = window.setTimeout(() => controller.abort(), 25000)
+
     try {
       const { data: { session } } = await supabase.auth.getSession()
 
       if (!session?.access_token) {
-        throw new Error('Authentication required')
+        throw new Error(isEnglish ? "Your session expired. Sign in again before subscribing." : "Sua sessao expirou. Entre novamente antes de assinar.")
       }
 
       const response = await fetch('/api/stripe/checkout', {
@@ -214,28 +222,32 @@ export default function SubscriptionPage() {
         body: JSON.stringify({
           plan: newPlan,
         }),
+        signal: controller.signal,
       })
 
-      if (!response.ok) {
-        const data = await response.json().catch(() => null)
-        throw new Error(data?.error || 'Checkout failed')
+      const data = await response.json().catch(() => null)
+
+      if (!response.ok || data?.error) {
+        throw new Error(data?.error || (isEnglish ? "Checkout failed." : "Falha ao iniciar checkout."))
       }
 
-      const { url, error: stripeError } = await response.json()
-
-      if (stripeError) {
-        throw new Error(stripeError)
-      }
-
-      if (url) {
-        window.location.href = url
+      if (data?.url) {
+        window.location.assign(data.url)
       } else {
-        throw new Error('Checkout URL not returned')
+        throw new Error(isEnglish ? "Stripe did not return a checkout link." : "A Stripe nao retornou o link de checkout.")
       }
     } catch (error) {
       console.error('Checkout error:', error)
-      toast.error(isEnglish ? "Unable to start checkout. Please try again." : "Nao foi possivel iniciar o checkout. Tente novamente.")
+      const message = error instanceof Error && error.name === "AbortError"
+        ? (isEnglish ? "Checkout took too long. Please try again." : "O checkout demorou demais. Tente novamente.")
+        : error instanceof Error
+          ? error.message
+          : (isEnglish ? "Unable to start checkout. Please try again." : "Nao foi possivel iniciar o checkout. Tente novamente.")
+
+      setCheckoutError(message)
+      toast.error(message)
     } finally {
+      window.clearTimeout(timeout)
       setLoading(null)
     }
   }
@@ -290,6 +302,21 @@ export default function SubscriptionPage() {
               : "Desbloqueie o máximo do seu progresso fitness com ferramentas alimentadas por IA"}
           </p>
         </motion.div>
+        {checkoutError && (
+          <motion.div
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mb-8 glass-strong border border-red-500/25 bg-red-500/10 rounded-2xl p-4 flex items-start gap-3"
+          >
+            <XCircle className="w-5 h-5 text-red-400 shrink-0 mt-0.5" />
+            <div>
+              <p className="text-sm font-black text-red-300">
+                {isEnglish ? "Checkout unavailable" : "Checkout indisponivel"}
+              </p>
+              <p className="text-sm text-red-100/80">{checkoutError}</p>
+            </div>
+          </motion.div>
+        )}
         {/* Ads Toggle for Paid Plans */}
         {(currentPlan === "pro" || currentPlan === "premium") && (
           <motion.div 

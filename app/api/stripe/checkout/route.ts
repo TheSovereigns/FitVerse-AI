@@ -8,16 +8,33 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_KEY;
-const supabaseAdmin = supabaseUrl && supabaseServiceKey
-  ? createClient(supabaseUrl, supabaseServiceKey, {
+const hasSupabaseConfig = Boolean(
+  supabaseUrl &&
+    supabaseServiceKey &&
+    !supabaseUrl.includes('placeholder') &&
+    !supabaseServiceKey.includes('placeholder') &&
+    !supabaseServiceKey.includes('your_')
+);
+const supabaseAdmin = hasSupabaseConfig
+  ? createClient(supabaseUrl!, supabaseServiceKey!, {
       auth: { autoRefreshToken: false, persistSession: false },
     })
   : null;
 
 const PRICE_IDS = {
-  pro: process.env.STRIPE_PRO_PRICE_ID || 'price_pro_monthly',
-  premium: process.env.STRIPE_PREMIUM_PRICE_ID || 'price_premium_monthly',
+  pro: process.env.STRIPE_PRO_PRICE_ID,
+  premium: process.env.STRIPE_PREMIUM_PRICE_ID,
 };
+
+function isConfiguredStripeValue(value?: string): value is string {
+  return Boolean(
+    value &&
+      !value.includes('placeholder') &&
+      !value.includes('your_') &&
+      value !== 'price_pro_monthly' &&
+      value !== 'price_premium_monthly'
+  );
+}
 
 const responseHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -30,7 +47,7 @@ export async function OPTIONS() {
 }
 
 export async function POST(req: Request) {
-  if (!process.env.STRIPE_SECRET_KEY) {
+  if (!isConfiguredStripeValue(process.env.STRIPE_SECRET_KEY)) {
     return NextResponse.json(
       { error: 'Stripe nao configurado. Configure STRIPE_SECRET_KEY no ambiente.' },
       { status: 500, headers: responseHeaders }
@@ -63,21 +80,24 @@ export async function POST(req: Request) {
       );
     }
 
-    const body = await req.json();
-    const { plan } = body;
+    const body = await req.json().catch(() => ({}));
+    const requestedPlan = typeof body.plan === 'string'
+      ? body.plan.toLowerCase()
+      : Object.entries(PRICE_IDS).find(([, priceId]) => priceId && priceId === body.priceId)?.[0];
+    const plan = requestedPlan as keyof typeof PRICE_IDS | undefined;
 
     if (!plan || !['pro', 'premium'].includes(plan)) {
       return NextResponse.json(
-        { error: 'Plano invalido.' },
+        { error: 'Plano invalido. Envie plan como pro ou premium.' },
         { status: 400, headers: responseHeaders }
       );
     }
 
-    const priceId = PRICE_IDS[plan as keyof typeof PRICE_IDS];
-    if (!priceId) {
+    const priceId = PRICE_IDS[plan];
+    if (!isConfiguredStripeValue(priceId)) {
       return NextResponse.json(
-        { error: 'Plano invalido.' },
-        { status: 400, headers: responseHeaders }
+        { error: `Preco do plano ${plan} nao configurado. Configure ${plan === 'pro' ? 'STRIPE_PRO_PRICE_ID' : 'STRIPE_PREMIUM_PRICE_ID'} no ambiente.` },
+        { status: 500, headers: responseHeaders }
       );
     }
 
@@ -112,7 +132,7 @@ export async function POST(req: Request) {
         .eq('id', user.id);
     }
 
-    const session = await stripe.checkout.sessions.create({
+    const sessionParams: Stripe.Checkout.SessionCreateParams = {
       mode: 'subscription',
       payment_method_types: ['card'],
       line_items: [
@@ -123,7 +143,6 @@ export async function POST(req: Request) {
       ],
       success_url: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/subscription?success=true&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/subscription?canceled=true`,
-      customer: customerId,
       metadata: {
         userId: user.id,
         plan,
@@ -134,7 +153,15 @@ export async function POST(req: Request) {
           plan,
         },
       },
-    });
+    };
+
+    if (customerId) {
+      sessionParams.customer = customerId;
+    } else if (email) {
+      sessionParams.customer_email = email;
+    }
+
+    const session = await stripe.checkout.sessions.create(sessionParams);
 
     return NextResponse.json({ sessionId: session.id, url: session.url }, { headers: responseHeaders });
   } catch (error) {

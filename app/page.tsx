@@ -7,7 +7,6 @@ import { useState, useEffect, useRef } from "react"
 import { useRouter } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
 import { cn } from "@/lib/utils"
-import { loadStripe } from "@stripe/stripe-js"
 import { ScanDashboard } from "@/components/scan-dashboard"
 import { ProductResult, type ProductAnalysis } from "@/components/product-result"
 import { ScanHistory } from "@/components/scan-history"
@@ -33,9 +32,6 @@ import { supabase } from "@/lib/supabase"
 import { usePlanLimits } from "@/hooks/usePlanLimits"
 
 type View = "home" | "dashboard" | "result" | "recipes" | "training" | "profile" | "planner" | "settings" | "store" | "chatbot"
-
-// Inicialize o Stripe fora do componente para evitar recriação
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
 export default function DashboardPage() {
   const router = useRouter()
@@ -85,7 +81,6 @@ export default function DashboardPage() {
     },
   ])
   const [userMetabolicPlanState, setUserMetabolicPlanState] = useState<any>(null)
-  const [loadingStripe, setLoadingStripe] = useState(false)
   const bottomNavInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
@@ -224,38 +219,6 @@ export default function DashboardPage() {
       case "settings": return t("view_settings")
       case "chatbot": return t("view_chatbot")
       default: return t("view_fitverse")
-    }
-  }
-
-  const handleCheckout = async (priceId: string) => {
-    setLoadingStripe(true)
-    try {
-      const response = await fetch('/api/stripe/checkout', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ priceId }),
-      })
-
-      if (!response.ok) {
-        try {
-          const errorData = await response.json()
-          throw new Error(t("page_error_checkout"))
-        } catch {
-          throw new Error(t("page_error_payment"))
-        }
-      }
-
-      const data = await response.json()
-      const stripe = await stripePromise
-      if (stripe) {
-        const { error } = await stripe.redirectToCheckout({ sessionId: data.sessionId })
-        if (error) console.error(error)
-      }
-    } catch (error) {
-      console.error("Erro no checkout:", error)
-      alert(t("page_error_stripe_keys"))
-    } finally {
-      setLoadingStripe(false)
     }
   }
 
