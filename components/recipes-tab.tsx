@@ -9,7 +9,6 @@ import { RecipeModal } from "@/components/recipe-modal"
 import { ChefHat, Clock, Flame, Loader2, ArrowRight } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useTranslation } from "@/lib/i18n"
-import { usePlanLimits } from "@/hooks/usePlanLimits"
 import { supabase } from "@/lib/supabase"
 import { toast } from "sonner"
 
@@ -31,25 +30,25 @@ type RecipesTabProps = {
 
 export function RecipesTab({ metabolicPlan }: RecipesTabProps) {
   const { t, locale } = useTranslation()
-  const { plan, canGenerateDiet: checkCanGenerateDiet } = usePlanLimits()
   const [ingredient, setIngredient] = useState("")
   const [isGenerating, setIsGenerating] = useState(false)
+  const [generationError, setGenerationError] = useState<string | null>(null)
   const [recipes, setRecipes] = useState<Recipe[]>([])
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null)
   const [savedRecipes, setSavedRecipes] = useState<Recipe[]>([])
 
   const handleGenerateRecipes = async () => {
-    if (!ingredient.trim()) return
-    
-    const dietsThisMonth = recipes.length
-    if (!checkCanGenerateDiet(dietsThisMonth)) {
-      toast.error(t("page_limit_diet") || "Limite mensal de dietas atingido. Atualize para um plano superior!")
+    const trimmedIngredient = ingredient.trim()
+    if (!trimmedIngredient) {
+      const message = locale === "en-US" ? "Enter an ingredient before generating recipes." : "Digite um ingrediente antes de gerar receitas."
+      setGenerationError(message)
+      toast.error(message)
       return
     }
 
     setIsGenerating(true)
+    setGenerationError(null)
     try {
-      // Get token from localStorage directly
       let token = ''
       for (let i = 0; i < localStorage.length; i++) {
         const key = localStorage.key(i)
@@ -64,6 +63,15 @@ export function RecipesTab({ metabolicPlan }: RecipesTabProps) {
           }
         }
       }
+
+      if (!token) {
+        const { data: { session } } = await supabase.auth.getSession()
+        token = session?.access_token || ''
+      }
+
+      if (!token) {
+        throw new Error(locale === "en-US" ? "Please sign in again before generating recipes." : "Entre novamente antes de gerar receitas.")
+      }
       
       const response = await fetch("/api/generate-recipes", {
         method: "POST",
@@ -72,20 +80,35 @@ export function RecipesTab({ metabolicPlan }: RecipesTabProps) {
           "Authorization": `Bearer ${token}`
         },
         body: JSON.stringify({
-          productName: ingredient,
+          productName: trimmedIngredient,
           dietProfile: metabolicPlan?.goal || "Maintenance/Longevity",
           locale,
         }),
       })
 
-      const data = await response.json()
+      const data = await response.json().catch(() => null)
       if (!response.ok) {
-        toast.error(data.error || "Erro ao gerar receitas")
+        const message = data?.error || (locale === "en-US" ? "Could not generate recipes right now." : "Nao foi possivel gerar receitas agora.")
+        setGenerationError(message)
+        toast.error(message)
         return
       }
+
+      if (!Array.isArray(data?.recipes) || data.recipes.length === 0) {
+        throw new Error(locale === "en-US" ? "The generator did not return recipes. Try another ingredient." : "O gerador nao retornou receitas. Tente outro ingrediente.")
+      }
+
       setRecipes(data.recipes)
+      toast.success(locale === "en-US" ? "Recipes generated!" : "Receitas geradas!")
     } catch (error) {
       console.error("Error generating recipes:", error)
+      const message = error instanceof Error
+        ? error.message
+        : locale === "en-US"
+          ? "Unexpected error while generating recipes."
+          : "Erro inesperado ao gerar receitas."
+      setGenerationError(message)
+      toast.error(message)
     } finally {
       setIsGenerating(false)
     }
@@ -129,6 +152,32 @@ export function RecipesTab({ metabolicPlan }: RecipesTabProps) {
           </Button>
         </div>
       </motion.form>
+
+      <AnimatePresence>
+        {(isGenerating || generationError) && (
+          <motion.div
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            className={cn(
+              "rounded-[1.25rem] border px-4 py-3 text-sm font-bold shadow-lg",
+              generationError
+                ? "border-red-500/25 bg-red-500/10 text-red-600 dark:text-red-300"
+                : "border-primary/20 bg-primary/10 text-primary"
+            )}
+          >
+            <div className="flex items-center gap-3">
+              {isGenerating && !generationError ? <Loader2 className="h-4 w-4 animate-spin shrink-0" /> : <ChefHat className="h-4 w-4 shrink-0" />}
+              <span>
+                {generationError ||
+                  (locale === "en-US"
+                    ? "Generating recipes with AI. This can take a few seconds."
+                    : "Gerando receitas com IA. Isso pode levar alguns segundos.")}
+              </span>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Results Grid */}
       <AnimatePresence mode="wait">

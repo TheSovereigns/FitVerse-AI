@@ -11,7 +11,7 @@ const supabase = (supabaseUrl && supabaseKey && !supabaseUrl.includes('placehold
   : null;
 
 const PLAN_LIMITS = {
-  free: { dietsPerMonth: 0 },
+  free: { dietsPerMonth: 2 },
   pro: { dietsPerMonth: 5 },
   premium: { dietsPerMonth: Infinity },
   banned: { dietsPerMonth: 0 },
