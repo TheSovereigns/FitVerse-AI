@@ -117,7 +117,21 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Corpo da requisição inválido.' }, { status: 400, headers });
     }
 
-    const { message, history, userMetabolicPlan, userId, userContext } = body;
+    const { message, history, userMetabolicPlan, userContext } = body;
+    let authenticatedUserId: string | null = null;
+
+    const token = req.headers.get('Authorization')?.replace('Bearer ', '');
+    if (!token) {
+      return NextResponse.json({ error: 'Nao autorizado.' }, { status: 401, headers });
+    }
+
+    if (supabaseAdmin) {
+      const { data: { user }, error } = await supabaseAdmin.auth.getUser(token);
+      if (error || !user) {
+        return NextResponse.json({ error: 'Token invalido.' }, { status: 401, headers });
+      }
+      authenticatedUserId = user.id;
+    }
 
     if (!message) {
       return NextResponse.json({ error: 'Mensagem vazia.' }, { status: 400, headers });
@@ -191,7 +205,7 @@ PERGUNTA: ${message}`;
     const { category, subcategory } = detectCategory(message);
 
     // Save to dataset — non-blocking, never break the chat
-    if (supabaseAdmin && userId) {
+    if (supabaseAdmin && authenticatedUserId) {
       (async () => {
         try {
           let conversationId: string | null = null;
@@ -199,7 +213,7 @@ PERGUNTA: ${message}`;
           const { data: existingConv } = await supabaseAdmin
             .from('ai_conversations')
             .select('id')
-            .eq('user_id', userId)
+            .eq('user_id', authenticatedUserId)
             .order('created_at', { ascending: false })
             .limit(1)
             .single();
@@ -209,7 +223,7 @@ PERGUNTA: ${message}`;
           } else {
             const { data: newConv } = await supabaseAdmin
               .from('ai_conversations')
-              .insert({ user_id: userId, session_id: crypto.randomUUID() })
+              .insert({ user_id: authenticatedUserId, session_id: crypto.randomUUID() })
               .select('id')
               .single();
             if (newConv) conversationId = newConv.id;
@@ -220,7 +234,7 @@ PERGUNTA: ${message}`;
               .from('ai_messages')
               .insert({
                 conversation_id: conversationId,
-                user_id: userId,
+                user_id: authenticatedUserId,
                 user_message: message,
                 user_message_lang: userMessageLang,
                 user_context: userContext || {},

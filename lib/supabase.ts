@@ -68,7 +68,7 @@ export type Profile = {
   id: string
   email: string
   name: string | null
-  plan: 'free' | 'pro' | 'premium'
+  plan: 'free' | 'pro' | 'premium' | 'banned'
   is_admin: boolean
   country: string
   created_at: string

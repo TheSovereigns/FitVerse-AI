@@ -1,4 +1,4 @@
-export type Plan = 'free' | 'pro' | 'premium'
+export type Plan = 'free' | 'pro' | 'premium' | 'banned'
 
 export interface PlanLimits {
   scansPerDay: number | 'unlimited'
@@ -37,6 +37,15 @@ export const PLAN_LIMITS: Record<Plan, PlanLimits> = {
     dietsPerMonth: 'unlimited',
     hasAds: false,
     prioritySupport: true,
+  },
+  banned: {
+    scansPerDay: 0,
+    analysisLevel: 'basic',
+    historyDays: 0,
+    workoutsPerMonth: 0,
+    dietsPerMonth: 0,
+    hasAds: true,
+    prioritySupport: false,
   },
 }
 

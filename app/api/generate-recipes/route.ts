@@ -14,6 +14,7 @@ const PLAN_LIMITS = {
   free: { dietsPerMonth: 0 },
   pro: { dietsPerMonth: 5 },
   premium: { dietsPerMonth: Infinity },
+  banned: { dietsPerMonth: 0 },
 }
 
 const google = createGoogleGenerativeAI({

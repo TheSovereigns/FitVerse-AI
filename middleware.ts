@@ -5,7 +5,7 @@ import { createClient } from "@supabase/supabase-js"
 // Initialize Supabase admin client for server-side operations
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ""
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || ""
-const supabaseAdmin = supabaseServiceKey
+const supabaseAdmin = supabaseUrl && supabaseServiceKey
   ? createClient(supabaseUrl, supabaseServiceKey, {
       auth: { autoRefreshToken: false, persistSession: false },
     })
@@ -31,26 +31,32 @@ const publicRoutes = [
   "/api/chatbot",
 ]
 
-// Admin routes
-const adminRoutes = ["/admin-dashboard", "/api/admin"]
+// Admin API routes. Admin pages use client-side Supabase session guards.
+const adminRoutes = ["/api/admin"]
 
-// Protected routes (require auth)
-const protectedRoutes = [
-  "/dashboard",
-  "/bioscan",
-  "/treinos",
-  "/dieta",
-  "/chat",
-  "/perfil",
-  "/settings",
-  "/subscription",
-]
+// API routes that require auth but are not admin-only.
+const protectedRoutes: string[] = []
+
+function matchesRoute(path: string, route: string) {
+  if (route === "/") {
+    return path === "/"
+  }
+
+  return path === route || path.startsWith(`${route}/`)
+}
 
 async function getSession(request: NextRequest) {
   if (!supabaseAdmin) return null
 
   try {
-    // Get the auth token from cookies
+    const bearerToken = request.headers.get("Authorization")?.replace("Bearer ", "")
+    if (bearerToken) {
+      const { data: { user }, error } = await supabaseAdmin.auth.getUser(bearerToken)
+      if (error || !user) return null
+      return user
+    }
+
+    // Fallback for deployments that store Supabase auth in cookies.
     const cookieHeader = request.headers.get("cookie") || ""
     const token = cookieHeader
       .split("; ")
@@ -119,16 +125,16 @@ export async function middleware(request: NextRequest) {
   )
 
   // 3. Check if route is public
-  const isPublicRoute = publicRoutes.some((route) => path.startsWith(route))
+  const isPublicRoute = publicRoutes.some((route) => matchesRoute(path, route))
   if (isPublicRoute) {
     return response
   }
 
   // 4. Check authentication for protected routes
   const isProtectedRoute = protectedRoutes.some((route) =>
-    path.startsWith(route)
+    matchesRoute(path, route)
   )
-  const isAdminRoute = adminRoutes.some((route) => path.startsWith(route))
+  const isAdminRoute = adminRoutes.some((route) => matchesRoute(path, route))
 
   if (isProtectedRoute || isAdminRoute) {
     const user = await getSession(request)

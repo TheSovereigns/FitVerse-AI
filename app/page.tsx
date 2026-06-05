@@ -50,6 +50,7 @@ export default function DashboardPage() {
   const [authTimedOut, setAuthTimedOut] = useState(false)
   const [isAnalyzing, setIsAnalyzing] = useState(false)
   const [isAdmin, setIsAdmin] = useState(false)
+  const [scanError, setScanError] = useState<string | null>(null)
   const [analysisResult, setAnalysisResult] = useState<ProductAnalysis | null>(null)
   const [dailyActivity, setDailyActivity] = useState<any>({
     date: new Date().toISOString().split('T')[0],
@@ -270,8 +271,10 @@ export default function DashboardPage() {
     setIslandState("scanning")
     setCurrentView("result")
     setAnalysisResult(null)
+    setScanError(null)
 
     let displayImage = "/placeholder.svg?height=80&width=80"
+    let imageMimeType = "image/jpeg"
 
     const toBase64 = (file: File): Promise<string> =>
       new Promise((resolve, reject) => {
@@ -282,14 +285,12 @@ export default function DashboardPage() {
       })
 
     try {
-      console.log('DEBUG: entering try block');
       let imageData: string | undefined
 
       if (fileOrUrl instanceof File) {
-        console.log('DEBUG: before toBase64');
         displayImage = URL.createObjectURL(fileOrUrl)
+        imageMimeType = fileOrUrl.type || "image/jpeg"
         imageData = await toBase64(fileOrUrl)
-        console.log('DEBUG: after toBase64, length:', imageData?.length);
       } else if (typeof fileOrUrl === "string") {
         displayImage = fileOrUrl
         imageData = fileOrUrl
@@ -299,8 +300,6 @@ export default function DashboardPage() {
         throw new Error(t("page_error_no_image"))
       }
 
-      console.log('DEBUG: getting session...');
-      
       // Try to get token directly from localStorage
       let token = ''
       
@@ -314,7 +313,6 @@ export default function DashboardPage() {
               const parsed = JSON.parse(storedSession)
               if (parsed?.access_token) {
                 token = parsed.access_token
-                console.log('DEBUG: got token from localStorage')
                 break
               }
             }
@@ -323,16 +321,14 @@ export default function DashboardPage() {
         
         // If no token, try supabase.auth.getSession() with timeout
         if (!token) {
-          console.log('DEBUG: trying getSession...')
           const sessionPromise = supabase.auth.getSession()
-          const timeoutPromise = new Promise((_, reject) => 
+          const timeoutPromise = new Promise<never>((_, reject) => 
             setTimeout(() => reject(new Error('Timeout')), 8000)
           )
           
           try {
-            const sessionData = await Promise.race([sessionPromise, timeoutPromise])
-            token = sessionData?.session?.access_token || ''
-            console.log('DEBUG: getSession completed')
+            const { data: sessionData } = await Promise.race([sessionPromise, timeoutPromise])
+            token = sessionData.session?.access_token || ''
           } catch (getSessionError) {
             console.error('DEBUG: getSession failed:', getSessionError)
           }
@@ -341,16 +337,17 @@ export default function DashboardPage() {
         console.error('Error getting token:', e)
       }
       
-      console.log('DEBUG: session result:', { hasToken: !!token });
+      if (!token) {
+        throw new Error(isEnglish ? "Please sign in again before scanning." : "Entre novamente antes de escanear.")
+      }
 
       const controller = new AbortController()
       const timeoutId = setTimeout(() => {
         controller.abort()
-      }, 15000)
+      }, 60000)
 
       let response
       try {
-        console.log('DEBUG: before fetch');
         response = await fetch('/api/analyze-product', {
           method: 'POST',
           headers: { 
@@ -359,35 +356,35 @@ export default function DashboardPage() {
           },
           body: JSON.stringify({
             imageData: imageData,
+            mimeType: imageMimeType,
             metabolicPlan: userMetabolicPlanState,
             locale,
           }),
           signal: controller.signal,
         })
-        console.log('DEBUG: after fetch');
       } catch (fetchError) {
-        console.log('DEBUG: fetch error:', fetchError);
         clearTimeout(timeoutId)
+        const message = fetchError instanceof Error && fetchError.name === 'AbortError'
+          ? (isEnglish ? "The scan took too long. Please try again with a clearer image." : "A analise demorou demais. Tente novamente com uma imagem mais nitida.")
+          : (isEnglish ? "Connection error. Please check your internet." : "Erro de conexao. Verifique sua internet.")
+
         if (fetchError instanceof Error && fetchError.name === 'AbortError') {
-          toast.error(isEnglish ? "Request timed out. Please try again." : "Tempo limite excedido. Tente novamente.")
+          toast.error(message)
         } else {
-          toast.error(isEnglish ? "Connection error. Please check your internet." : "Erro de conexão. Verifique sua internet.")
+          toast.error(message)
         }
         setIslandState("error")
         setTimeout(() => setIslandState("idle"), 3000)
-        setCurrentView("dashboard")
+        setScanError(message)
+        setCurrentView("result")
         setIsAnalyzing(false)
         return
       }
       clearTimeout(timeoutId)
 
       if (!response.ok) {
-        try {
-          const errorData = await response.json()
-          throw new Error(errorData.error || t("page_error_ai_fail"))
-        } catch {
-          throw new Error(t("page_error_ai_server"))
-        }
+        const errorData = await response.json().catch(() => null)
+        throw new Error(errorData?.error || t("page_error_ai_fail"))
       }
 
       const analysis: ProductAnalysis = await response.json()
@@ -417,10 +414,12 @@ export default function DashboardPage() {
       incrementScans()
     } catch (error) {
       console.error("Erro durante a análise:", error)
+      const message = error instanceof Error ? error.message : t("page_error_retry")
       setIslandState("error")
       setTimeout(() => setIslandState("idle"), 3000)
-      toast.error(error instanceof Error ? error.message : t("page_error_retry"))
-      setCurrentView("dashboard")
+      setScanError(message)
+      toast.error(message)
+      setCurrentView("result")
     } finally {
       setIsAnalyzing(false)
     }
@@ -486,7 +485,7 @@ export default function DashboardPage() {
           <NavButton icon={Calculator} label={t("nav_diet")} active={currentView === "planner"} onClick={() => setCurrentView("planner")} />
           <NavButton icon={ChefHat} label={t("nav_recipes")} active={currentView === "recipes"} onClick={() => setCurrentView("recipes")} />
           <NavButton icon={ShoppingBag} label={t("nav_store")} active={currentView === "store"} onClick={() => setCurrentView("store")} />
-          <NavButton icon={Bot} label={t("nav_aichat")} active={currentView === "chatbot")} onClick={() => setCurrentView("chatbot")} />
+          <NavButton icon={Bot} label={t("nav_aichat")} active={currentView === "chatbot"} onClick={() => setCurrentView("chatbot")} />
         </nav>
 
         <div className="p-2 lg:p-3 mb-3 lg:mb-4 space-y-2 border-t border-white/10 pt-4 flex flex-col items-center">
@@ -532,8 +531,39 @@ export default function DashboardPage() {
 
         <main className="flex-1 p-4 md:p-6 lg:p-8 xl:p-12 overflow-y-auto pb-24 md:pb-8">
           {currentView === "home" && <HomeDashboard userMetabolicPlan={userMetabolicPlanState} dailyActivity={dailyActivity} onNavigate={setCurrentView} />}
-          {currentView === "dashboard" && <ScanDashboard onScan={handleScan} />}
-          {currentView === "result" && (isAnalyzing || !currentAnalysis ? <ProductSkeleton /> : <ProductResult result={currentAnalysis} onBack={() => setCurrentView("dashboard")} />)}
+          {currentView === "dashboard" && <ScanDashboard onScan={handleScan} isScanning={isAnalyzing} />}
+          {currentView === "result" && (
+            scanError ? (
+              <div className="min-h-[60vh] flex items-center justify-center">
+                <div className="w-full max-w-md glass-strong border border-red-500/20 rounded-[2rem] p-6 text-center space-y-5">
+                  <div className="w-14 h-14 mx-auto rounded-2xl bg-red-500/10 flex items-center justify-center">
+                    <ScanLine className="w-7 h-7 text-red-400" />
+                  </div>
+                  <div>
+                    <h2 className="text-2xl font-black text-foreground tracking-tight">
+                      {isEnglish ? "Scan failed" : "Nao foi possivel analisar"}
+                    </h2>
+                    <p className="mt-2 text-sm font-bold text-muted-foreground">
+                      {scanError}
+                    </p>
+                  </div>
+                  <Button
+                    onClick={() => {
+                      setScanError(null)
+                      setCurrentView("dashboard")
+                    }}
+                    className="w-full h-12 rounded-2xl font-black"
+                  >
+                    {isEnglish ? "Try another image" : "Tentar outra imagem"}
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              isAnalyzing || !currentAnalysis
+                ? <ProductSkeleton />
+                : <ProductResult result={currentAnalysis} onBack={() => setCurrentView("dashboard")} />
+            )
+          )}
           {currentView === "recipes" && <RecipesTab />}
           {currentView === "training" && <TrainingTab />}
           {currentView === "planner" && (

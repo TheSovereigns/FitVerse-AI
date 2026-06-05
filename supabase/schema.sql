@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS public.profiles (
   id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
   email TEXT NOT NULL,
   name TEXT,
-  plan TEXT DEFAULT 'free' CHECK (plan IN ('free', 'premium')),
+  plan TEXT DEFAULT 'free' CHECK (plan IN ('free', 'pro', 'premium', 'banned')),
   is_admin BOOLEAN DEFAULT false,
   country TEXT DEFAULT 'BR' CHECK (country IN ('BR', 'US', 'other')),
   created_at TIMESTAMPTZ DEFAULT NOW(),

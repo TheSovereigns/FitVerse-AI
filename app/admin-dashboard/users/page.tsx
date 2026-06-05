@@ -157,14 +157,28 @@ export default function AdminUsersPage() {
     }
   }
 
+  const updateUserAsAdmin = async (userId: string, updates: Record<string, unknown>) => {
+    const { data: { session } } = await supabase.auth.getSession()
+    if (!session?.access_token) throw new Error("Authentication required")
+
+    const response = await fetch("/api/admin/users", {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${session.access_token}`,
+      },
+      body: JSON.stringify({ userId, updates }),
+    })
+
+    if (!response.ok) {
+      const data = await response.json().catch(() => null)
+      throw new Error(data?.error || "Admin update failed")
+    }
+  }
+
   const handlePromoteToAdmin = async (userId: string) => {
     try {
-      const { error } = await supabase
-        .from('profiles')
-        .update({ is_admin: true })
-        .eq('id', userId)
-
-      if (error) throw error
+      await updateUserAsAdmin(userId, { is_admin: true })
       fetchUsers()
     } catch (error) {
       console.error("Error promoting user:", error)
@@ -173,12 +187,7 @@ export default function AdminUsersPage() {
 
   const handleDemoteFromAdmin = async (userId: string) => {
     try {
-      const { error } = await supabase
-        .from('profiles')
-        .update({ is_admin: false })
-        .eq('id', userId)
-
-      if (error) throw error
+      await updateUserAsAdmin(userId, { is_admin: false })
       fetchUsers()
     } catch (error) {
       console.error("Error demoting user:", error)
@@ -187,12 +196,7 @@ export default function AdminUsersPage() {
 
   const handleChangePlan = async (userId: string, newPlan: string) => {
     try {
-      const { error } = await supabase
-        .from('profiles')
-        .update({ plan: newPlan })
-        .eq('id', userId)
-
-      if (error) throw error
+      await updateUserAsAdmin(userId, { plan: newPlan })
       fetchUsers()
     } catch (error) {
       console.error("Error changing plan:", error)
@@ -203,12 +207,7 @@ export default function AdminUsersPage() {
     if (!confirm(locale === "en-US" ? "Are you sure you want to ban this user?" : "Tem certeza que deseja banir este usuário?")) return
     
     try {
-      const { error } = await supabase
-        .from('profiles')
-        .update({ plan: 'banned' })
-        .eq('id', userId)
-
-      if (error) throw error
+      await updateUserAsAdmin(userId, { plan: 'banned' })
       fetchUsers()
     } catch (error) {
       console.error("Error banning user:", error)

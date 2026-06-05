@@ -14,6 +14,7 @@ const PLAN_LIMITS = {
   free: { workoutsPerMonth: 0 },
   pro: { workoutsPerMonth: 5 },
   premium: { workoutsPerMonth: Infinity },
+  banned: { workoutsPerMonth: 0 },
 }
 
 const google = createGoogleGenerativeAI({

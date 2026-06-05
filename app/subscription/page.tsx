@@ -27,7 +27,7 @@ import { loadStripe } from "@stripe/stripe-js"
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!)
 
-type Plan = "free" | "pro" | "premium"
+type Plan = "free" | "pro" | "premium" | "banned"
 
 const plans = [
   {
@@ -166,13 +166,22 @@ export default function SubscriptionPage() {
     if (isFreePlan) {
       setLoading(newPlan)
       try {
-        await supabase
-          .from("profiles")
-          .update({ 
-            plan: newPlan,
-            ads_enabled: true
-          })
-          .eq("id", user.id)
+        const { data: { session } } = await supabase.auth.getSession()
+        if (!session?.access_token) throw new Error("Authentication required")
+
+        const response = await fetch("/api/subscription/plan", {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${session.access_token}`,
+          },
+          body: JSON.stringify({ plan: newPlan }),
+        })
+
+        if (!response.ok) {
+          const data = await response.json().catch(() => null)
+          throw new Error(data?.error || "Failed to switch plan")
+        }
 
         setCurrentPlan(newPlan)
         setAdsEnabled(true)
@@ -190,18 +199,26 @@ export default function SubscriptionPage() {
 
     setLoading(newPlan)
     try {
+      const { data: { session } } = await supabase.auth.getSession()
+
+      if (!session?.access_token) {
+        throw new Error('Authentication required')
+      }
+
       const response = await fetch('/api/stripe/checkout', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`,
+        },
         body: JSON.stringify({
           plan: newPlan,
-          userId: user.id,
-          email: user.email,
         }),
       })
 
       if (!response.ok) {
-        throw new Error('Checkout failed')
+        const data = await response.json().catch(() => null)
+        throw new Error(data?.error || 'Checkout failed')
       }
 
       const { url, error: stripeError } = await response.json()
@@ -213,36 +230,11 @@ export default function SubscriptionPage() {
       if (url) {
         window.location.href = url
       } else {
-        await supabase
-          .from("profiles")
-          .update({ 
-            plan: newPlan,
-            ads_enabled: false
-          })
-          .eq("id", user.id)
-
-        setCurrentPlan(newPlan)
-        setAdsEnabled(false)
-        localStorage.setItem("userPlan", newPlan)
-        
-        toast.success(isEnglish ? `Switched to ${newPlan}` : `Plano alterado para ${newPlan}`)
+        throw new Error('Checkout URL not returned')
       }
     } catch (error) {
       console.error('Checkout error:', error)
-      await supabase
-        .from("profiles")
-        .update({ 
-          plan: newPlan,
-          ads_enabled: false
-        })
-        .eq("id", user.id)
-
-      setCurrentPlan(newPlan)
-      setAdsEnabled(false)
-      localStorage.setItem("userPlan", newPlan)
-      await refreshPlan()
-      
-      toast.success(isEnglish ? `Switched to ${newPlan} (demo)` : `Plano alterado para ${newPlan} (demo)`)
+      toast.error(isEnglish ? "Unable to start checkout. Please try again." : "Nao foi possivel iniciar o checkout. Tente novamente.")
     } finally {
       setLoading(null)
     }

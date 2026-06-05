@@ -12,6 +12,7 @@ const PLAN_LIMITS = {
   free: { scansPerDay: 5 },
   pro: { scansPerDay: 50 },
   premium: { scansPerDay: Infinity },
+  banned: { scansPerDay: 0 },
 };
 
 async function checkScanLimit(userId: string, plan: string): Promise<boolean> {
@@ -92,10 +93,14 @@ export async function POST(req: Request) {
 
   try {
     const body = await req.json();
-    const { imageData, locale = "pt-BR" } = body;
+    const { imageData, mimeType = "image/jpeg", locale = "pt-BR" } = body;
 
     if (!imageData) {
       return NextResponse.json({ error: 'Imagem não fornecida.' }, { status: 400, headers });
+    }
+
+    if (typeof mimeType !== "string" || !mimeType.startsWith("image/")) {
+      return NextResponse.json({ error: 'Formato de imagem invalido.' }, { status: 400, headers });
     }
 
     const base64Data = imageData.includes('base64,') 
@@ -154,7 +159,7 @@ export async function POST(req: Request) {
       {
         inlineData: {
           data: base64Data,
-          mimeType: "image/jpeg",
+          mimeType,
         },
       },
     ]);
@@ -164,7 +169,30 @@ export async function POST(req: Request) {
     
     text = text.replace(/```json/g, '').replace(/```/g, '').trim();
     
-    const analysis = JSON.parse(text);
+    let analysis;
+    try {
+      analysis = JSON.parse(text);
+    } catch {
+      console.error('Resposta invalida da IA:', text);
+      return NextResponse.json(
+        { error: 'A IA retornou uma resposta invalida. Tente uma foto mais nitida do alimento ou rotulo.' },
+        { status: 502, headers }
+      );
+    }
+
+    if (analysis.error) {
+      return NextResponse.json(
+        { error: typeof analysis.error === 'string' ? analysis.error : 'A imagem nao parece ser um alimento.' },
+        { status: 422, headers }
+      );
+    }
+
+    if (!analysis.productName || typeof analysis.longevityScore !== 'number') {
+      return NextResponse.json(
+        { error: 'Nao foi possivel identificar o alimento. Tente uma foto mais clara.' },
+        { status: 422, headers }
+      );
+    }
 
     const transformed = {
       ...analysis,

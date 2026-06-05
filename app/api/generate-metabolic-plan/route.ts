@@ -15,14 +15,18 @@ export async function POST(req: Request) {
     }
 
     const authHeader = req.headers.get('Authorization')
-    let userId: string | null = null
-    
-    if (authHeader && supabase) {
-      const token = authHeader.replace('Bearer ', '')
-      const { data: { user }, error: authError } = await supabase.auth.getUser(token)
-      if (user && !authError) {
-        userId = user.id
-      }
+    if (!authHeader) {
+      return NextResponse.json({ error: 'Nao autorizado.' }, { status: 401, headers })
+    }
+
+    if (!supabase) {
+      return NextResponse.json({ error: 'Configuracao do servidor incompleta.' }, { status: 500, headers })
+    }
+
+    const token = authHeader.replace('Bearer ', '')
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token)
+    if (!user || authError) {
+      return NextResponse.json({ error: 'Token invalido.' }, { status: 401, headers })
     }
 
     const apiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_GENERATIVE_AI_API_KEY;
