@@ -121,6 +121,7 @@ const translations = {
     chatbot_placeholder: "Pergunte ao seu Coach...", chatbot_header: "Coach FitVerse",
     chatbot_status: "FitVerse AI Ativo", chatbot_analyzing: "ANALISANDO...",
     chatbot_error: "Erro de conexão bio-neural. Tente novamente.", chatbot_net_error: "Falha na rede neural.",
+    chatbot_disabled_desc: "O Coach FitVerse está sendo preparado para voltar com respostas melhores e mais seguras.",
     chatbot_rate_experience: "Como está sendo sua experiência com a IA?",
     chatbot_skip_rating: "Talvez depois",
     // Feedback
@@ -533,6 +534,7 @@ const translations = {
     chatbot_placeholder: "Ask your Coach...", chatbot_header: "FitVerse Coach",
     chatbot_status: "FitVerse AI Active", chatbot_analyzing: "ANALYZING...",
     chatbot_error: "Bio-neural connection error. Please try again.", chatbot_net_error: "Neural network failure.",
+    chatbot_disabled_desc: "The FitVerse Coach is being prepared to return with better and safer answers.",
     chatbot_rate_experience: "How has your AI experience been?",
     chatbot_skip_rating: "Maybe later",
     // Feedback
