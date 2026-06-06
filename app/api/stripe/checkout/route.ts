@@ -6,6 +6,8 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
   apiVersion: '2024-06-20',
 });
 
+export const maxDuration = 20;
+
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_KEY;
 const hasSupabaseConfig = Boolean(
@@ -34,6 +36,15 @@ function isConfiguredStripeValue(value?: string): value is string {
       value !== 'price_pro_monthly' &&
       value !== 'price_premium_monthly'
   );
+}
+
+function withTimeout<T>(promise: Promise<T>, timeoutMs: number, message: string): Promise<T> {
+  return Promise.race([
+    promise,
+    new Promise<T>((_, reject) => {
+      setTimeout(() => reject(new Error(message)), timeoutMs);
+    }),
+  ]);
 }
 
 const responseHeaders = {
@@ -72,7 +83,11 @@ export async function POST(req: Request) {
       );
     }
 
-    const { data: { user }, error: authError } = await supabaseAdmin.auth.getUser(token);
+    const { data: { user }, error: authError } = await withTimeout(
+      supabaseAdmin.auth.getUser(token),
+      8000,
+      'Tempo esgotado ao validar usuario no Supabase.'
+    );
     if (authError || !user) {
       return NextResponse.json(
         { error: 'Token invalido.' },
@@ -101,32 +116,45 @@ export async function POST(req: Request) {
       );
     }
 
-    const { data: profile } = await supabaseAdmin
-      .from('profiles')
-      .select('stripe_customer_id')
-      .eq('id', user.id)
-      .single();
+    const profileResult = await withTimeout(
+      Promise.resolve(supabaseAdmin
+        .from('profiles')
+        .select('stripe_customer_id')
+        .eq('id', user.id)
+        .single()),
+      8000,
+      'Tempo esgotado ao buscar perfil do usuario.'
+    );
+    const profile = profileResult.data;
 
     let customerId = profile?.stripe_customer_id as string | undefined;
     const email = user.email || undefined;
 
     if (!customerId && email) {
-      const existingCustomers = await stripe.customers.list({
-        email,
-        limit: 1,
-      });
+      const existingCustomers = await withTimeout(
+        stripe.customers.list({
+          email,
+          limit: 1,
+        }),
+        10000,
+        'Tempo esgotado ao consultar cliente na Stripe.'
+      );
 
       if (existingCustomers.data.length > 0) {
         customerId = existingCustomers.data[0].id;
       } else {
-        const customer = await stripe.customers.create({
-          email,
-          metadata: { userId: user.id },
-        });
+        const customer = await withTimeout(
+          stripe.customers.create({
+            email,
+            metadata: { userId: user.id },
+          }),
+          10000,
+          'Tempo esgotado ao criar cliente na Stripe.'
+        );
         customerId = customer.id;
       }
 
-      await supabaseAdmin
+      void supabaseAdmin
         .from('profiles')
         .update({ stripe_customer_id: customerId })
         .eq('id', user.id);
@@ -161,7 +189,11 @@ export async function POST(req: Request) {
       sessionParams.customer_email = email;
     }
 
-    const session = await stripe.checkout.sessions.create(sessionParams);
+    const session = await withTimeout(
+      stripe.checkout.sessions.create(sessionParams),
+      12000,
+      'Tempo esgotado ao criar checkout na Stripe.'
+    );
 
     return NextResponse.json({ sessionId: session.id, url: session.url }, { headers: responseHeaders });
   } catch (error) {
