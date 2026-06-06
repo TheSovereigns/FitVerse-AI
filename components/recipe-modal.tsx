@@ -1,45 +1,38 @@
 "use client"
 
-import { motion, AnimatePresence } from "framer-motion"
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { motion } from "framer-motion"
+import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Progress } from "@/components/ui/progress"
-import { 
-  Clock, 
-  Flame, 
-  ChefHat, 
-  Utensils, 
-  Activity, 
-  CheckCircle2, 
-  Sparkles, 
-  Zap, 
-  Beef, 
-  Cookie, 
-  Droplet,
+import {
   ArrowRight,
-  ChevronRight,
-  Info
+  ChefHat,
+  Clock,
+  Flame,
+  Info,
+  Sparkles,
+  Utensils,
+  Users,
+  X,
 } from "lucide-react"
-import { cn } from "@/lib/utils"
-
 import { useTranslation } from "@/lib/i18n"
 
 type Recipe = {
-  name: string;
-  prepTime: string;
-  difficulty: "Fácil" | "Médio" | "Difícil" | string;
+  name: string
+  prepTime: string
+  difficulty: "Facil" | "Medio" | "Dificil" | string
   macros: {
-    calories: number;
-    protein: number;
-    carbs: number;
-    fat: number;
-  };
-  ingredients: string[];
-  instructions: string[];
-  biohackingTips?: string[];
-  description?: string;
-  servings?: number;
+    calories: number
+    protein: number
+    carbs: number
+    fat: number
+  }
+  ingredients: string[]
+  instructions: string[]
+  biohackingTips?: string[]
+  description?: string
+  servings?: number
 }
 
 interface RecipeModalProps {
@@ -49,158 +42,183 @@ interface RecipeModalProps {
 
 export function RecipeModal({ recipe, onClose }: RecipeModalProps) {
   const { t } = useTranslation()
+  const totalMacros = Math.max(
+    1,
+    (recipe.macros?.protein || 0) + (recipe.macros?.carbs || 0) + (recipe.macros?.fat || 0)
+  )
 
   const getDifficultyLabel = (diff: string) => {
-    if (diff === "Fácil" || diff === "Easy") return t("rm_easy")
-    if (diff === "Médio" || diff === "Medium") return t("rm_medium")
-    if (diff === "Difícil" || diff === "Hard") return t("rm_hard")
+    if (["Facil", "Fácil", "FÃ¡cil", "Easy"].includes(diff)) return t("rm_easy")
+    if (["Medio", "Médio", "MÃ©dio", "Medium"].includes(diff)) return t("rm_medium")
+    if (["Dificil", "Difícil", "DifÃ­cil", "Hard"].includes(diff)) return t("rm_hard")
     return diff
   }
 
   return (
-    <Dialog open={true} onOpenChange={(open) => !open && onClose()}>      
-      <DialogContent className="max-w-3xl w-full h-[80vh] md:h-[80vh] flex flex-col p-0 gap-0 bg-transparent border-none shadow-none rounded-[2rem] overflow-hidden" showCloseButton={false}>
-        <motion.div 
-          initial={{ y: 50, opacity: 0 }}
+    <Dialog open={true} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent
+        className="h-[86vh] w-full max-w-4xl overflow-hidden rounded-[2rem] border-none bg-transparent p-0 shadow-none md:h-[84vh]"
+        showCloseButton={false}
+      >
+        <motion.div
+          initial={{ y: 36, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          className="flex-1 glass-strong border-t border-white/20 rounded-[2rem] flex flex-col overflow-hidden shadow-[0_20px_40px_rgba(0,0,0,0.5)]"
+          className="relative flex h-full flex-col overflow-hidden rounded-[2rem] border border-orange-300/22 bg-[#070604]/96 shadow-[inset_0_1px_0_rgba(251,146,60,0.16),0_24px_90px_rgba(0,0,0,0.58)] backdrop-blur-2xl"
         >
-          {/* Header Bar */}
-          <div className="w-10 h-1 bg-white/20 rounded-full mx-auto mt-3 mb-2 shrink-0" />
-          
-          <ScrollArea className="flex-1">
-            <div className="p-4 md:p-6 space-y-6 pb-28">
-              {/* Hero Section */}
-              <div className="text-center space-y-6">
-               <div className="flex items-center justify-center gap-3">
-                    <Zap className="w-4 h-4 text-primary animate-pulse" />
-                    <span className="text-[8px] font-black uppercase tracking-[0.4em] opacity-40">{t("rm_ga_synthesis")}</span>
-                 </div>
-                 <DialogTitle className="text-2xl md:text-4xl font-black text-foreground tracking-tight leading-tight">
-                    {recipe.name}
-                 </DialogTitle>
-                 {recipe.description && (
-                   <DialogDescription className="text-sm md:text-base font-bold text-muted-foreground opacity-50 italic max-w-2xl mx-auto leading-relaxed">
-                     "{recipe.description}"
-                   </DialogDescription>
-                 )}
-              </div>
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_25%_0%,rgba(255,149,0,0.20),transparent_36%),radial-gradient(circle_at_90%_10%,rgba(251,191,36,0.12),transparent_32%)]" />
+          <div className="pointer-events-none absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-orange-300/60 to-transparent" />
 
-               {/* Quick Stats Bento */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+          <div className="relative flex items-center justify-between border-b border-orange-300/14 bg-black/35 px-4 py-3 md:px-5">
+            <div className="flex items-center gap-2">
+              <div className="flex h-9 w-9 items-center justify-center rounded-2xl border border-orange-300/16 bg-orange-500/10 text-amber-100">
+                <ChefHat className="h-4 w-4" />
+              </div>
+              <div>
+                <p className="text-[9px] font-black uppercase tracking-[0.26em] text-orange-100/45">
+                  {t("rm_ga_synthesis")}
+                </p>
+                <p className="text-xs font-black text-orange-50/70">{getDifficultyLabel(recipe.difficulty)}</p>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={onClose}
+              className="flex h-10 w-10 items-center justify-center rounded-2xl border border-orange-300/14 bg-orange-500/8 text-orange-100/70 transition hover:bg-orange-500/16 hover:text-orange-50"
+              aria-label="Close"
+            >
+              <X className="h-5 w-5" />
+            </button>
+          </div>
+
+          <ScrollArea className="relative flex-1">
+            <div className="space-y-5 p-4 pb-28 md:p-6 md:pb-28">
+              <section className="relative overflow-hidden rounded-[1.75rem] border border-orange-300/18 bg-orange-950/16 p-5 md:p-6">
+                <div className="absolute inset-y-0 left-0 w-1.5 bg-gradient-to-b from-amber-300 via-orange-500 to-orange-900" />
+                <DialogTitle className="max-w-3xl text-2xl font-black leading-tight tracking-tight text-foreground md:text-4xl">
+                  {recipe.name}
+                </DialogTitle>
+                {recipe.description && (
+                  <DialogDescription className="mt-3 max-w-3xl text-sm font-bold leading-relaxed text-orange-50/55 md:text-base">
+                    {recipe.description}
+                  </DialogDescription>
+                )}
+              </section>
+
+              <section className="grid grid-cols-2 gap-3 md:grid-cols-4">
                 {[
-                  { label: t("rm_time"), val: recipe.prepTime, icon: Clock, color: "text-blue-400" },
-                  { label: t("rm_energy"), val: recipe.macros.calories + " kcal", icon: Flame, color: "text-rose-500" },
-                  { label: t("rm_level"), val: getDifficultyLabel(recipe.difficulty), icon: ChefHat, color: "text-amber-400" },
-                  { label: t("rm_servings"), val: recipe.servings || 1, icon: Utensils, color: "text-emerald-400" }
-                ].map((stat, i) => (
-                  <div key={i} className="glass-strong border-white/10 rounded-xl md:rounded-2xl p-3 md:p-5 flex flex-col items-center justify-center gap-2 shadow-lg hover:scale-105 transition-all">
-                    <stat.icon className={cn("w-4 h-4 md:w-6 md:h-6", stat.color)} />
-                    <div className="text-center">
-                       <p className="text-lg md:text-2xl font-black text-foreground tracking-tighter">{stat.val}</p>
-                       <p className="text-[8px] md:text-[10px] font-black uppercase tracking-widest opacity-30 mt-1">{stat.label}</p>
-                    </div>
+                  { label: t("rm_time"), val: recipe.prepTime, icon: Clock },
+                  { label: t("rm_energy"), val: `${recipe.macros.calories} kcal`, icon: Flame },
+                  { label: t("rm_level"), val: getDifficultyLabel(recipe.difficulty), icon: ChefHat },
+                  { label: t("rm_servings"), val: recipe.servings || 1, icon: Users },
+                ].map((stat) => (
+                  <div key={stat.label} className="rounded-2xl border border-orange-300/14 bg-black/38 p-3 shadow-lg backdrop-blur-xl md:p-4">
+                    <stat.icon className="h-5 w-5 text-amber-200" />
+                    <p className="mt-3 text-lg font-black leading-tight text-orange-50 md:text-xl">{stat.val}</p>
+                    <p className="mt-1 text-[9px] font-black uppercase tracking-widest text-orange-100/38">{stat.label}</p>
                   </div>
                 ))}
-              </div>
+              </section>
 
-              {/* Macros Breakdown */}
-              <div className="p-10 glass-strong border-white/10 rounded-[3rem] shadow-2xl relative overflow-hidden group">
-                 <div className="absolute inset-0 mesh-gradient opacity-10 group-hover:opacity-20 transition-opacity" />
-                 <div className="relative z-10 grid grid-cols-3 gap-8">
+              <section className="relative overflow-hidden rounded-[1.75rem] border border-orange-300/16 bg-black/42 p-4 shadow-xl backdrop-blur-2xl md:p-5">
+                <div className="absolute inset-0 bg-gradient-to-br from-orange-500/10 via-transparent to-amber-300/8" />
+                <div className="relative">
+                  <div className="mb-4 flex items-center justify-between gap-3">
+                    <h3 className="text-sm font-black uppercase tracking-[0.18em] text-orange-50">
+                      {t("rm_energy")}
+                    </h3>
+                    <span className="rounded-full border border-orange-300/14 bg-orange-500/10 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-amber-100">
+                      {recipe.macros.calories} kcal
+                    </span>
+                  </div>
+                  <div className="grid gap-4 md:grid-cols-3">
                     {[
-                      { label: t("rm_prot"), val: recipe.macros.protein, color: "bg-blue-500" },
-                      { label: t("rm_carb"), val: recipe.macros.carbs, color: "bg-amber-500" },
-                      { label: t("rm_fat"), val: recipe.macros.fat, color: "bg-rose-500" }
-                    ].map((m, i) => (
-                      <div key={i} className="space-y-4">
-                         <div className="flex items-end justify-between">
-                            <span className="text-[10px] font-black uppercase tracking-[0.3em] opacity-40">{m.label}</span>
-                            <span className="text-2xl font-black text-foreground">{m.val}g</span>
-                         </div>
-                         <Progress value={(m.val / (recipe.macros.protein + recipe.macros.carbs + recipe.macros.fat)) * 100} className="h-2 bg-white/5" indicatorClassName={m.color} />
+                      { label: t("rm_prot"), val: recipe.macros.protein, bar: "bg-orange-400" },
+                      { label: t("rm_carb"), val: recipe.macros.carbs, bar: "bg-amber-300" },
+                      { label: t("rm_fat"), val: recipe.macros.fat, bar: "bg-orange-600" },
+                    ].map((macro) => (
+                      <div key={macro.label} className="rounded-2xl border border-orange-300/12 bg-orange-950/18 p-3">
+                        <div className="mb-2 flex items-end justify-between">
+                          <span className="text-[9px] font-black uppercase tracking-widest text-orange-100/42">{macro.label}</span>
+                          <span className="text-xl font-black text-orange-50">{macro.val}g</span>
+                        </div>
+                        <Progress
+                          value={(macro.val / totalMacros) * 100}
+                          className="h-2 bg-orange-950/70"
+                          indicatorClassName={macro.bar}
+                        />
                       </div>
                     ))}
-                 </div>
-              </div>
+                  </div>
+                </div>
+              </section>
 
-               <div className="grid md:grid-cols-2 gap-6">
-                {/* Ingredients Column */}
-                <div className="space-y-4">
-                  <h3 className="text-lg font-black uppercase tracking-tight flex items-center gap-3 italic">
-                    <div className="w-8 h-8 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
-                       <Utensils className="w-4 h-4" />
-                    </div>
+              <section className="grid gap-4 md:grid-cols-2">
+                <div className="rounded-[1.75rem] border border-orange-300/16 bg-black/42 p-4 shadow-xl backdrop-blur-2xl md:p-5">
+                  <h3 className="mb-4 flex items-center gap-3 text-sm font-black uppercase tracking-[0.18em] text-orange-50">
+                    <span className="flex h-9 w-9 items-center justify-center rounded-2xl border border-orange-300/14 bg-orange-500/10 text-amber-100">
+                      <Utensils className="h-4 w-4" />
+                    </span>
                     {t("rm_ingredients")}
                   </h3>
-                  <div className="grid grid-cols-1 gap-2">
+                  <div className="space-y-2">
                     {recipe.ingredients.map((ingredient, index) => (
-                      <motion.div 
-                        key={index}
-                        whileHover={{ x: 5 }}
-                        className="p-3 glass-strong border-white/5 rounded-2xl flex items-center gap-3 group"
+                      <div
+                        key={`${ingredient}-${index}`}
+                        className="flex items-start gap-3 rounded-2xl border border-orange-300/10 bg-orange-950/14 p-3"
                       >
-                         <div className="w-3 h-3 rounded-full border-2 border-primary/30 group-hover:bg-primary group-hover:border-primary transition-all shrink-0" />
-                         <span className="text-sm font-bold text-foreground/80 group-hover:text-foreground transition-colors">{ingredient}</span>
-                      </motion.div>
+                        <span className="mt-1 h-2.5 w-2.5 shrink-0 rounded-full bg-orange-400 shadow-[0_0_18px_rgba(251,146,60,0.45)]" />
+                        <span className="text-sm font-bold leading-relaxed text-orange-50/76">{ingredient}</span>
+                      </div>
                     ))}
                   </div>
                 </div>
 
-                {/* Instructions Column */}
-                <div className="space-y-4">
-                  <h3 className="text-lg font-black uppercase tracking-tight flex items-center gap-3 italic">
-                    <div className="w-8 h-8 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
-                       <ChefHat className="w-4 h-4" />
-                    </div>
+                <div className="rounded-[1.75rem] border border-orange-300/16 bg-black/42 p-4 shadow-xl backdrop-blur-2xl md:p-5">
+                  <h3 className="mb-4 flex items-center gap-3 text-sm font-black uppercase tracking-[0.18em] text-orange-50">
+                    <span className="flex h-9 w-9 items-center justify-center rounded-2xl border border-orange-300/14 bg-orange-500/10 text-amber-100">
+                      <ChefHat className="h-4 w-4" />
+                    </span>
                     {t("rm_instructions")}
                   </h3>
                   <div className="space-y-3">
                     {recipe.instructions.map((step, index) => (
-                      <div key={index} className="flex gap-3 group">
-                        <div className="shrink-0 w-8 h-8 rounded-xl glass-strong border-primary/20 text-primary flex items-center justify-center font-black text-sm shadow-lg transition-all group-hover:bg-primary group-hover:text-white">
+                      <div key={`${step}-${index}`} className="flex gap-3">
+                        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl border border-orange-300/18 bg-orange-500/10 text-sm font-black text-amber-100">
                           {index + 1}
                         </div>
-                        <p className="text-sm font-bold leading-relaxed text-muted-foreground group-hover:text-foreground transition-all pt-1">
-                          {step}
-                        </p>
+                        <p className="pt-1 text-sm font-bold leading-relaxed text-orange-50/70">{step}</p>
                       </div>
                     ))}
                   </div>
                 </div>
-              </div>
+              </section>
 
-              {/* Biohacking Tips Bento */}
               {recipe.biohackingTips && recipe.biohackingTips.length > 0 && (
-                <div className="p-6 glass-strong border-emerald-500/20 rounded-2xl shadow-xl relative overflow-hidden">
-                   <div className="absolute inset-0 bg-emerald-500/5 opacity-50" />
-                   <div className="relative z-10">
-                      <h3 className="text-lg font-black uppercase tracking-tighter flex items-center gap-3 text-emerald-400 italic mb-4">
-                         <Sparkles className="w-5 h-5 animate-pulse" />
-                         {t("rm_biohacks")}
-                      </h3>
-                       <div className="grid md:grid-cols-2 gap-3">
-                         {recipe.biohackingTips.map((tip, index) => (
-                           <div key={index} className="flex items-start gap-3 p-3 bg-emerald-500/5 rounded-xl border border-emerald-500/10">
-                             <Info className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
-                             <span className="text-sm font-bold text-emerald-100/80 leading-relaxed">{tip}</span>
-                           </div>
-                         ))}
-                       </div>
-                   </div>
-                </div>
+                <section className="rounded-[1.75rem] border border-orange-300/16 bg-orange-950/16 p-4 shadow-xl backdrop-blur-2xl md:p-5">
+                  <h3 className="mb-4 flex items-center gap-3 text-sm font-black uppercase tracking-[0.18em] text-orange-50">
+                    <Sparkles className="h-5 w-5 text-amber-200" />
+                    {t("rm_biohacks")}
+                  </h3>
+                  <div className="grid gap-3 md:grid-cols-2">
+                    {recipe.biohackingTips.map((tip, index) => (
+                      <div key={`${tip}-${index}`} className="flex items-start gap-3 rounded-2xl border border-orange-300/12 bg-black/28 p-3">
+                        <Info className="mt-0.5 h-4 w-4 shrink-0 text-amber-200" />
+                        <span className="text-sm font-bold leading-relaxed text-orange-50/70">{tip}</span>
+                      </div>
+                    ))}
+                  </div>
+                </section>
               )}
             </div>
           </ScrollArea>
 
-          {/* Action Bar */}
-          <div className="absolute bottom-0 inset-x-0 glass-strong border-t border-white/10 p-4 flex items-center justify-center gap-4 z-20 shadow-[0_-10px_30px_rgba(0,0,0,0.5)]">
-            <Button 
-              onClick={onClose} 
-              className="w-full max-w-sm h-14 rounded-2xl mesh-gradient text-white font-black text-base uppercase tracking-widest shadow-xl haptic-press"
+          <div className="absolute inset-x-0 bottom-0 z-20 border-t border-orange-300/14 bg-black/70 p-4 backdrop-blur-2xl">
+            <Button
+              onClick={onClose}
+              className="mx-auto flex h-12 w-full max-w-sm rounded-2xl bg-orange-500 text-sm font-black uppercase tracking-[0.16em] text-black shadow-[0_14px_34px_rgba(255,149,0,0.24)] hover:bg-amber-300"
             >
               {t("rm_close")}
-              <ArrowRight className="ml-2 w-5 h-5" />
+              <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
           </div>
         </motion.div>
