@@ -97,13 +97,13 @@ const plans = [
 
 const accentStyles = {
   zinc: {
-    shell: "border-white/14 bg-white/[0.055]",
-    icon: "bg-white/10 text-zinc-100 border-white/10",
-    title: "text-zinc-100",
-    button: "bg-white/10 hover:bg-white/16 text-white border-white/10",
-    check: "text-zinc-200",
-    shine: "from-white/12 via-white/[0.03] to-transparent",
-    ring: "shadow-[inset_0_1px_0_rgba(255,255,255,0.12),0_24px_80px_rgba(0,0,0,0.24)]",
+    shell: "border-orange-300/18 bg-orange-950/20",
+    icon: "bg-orange-500/10 text-orange-100 border-orange-300/16",
+    title: "text-orange-50",
+    button: "bg-orange-500/10 hover:bg-orange-500/18 text-orange-100 border-orange-300/18",
+    check: "text-orange-200",
+    shine: "from-orange-300/12 via-orange-500/[0.035] to-transparent",
+    ring: "shadow-[inset_0_1px_0_rgba(251,146,60,0.14),0_24px_80px_rgba(0,0,0,0.24)]",
   },
   orange: {
     shell: "border-amber-300/35 bg-amber-300/[0.075]",
@@ -111,8 +111,8 @@ const accentStyles = {
     title: "text-amber-100",
     button: "bg-amber-300 hover:bg-amber-200 text-slate-950 border-amber-100/20",
     check: "text-amber-200",
-    shine: "from-amber-200/20 via-white/[0.045] to-transparent",
-    ring: "shadow-[inset_0_1px_0_rgba(255,255,255,0.16),0_28px_100px_rgba(245,158,11,0.18)]",
+    shine: "from-amber-200/20 via-orange-500/[0.045] to-transparent",
+    ring: "shadow-[inset_0_1px_0_rgba(251,191,36,0.18),0_28px_100px_rgba(245,158,11,0.18)]",
   },
 }
 
@@ -314,16 +314,16 @@ export default function SubscriptionPage() {
   return (
     <div className="min-h-screen bg-[#070604] text-white relative overflow-hidden">
       <div className="absolute inset-0 pointer-events-none bg-[linear-gradient(115deg,rgba(255,122,24,0.20)_0%,transparent_32%,rgba(245,158,11,0.16)_62%,transparent_100%)]" />
-      <div className="absolute inset-0 pointer-events-none opacity-[0.18] [background-image:linear-gradient(rgba(255,255,255,0.08)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.08)_1px,transparent_1px)] [background-size:72px_72px]" />
-      <div className="absolute inset-x-0 top-0 h-48 pointer-events-none bg-gradient-to-b from-white/8 to-transparent" />
+      <div className="absolute inset-0 pointer-events-none opacity-[0.16] [background-image:linear-gradient(rgba(251,146,60,0.12)_1px,transparent_1px),linear-gradient(90deg,rgba(251,146,60,0.12)_1px,transparent_1px)] [background-size:72px_72px]" />
+      <div className="absolute inset-x-0 top-0 h-48 pointer-events-none bg-gradient-to-b from-orange-500/12 to-transparent" />
 
-      <header className="relative z-10 border-b border-white/10 bg-white/[0.045] backdrop-blur-2xl">
+      <header className="relative z-10 border-b border-orange-300/16 bg-black/50 backdrop-blur-2xl">
         <div className="max-w-7xl mx-auto px-4 md:px-6 py-4 flex items-center justify-between gap-3">
           <Button
             variant="ghost"
             size="icon"
             onClick={() => router.push("/")}
-            className="rounded-2xl border border-white/10 bg-white/[0.04] hover:bg-white/10"
+            className="rounded-2xl border border-orange-300/18 bg-orange-500/8 hover:bg-orange-500/14"
           >
             <ArrowLeft className="w-5 h-5" />
           </Button>
@@ -337,8 +337,8 @@ export default function SubscriptionPage() {
             </h1>
           </div>
 
-          <div className="h-10 px-3 rounded-2xl border border-white/10 bg-white/[0.04] flex items-center gap-2">
-            <span className="hidden sm:inline text-[10px] uppercase tracking-widest text-white/45">
+          <div className="h-10 px-3 rounded-2xl border border-orange-300/18 bg-orange-500/8 flex items-center gap-2">
+            <span className="hidden sm:inline text-[10px] uppercase tracking-widest text-orange-100/50">
               {isEnglish ? "Current" : "Atual"}
             </span>
             <span className="text-xs font-black text-amber-100">{currentPlan.toUpperCase()}</span>
@@ -347,22 +347,22 @@ export default function SubscriptionPage() {
       </header>
 
       <main className="relative z-10 max-w-7xl mx-auto px-4 md:px-6 py-5 md:py-7">
-        <section className="relative overflow-hidden rounded-[2rem] md:rounded-[2.5rem] border border-orange-300/25 bg-black/45 backdrop-blur-2xl shadow-[inset_0_1px_0_rgba(255,255,255,0.16),0_30px_120px_rgba(0,0,0,0.32)] p-5 md:p-6 mb-5">
+        <section className="relative overflow-hidden rounded-[2rem] md:rounded-[2.5rem] border border-orange-300/35 bg-black/55 backdrop-blur-2xl shadow-[inset_0_1px_0_rgba(251,146,60,0.16),0_30px_120px_rgba(0,0,0,0.32)] p-5 md:p-6 mb-5">
           <div className="absolute left-0 top-0 bottom-0 w-2 bg-gradient-to-b from-orange-300 via-orange-500 to-amber-700" />
-          <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/50 to-transparent" />
-          <div className="absolute inset-0 pointer-events-none bg-[linear-gradient(135deg,rgba(255,255,255,0.11),transparent_34%,rgba(255,122,24,0.10)_64%,rgba(245,158,11,0.10))]" />
+          <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-orange-300/60 to-transparent" />
+          <div className="absolute inset-0 pointer-events-none bg-[linear-gradient(135deg,rgba(251,146,60,0.12),transparent_34%,rgba(255,122,24,0.10)_64%,rgba(245,158,11,0.10))]" />
           <div className="relative grid lg:grid-cols-[1fr_auto] gap-5 items-end">
             <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }}>
               <div className="inline-flex items-center gap-2 rounded-full border border-orange-300/25 bg-orange-300/10 px-3 py-2 mb-3">
                 <Lock className="w-4 h-4 text-amber-200" />
-                <span className="text-xs font-black uppercase tracking-widest text-white/68">
+                <span className="text-xs font-black uppercase tracking-widest text-orange-50/75">
                   {isEnglish ? "Stripe checkout protected" : "Checkout protegido pela Stripe"}
                 </span>
               </div>
               <h2 className="max-w-3xl text-3xl md:text-5xl font-black tracking-tight leading-[1.02]">
                 {isEnglish ? "FitVerse Black Plans." : "Planos FitVerse Black."}
               </h2>
-              <p className="mt-3 max-w-2xl text-sm md:text-base text-white/58 leading-relaxed">
+              <p className="mt-3 max-w-2xl text-sm md:text-base text-orange-50/58 leading-relaxed">
                 {isEnglish
                   ? "More scans, richer analysis, workouts and recipes with a smooth ad-free FitVerse experience."
                   : "Mais scans, analises melhores, treinos e receitas em uma experiencia FitVerse mais limpa e sem anuncios."}
@@ -380,8 +380,8 @@ export default function SubscriptionPage() {
                 { label: isEnglish ? "Workouts" : "Treinos", value: planSummary.workouts },
                 { label: isEnglish ? "Recipes" : "Receitas", value: planSummary.recipes },
               ].map((item) => (
-                <div key={item.label} className="rounded-2xl border border-white/10 bg-black/22 backdrop-blur-xl p-3">
-                  <p className="text-[10px] uppercase tracking-widest text-white/40">{item.label}</p>
+                <div key={item.label} className="rounded-2xl border border-orange-300/18 bg-orange-950/20 backdrop-blur-xl p-3">
+                  <p className="text-[10px] uppercase tracking-widest text-orange-100/45">{item.label}</p>
                   <p className="mt-2 text-lg md:text-2xl font-black text-white">{item.value}</p>
                 </div>
               ))}
@@ -409,7 +409,7 @@ export default function SubscriptionPage() {
           <motion.div
             initial={{ opacity: 0, y: -8 }}
             animate={{ opacity: 1, y: 0 }}
-            className="mb-6 rounded-2xl border border-white/10 bg-white/[0.05] backdrop-blur-xl p-4 flex items-center justify-between"
+            className="mb-6 rounded-2xl border border-orange-300/18 bg-orange-500/8 backdrop-blur-xl p-4 flex items-center justify-between"
           >
             <div className="flex items-center gap-3 min-w-0">
               <div className="w-10 h-10 rounded-xl bg-amber-200/12 text-amber-100 flex items-center justify-center shrink-0">
@@ -419,7 +419,7 @@ export default function SubscriptionPage() {
                 <p className="text-sm font-black">
                   {adsEnabled ? (isEnglish ? "Ads enabled" : "Anuncios ativados") : (isEnglish ? "Ads disabled" : "Anuncios desativados")}
                 </p>
-                <p className="text-xs text-white/45">{isEnglish ? "Paid plans can control ads" : "Planos pagos podem controlar anuncios"}</p>
+                <p className="text-xs text-orange-50/45">{isEnglish ? "Paid plans can control ads" : "Planos pagos podem controlar anuncios"}</p>
               </div>
             </div>
             <Switch checked={adsEnabled} onCheckedChange={handleToggleAds} disabled={adsLoading} />
@@ -446,9 +446,9 @@ export default function SubscriptionPage() {
                   planItem.popular && "md:min-h-[472px]"
                 )}
               >
-                <div className={cn("absolute inset-x-0 top-0 h-2", planItem.id === "free" ? "bg-white/20" : "bg-orange-400")} />
+                <div className="absolute inset-x-0 top-0 h-2 bg-orange-400" />
                 <div className={cn("absolute inset-x-0 top-0 h-36 bg-gradient-to-b pointer-events-none", styles.shine)} />
-                <div className="absolute inset-x-6 top-0 h-px bg-gradient-to-r from-transparent via-white/60 to-transparent" />
+                <div className="absolute inset-x-6 top-0 h-px bg-gradient-to-r from-transparent via-orange-200/55 to-transparent" />
 
                 <div className="relative flex items-start justify-between gap-3 mb-5">
                   <div className={cn("w-12 h-12 rounded-2xl border flex items-center justify-center", styles.icon)}>
@@ -470,22 +470,22 @@ export default function SubscriptionPage() {
 
                 <div className="relative">
                   <h3 className={cn("text-2xl md:text-3xl font-black tracking-tight", styles.title)}>{planItem.name}</h3>
-                  <p className="text-sm text-white/52 mt-1 min-h-5">
+                  <p className="text-sm text-orange-50/52 mt-1 min-h-5">
                     {isEnglish ? planItem.subtitleEn : planItem.subtitle}
                   </p>
                   <div className="mt-4 flex items-end gap-1">
                     <span className="text-3xl md:text-4xl font-black tracking-tight">{isEnglish ? planItem.priceUsd : planItem.price}</span>
-                    <span className="text-sm text-white/45 mb-2">{isEnglish ? planItem.periodEn : planItem.period}</span>
+                    <span className="text-sm text-orange-50/45 mb-2">{isEnglish ? planItem.periodEn : planItem.period}</span>
                   </div>
                 </div>
 
                 <div className="relative mt-5 space-y-2.5 flex-1">
                   {planItem.features.map((feature) => (
                     <div key={feature.text} className="flex items-center gap-2.5 text-[13px]">
-                      <span className="w-5 h-5 rounded-full bg-white/8 border border-white/10 flex items-center justify-center shrink-0">
+                      <span className="w-5 h-5 rounded-full bg-orange-500/10 border border-orange-300/16 flex items-center justify-center shrink-0">
                         <Check className={cn("w-3.5 h-3.5", styles.check)} />
                       </span>
-                      <span className="text-white/70">{isEnglish ? feature.textEn : feature.text}</span>
+                      <span className="text-orange-50/70">{isEnglish ? feature.textEn : feature.text}</span>
                     </div>
                   ))}
                 </div>
@@ -494,9 +494,9 @@ export default function SubscriptionPage() {
                   onClick={() => handleSwitchPlan(planItem.id)}
                   disabled={isCurrentPlan || Boolean(loading)}
                   className={cn(
-                    "relative mt-5 h-12 rounded-2xl border font-black tracking-[0.14em] uppercase shadow-[inset_0_1px_0_rgba(255,255,255,0.18)]",
+                    "relative mt-5 h-12 rounded-2xl border font-black tracking-[0.14em] uppercase shadow-[inset_0_1px_0_rgba(251,191,36,0.20)]",
                     isCurrentPlan
-                      ? "bg-white/7 text-white/38 border-white/10"
+                      ? "bg-orange-500/8 text-orange-100/40 border-orange-300/16"
                       : styles.button
                   )}
                 >
@@ -521,20 +521,20 @@ export default function SubscriptionPage() {
           })}
         </section>
 
-        <section className="mt-6 rounded-[2rem] border border-white/10 bg-white/[0.045] backdrop-blur-2xl p-4 md:p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.12)]">
+        <section className="mt-6 rounded-[2rem] border border-orange-300/18 bg-black/45 backdrop-blur-2xl p-4 md:p-5 shadow-[inset_0_1px_0_rgba(251,146,60,0.12)]">
           <div className="grid md:grid-cols-3 gap-3">
             {[
               { icon: Lock, title: isEnglish ? "Stripe payment" : "Pagamento Stripe", desc: isEnglish ? "Card checkout handled by Stripe." : "Checkout de cartao processado pela Stripe." },
               { icon: BadgeCheck, title: isEnglish ? "Plan sync" : "Plano sincronizado", desc: isEnglish ? "Webhook updates your account after payment." : "O webhook atualiza sua conta apos o pagamento." },
               { icon: Sparkles, title: isEnglish ? "Ad control" : "Controle de anuncios", desc: isEnglish ? "Paid users can disable ads." : "Usuarios pagos podem desativar anuncios." },
             ].map((item) => (
-              <div key={item.title} className="flex items-center gap-3 rounded-2xl border border-white/8 bg-black/18 p-3">
-                <div className="w-10 h-10 rounded-xl bg-white/8 flex items-center justify-center text-amber-100 shrink-0">
+              <div key={item.title} className="flex items-center gap-3 rounded-2xl border border-orange-300/14 bg-orange-950/18 p-3">
+                <div className="w-10 h-10 rounded-xl bg-orange-500/10 flex items-center justify-center text-amber-100 shrink-0">
                   <item.icon className="w-5 h-5" />
                 </div>
                 <div>
                   <p className="font-black text-sm">{item.title}</p>
-                  <p className="text-xs text-white/45 mt-1">{item.desc}</p>
+                  <p className="text-xs text-orange-50/45 mt-1">{item.desc}</p>
                 </div>
               </div>
             ))}
