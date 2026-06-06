@@ -38,19 +38,19 @@ const SettingRow = ({
   isLast?: boolean
 }) => (
   <motion.div
-    whileHover={{ backgroundColor: "rgba(255, 255, 255, 0.05)" }}
+    whileHover={{ backgroundColor: "rgba(249, 115, 22, 0.055)" }}
     className={cn(
-      "flex items-center justify-between py-4 md:py-5 lg:py-6 px-5 md:px-6 lg:px-8 border-white/5 transition-all",
+      "flex items-center justify-between gap-4 py-4 md:py-5 lg:py-6 px-5 md:px-6 lg:px-8 border-white/8 transition-all",
       !isLast && "border-b"
     )}
   >
     <div className="flex items-center gap-4 md:gap-6">
-      <div className="w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center shadow-inner">
-        <Icon className="w-5 h-5 md:w-6 md:h-6 text-primary" />
+      <div className="w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-orange-300/10 border border-orange-300/15 flex items-center justify-center shadow-inner">
+        <Icon className="w-5 h-5 md:w-6 md:h-6 text-orange-300" />
       </div>
-      <div>
+      <div className="min-w-0">
         <h4 className="font-black text-foreground tracking-tight text-base md:text-lg leading-tight mb-0.5">{title}</h4>
-        <p className="text-[9px] md:text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground opacity-40">{description}</p>
+        <p className="text-[9px] md:text-[10px] font-black uppercase tracking-[0.24em] text-muted-foreground opacity-45 line-clamp-2">{description}</p>
       </div>
     </div>
     <div className="flex items-center gap-3 md:gap-4">
@@ -204,17 +204,18 @@ export function SettingsPage({ onBack }: { onBack?: () => void }) {
   }
 
   return (
-    <div className="w-full max-w-3xl md:max-w-4xl lg:max-w-5xl mx-auto space-y-10 md:space-y-16 pb-safe-nav animate-in fade-in duration-1000">
+    <div className="w-full max-w-3xl md:max-w-4xl lg:max-w-5xl mx-auto space-y-6 md:space-y-8 pb-safe-nav animate-in fade-in duration-1000">
       {/* Header */}
-      <div className="flex flex-col items-center justify-center pt-8 md:pt-12 pb-4 md:pb-6 text-center">
-        <div className="w-12 h-12 md:w-20 md:h-20 rounded-[1.25rem] md:rounded-[2rem] glass-strong border-white/20 mb-3 md:mb-6 flex items-center justify-center shadow-xl relative group">
-          <div className="absolute inset-0 mesh-gradient opacity-20 rounded-[1.25rem] md:rounded-[2rem]" />
+      <div className="relative overflow-hidden flex flex-col items-center justify-center mt-4 md:mt-8 p-6 md:p-10 text-center rounded-[2rem] md:rounded-[3rem] border border-orange-300/15 bg-black/30 backdrop-blur-2xl shadow-[inset_0_1px_0_rgba(255,255,255,0.12),0_30px_90px_rgba(0,0,0,0.28)]">
+        <div className="absolute inset-0 pointer-events-none bg-[linear-gradient(135deg,rgba(255,255,255,0.10),transparent_35%,rgba(249,115,22,0.13))]" />
+        <div className="w-12 h-12 md:w-20 md:h-20 rounded-[1.25rem] md:rounded-[2rem] bg-orange-300/10 border border-orange-300/20 mb-3 md:mb-5 flex items-center justify-center shadow-xl relative group">
+          <div className="absolute inset-0 bg-gradient-to-br from-orange-300/20 to-transparent rounded-[1.25rem] md:rounded-[2rem]" />
           <Smartphone className="w-5 h-5 md:w-8 md:h-8 text-primary relative z-10" />
         </div>
-        <h1 className="text-2xl md:text-4xl font-black text-foreground tracking-tight leading-none">
+        <h1 className="relative text-2xl md:text-4xl font-black text-foreground tracking-tight leading-none">
           {t("settings_title")}<span className="text-primary italic">{t("settings_accent")}</span>
         </h1>
-        <p className="text-xs md:text-lg font-bold text-muted-foreground mt-2 md:mt-3 opacity-50 uppercase tracking-[0.3em]">
+        <p className="relative text-xs md:text-base font-bold text-muted-foreground mt-2 md:mt-3 opacity-55 uppercase tracking-[0.3em]">
           {t("settings_subtitle")}
         </p>
       </div>
@@ -223,14 +224,14 @@ export function SettingsPage({ onBack }: { onBack?: () => void }) {
         {/* Account */}
         <div>
           <div className="flex items-center gap-2 px-3 md:px-8 mb-3 md:mb-5">
-            <User className="w-3 h-3 text-primary" />
+            <User className="w-3 h-3 text-orange-300" />
             <h3 className="font-black text-muted-foreground text-[8px] uppercase tracking-[0.3em] opacity-40">{t("settings_account")}</h3>
           </div>
-          <div className="glass-strong border-white/10 shadow-xl rounded-[1.5rem] md:rounded-[2.5rem] overflow-hidden">
+          <div className="border border-white/10 bg-black/30 backdrop-blur-2xl shadow-xl rounded-[1.5rem] md:rounded-[2.5rem] overflow-hidden">
             <SettingRow icon={ShieldCheck} title={t("settings_premium")} description={t("settings_premium_desc")} isLast>
               <div className="flex items-center gap-2 md:gap-3">
                 {userSubscription === "free" && (
-                  <Badge className="bg-primary/20 text-primary border-none font-black text-[10px] tracking-widest px-2 md:px-3 py-1">
+                  <Badge className="bg-orange-300/15 text-orange-200 border border-orange-300/20 font-black text-[10px] tracking-widest px-2 md:px-3 py-1">
                     {t("settings_upgrade_badge")}
                   </Badge>
                 )}
@@ -248,10 +249,10 @@ export function SettingsPage({ onBack }: { onBack?: () => void }) {
         {/* Preferences */}
         <div>
           <div className="flex items-center gap-3 px-5 md:px-10 mb-4 md:mb-6">
-            <Zap className="w-4 h-4 text-primary" />
+            <Zap className="w-4 h-4 text-orange-300" />
             <h3 className="font-black text-muted-foreground text-[10px] uppercase tracking-[0.4em] opacity-40">{t("settings_prefs")}</h3>
           </div>
-          <div className="glass-strong border-white/10 shadow-2xl rounded-[2.5rem] md:rounded-[3.5rem] overflow-hidden">
+          <div className="border border-white/10 bg-black/30 backdrop-blur-2xl shadow-2xl rounded-[2rem] md:rounded-[2.75rem] overflow-hidden">
             <SettingRow
               icon={theme === "dark" ? Moon : Sun}
               title={t("settings_theme")}
@@ -260,7 +261,7 @@ export function SettingsPage({ onBack }: { onBack?: () => void }) {
               <Button
                 variant="ghost"
                 onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                className="h-10 md:h-12 rounded-full font-black text-[9px] md:text-[10px] tracking-widest px-4 md:px-6 glass border-white/10 hover:bg-primary hover:text-white transition-all"
+                className="h-10 md:h-12 rounded-full font-black text-[9px] md:text-[10px] tracking-widest px-4 md:px-6 border border-orange-300/15 bg-orange-300/10 hover:bg-orange-300 hover:text-black transition-all"
               >
                 {t("settings_theme_btn")}
               </Button>
@@ -274,15 +275,15 @@ export function SettingsPage({ onBack }: { onBack?: () => void }) {
         {/* Data & Region */}
         <div>
           <div className="flex items-center gap-3 px-5 md:px-10 mb-4 md:mb-6">
-            <ShieldAlert className="w-4 h-4 text-primary" />
+            <ShieldAlert className="w-4 h-4 text-orange-300" />
             <h3 className="font-black text-muted-foreground text-[10px] uppercase tracking-[0.4em] opacity-40">{t("settings_data")}</h3>
           </div>
-          <div className="glass-strong border-white/10 shadow-2xl rounded-[2.5rem] md:rounded-[3.5rem] overflow-hidden">
+          <div className="border border-white/10 bg-black/30 backdrop-blur-2xl shadow-2xl rounded-[2rem] md:rounded-[2.75rem] overflow-hidden">
             <SettingRow icon={Trash2} title={t("settings_clear_cache")} description={t("settings_clear_cache_desc")}>
               <Button
                 variant="ghost"
                 onClick={handleClearCache}
-                className="h-10 md:h-12 rounded-full font-black text-[9px] md:text-[10px] tracking-widest px-4 md:px-6 glass border-rose-500/20 text-rose-500 hover:bg-rose-500 hover:text-white transition-all"
+                className="h-10 md:h-12 rounded-full font-black text-[9px] md:text-[10px] tracking-widest px-4 md:px-6 border border-rose-500/20 bg-rose-500/10 text-rose-300 hover:bg-rose-500 hover:text-white transition-all"
               >
                 {t("settings_clear_btn")}
               </Button>
@@ -293,8 +294,8 @@ export function SettingsPage({ onBack }: { onBack?: () => void }) {
               <button
                 onClick={handleLanguageToggle}
                 className={cn(
-                  "flex items-center gap-2 px-4 h-10 rounded-full glass border border-white/20 font-black text-[10px] tracking-widest transition-all haptic-press hover:border-primary/60",
-                  "hover:bg-primary/10"
+                  "flex items-center gap-2 px-4 h-10 rounded-full border border-orange-300/15 bg-orange-300/10 font-black text-[10px] tracking-widest transition-all haptic-press hover:border-orange-300/60",
+                  "hover:bg-orange-300/15"
                 )}
               >
                 <span className="text-base leading-none">{locale === "pt-BR" ? "🇧🇷" : "🇺🇸"}</span>
@@ -311,7 +312,7 @@ export function SettingsPage({ onBack }: { onBack?: () => void }) {
               <ShieldCheck className="w-4 h-4 text-orange-500" />
               <h3 className="font-black text-muted-foreground text-[10px] uppercase tracking-[0.4em] opacity-40">Admin</h3>
             </div>
-            <div className="glass-strong border-white/10 shadow-2xl rounded-[2.5rem] md:rounded-[3.5rem] overflow-hidden">
+            <div className="border border-white/10 bg-black/30 backdrop-blur-2xl shadow-2xl rounded-[2rem] md:rounded-[2.75rem] overflow-hidden">
               <SettingRow 
                 icon={ShieldCheck} 
                 title="Admin Dashboard" 
@@ -321,7 +322,7 @@ export function SettingsPage({ onBack }: { onBack?: () => void }) {
                 <Button
                   variant="ghost"
                   onClick={() => router.push("/admin-dashboard")}
-                  className="h-10 md:h-12 rounded-full font-black text-[9px] md:text-[10px] tracking-widest px-4 md:px-6 glass border-orange-500/20 text-orange-500 hover:bg-orange-500 hover:text-white transition-all"
+                  className="h-10 md:h-12 rounded-full font-black text-[9px] md:text-[10px] tracking-widest px-4 md:px-6 border border-orange-500/20 bg-orange-500/10 text-orange-300 hover:bg-orange-500 hover:text-black transition-all"
                 >
                   {locale === "en-US" ? "Access" : "Acessar"}
                   <ChevronRight className="ml-2 w-4 h-4" />
@@ -336,7 +337,7 @@ export function SettingsPage({ onBack }: { onBack?: () => void }) {
           <Button
             variant="ghost"
             onClick={handleLogout}
-            className="w-full h-16 md:h-24 rounded-[2rem] md:rounded-[2.5rem] glass-strong border-white/10 font-black text-xl md:text-2xl uppercase tracking-[0.2em] text-rose-500 hover:bg-rose-500 hover:text-white transition-all shadow-xl flex items-center justify-center ios-active py-6"
+            className="w-full h-16 md:h-20 rounded-[2rem] md:rounded-[2.5rem] border border-rose-500/20 bg-black/30 backdrop-blur-2xl font-black text-lg md:text-xl uppercase tracking-[0.2em] text-rose-300 hover:bg-rose-500 hover:text-white transition-all shadow-xl flex items-center justify-center ios-active py-6"
           >
             {t("settings_logout")}
             <LogOut className="ml-3 md:ml-4 w-6 h-6 md:w-8 md:h-8" />

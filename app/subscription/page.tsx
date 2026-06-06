@@ -61,7 +61,7 @@ const plans = [
     period: "/mes",
     periodEn: "/month",
     icon: Star,
-    accent: "blue",
+    accent: "orange",
     popular: true,
     features: [
       { text: "50 scans por dia", textEn: "50 scans per day" },
@@ -104,15 +104,6 @@ const accentStyles = {
     check: "text-zinc-200",
     shine: "from-white/12 via-white/[0.03] to-transparent",
     ring: "shadow-[inset_0_1px_0_rgba(255,255,255,0.12),0_24px_80px_rgba(0,0,0,0.24)]",
-  },
-  blue: {
-    shell: "border-sky-300/35 bg-sky-300/[0.075]",
-    icon: "bg-sky-300/15 text-sky-100 border-sky-200/20",
-    title: "text-sky-100",
-    button: "bg-sky-300 hover:bg-sky-200 text-slate-950 border-sky-100/20",
-    check: "text-sky-200",
-    shine: "from-sky-200/20 via-white/[0.045] to-transparent",
-    ring: "shadow-[inset_0_1px_0_rgba(255,255,255,0.16),0_28px_100px_rgba(14,165,233,0.18)]",
   },
   orange: {
     shell: "border-amber-300/35 bg-amber-300/[0.075]",
@@ -321,8 +312,8 @@ export default function SubscriptionPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#07080c] text-white relative overflow-hidden">
-      <div className="absolute inset-0 pointer-events-none bg-[linear-gradient(115deg,rgba(14,165,233,0.16)_0%,transparent_28%,rgba(245,158,11,0.14)_62%,transparent_100%)]" />
+    <div className="min-h-screen bg-[#070604] text-white relative overflow-hidden">
+      <div className="absolute inset-0 pointer-events-none bg-[linear-gradient(115deg,rgba(255,122,24,0.20)_0%,transparent_32%,rgba(245,158,11,0.16)_62%,transparent_100%)]" />
       <div className="absolute inset-0 pointer-events-none opacity-[0.18] [background-image:linear-gradient(rgba(255,255,255,0.08)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.08)_1px,transparent_1px)] [background-size:72px_72px]" />
       <div className="absolute inset-x-0 top-0 h-48 pointer-events-none bg-gradient-to-b from-white/8 to-transparent" />
 
@@ -338,7 +329,7 @@ export default function SubscriptionPage() {
           </Button>
 
           <div className="text-center min-w-0">
-            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-sky-200/75">
+            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-amber-200/75">
               FitVerse AI
             </p>
             <h1 className="text-base md:text-xl font-black tracking-tight truncate">
@@ -358,11 +349,11 @@ export default function SubscriptionPage() {
       <main className="relative z-10 max-w-7xl mx-auto px-4 md:px-6 py-5 md:py-7">
         <section className="relative overflow-hidden rounded-[2rem] md:rounded-[2.5rem] border border-white/12 bg-white/[0.055] backdrop-blur-2xl shadow-[inset_0_1px_0_rgba(255,255,255,0.16),0_30px_120px_rgba(0,0,0,0.32)] p-5 md:p-6 mb-5">
           <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/50 to-transparent" />
-          <div className="absolute inset-0 pointer-events-none bg-[linear-gradient(135deg,rgba(255,255,255,0.11),transparent_34%,rgba(14,165,233,0.08)_64%,rgba(245,158,11,0.08))]" />
+          <div className="absolute inset-0 pointer-events-none bg-[linear-gradient(135deg,rgba(255,255,255,0.11),transparent_34%,rgba(255,122,24,0.10)_64%,rgba(245,158,11,0.10))]" />
           <div className="relative grid lg:grid-cols-[1fr_auto] gap-5 items-end">
             <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }}>
               <div className="inline-flex items-center gap-2 rounded-full border border-white/12 bg-black/18 px-3 py-2 mb-3">
-                <Lock className="w-4 h-4 text-sky-200" />
+                <Lock className="w-4 h-4 text-amber-200" />
                 <span className="text-xs font-black uppercase tracking-widest text-white/68">
                   {isEnglish ? "Stripe checkout protected" : "Checkout protegido pela Stripe"}
                 </span>
@@ -463,7 +454,7 @@ export default function SubscriptionPage() {
                   </div>
                   <div className="flex flex-wrap justify-end gap-2">
                     {planItem.popular && (
-                      <Badge className="rounded-full border-sky-200/25 bg-sky-200/12 text-sky-100">
+                      <Badge className="rounded-full border-amber-200/25 bg-amber-200/12 text-amber-100">
                         {isEnglish ? "Recommended" : "Recomendado"}
                       </Badge>
                     )}
@@ -536,7 +527,7 @@ export default function SubscriptionPage() {
               { icon: Sparkles, title: isEnglish ? "Ad control" : "Controle de anuncios", desc: isEnglish ? "Paid users can disable ads." : "Usuarios pagos podem desativar anuncios." },
             ].map((item) => (
               <div key={item.title} className="flex items-center gap-3 rounded-2xl border border-white/8 bg-black/18 p-3">
-                <div className="w-10 h-10 rounded-xl bg-white/8 flex items-center justify-center text-sky-100 shrink-0">
+                <div className="w-10 h-10 rounded-xl bg-white/8 flex items-center justify-center text-amber-100 shrink-0">
                   <item.icon className="w-5 h-5" />
                 </div>
                 <div>

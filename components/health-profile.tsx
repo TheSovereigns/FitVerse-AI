@@ -152,15 +152,17 @@ export function HealthProfile({ scanHistory, onNavigateToSettings, onNavigateToS
   const userSubscription = currentPlan || "free"
 
   return (
-    <div className="w-full max-w-5xl xl:max-w-6xl mx-auto space-y-6 md:space-y-10 pb-safe-nav animate-in fade-in duration-500">
+    <div className="w-full max-w-5xl xl:max-w-6xl mx-auto space-y-5 md:space-y-8 pb-safe-nav animate-in fade-in duration-500">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 md:gap-6 mt-4 md:mt-8">
+      <div className="relative overflow-hidden rounded-[2rem] md:rounded-[3rem] border border-orange-300/15 bg-black/30 backdrop-blur-2xl shadow-[inset_0_1px_0_rgba(255,255,255,0.12),0_30px_90px_rgba(0,0,0,0.28)] p-4 md:p-7 mt-4 md:mt-8">
+        <div className="absolute inset-0 pointer-events-none bg-[linear-gradient(135deg,rgba(255,255,255,0.10),transparent_35%,rgba(249,115,22,0.12))]" />
+        <div className="relative z-10 flex flex-col md:flex-row md:items-end justify-between gap-4 md:gap-6">
         <div className="flex items-center gap-4 md:gap-8">
           <motion.div
             whileHover={{ rotate: 10, scale: 1.05 }}
-            className="w-14 h-14 md:w-20 md:h-20 rounded-[1.5rem] md:rounded-[2rem] glass-strong border-white/20 flex items-center justify-center shadow-xl relative overflow-hidden group"
+            className="w-14 h-14 md:w-20 md:h-20 rounded-[1.5rem] md:rounded-[2rem] border border-orange-300/20 bg-orange-300/10 flex items-center justify-center shadow-xl relative overflow-hidden group"
           >
-            <div className="absolute inset-0 mesh-gradient opacity-20" />
+            <div className="absolute inset-0 bg-gradient-to-br from-orange-300/20 to-transparent" />
             <User className="w-6 h-6 md:w-8 md:h-8 text-primary relative z-10" />
           </motion.div>
           <div>
@@ -214,7 +216,7 @@ export function HealthProfile({ scanHistory, onNavigateToSettings, onNavigateToS
               </div>
             )}
             <div className="flex items-center gap-2 mt-1 md:mt-2">
-              <Activity className="w-3 h-3 md:w-4 md:h-4 text-emerald-400 animate-pulse" />
+              <Activity className="w-3 h-3 md:w-4 md:h-4 text-orange-300 animate-pulse" />
                <p className="text-xs md:text-sm font-bold text-muted-foreground opacity-50 uppercase tracking-[0.2em] truncate max-w-[200px] md:max-w-none">
                  {user?.email || ""}
                </p>
@@ -223,14 +225,14 @@ export function HealthProfile({ scanHistory, onNavigateToSettings, onNavigateToS
         </div>
 
         <div className="flex items-center gap-2 md:gap-4">
-          <div className="flex p-1 glass-strong border-white/10 rounded-full shadow-inner">
+          <div className="flex p-1 border border-white/10 bg-white/[0.055] backdrop-blur-xl rounded-full shadow-inner">
             {(["week", "month"] as const).map(p => (
               <button
                 key={p}
                 onClick={() => setSelectedPeriod(p)}
                   className={cn(
                   "px-3 md:px-6 py-2.5 md:py-2 min-h-[44px] rounded-full text-[10px] font-black uppercase tracking-widest transition-all duration-500",
-                  selectedPeriod === p ? "mesh-gradient text-white shadow-xl scale-105" : "text-muted-foreground opacity-40 hover:opacity-100"
+                  selectedPeriod === p ? "bg-orange-400 text-black shadow-xl scale-105" : "text-muted-foreground opacity-50 hover:opacity-100"
                 )}
               >
                 {p === "week" ? t("profile_7cycles") : t("profile_30cycles")}
@@ -241,7 +243,7 @@ export function HealthProfile({ scanHistory, onNavigateToSettings, onNavigateToS
             variant="ghost"
             size="icon"
             onClick={onNavigateToSettings}
-            className="w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl glass-strong border-white/20 hover:bg-white/10 shadow-xl haptic-press"
+            className="w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl border border-white/10 bg-white/[0.055] hover:bg-orange-300/10 shadow-xl haptic-press"
           >
             <Settings className="w-4 h-4 md:w-5 md:h-4 text-foreground" />
           </Button>
@@ -249,20 +251,21 @@ export function HealthProfile({ scanHistory, onNavigateToSettings, onNavigateToS
             variant="ghost"
             size="icon"
             onClick={handleSignOut}
-            className="w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl glass-strong border-white/20 hover:bg-red-500/10 shadow-xl haptic-press text-red-400"
+            className="w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl border border-white/10 bg-white/[0.055] hover:bg-red-500/10 shadow-xl haptic-press text-red-400"
           >
             <LogOut className="w-4 h-4 md:w-5 md:h-4" />
           </Button>
         </div>
+      </div>
       </div>
 
       <div className="space-y-4 md:space-y-8">
         {/* Subscription Card */}
         <motion.div
           whileHover={{ y: -3 }}
-          className="relative glass-strong border-white/10 rounded-[2rem] md:rounded-[3rem] p-5 md:p-10 shadow-[0_30px_60px_rgba(0,0,0,0.3)] overflow-hidden group"
+          className="relative border border-orange-300/15 bg-black/30 backdrop-blur-2xl rounded-[2rem] md:rounded-[3rem] p-5 md:p-8 shadow-[0_30px_80px_rgba(0,0,0,0.28)] overflow-hidden group"
         >
-          <div className="absolute inset-0 mesh-gradient opacity-10 group-hover:opacity-15 transition-opacity" />
+          <div className="absolute inset-0 bg-gradient-to-r from-orange-300/12 via-white/[0.03] to-transparent group-hover:opacity-90 transition-opacity" />
           <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 md:gap-8">
             <div className="flex items-center gap-3 md:gap-6">
               <div className="w-12 h-12 md:w-16 md:h-16 rounded-[1.5rem] md:rounded-[2rem] bg-primary/20 border border-primary/30 flex items-center justify-center shadow-inner">
@@ -282,7 +285,7 @@ export function HealthProfile({ scanHistory, onNavigateToSettings, onNavigateToS
             </div>
             <Button
               onClick={() => router.push("/subscription")}
-              className="w-full md:w-auto h-12 md:h-16 px-6 md:px-10 mesh-gradient text-white font-black text-sm md:text-lg rounded-[1.25rem] md:rounded-[1.5rem] shadow-xl haptic-press flex items-center gap-2"
+              className="w-full md:w-auto h-12 md:h-14 px-6 md:px-9 bg-orange-400 hover:bg-orange-300 text-black font-black text-sm md:text-base rounded-[1.25rem] md:rounded-[1.5rem] shadow-xl shadow-orange-500/20 haptic-press flex items-center gap-2"
             >
               {userSubscription === "free" ? t("subscription_upgrade") : t("subscription_manage")}
               <Zap className="w-4 h-4 md:w-5 md:h-5" />
@@ -295,7 +298,7 @@ export function HealthProfile({ scanHistory, onNavigateToSettings, onNavigateToS
           {/* Average Score Ring */}
           <motion.div
             whileHover={{ scale: 1.02 }}
-            className="glass-strong border-white/10 rounded-[1.5rem] md:rounded-[3rem] p-3 md:p-8 shadow-xl flex flex-col items-center justify-center text-center"
+            className="border border-white/10 bg-black/30 backdrop-blur-2xl rounded-[1.5rem] md:rounded-[2.5rem] p-3 md:p-7 shadow-xl flex flex-col items-center justify-center text-center"
           >
             <div className="relative w-14 h-14 md:w-32 md:h-32 mb-2 md:mb-6">
               <svg className="w-full h-full -rotate-90">
@@ -320,7 +323,7 @@ export function HealthProfile({ scanHistory, onNavigateToSettings, onNavigateToS
           {/* Streak */}
           <motion.div
             whileHover={{ scale: 1.02 }}
-            className="glass-strong border-white/10 rounded-[1.5rem] md:rounded-[3rem] p-3 md:p-8 shadow-xl flex flex-col items-center justify-center text-center"
+            className="border border-orange-300/12 bg-black/30 backdrop-blur-2xl rounded-[1.5rem] md:rounded-[2.5rem] p-3 md:p-7 shadow-xl flex flex-col items-center justify-center text-center"
           >
             <div className="w-10 h-10 md:w-20 md:h-20 rounded-[1rem] md:rounded-[2rem] bg-rose-500/10 flex items-center justify-center text-rose-500 mb-2 md:mb-6 shadow-inner">
               <TrendingUp className="w-5 h-5 md:w-10 md:h-10" />
@@ -332,9 +335,9 @@ export function HealthProfile({ scanHistory, onNavigateToSettings, onNavigateToS
           {/* Total Scans */}
           <motion.div
             whileHover={{ scale: 1.02 }}
-            className="glass-strong border-white/10 rounded-[1.5rem] md:rounded-[3rem] p-3 md:p-8 shadow-xl flex flex-col items-center justify-center text-center"
+            className="border border-orange-300/12 bg-black/30 backdrop-blur-2xl rounded-[1.5rem] md:rounded-[2.5rem] p-3 md:p-7 shadow-xl flex flex-col items-center justify-center text-center"
           >
-            <div className="w-10 h-10 md:w-20 md:h-20 rounded-[1rem] md:rounded-[2rem] bg-blue-500/10 flex items-center justify-center text-blue-500 mb-2 md:mb-6 shadow-inner">
+            <div className="w-10 h-10 md:w-20 md:h-20 rounded-[1rem] md:rounded-[2rem] bg-orange-500/10 flex items-center justify-center text-orange-300 mb-2 md:mb-6 shadow-inner">
               <Sparkles className="w-5 h-5 md:w-10 md:h-10" />
             </div>
             <p className="text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-black tracking-tighter text-foreground leading-none mb-1 md:mb-2">{distribution.total}</p>
@@ -343,15 +346,15 @@ export function HealthProfile({ scanHistory, onNavigateToSettings, onNavigateToS
         </div>
 
         {/* Scan History */}
-        <div className="glass-strong border-white/10 shadow-[0_30px_60px_rgba(0,0,0,0.3)] rounded-[2rem] md:rounded-[3rem] p-4 md:p-8 overflow-hidden relative group">
-          <div className="absolute inset-0 mesh-gradient opacity-5" />
+        <div className="border border-white/10 bg-black/30 backdrop-blur-2xl shadow-[0_30px_70px_rgba(0,0,0,0.28)] rounded-[2rem] md:rounded-[3rem] p-4 md:p-8 overflow-hidden relative group">
+          <div className="absolute inset-0 bg-gradient-to-br from-orange-300/8 to-transparent" />
           <div className="relative z-10">
             <div className="flex items-center justify-between mb-4 md:mb-8">
               <div>
                 <h2 className="text-xl md:text-3xl font-black tracking-tighter text-foreground uppercase italic">{t("profile_history_title")}</h2>
                 <p className="text-[8px] md:text-[10px] font-black uppercase tracking-[0.3em] opacity-30 mt-0.5 md:mt-1">{t("profile_history_sub")}</p>
               </div>
-              <Button variant="ghost" className="h-8 md:h-10 rounded-full font-black text-[8px] md:text-[10px] tracking-widest px-3 md:px-5 glass hover:bg-white/10 transition-all border-none">
+              <Button variant="ghost" className="h-8 md:h-10 rounded-full font-black text-[8px] md:text-[10px] tracking-widest px-3 md:px-5 border border-white/10 bg-white/[0.055] hover:bg-orange-300/10 transition-all">
                 {t("profile_export")} <ArrowRight className="w-3 h-3 md:w-4 md:h-3 ml-1" />
               </Button>
             </div>
@@ -360,7 +363,7 @@ export function HealthProfile({ scanHistory, onNavigateToSettings, onNavigateToS
         </div>
 
         {/* Daily Summary Section */}
-        <div className="glass-strong border-white/10 rounded-[2rem] p-5 md:p-8">
+        <div className="border border-white/10 bg-black/30 backdrop-blur-2xl rounded-[2rem] p-5 md:p-8">
           <h3 className="text-lg font-black uppercase tracking-widest opacity-40 mb-4">
             {t("summary_title") || "Resumo do Dia"}
           </h3>
