@@ -154,7 +154,8 @@ export function HealthProfile({ scanHistory, onNavigateToSettings, onNavigateToS
   return (
     <div className="w-full max-w-5xl xl:max-w-6xl mx-auto space-y-5 md:space-y-8 pb-safe-nav animate-in fade-in duration-500">
       {/* Header */}
-      <div className="relative overflow-hidden rounded-[2rem] md:rounded-[3rem] border border-orange-300/15 bg-black/30 backdrop-blur-2xl shadow-[inset_0_1px_0_rgba(255,255,255,0.12),0_30px_90px_rgba(0,0,0,0.28)] p-4 md:p-7 mt-4 md:mt-8">
+      <div className="relative overflow-hidden rounded-[2rem] md:rounded-[3rem] border border-orange-300/25 bg-black/45 backdrop-blur-2xl shadow-[inset_0_1px_0_rgba(255,255,255,0.12),0_30px_90px_rgba(0,0,0,0.28)] p-4 md:p-7 mt-4 md:mt-8">
+        <div className="absolute left-0 top-0 bottom-0 w-2 bg-gradient-to-b from-orange-300 via-orange-500 to-amber-700" />
         <div className="absolute inset-0 pointer-events-none bg-[linear-gradient(135deg,rgba(255,255,255,0.10),transparent_35%,rgba(249,115,22,0.12))]" />
         <div className="relative z-10 flex flex-col md:flex-row md:items-end justify-between gap-4 md:gap-6">
         <div className="flex items-center gap-4 md:gap-8">
@@ -166,6 +167,9 @@ export function HealthProfile({ scanHistory, onNavigateToSettings, onNavigateToS
             <User className="w-6 h-6 md:w-8 md:h-8 text-primary relative z-10" />
           </motion.div>
           <div>
+            <div className="mb-2 inline-flex rounded-full border border-orange-300/25 bg-orange-300/10 px-3 py-1 text-[9px] font-black uppercase tracking-[0.24em] text-orange-100">
+              FitVerse Profile
+            </div>
             {isEditing ? (
               <div className="flex items-center gap-2">
                 <Input
@@ -263,8 +267,9 @@ export function HealthProfile({ scanHistory, onNavigateToSettings, onNavigateToS
         {/* Subscription Card */}
         <motion.div
           whileHover={{ y: -3 }}
-          className="relative border border-orange-300/15 bg-black/30 backdrop-blur-2xl rounded-[2rem] md:rounded-[3rem] p-5 md:p-8 shadow-[0_30px_80px_rgba(0,0,0,0.28)] overflow-hidden group"
+          className="relative border border-orange-300/25 bg-black/45 backdrop-blur-2xl rounded-[2rem] md:rounded-[3rem] p-5 md:p-8 shadow-[0_30px_80px_rgba(0,0,0,0.28)] overflow-hidden group"
         >
+          <div className="absolute inset-x-0 top-0 h-2 bg-orange-400" />
           <div className="absolute inset-0 bg-gradient-to-r from-orange-300/12 via-white/[0.03] to-transparent group-hover:opacity-90 transition-opacity" />
           <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 md:gap-8">
             <div className="flex items-center gap-3 md:gap-6">
@@ -298,8 +303,9 @@ export function HealthProfile({ scanHistory, onNavigateToSettings, onNavigateToS
           {/* Average Score Ring */}
           <motion.div
             whileHover={{ scale: 1.02 }}
-            className="border border-white/10 bg-black/30 backdrop-blur-2xl rounded-[1.5rem] md:rounded-[2.5rem] p-3 md:p-7 shadow-xl flex flex-col items-center justify-center text-center"
+            className="relative overflow-hidden border border-orange-300/12 bg-black/35 backdrop-blur-2xl rounded-[1.5rem] md:rounded-[2.5rem] p-3 md:p-7 shadow-xl flex flex-col items-center justify-center text-center"
           >
+            <div className="absolute inset-x-0 top-0 h-1 bg-orange-400/80" />
             <div className="relative w-14 h-14 md:w-32 md:h-32 mb-2 md:mb-6">
               <svg className="w-full h-full -rotate-90">
                 <circle cx="50%" cy="50%" r="44%" className="fill-none stroke-white/5" strokeWidth="8" />
@@ -323,8 +329,9 @@ export function HealthProfile({ scanHistory, onNavigateToSettings, onNavigateToS
           {/* Streak */}
           <motion.div
             whileHover={{ scale: 1.02 }}
-            className="border border-orange-300/12 bg-black/30 backdrop-blur-2xl rounded-[1.5rem] md:rounded-[2.5rem] p-3 md:p-7 shadow-xl flex flex-col items-center justify-center text-center"
+            className="relative overflow-hidden border border-orange-300/12 bg-black/35 backdrop-blur-2xl rounded-[1.5rem] md:rounded-[2.5rem] p-3 md:p-7 shadow-xl flex flex-col items-center justify-center text-center"
           >
+            <div className="absolute inset-x-0 top-0 h-1 bg-orange-400/80" />
             <div className="w-10 h-10 md:w-20 md:h-20 rounded-[1rem] md:rounded-[2rem] bg-rose-500/10 flex items-center justify-center text-rose-500 mb-2 md:mb-6 shadow-inner">
               <TrendingUp className="w-5 h-5 md:w-10 md:h-10" />
             </div>
@@ -335,8 +342,9 @@ export function HealthProfile({ scanHistory, onNavigateToSettings, onNavigateToS
           {/* Total Scans */}
           <motion.div
             whileHover={{ scale: 1.02 }}
-            className="border border-orange-300/12 bg-black/30 backdrop-blur-2xl rounded-[1.5rem] md:rounded-[2.5rem] p-3 md:p-7 shadow-xl flex flex-col items-center justify-center text-center"
+            className="relative overflow-hidden border border-orange-300/12 bg-black/35 backdrop-blur-2xl rounded-[1.5rem] md:rounded-[2.5rem] p-3 md:p-7 shadow-xl flex flex-col items-center justify-center text-center"
           >
+            <div className="absolute inset-x-0 top-0 h-1 bg-orange-400/80" />
             <div className="w-10 h-10 md:w-20 md:h-20 rounded-[1rem] md:rounded-[2rem] bg-orange-500/10 flex items-center justify-center text-orange-300 mb-2 md:mb-6 shadow-inner">
               <Sparkles className="w-5 h-5 md:w-10 md:h-10" />
             </div>

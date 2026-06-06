@@ -347,19 +347,20 @@ export default function SubscriptionPage() {
       </header>
 
       <main className="relative z-10 max-w-7xl mx-auto px-4 md:px-6 py-5 md:py-7">
-        <section className="relative overflow-hidden rounded-[2rem] md:rounded-[2.5rem] border border-white/12 bg-white/[0.055] backdrop-blur-2xl shadow-[inset_0_1px_0_rgba(255,255,255,0.16),0_30px_120px_rgba(0,0,0,0.32)] p-5 md:p-6 mb-5">
+        <section className="relative overflow-hidden rounded-[2rem] md:rounded-[2.5rem] border border-orange-300/25 bg-black/45 backdrop-blur-2xl shadow-[inset_0_1px_0_rgba(255,255,255,0.16),0_30px_120px_rgba(0,0,0,0.32)] p-5 md:p-6 mb-5">
+          <div className="absolute left-0 top-0 bottom-0 w-2 bg-gradient-to-b from-orange-300 via-orange-500 to-amber-700" />
           <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/50 to-transparent" />
           <div className="absolute inset-0 pointer-events-none bg-[linear-gradient(135deg,rgba(255,255,255,0.11),transparent_34%,rgba(255,122,24,0.10)_64%,rgba(245,158,11,0.10))]" />
           <div className="relative grid lg:grid-cols-[1fr_auto] gap-5 items-end">
             <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }}>
-              <div className="inline-flex items-center gap-2 rounded-full border border-white/12 bg-black/18 px-3 py-2 mb-3">
+              <div className="inline-flex items-center gap-2 rounded-full border border-orange-300/25 bg-orange-300/10 px-3 py-2 mb-3">
                 <Lock className="w-4 h-4 text-amber-200" />
                 <span className="text-xs font-black uppercase tracking-widest text-white/68">
                   {isEnglish ? "Stripe checkout protected" : "Checkout protegido pela Stripe"}
                 </span>
               </div>
               <h2 className="max-w-3xl text-3xl md:text-5xl font-black tracking-tight leading-[1.02]">
-                {isEnglish ? "Choose your FitVerse plan." : "Escolha seu plano FitVerse."}
+                {isEnglish ? "FitVerse Black Plans." : "Planos FitVerse Black."}
               </h2>
               <p className="mt-3 max-w-2xl text-sm md:text-base text-white/58 leading-relaxed">
                 {isEnglish
@@ -445,6 +446,7 @@ export default function SubscriptionPage() {
                   planItem.popular && "md:min-h-[472px]"
                 )}
               >
+                <div className={cn("absolute inset-x-0 top-0 h-2", planItem.id === "free" ? "bg-white/20" : "bg-orange-400")} />
                 <div className={cn("absolute inset-x-0 top-0 h-36 bg-gradient-to-b pointer-events-none", styles.shine)} />
                 <div className="absolute inset-x-6 top-0 h-px bg-gradient-to-r from-transparent via-white/60 to-transparent" />
 

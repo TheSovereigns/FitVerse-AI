@@ -206,8 +206,12 @@ export function SettingsPage({ onBack }: { onBack?: () => void }) {
   return (
     <div className="w-full max-w-3xl md:max-w-4xl lg:max-w-5xl mx-auto space-y-6 md:space-y-8 pb-safe-nav animate-in fade-in duration-1000">
       {/* Header */}
-      <div className="relative overflow-hidden flex flex-col items-center justify-center mt-4 md:mt-8 p-6 md:p-10 text-center rounded-[2rem] md:rounded-[3rem] border border-orange-300/15 bg-black/30 backdrop-blur-2xl shadow-[inset_0_1px_0_rgba(255,255,255,0.12),0_30px_90px_rgba(0,0,0,0.28)]">
+      <div className="relative overflow-hidden flex flex-col items-center justify-center mt-4 md:mt-8 p-6 md:p-10 text-center rounded-[2rem] md:rounded-[3rem] border border-orange-300/25 bg-black/45 backdrop-blur-2xl shadow-[inset_0_1px_0_rgba(255,255,255,0.12),0_30px_90px_rgba(0,0,0,0.28)]">
+        <div className="absolute left-0 top-0 bottom-0 w-2 bg-gradient-to-b from-orange-300 via-orange-500 to-amber-700" />
         <div className="absolute inset-0 pointer-events-none bg-[linear-gradient(135deg,rgba(255,255,255,0.10),transparent_35%,rgba(249,115,22,0.13))]" />
+        <div className="relative mb-3 rounded-full border border-orange-300/25 bg-orange-300/10 px-3 py-1 text-[9px] font-black uppercase tracking-[0.24em] text-orange-100">
+          Control Center
+        </div>
         <div className="w-12 h-12 md:w-20 md:h-20 rounded-[1.25rem] md:rounded-[2rem] bg-orange-300/10 border border-orange-300/20 mb-3 md:mb-5 flex items-center justify-center shadow-xl relative group">
           <div className="absolute inset-0 bg-gradient-to-br from-orange-300/20 to-transparent rounded-[1.25rem] md:rounded-[2rem]" />
           <Smartphone className="w-5 h-5 md:w-8 md:h-8 text-primary relative z-10" />
@@ -227,7 +231,8 @@ export function SettingsPage({ onBack }: { onBack?: () => void }) {
             <User className="w-3 h-3 text-orange-300" />
             <h3 className="font-black text-muted-foreground text-[8px] uppercase tracking-[0.3em] opacity-40">{t("settings_account")}</h3>
           </div>
-          <div className="border border-white/10 bg-black/30 backdrop-blur-2xl shadow-xl rounded-[1.5rem] md:rounded-[2.5rem] overflow-hidden">
+          <div className="relative border border-orange-300/18 bg-black/38 backdrop-blur-2xl shadow-xl rounded-[1.5rem] md:rounded-[2.5rem] overflow-hidden">
+            <div className="absolute inset-x-0 top-0 h-1 bg-orange-400/80" />
             <SettingRow icon={ShieldCheck} title={t("settings_premium")} description={t("settings_premium_desc")} isLast>
               <div className="flex items-center gap-2 md:gap-3">
                 {userSubscription === "free" && (
@@ -252,7 +257,8 @@ export function SettingsPage({ onBack }: { onBack?: () => void }) {
             <Zap className="w-4 h-4 text-orange-300" />
             <h3 className="font-black text-muted-foreground text-[10px] uppercase tracking-[0.4em] opacity-40">{t("settings_prefs")}</h3>
           </div>
-          <div className="border border-white/10 bg-black/30 backdrop-blur-2xl shadow-2xl rounded-[2rem] md:rounded-[2.75rem] overflow-hidden">
+          <div className="relative border border-orange-300/18 bg-black/38 backdrop-blur-2xl shadow-2xl rounded-[2rem] md:rounded-[2.75rem] overflow-hidden">
+            <div className="absolute inset-x-0 top-0 h-1 bg-orange-400/80" />
             <SettingRow
               icon={theme === "dark" ? Moon : Sun}
               title={t("settings_theme")}
@@ -278,7 +284,8 @@ export function SettingsPage({ onBack }: { onBack?: () => void }) {
             <ShieldAlert className="w-4 h-4 text-orange-300" />
             <h3 className="font-black text-muted-foreground text-[10px] uppercase tracking-[0.4em] opacity-40">{t("settings_data")}</h3>
           </div>
-          <div className="border border-white/10 bg-black/30 backdrop-blur-2xl shadow-2xl rounded-[2rem] md:rounded-[2.75rem] overflow-hidden">
+          <div className="relative border border-orange-300/18 bg-black/38 backdrop-blur-2xl shadow-2xl rounded-[2rem] md:rounded-[2.75rem] overflow-hidden">
+            <div className="absolute inset-x-0 top-0 h-1 bg-orange-400/80" />
             <SettingRow icon={Trash2} title={t("settings_clear_cache")} description={t("settings_clear_cache_desc")}>
               <Button
                 variant="ghost"
