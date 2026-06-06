@@ -97,28 +97,31 @@ const plans = [
 
 const accentStyles = {
   zinc: {
-    icon: "bg-white/8 text-zinc-300",
-    title: "text-zinc-200",
-    border: "border-white/10",
-    button: "bg-white/10 hover:bg-white/15 text-white",
-    check: "text-zinc-300",
-    glow: "from-zinc-400/10",
+    shell: "border-white/14 bg-white/[0.055]",
+    icon: "bg-white/10 text-zinc-100 border-white/10",
+    title: "text-zinc-100",
+    button: "bg-white/10 hover:bg-white/16 text-white border-white/10",
+    check: "text-zinc-200",
+    shine: "from-white/12 via-white/[0.03] to-transparent",
+    ring: "shadow-[inset_0_1px_0_rgba(255,255,255,0.12),0_24px_80px_rgba(0,0,0,0.24)]",
   },
   blue: {
-    icon: "bg-blue-500/15 text-blue-300",
-    title: "text-blue-300",
-    border: "border-blue-400/35 shadow-[0_24px_80px_rgba(37,99,235,0.18)]",
-    button: "bg-blue-500 hover:bg-blue-400 text-white",
-    check: "text-blue-300",
-    glow: "from-blue-500/20",
+    shell: "border-sky-300/35 bg-sky-300/[0.075]",
+    icon: "bg-sky-300/15 text-sky-100 border-sky-200/20",
+    title: "text-sky-100",
+    button: "bg-sky-300 hover:bg-sky-200 text-slate-950 border-sky-100/20",
+    check: "text-sky-200",
+    shine: "from-sky-200/20 via-white/[0.045] to-transparent",
+    ring: "shadow-[inset_0_1px_0_rgba(255,255,255,0.16),0_28px_100px_rgba(14,165,233,0.18)]",
   },
   orange: {
-    icon: "bg-orange-500/15 text-orange-300",
-    title: "text-orange-300",
-    border: "border-orange-400/35 shadow-[0_24px_80px_rgba(249,115,22,0.18)]",
-    button: "bg-orange-500 hover:bg-orange-400 text-black",
-    check: "text-orange-300",
-    glow: "from-orange-500/20",
+    shell: "border-amber-300/35 bg-amber-300/[0.075]",
+    icon: "bg-amber-300/15 text-amber-100 border-amber-200/20",
+    title: "text-amber-100",
+    button: "bg-amber-300 hover:bg-amber-200 text-slate-950 border-amber-100/20",
+    check: "text-amber-200",
+    shine: "from-amber-200/20 via-white/[0.045] to-transparent",
+    ring: "shadow-[inset_0_1px_0_rgba(255,255,255,0.16),0_28px_100px_rgba(245,158,11,0.18)]",
   },
 }
 
@@ -318,97 +321,94 @@ export default function SubscriptionPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#080705] text-white relative overflow-hidden">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_10%,rgba(249,115,22,0.20),transparent_30%),radial-gradient(circle_at_80%_20%,rgba(37,99,235,0.18),transparent_28%),linear-gradient(180deg,rgba(255,255,255,0.03),transparent_45%)] pointer-events-none" />
-      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-orange-300/40 to-transparent" />
+    <div className="min-h-screen bg-[#07080c] text-white relative overflow-hidden">
+      <div className="absolute inset-0 pointer-events-none bg-[linear-gradient(115deg,rgba(14,165,233,0.16)_0%,transparent_28%,rgba(245,158,11,0.14)_62%,transparent_100%)]" />
+      <div className="absolute inset-0 pointer-events-none opacity-[0.18] [background-image:linear-gradient(rgba(255,255,255,0.08)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.08)_1px,transparent_1px)] [background-size:72px_72px]" />
+      <div className="absolute inset-x-0 top-0 h-48 pointer-events-none bg-gradient-to-b from-white/8 to-transparent" />
 
-      <header className="relative z-10 border-b border-white/10 bg-black/25 backdrop-blur-2xl">
-        <div className="max-w-7xl mx-auto px-4 md:px-6 py-4 flex items-center justify-between">
+      <header className="relative z-10 border-b border-white/10 bg-white/[0.045] backdrop-blur-2xl">
+        <div className="max-w-7xl mx-auto px-4 md:px-6 py-4 flex items-center justify-between gap-3">
           <Button
             variant="ghost"
             size="icon"
             onClick={() => router.push("/")}
-            className="rounded-full hover:bg-white/10"
+            className="rounded-2xl border border-white/10 bg-white/[0.04] hover:bg-white/10"
           >
             <ArrowLeft className="w-5 h-5" />
           </Button>
 
-          <div className="text-center">
-            <p className="text-[10px] font-black uppercase tracking-[0.32em] text-orange-300/80">
+          <div className="text-center min-w-0">
+            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-sky-200/75">
               FitVerse AI
             </p>
-            <h1 className="text-lg md:text-2xl font-black tracking-tight">
+            <h1 className="text-base md:text-xl font-black tracking-tight truncate">
               {isEnglish ? "Subscription Plans" : "Planos de Assinatura"}
             </h1>
           </div>
 
-          <Badge className="rounded-full border-orange-400/25 bg-orange-500/10 text-orange-200">
-            {currentPlan.toUpperCase()}
-          </Badge>
+          <div className="h-10 px-3 rounded-2xl border border-white/10 bg-white/[0.04] flex items-center gap-2">
+            <span className="hidden sm:inline text-[10px] uppercase tracking-widest text-white/45">
+              {isEnglish ? "Current" : "Atual"}
+            </span>
+            <span className="text-xs font-black text-amber-100">{currentPlan.toUpperCase()}</span>
+          </div>
         </div>
       </header>
 
-      <main className="relative z-10 max-w-7xl mx-auto px-4 md:px-6 py-8 md:py-12">
-        <section className="grid lg:grid-cols-[1.05fr_0.95fr] gap-8 md:gap-10 items-end mb-10">
-          <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }}>
-            <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-2 mb-5">
-              <Lock className="w-4 h-4 text-orange-300" />
-              <span className="text-xs font-black uppercase tracking-widest text-white/70">
-                {isEnglish ? "Secure Stripe checkout" : "Pagamento seguro via Stripe"}
-              </span>
-            </div>
-            <h2 className="text-4xl md:text-6xl font-black tracking-tight leading-none max-w-3xl">
-              {isEnglish ? "Choose the plan that matches your pace." : "Escolha o plano que acompanha seu ritmo."}
-            </h2>
-            <p className="mt-5 text-base md:text-lg text-white/55 max-w-2xl">
-              {isEnglish
-                ? "Unlock scans, workouts, recipes, history and an ad-free experience as your routine grows."
-                : "Libere scans, treinos, receitas, historico e uma experiencia sem anuncios conforme sua rotina evolui."}
-            </p>
-          </motion.div>
+      <main className="relative z-10 max-w-7xl mx-auto px-4 md:px-6 py-5 md:py-7">
+        <section className="relative overflow-hidden rounded-[2rem] md:rounded-[2.5rem] border border-white/12 bg-white/[0.055] backdrop-blur-2xl shadow-[inset_0_1px_0_rgba(255,255,255,0.16),0_30px_120px_rgba(0,0,0,0.32)] p-5 md:p-6 mb-5">
+          <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/50 to-transparent" />
+          <div className="absolute inset-0 pointer-events-none bg-[linear-gradient(135deg,rgba(255,255,255,0.11),transparent_34%,rgba(14,165,233,0.08)_64%,rgba(245,158,11,0.08))]" />
+          <div className="relative grid lg:grid-cols-[1fr_auto] gap-5 items-end">
+            <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }}>
+              <div className="inline-flex items-center gap-2 rounded-full border border-white/12 bg-black/18 px-3 py-2 mb-3">
+                <Lock className="w-4 h-4 text-sky-200" />
+                <span className="text-xs font-black uppercase tracking-widest text-white/68">
+                  {isEnglish ? "Stripe checkout protected" : "Checkout protegido pela Stripe"}
+                </span>
+              </div>
+              <h2 className="max-w-3xl text-3xl md:text-5xl font-black tracking-tight leading-[1.02]">
+                {isEnglish ? "Choose your FitVerse plan." : "Escolha seu plano FitVerse."}
+              </h2>
+              <p className="mt-3 max-w-2xl text-sm md:text-base text-white/58 leading-relaxed">
+                {isEnglish
+                  ? "More scans, richer analysis, workouts and recipes with a smooth ad-free FitVerse experience."
+                  : "Mais scans, analises melhores, treinos e receitas em uma experiencia FitVerse mais limpa e sem anuncios."}
+              </p>
+            </motion.div>
 
-          <motion.div
-            initial={{ opacity: 0, y: 18 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.08 }}
-            className="rounded-[2rem] border border-white/10 bg-white/[0.04] p-4 md:p-5"
-          >
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-11 h-11 rounded-2xl bg-orange-500/15 text-orange-300 flex items-center justify-center">
-                <Zap className="w-5 h-5" />
-              </div>
-              <div>
-                <p className="font-black">{isEnglish ? "Current benefits" : "Beneficios atuais"}</p>
-                <p className="text-xs text-white/45">{isEnglish ? "Based on your active plan" : "Com base no seu plano ativo"}</p>
-              </div>
-            </div>
-            <div className="grid grid-cols-3 gap-3">
+            <motion.div
+              initial={{ opacity: 0, y: 14 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.08 }}
+            className="grid grid-cols-3 gap-2 md:gap-3 lg:w-[390px]"
+            >
               {[
                 { label: isEnglish ? "Scans" : "Scans", value: planSummary.scans },
                 { label: isEnglish ? "Workouts" : "Treinos", value: planSummary.workouts },
                 { label: isEnglish ? "Recipes" : "Receitas", value: planSummary.recipes },
               ].map((item) => (
-                <div key={item.label} className="rounded-2xl bg-black/25 border border-white/10 p-3">
+                <div key={item.label} className="rounded-2xl border border-white/10 bg-black/22 backdrop-blur-xl p-3">
                   <p className="text-[10px] uppercase tracking-widest text-white/40">{item.label}</p>
-                  <p className="text-xl font-black text-orange-200 mt-1">{item.value}</p>
+                  <p className="mt-2 text-lg md:text-2xl font-black text-white">{item.value}</p>
                 </div>
               ))}
-            </div>
-          </motion.div>
+            </motion.div>
+          </div>
         </section>
 
         {checkoutError && (
           <motion.div
             initial={{ opacity: 0, y: -8 }}
             animate={{ opacity: 1, y: 0 }}
-            className="mb-8 border border-red-400/25 bg-red-500/10 rounded-2xl p-4 flex items-start gap-3"
+            className="mb-6 border border-red-300/25 bg-red-500/12 backdrop-blur-xl rounded-2xl p-4 flex items-start gap-3"
           >
-            <XCircle className="w-5 h-5 text-red-300 shrink-0 mt-0.5" />
+            <XCircle className="w-5 h-5 text-red-200 shrink-0 mt-0.5" />
             <div>
-              <p className="text-sm font-black text-red-200">
+              <p className="text-sm font-black text-red-100">
                 {isEnglish ? "Checkout unavailable" : "Checkout indisponivel"}
               </p>
-              <p className="text-sm text-red-100/75">{checkoutError}</p>
+              <p className="text-sm text-red-50/75">{checkoutError}</p>
             </div>
           </motion.div>
         )}
@@ -417,11 +417,13 @@ export default function SubscriptionPage() {
           <motion.div
             initial={{ opacity: 0, y: -8 }}
             animate={{ opacity: 1, y: 0 }}
-            className="mb-8 rounded-2xl border border-white/10 bg-white/[0.04] p-4 flex items-center justify-between"
+            className="mb-6 rounded-2xl border border-white/10 bg-white/[0.05] backdrop-blur-xl p-4 flex items-center justify-between"
           >
-            <div className="flex items-center gap-3">
-              <Sparkles className="w-5 h-5 text-orange-300" />
-              <div>
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="w-10 h-10 rounded-xl bg-amber-200/12 text-amber-100 flex items-center justify-center shrink-0">
+                <Sparkles className="w-5 h-5" />
+              </div>
+              <div className="min-w-0">
                 <p className="text-sm font-black">
                   {adsEnabled ? (isEnglish ? "Ads enabled" : "Anuncios ativados") : (isEnglish ? "Ads disabled" : "Anuncios desativados")}
                 </p>
@@ -432,7 +434,7 @@ export default function SubscriptionPage() {
           </motion.div>
         )}
 
-        <section className="grid md:grid-cols-3 gap-5 lg:gap-6">
+        <section className="grid md:grid-cols-3 gap-4 lg:gap-5 items-stretch">
           {plans.map((planItem, index) => {
             const isCurrentPlan = planItem.id === currentPlan
             const isLoadingPlan = loading === planItem.id
@@ -446,47 +448,51 @@ export default function SubscriptionPage() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.06 }}
                 className={cn(
-                  "relative overflow-hidden rounded-[2rem] border bg-white/[0.035] p-5 md:p-6 min-h-[560px] flex flex-col",
-                  styles.border,
-                  planItem.popular && "md:-translate-y-3"
+                  "relative overflow-hidden rounded-[2rem] border backdrop-blur-2xl p-5 min-h-[450px] flex flex-col transition-transform duration-300 hover:-translate-y-1",
+                  styles.shell,
+                  styles.ring,
+                  planItem.popular && "md:min-h-[472px]"
                 )}
               >
-                <div className={cn("absolute inset-x-0 top-0 h-36 bg-gradient-to-b to-transparent pointer-events-none", styles.glow)} />
+                <div className={cn("absolute inset-x-0 top-0 h-36 bg-gradient-to-b pointer-events-none", styles.shine)} />
+                <div className="absolute inset-x-6 top-0 h-px bg-gradient-to-r from-transparent via-white/60 to-transparent" />
 
-                <div className="relative flex items-start justify-between mb-6">
-                  <div className={cn("w-14 h-14 rounded-2xl flex items-center justify-center", styles.icon)}>
-                    <Icon className="w-7 h-7" />
+                <div className="relative flex items-start justify-between gap-3 mb-5">
+                  <div className={cn("w-12 h-12 rounded-2xl border flex items-center justify-center", styles.icon)}>
+                    <Icon className="w-6 h-6" />
                   </div>
-                  <div className="flex gap-2">
+                  <div className="flex flex-wrap justify-end gap-2">
                     {planItem.popular && (
-                      <Badge className="rounded-full bg-blue-500/15 text-blue-200 border-blue-300/25">
-                        {isEnglish ? "Best value" : "Mais escolhido"}
+                      <Badge className="rounded-full border-sky-200/25 bg-sky-200/12 text-sky-100">
+                        {isEnglish ? "Recommended" : "Recomendado"}
                       </Badge>
                     )}
                     {isCurrentPlan && (
-                      <Badge className="rounded-full bg-orange-500/15 text-orange-200 border-orange-300/25">
+                      <Badge className="rounded-full border-amber-200/25 bg-amber-200/12 text-amber-100">
                         {isEnglish ? "Current" : "Atual"}
                       </Badge>
                     )}
                   </div>
                 </div>
 
-                <div className="relative mb-6">
-                  <h3 className={cn("text-3xl font-black tracking-tight", styles.title)}>{planItem.name}</h3>
-                  <p className="text-sm text-white/50 mt-1">
+                <div className="relative">
+                  <h3 className={cn("text-2xl md:text-3xl font-black tracking-tight", styles.title)}>{planItem.name}</h3>
+                  <p className="text-sm text-white/52 mt-1 min-h-5">
                     {isEnglish ? planItem.subtitleEn : planItem.subtitle}
                   </p>
-                  <div className="mt-5 flex items-end gap-1">
-                    <span className="text-4xl font-black">{isEnglish ? planItem.priceUsd : planItem.price}</span>
-                    <span className="text-sm text-white/45 mb-1">{isEnglish ? planItem.periodEn : planItem.period}</span>
+                  <div className="mt-4 flex items-end gap-1">
+                    <span className="text-3xl md:text-4xl font-black tracking-tight">{isEnglish ? planItem.priceUsd : planItem.price}</span>
+                    <span className="text-sm text-white/45 mb-2">{isEnglish ? planItem.periodEn : planItem.period}</span>
                   </div>
                 </div>
 
-                <div className="relative space-y-3 flex-1">
+                <div className="relative mt-5 space-y-2.5 flex-1">
                   {planItem.features.map((feature) => (
-                    <div key={feature.text} className="flex items-center gap-3 text-sm">
-                      <Check className={cn("w-4 h-4 shrink-0", styles.check)} />
-                      <span className="text-white/68">{isEnglish ? feature.textEn : feature.text}</span>
+                    <div key={feature.text} className="flex items-center gap-2.5 text-[13px]">
+                      <span className="w-5 h-5 rounded-full bg-white/8 border border-white/10 flex items-center justify-center shrink-0">
+                        <Check className={cn("w-3.5 h-3.5", styles.check)} />
+                      </span>
+                      <span className="text-white/70">{isEnglish ? feature.textEn : feature.text}</span>
                     </div>
                   ))}
                 </div>
@@ -495,9 +501,9 @@ export default function SubscriptionPage() {
                   onClick={() => handleSwitchPlan(planItem.id)}
                   disabled={isCurrentPlan || Boolean(loading)}
                   className={cn(
-                    "relative mt-7 h-14 rounded-2xl font-black tracking-[0.18em] uppercase",
+                    "relative mt-5 h-12 rounded-2xl border font-black tracking-[0.14em] uppercase shadow-[inset_0_1px_0_rgba(255,255,255,0.18)]",
                     isCurrentPlan
-                      ? "bg-white/5 text-white/35 border border-white/10"
+                      ? "bg-white/7 text-white/38 border-white/10"
                       : styles.button
                   )}
                 >
@@ -522,22 +528,24 @@ export default function SubscriptionPage() {
           })}
         </section>
 
-        <section className="mt-8 grid md:grid-cols-3 gap-4">
-          {[
-            { icon: Lock, title: isEnglish ? "Stripe payment" : "Pagamento Stripe", desc: isEnglish ? "Card checkout handled by Stripe." : "Checkout de cartao processado pela Stripe." },
-            { icon: BadgeCheck, title: isEnglish ? "Plan sync" : "Plano sincronizado", desc: isEnglish ? "Webhook updates your account after payment." : "O webhook atualiza sua conta apos o pagamento." },
-            { icon: Sparkles, title: isEnglish ? "Ad control" : "Controle de anuncios", desc: isEnglish ? "Paid users can disable ads." : "Usuarios pagos podem desativar anuncios." },
-          ].map((item) => (
-            <div key={item.title} className="rounded-2xl border border-white/10 bg-white/[0.035] p-4 flex gap-3">
-              <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-orange-300 shrink-0">
-                <item.icon className="w-5 h-5" />
+        <section className="mt-6 rounded-[2rem] border border-white/10 bg-white/[0.045] backdrop-blur-2xl p-4 md:p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.12)]">
+          <div className="grid md:grid-cols-3 gap-3">
+            {[
+              { icon: Lock, title: isEnglish ? "Stripe payment" : "Pagamento Stripe", desc: isEnglish ? "Card checkout handled by Stripe." : "Checkout de cartao processado pela Stripe." },
+              { icon: BadgeCheck, title: isEnglish ? "Plan sync" : "Plano sincronizado", desc: isEnglish ? "Webhook updates your account after payment." : "O webhook atualiza sua conta apos o pagamento." },
+              { icon: Sparkles, title: isEnglish ? "Ad control" : "Controle de anuncios", desc: isEnglish ? "Paid users can disable ads." : "Usuarios pagos podem desativar anuncios." },
+            ].map((item) => (
+              <div key={item.title} className="flex items-center gap-3 rounded-2xl border border-white/8 bg-black/18 p-3">
+                <div className="w-10 h-10 rounded-xl bg-white/8 flex items-center justify-center text-sky-100 shrink-0">
+                  <item.icon className="w-5 h-5" />
+                </div>
+                <div>
+                  <p className="font-black text-sm">{item.title}</p>
+                  <p className="text-xs text-white/45 mt-1">{item.desc}</p>
+                </div>
               </div>
-              <div>
-                <p className="font-black text-sm">{item.title}</p>
-                <p className="text-xs text-white/45 mt-1">{item.desc}</p>
-              </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </section>
       </main>
     </div>
