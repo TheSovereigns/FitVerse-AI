@@ -56,9 +56,9 @@
   --gradient-primary: linear-gradient(135deg, #FF9500 0%, #FFB020 55%, #F97316 100%);
   --gradient-secondary: linear-gradient(135deg, rgba(255,149,0,0.18) 0%, rgba(8,6,3,0.88) 100%);
   --gradient-success: linear-gradient(135deg, #FF9500 0%, #FFB020 100%);
-  --gradient-mesh: radial-gradient(circle at 12% 10%, rgba(255,149,0,0.36) 0%, transparent 46%),
-                   radial-gradient(circle at 88% 12%, rgba(249,115,22,0.24) 0%, transparent 42%),
-                   radial-gradient(circle at 50% 50%, rgba(255,176,32,0.12) 0%, transparent 56%),
+  --gradient-mesh: radial-gradient(circle at 12% 10%, rgba(255,149,0,0.22) 0%, transparent 46%),
+                   radial-gradient(circle at 88% 12%, rgba(249,115,22,0.14) 0%, transparent 42%),
+                   radial-gradient(circle at 50% 50%, rgba(255,176,32,0.07) 0%, transparent 56%),
                    radial-gradient(circle at 50% 100%, rgba(0,0,0,0.92) 0%, transparent 62%);
   --liquid-blur: 80px;
 }
@@ -125,9 +125,9 @@ aside.group:hover .sidebar-nav-label {
   
   /* Premium FitVerse Mesh Dark */
   /* Premium FitVerse Mesh (Dark) - FitVerse Brand */
-  --gradient-mesh: radial-gradient(circle at 10% 10%, rgba(255,159,10,0.5) 0%, transparent 70%),
-                   radial-gradient(circle at 90% 10%, rgba(255,60,0,0.3) 0%, transparent 60%),
-                   radial-gradient(circle at 50% 50%, rgba(255,159,10,0.15) 0%, transparent 80%),
+  --gradient-mesh: radial-gradient(circle at 10% 10%, rgba(255,159,10,0.28) 0%, transparent 70%),
+                   radial-gradient(circle at 90% 10%, rgba(255,60,0,0.16) 0%, transparent 60%),
+                   radial-gradient(circle at 50% 50%, rgba(255,159,10,0.08) 0%, transparent 80%),
                    radial-gradient(circle at 20% 90%, rgba(5,5,5,0.95) 0%, transparent 60%),
                    radial-gradient(circle at 80% 90%, rgba(255,159,10,0.4) 0%, transparent 60%);
 }
