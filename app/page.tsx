@@ -460,15 +460,20 @@ export default function DashboardPage() {
       {/* Main Content */}
       <div className="flex-1 md:pl-24 lg:pl-32 xl:pl-36 flex flex-col min-h-screen relative transition-all duration-500 max-w-[1600px] xl:max-w-[1800px] mx-auto w-full">
         {/* Header - Visible on all screens */}
-        <header className="sticky top-0 z-40 bg-transparent px-4 md:px-6 h-14 md:h-16 lg:h-14 flex items-center justify-between">
-          <div className="md:hidden font-black text-2xl flex items-center gap-2 text-foreground">
-            <ScanLine className="text-primary size-7" />
-            <span>{t("home_brand")}</span>
+        <header className="sticky top-0 z-40 flex h-16 items-center justify-between border-b border-orange-300/10 bg-[#070503]/78 px-3 backdrop-blur-2xl md:h-16 md:border-none md:bg-transparent md:px-6 lg:h-14">
+          <div className="md:hidden flex min-w-0 items-center gap-2 text-foreground">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl border border-orange-300/14 bg-orange-500/10 shadow-[0_12px_28px_rgba(255,149,0,0.12)]">
+              <ScanLine className="size-5 text-primary" />
+            </div>
+            <div className="min-w-0">
+              <span className="block truncate text-lg font-black tracking-tight">{t("home_brand")}</span>
+              <span className="block text-[9px] font-black uppercase tracking-[0.22em] text-orange-100/34">{getViewTitle()}</span>
+            </div>
           </div>
           <div className="hidden md:block">
              {/* Large title or scroll transition space */}
           </div>
-            <div className="flex items-center gap-4 md:gap-6">
+            <div className="flex items-center gap-2 md:gap-6">
               {(isAdmin || user?.user_metadata?.is_admin) && (
                 <Button 
                   variant="ghost" 
@@ -492,7 +497,7 @@ export default function DashboardPage() {
           </div>
         </header>
 
-        <main className="flex-1 p-4 md:p-6 lg:p-8 xl:p-12 overflow-y-auto pb-24 md:pb-8">
+        <main className="flex-1 overflow-y-auto px-3 pb-safe-nav pt-3 md:p-6 md:pb-8 lg:p-8 xl:p-12">
           {currentView === "home" && <HomeDashboard userMetabolicPlan={userMetabolicPlanState} dailyActivity={dailyActivity} onNavigate={setCurrentView} />}
           {currentView === "dashboard" && <ScanDashboard onScan={handleScan} isScanning={isAnalyzing} />}
           {currentView === "result" && (
@@ -561,16 +566,17 @@ export default function DashboardPage() {
         ref={bottomNavInputRef}
         className="hidden"
         accept="image/*"
+        capture="environment"
         onChange={handleBottomNavFileChange}
       />
 
       {/* Floating Action Button */}
       <Button 
         onClick={handleNavScan} 
-        className="fixed bottom-28 right-8 md:bottom-10 md:right-10 xl:bottom-12 xl:right-12 z-50 h-16 w-16 md:h-16 md:w-16 lg:h-14 lg:w-14 rounded-full bg-orange-500 text-black shadow-[0_18px_44px_rgba(255,149,0,0.32)] transition-all duration-500 hover:scale-110 hover:bg-amber-300 active:scale-75 border border-orange-200/30"
+        className="mobile-fab-safe fixed right-5 z-50 h-14 w-14 rounded-full border border-orange-200/35 bg-orange-500 text-black shadow-[0_18px_44px_rgba(255,149,0,0.34)] transition-all duration-500 hover:scale-105 hover:bg-amber-300 active:scale-90 md:bottom-10 md:right-10 md:h-16 md:w-16 xl:bottom-12 xl:right-12"
           aria-label={t("home_scan_product")}
       >
-        <ScanLine className="h-8 w-8 md:h-10 md:w-10 text-white" />
+        <ScanLine className="h-7 w-7 text-black md:h-9 md:w-9" />
       </Button>
 
       {/* Mobile Bottom Nav - Opens menu on swipe up */}
@@ -582,24 +588,28 @@ export default function DashboardPage() {
         onDragEnd={(_, info) => {
           if (info.offset.y < -30) setIsMenuExpanded(true)
         }}
-        className="md:hidden fixed bottom-6 left-4 right-4 glass-strong rounded-[2rem] z-40 shadow-2xl border border-orange-300/18 h-16 px-2 flex items-center justify-around max-w-md mx-auto active:cursor-grab"
+        className="mobile-bottom-safe md:hidden fixed left-3 right-3 z-40 mx-auto flex h-16 max-w-md items-center justify-around rounded-[1.65rem] border border-orange-300/18 bg-[#090603]/76 px-2 shadow-[0_20px_56px_rgba(0,0,0,0.55)] backdrop-blur-2xl active:cursor-grab"
       >
-        <button onClick={() => setCurrentView("home")} className="flex flex-col items-center justify-center p-2">
-          <Home className={cn("w-6 h-6", currentView === "home" ? "text-primary" : "text-muted-foreground")} />
+        <button onClick={() => setCurrentView("home")} className="relative flex h-12 w-12 flex-col items-center justify-center rounded-2xl p-2" aria-label={t("nav_home")}>
+          <Home className={cn("w-5 h-5", currentView === "home" ? "text-primary" : "text-orange-50/42")} />
+          {currentView === "home" && <span className="absolute bottom-1 h-1 w-1 rounded-full bg-primary" />}
         </button>
-        <button onClick={() => setCurrentView("training")} className="flex flex-col items-center justify-center p-2">
-          <Dumbbell className={cn("w-6 h-6", currentView === "training" ? "text-primary" : "text-muted-foreground")} />
+        <button onClick={() => setCurrentView("training")} className="relative flex h-12 w-12 flex-col items-center justify-center rounded-2xl p-2" aria-label={t("nav_workouts")}>
+          <Dumbbell className={cn("w-5 h-5", currentView === "training" ? "text-primary" : "text-orange-50/42")} />
+          {currentView === "training" && <span className="absolute bottom-1 h-1 w-1 rounded-full bg-primary" />}
         </button>
-        <button onClick={() => setIsMenuExpanded(true)} className="flex flex-col items-center justify-center p-2 -mt-2">
-          <div className="w-10 h-10 rounded-full bg-orange-500/18 border border-orange-300/16 flex items-center justify-center">
+        <button onClick={() => setIsMenuExpanded(true)} className="-mt-2 flex h-12 w-12 flex-col items-center justify-center rounded-2xl p-1" aria-label="Abrir menu">
+          <div className="flex h-11 w-11 items-center justify-center rounded-full border border-orange-300/20 bg-orange-500/18 shadow-[0_10px_28px_rgba(255,149,0,0.14)]">
             <ChevronUp className="w-5 h-5 text-primary" />
           </div>
         </button>
-        <button onClick={() => setCurrentView("chatbot")} className="flex flex-col items-center justify-center p-2">
-          <Bot className={cn("w-6 h-6", currentView === "chatbot" ? "text-primary" : "text-muted-foreground")} />
+        <button onClick={() => setCurrentView("recipes")} className="relative flex h-12 w-12 flex-col items-center justify-center rounded-2xl p-2" aria-label={t("nav_recipes")}>
+          <ChefHat className={cn("w-5 h-5", currentView === "recipes" ? "text-primary" : "text-orange-50/42")} />
+          {currentView === "recipes" && <span className="absolute bottom-1 h-1 w-1 rounded-full bg-primary" />}
         </button>
-        <button onClick={() => setCurrentView("profile")} className="flex flex-col items-center justify-center p-2">
-          <User className={cn("w-6 h-6", currentView === "profile" ? "text-primary" : "text-muted-foreground")} />
+        <button onClick={() => setCurrentView("profile")} className="relative flex h-12 w-12 flex-col items-center justify-center rounded-2xl p-2" aria-label={t("nav_profile")}>
+          <User className={cn("w-5 h-5", currentView === "profile" ? "text-primary" : "text-orange-50/42")} />
+          {currentView === "profile" && <span className="absolute bottom-1 h-1 w-1 rounded-full bg-primary" />}
         </button>
       </motion.nav>
     </div>

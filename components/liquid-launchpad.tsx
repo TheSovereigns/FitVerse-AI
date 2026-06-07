@@ -4,7 +4,6 @@ import { motion, AnimatePresence } from "framer-motion"
 import { 
   X, Home, ScanLine, Dumbbell, Calculator, 
   ChefHat, ShoppingBag, Bot, User, Settings,
-  ChevronDown, Search
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useTranslation } from "@/lib/i18n"
@@ -20,15 +19,15 @@ export function LiquidLaunchpad({ isOpen, onClose, onNavigate, currentView }: La
   const { t } = useTranslation()
 
   const menuItems = [
-    { id: "home", icon: Home, label: t("nav_home"), color: "from-blue-500/20 to-cyan-500/10" },
-    { id: "dashboard", icon: ScanLine, label: t("nav_bioscan"), color: "from-orange-500/20 to-amber-500/10" },
-    { id: "training", icon: Dumbbell, label: t("nav_workouts"), color: "from-rose-500/20 to-purple-500/10" },
-    { id: "planner", icon: Calculator, label: t("nav_diet"), color: "from-emerald-500/20 to-teal-500/10" },
-    { id: "recipes", icon: ChefHat, label: t("nav_recipes"), color: "from-pink-500/20 to-rose-500/10" },
-    { id: "store", icon: ShoppingBag, label: t("nav_store"), color: "from-blue-600/20 to-indigo-500/10" },
-    { id: "chatbot", icon: Bot, label: t("nav_aichat"), color: "from-violet-500/20 to-fuchsia-500/10" },
-    { id: "profile", icon: User, label: t("nav_profile"), color: "from-gray-500/20 to-slate-500/10" },
-    { id: "settings", icon: Settings, label: t("nav_settings"), color: "from-zinc-500/20 to-neutral-500/10" },
+    { id: "home", icon: Home, label: t("nav_home") },
+    { id: "dashboard", icon: ScanLine, label: t("nav_bioscan") },
+    { id: "training", icon: Dumbbell, label: t("nav_workouts") },
+    { id: "planner", icon: Calculator, label: t("nav_diet") },
+    { id: "recipes", icon: ChefHat, label: t("nav_recipes") },
+    { id: "store", icon: ShoppingBag, label: t("nav_store") },
+    { id: "chatbot", icon: Bot, label: t("nav_aichat") },
+    { id: "profile", icon: User, label: t("nav_profile") },
+    { id: "settings", icon: Settings, label: t("nav_settings") },
   ]
 
   return (
@@ -44,25 +43,27 @@ export function LiquidLaunchpad({ isOpen, onClose, onNavigate, currentView }: La
           onDragEnd={(_, info) => {
             if (info.offset.y > 100) onClose()
           }}
-          className="fixed inset-0 z-[100] md:hidden bg-transparent backdrop-blur-[60px] flex flex-col overflow-hidden mesh-gradient-animated"
+          className="fixed inset-0 z-[100] flex flex-col overflow-hidden bg-[#050302]/86 backdrop-blur-[48px] md:hidden"
         >
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(255,149,0,0.2),transparent_42%),radial-gradient(circle_at_20%_90%,rgba(249,115,22,0.13),transparent_36%)]" />
+
           {/* Top Indicator / Close handle */}
-          <div className="pt-2 pb-6 flex flex-col items-center gap-1 group cursor-pointer" onClick={onClose}>
-             <div className="w-10 h-1.5 rounded-full bg-white/20 group-hover:bg-white/40 transition-colors" />
-              <span className="text-[8px] font-black uppercase tracking-[0.3em] opacity-20 group-hover:opacity-40 transition-opacity">
+          <div className="relative z-10 flex cursor-pointer flex-col items-center gap-1 pb-5 pt-safe-top group" onClick={onClose}>
+             <div className="mt-2 h-1.5 w-11 rounded-full bg-orange-100/20 transition-colors group-hover:bg-orange-100/35" />
+              <span className="text-[8px] font-black uppercase tracking-[0.3em] text-orange-100/24 transition-opacity group-hover:text-orange-100/42">
                 {t("nav_pull_down_to_close")}
               </span>
           </div>
 
-           <div className="flex-1 px-4 pt-4 pb-32 space-y-10 overflow-y-auto scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent">
+           <div className="relative z-10 flex-1 space-y-8 overflow-y-auto px-4 pb-32 pt-2 scrollbar-thin scrollbar-thumb-orange-300/20 scrollbar-track-transparent">
 
 
             {/* Modules Grid */}
             <div className="space-y-6">
-                <h3 className="text-[10px] font-black uppercase tracking-[0.4em] opacity-30 ml-4">
+                <h3 className="ml-2 text-[10px] font-black uppercase tracking-[0.34em] text-orange-100/32">
                   {t("lp_bio_modules")}
                 </h3>
-               <div className="grid grid-cols-3 gap-4">
+               <div className="grid grid-cols-3 gap-3">
                  {menuItems.map((item) => {
                    const isActive = currentView === item.id
                    return (
@@ -75,23 +76,24 @@ export function LiquidLaunchpad({ isOpen, onClose, onNavigate, currentView }: La
                          onClose()
                        }}
                        className={cn(
-                         "relative aspect-square rounded-[2rem] flex flex-col items-center justify-center gap-3 transition-all duration-300 border haptic-press",
+                         "relative aspect-square rounded-[1.55rem] flex flex-col items-center justify-center gap-2 transition-all duration-300 border haptic-press overflow-hidden",
                          isActive 
-                           ? "bg-primary border-primary shadow-[0_0_30px_rgba(255,149,0,0.4)]" 
-                           : "glass-strong border-white/10 bg-gradient-to-br" + " " + item.color
+                           ? "border-orange-300/45 bg-orange-500 text-black shadow-[0_18px_42px_rgba(255,149,0,0.3)]"
+                           : "border-orange-300/12 bg-[#0c0704]/74 text-orange-50 shadow-[inset_0_1px_0_rgba(251,146,60,0.08),0_12px_30px_rgba(0,0,0,0.22)] backdrop-blur-2xl"
                        )}
                      >
-                       <item.icon className={cn("w-7 h-7", isActive ? "text-white" : "text-foreground/70")} />
+                       {!isActive && <span className="absolute inset-0 bg-gradient-to-br from-orange-500/10 via-transparent to-black/20" />}
+                       <item.icon className={cn("relative z-10 h-6 w-6", isActive ? "text-black" : "text-orange-100/70")} />
                        <span className={cn(
-                         "text-[9px] font-black uppercase tracking-widest",
-                         isActive ? "text-white" : "text-foreground/40"
+                         "relative z-10 max-w-[78px] truncate text-[8px] font-black uppercase tracking-widest",
+                         isActive ? "text-black" : "text-orange-100/42"
                        )}>
                          {item.label}
                        </span>
                        {isActive && (
                           <motion.div 
                             layoutId="launch-active"
-                            className="absolute inset-[-4px] border border-primary/40 rounded-[2.25rem] opacity-50"
+                            className="absolute inset-[-3px] rounded-[1.75rem] border border-orange-200/55 opacity-60"
                           />
                        )}
                      </motion.button>
@@ -101,26 +103,26 @@ export function LiquidLaunchpad({ isOpen, onClose, onNavigate, currentView }: La
             </div>
 
             {/* Quick Actions / Integration */}
-            <div className="grid grid-cols-2 gap-4">
-               <div className="glass-strong border-white/10 rounded-[2.5rem] p-6 flex flex-col gap-2">
-                  <div className="w-10 h-10 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
+            <div className="grid grid-cols-2 gap-3">
+               <div className="rounded-[1.5rem] border border-orange-300/12 bg-[#0c0704]/76 p-4 shadow-[0_14px_36px_rgba(0,0,0,0.25)] backdrop-blur-2xl">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-primary/10 text-primary">
                     <Calculator className="w-5 h-5" />
                   </div>
-                   <h4 className="font-black text-sm uppercase tracking-tighter">{t("lp_bio_stats")}</h4>
-                   <p className="text-[9px] font-bold opacity-40 uppercase tracking-widest">{t("lp_protocol")}</p>
+                   <h4 className="mt-4 text-sm font-black uppercase tracking-tight text-orange-50">{t("lp_bio_stats")}</h4>
+                   <p className="mt-1 text-[9px] font-bold uppercase tracking-widest text-orange-100/36">{t("lp_protocol")}</p>
                </div>
-               <div className="glass-strong border-white/10 rounded-[2.5rem] p-6 flex flex-col gap-2">
-                  <div className="w-10 h-10 rounded-2xl bg-cyan-500/10 flex items-center justify-center text-cyan-500">
+               <div className="rounded-[1.5rem] border border-orange-300/12 bg-[#0c0704]/76 p-4 shadow-[0_14px_36px_rgba(0,0,0,0.25)] backdrop-blur-2xl">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-orange-500/10 text-primary">
                     <ScanLine className="w-5 h-5" />
                   </div>
-                   <h4 className="font-black text-sm uppercase tracking-tighter">{t("lp_ai_sync")}</h4>
-                   <p className="text-[9px] font-bold opacity-40 uppercase tracking-widest">{t("lp_stabilized")}</p>
+                   <h4 className="mt-4 text-sm font-black uppercase tracking-tight text-orange-50">{t("lp_ai_sync")}</h4>
+                   <p className="mt-1 text-[9px] font-bold uppercase tracking-widest text-orange-100/36">{t("lp_stabilized")}</p>
                </div>
             </div>
           </div>
 
           {/* Footer Blur Edge */}
-          <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-black/60 to-transparent pointer-events-none" />
+          <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-black/75 to-transparent" />
         </motion.div>
       )}
     </AnimatePresence>

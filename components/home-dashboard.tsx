@@ -71,11 +71,11 @@ export function HomeDashboard({
   ]
 
   return (
-    <div className="mx-auto w-full max-w-6xl space-y-5 pb-safe-nav md:space-y-6">
+    <div className="mx-auto w-full max-w-6xl space-y-4 pb-safe-nav md:space-y-6">
       <motion.section
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
-        className="rounded-[1.5rem] border border-orange-300/14 bg-[#090704]/72 p-4 shadow-[0_18px_54px_rgba(0,0,0,0.28)] backdrop-blur-2xl md:p-6"
+        className="mobile-glass-glow rounded-[1.35rem] border border-orange-300/14 bg-[#090704]/74 p-4 shadow-[0_18px_54px_rgba(0,0,0,0.28)] backdrop-blur-2xl md:rounded-[1.5rem] md:p-6"
       >
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
@@ -88,10 +88,10 @@ export function HomeDashboard({
             <p className="mt-1 text-sm font-bold capitalize text-orange-50/45">{dateString}</p>
           </div>
 
-          <div className="flex flex-col gap-2 sm:flex-row">
+          <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-row">
             <Button
               onClick={() => onNavigate("dashboard")}
-              className="h-11 rounded-2xl bg-orange-500 px-5 text-[10px] font-black uppercase tracking-widest text-black hover:bg-amber-300"
+              className="h-11 min-w-0 rounded-2xl bg-orange-500 px-3 text-[10px] font-black uppercase tracking-widest text-black hover:bg-amber-300 sm:px-5"
             >
               <ScanLine className="h-4 w-4" />
               {t("dopamine_quick_scan")}
@@ -99,7 +99,7 @@ export function HomeDashboard({
             <Button
               variant="ghost"
               onClick={() => onNavigate("planner")}
-              className="h-11 rounded-2xl border border-orange-300/14 bg-orange-500/8 px-5 text-[10px] font-black uppercase tracking-widest text-orange-100 hover:bg-orange-500/14"
+              className="h-11 min-w-0 rounded-2xl border border-orange-300/14 bg-orange-500/8 px-3 text-[10px] font-black uppercase tracking-widest text-orange-100 hover:bg-orange-500/14 sm:px-5"
             >
               <Target className="h-4 w-4" />
               {t("view_planner")}
@@ -108,9 +108,9 @@ export function HomeDashboard({
         </div>
       </motion.section>
 
-      <section className="grid gap-4 lg:grid-cols-[1.25fr_0.75fr]">
+      <section className="grid gap-3 md:gap-4 lg:grid-cols-[1.25fr_0.75fr]">
         <Panel>
-          <div className="flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
+          <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
             <div className="min-w-0">
               <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-2xl border border-orange-300/14 bg-orange-500/8 text-amber-100">
                 <Flame className="h-5 w-5" />
@@ -133,7 +133,7 @@ export function HomeDashboard({
               </p>
             </div>
 
-            <div className="w-full rounded-[1.25rem] border border-orange-300/12 bg-orange-950/12 p-4 md:w-72">
+            <div className="w-full rounded-[1.15rem] border border-orange-300/12 bg-orange-950/12 p-4 shadow-[inset_0_1px_0_rgba(251,146,60,0.08)] md:w-72 md:rounded-[1.25rem]">
               <div className="mb-3 flex items-center justify-between">
                 <span className="text-[10px] font-black uppercase tracking-widest text-orange-100/38">
                   {isEnglish ? "Daily progress" : "Progresso diario"}
@@ -180,15 +180,17 @@ export function HomeDashboard({
           </h2>
           <span className="text-[10px] font-black uppercase tracking-[0.2em] text-orange-100/30">FitVerse</span>
         </div>
-        <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+        <div className="grid grid-cols-2 gap-2.5 md:grid-cols-4 md:gap-3">
           {quickActions.map((action) => (
             <button
               key={action.view}
               type="button"
               onClick={() => onNavigate(action.view)}
-              className="rounded-[1.25rem] border border-orange-300/12 bg-[#090704]/64 p-4 text-left shadow-[0_14px_38px_rgba(0,0,0,0.22)] backdrop-blur-xl transition hover:border-orange-300/28 hover:bg-orange-500/8"
+              className="min-h-[118px] rounded-[1.15rem] border border-orange-300/12 bg-[#090704]/66 p-3.5 text-left shadow-[0_14px_38px_rgba(0,0,0,0.22)] backdrop-blur-xl transition active:scale-[0.98] hover:border-orange-300/28 hover:bg-orange-500/8 md:rounded-[1.25rem] md:p-4"
             >
-              <action.icon className="mb-4 h-5 w-5 text-amber-200" />
+              <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-2xl border border-orange-300/12 bg-orange-500/10">
+                <action.icon className="h-4 w-4 text-amber-200" />
+              </div>
               <p className="text-sm font-black text-orange-50">{action.label}</p>
               <p className="mt-1 line-clamp-2 text-[10px] font-bold leading-relaxed text-orange-50/38">{action.desc}</p>
             </button>
@@ -237,7 +239,7 @@ export function HomeDashboard({
             ))}
           </div>
         ) : (
-          <div className="rounded-[1.25rem] border border-orange-300/10 bg-orange-950/10 p-6 text-center">
+          <div className="rounded-[1.15rem] border border-orange-300/10 bg-orange-950/10 p-5 text-center md:rounded-[1.25rem] md:p-6">
             <ScanLine className="mx-auto mb-3 h-8 w-8 text-amber-200" />
             <h3 className="text-base font-black text-foreground">{t("dopamine_empty_title")}</h3>
             <p className="mx-auto mt-2 max-w-md text-sm font-bold text-orange-50/42">{t("dopamine_empty_subtitle")}</p>
@@ -259,7 +261,7 @@ function Panel({ children }: { children: React.ReactNode }) {
     <motion.div
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
-      className="rounded-[1.5rem] border border-orange-300/14 bg-[#090704]/68 p-4 shadow-[0_18px_54px_rgba(0,0,0,0.26)] backdrop-blur-2xl md:p-5"
+      className="mobile-glass-glow rounded-[1.35rem] border border-orange-300/14 bg-[#090704]/70 p-4 shadow-[0_18px_54px_rgba(0,0,0,0.26)] backdrop-blur-2xl md:rounded-[1.5rem] md:p-5"
     >
       {children}
     </motion.div>
@@ -268,10 +270,10 @@ function Panel({ children }: { children: React.ReactNode }) {
 
 function Metric({ icon: Icon, label, value }: { icon: React.ElementType; label: string; value: string | number }) {
   return (
-    <div className="rounded-[1rem] border border-orange-300/10 bg-orange-950/12 p-3">
+    <div className="min-w-0 rounded-[1rem] border border-orange-300/10 bg-orange-950/12 p-2.5 shadow-[inset_0_1px_0_rgba(251,146,60,0.06)] md:p-3">
       <Icon className="h-4 w-4 text-amber-200" />
-      <p className="mt-3 truncate text-lg font-black text-orange-50">{value}</p>
-      <p className="mt-1 truncate text-[9px] font-black uppercase tracking-widest text-orange-100/34">{label}</p>
+      <p className="mt-3 truncate text-base font-black text-orange-50 md:text-lg">{value}</p>
+      <p className="mt-1 truncate text-[8px] font-black uppercase tracking-widest text-orange-100/34 md:text-[9px]">{label}</p>
     </div>
   )
 }

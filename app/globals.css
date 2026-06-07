@@ -888,27 +888,31 @@ aside.group:hover .sidebar-nav-label {
       transform: scale(0.92);
     }
     .haptic-press:hover {
-      transform: scale(1.03);
+      transform: none;
     }
   }
 
   .native-sheet {
     @apply fixed bottom-0 left-0 right-0 rounded-t-[3rem] z-[100] transform transition-transform duration-500 ease-out;
-    background: rgba(255, 255, 255, 0.55);
-    backdrop-filter: blur(80px) saturate(250%);
-    -webkit-backdrop-filter: blur(80px) saturate(250%);
-    border: 1px solid rgba(255, 255, 255, 0.6);
+    background: rgba(8, 6, 3, 0.82);
+    backdrop-filter: blur(54px) saturate(190%);
+    -webkit-backdrop-filter: blur(54px) saturate(190%);
+    border: 1px solid rgba(251, 146, 60, 0.2);
     box-shadow: 0 -20px 80px rgba(0, 0, 0, 0.4);
   }
 
   .dark .native-sheet {
-    background: rgba(15, 15, 15, 0.7);
-    backdrop-filter: blur(80px) saturate(260%);
-    -webkit-backdrop-filter: blur(80px) saturate(260%);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(8, 6, 3, 0.86);
+    backdrop-filter: blur(54px) saturate(190%);
+    -webkit-backdrop-filter: blur(54px) saturate(190%);
+    border: 1px solid rgba(251, 146, 60, 0.22);
   }
 
   /* ─── iOS Safe Area Utilities ─── */
+  .pt-safe-top {
+    padding-top: calc(env(safe-area-inset-top) + 0.5rem);
+  }
+
   .pb-safe {
     padding-bottom: calc(env(safe-area-inset-bottom) + 1rem);
   }
@@ -921,6 +925,33 @@ aside.group:hover .sidebar-nav-label {
   .mobile-bottom-nav {
     padding-bottom: env(safe-area-inset-bottom, 0px);
     bottom: max(1.5rem, calc(env(safe-area-inset-bottom) + 0.5rem));
+  }
+
+  .mobile-bottom-safe {
+    bottom: max(0.85rem, calc(env(safe-area-inset-bottom) + 0.55rem));
+  }
+
+  .mobile-fab-safe {
+    bottom: calc(env(safe-area-inset-bottom) + 5.8rem);
+  }
+
+  .mobile-glass-glow {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .mobile-glass-glow::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(135deg, rgba(251, 146, 60, 0.08), transparent 38%, rgba(255, 149, 0, 0.04));
+    opacity: 0.9;
+  }
+
+  .mobile-glass-glow > * {
+    position: relative;
+    z-index: 1;
   }
 
   /* ─── No Scrollbar ─── */
@@ -957,8 +988,38 @@ aside.group:hover .sidebar-nav-label {
 
   /* ─── Mobile-optimized pill card ─── */
   @media (max-width: 767px) {
+    html {
+      font-size: 15px;
+    }
+
+    button,
+    a,
+    [role="button"] {
+      min-height: 44px;
+    }
+
+    .glass {
+      backdrop-filter: blur(28px) saturate(165%);
+      -webkit-backdrop-filter: blur(28px) saturate(165%);
+      box-shadow:
+        inset 0 1px 0 rgba(251, 146, 60, 0.1),
+        0 14px 40px rgba(0, 0, 0, 0.34);
+    }
+
+    .glass-strong {
+      backdrop-filter: blur(34px) saturate(170%);
+      -webkit-backdrop-filter: blur(34px) saturate(170%);
+      box-shadow:
+        inset 0 1px 0 rgba(251, 146, 60, 0.13),
+        0 18px 48px rgba(0, 0, 0, 0.46);
+    }
+
+    .pb-safe-nav {
+      padding-bottom: calc(env(safe-area-inset-bottom) + 8rem);
+    }
+
     .mobile-pill-card {
-      border-radius: 2rem;
+      border-radius: 1.5rem;
       padding: 1.25rem;
     }
 
