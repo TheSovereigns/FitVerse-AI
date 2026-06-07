@@ -1,12 +1,12 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useEffect, useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
-import { Dumbbell, Flame, Clock, Zap, Play, Home, Building2, User, ArrowRight, Swords, Activity } from "lucide-react"
+import { Dialog, DialogContent } from "@/components/ui/dialog"
+import { Activity, ArrowRight, Building2, Clock, Dumbbell, Flame, Home, Play, Swords, User, Zap } from "lucide-react"
 import { WorkoutGenerator } from "@/components/workout-generator"
 import { ActiveWorkoutSession } from "@/components/active-workout-session"
 import { ExerciseDetailModal } from "@/components/exercise-detail-modal"
@@ -39,72 +39,71 @@ interface TrainingTabProps {
   userGoal?: string
 }
 
-export function TrainingTab({ metabolicPlan, scanHistory, userGoal }: TrainingTabProps) {
+const sampleWorkouts: Workout[] = [
+  {
+    name: "Treino Full Body",
+    category: "Full Body",
+    duration: "45 min",
+    calories: "350 kcal",
+    difficulty: "Intermediario",
+    aiVerdict: "Excelente para definicao muscular com foco em movimentos compostos.",
+    exercises: [
+      { name: "Agachamento", sets: "4", reps: "12", rest: "60s" },
+      { name: "Supino", sets: "4", reps: "12", rest: "60s" },
+      { name: "Remada", sets: "4", reps: "12", rest: "60s" },
+      { name: "Flexao", sets: "3", reps: "15", rest: "45s" },
+      { name: "Prancha", sets: "3", reps: "30s", rest: "30s" },
+    ],
+    criteria: { location: "Casa (Sem Equipamento)" },
+  },
+  {
+    name: "Treino Superior",
+    category: "Superior",
+    duration: "40 min",
+    calories: "280 kcal",
+    difficulty: "Iniciante",
+    aiVerdict: "Ideal para construir consistencia e controle tecnico.",
+    exercises: [
+      { name: "Supino com halteres", sets: "3", reps: "12", rest: "60s" },
+      { name: "Rosca direta", sets: "3", reps: "12", rest: "45s" },
+      { name: "Desenvolvimento", sets: "3", reps: "12", rest: "60s" },
+      { name: "Triceps pulley", sets: "3", reps: "12", rest: "45s" },
+    ],
+    criteria: { location: "Academia" },
+  },
+  {
+    name: "Treino Cardio",
+    category: "Cardio",
+    duration: "30 min",
+    calories: "300 kcal",
+    difficulty: "Avancado",
+    aiVerdict: "Alta intensidade para condicionamento e gasto calorico.",
+    exercises: [
+      { name: "Burpee", sets: "4", reps: "15", rest: "30s" },
+      { name: "Polichinelo", sets: "4", reps: "30s", rest: "30s" },
+      { name: "Afundo", sets: "3", reps: "12", rest: "45s" },
+      { name: "Mountain climber", sets: "4", reps: "20s", rest: "30s" },
+    ],
+    criteria: { location: "Casa (Sem Equipamento)" },
+  },
+]
+
+export function TrainingTab({ userGoal }: TrainingTabProps) {
   const { t, locale } = useTranslation()
   const [isGenerating, setIsGenerating] = useState(false)
   const [generationError, setGenerationError] = useState<string | null>(null)
   const [generatedWorkouts, setGeneratedWorkouts] = useState<Workout[]>([])
   const [activeFilter, setActiveFilter] = useState("all")
   const [showGeneratorModal, setShowGeneratorModal] = useState(false)
-  const [sortBy, setSortBy] = useState("default")
   const [activeSessionWorkout, setActiveSessionWorkout] = useState<Workout | null>(null)
   const [selectedExerciseDetail, setSelectedExerciseDetail] = useState<any>(null)
-
-  const sampleWorkouts: Workout[] = [
-    {
-      name: "Treino Full Body",
-      category: "Full Body",
-      duration: "45 min",
-      calories: "350 kcal",
-      difficulty: "Intermediário",
-      aiVerdict: "Excelente para definição muscular.",
-      exercises: [
-        { name: "Agachamento", sets: "4", reps: "12", rest: "60s" },
-        { name: "Supino", sets: "4", reps: "12", rest: "60s" },
-        { name: "Remada", sets: "4", reps: "12", rest: "60s" },
-        { name: "Flexão", sets: "3", reps: "15", rest: "45s" },
-        { name: "Prancha", sets: "3", reps: "30s", rest: "30s" },
-      ],
-      criteria: { location: "Casa (Sem Equipamento)" }
-    },
-    {
-      name: "Treino Superior",
-      category: "Superior",
-      duration: "40 min",
-      calories: "280 kcal",
-      difficulty: "Iniciante",
-      aiVerdict: "Ideal para quem está começando.",
-      exercises: [
-        { name: "Supino com halteres", sets: "3", reps: "12", rest: "60s" },
-        { name: "Rosca direta", sets: "3", reps: "12", rest: "45s" },
-        { name: "Desenvolvimento", sets: "3", reps: "12", rest: "60s" },
-        { name: "Tríceps pulley", sets: "3", reps: "12", rest: "45s" },
-      ],
-      criteria: { location: "Academia" }
-    },
-    {
-      name: "Treino Cardio",
-      category: "Cardio",
-      duration: "30 min",
-      calories: "300 kcal",
-      difficulty: "Avançado",
-      aiVerdict: "Alta queima calórica.",
-      exercises: [
-        { name: "Burpee", sets: "4", reps: "15", rest: "30s" },
-        { name: "Polichinelo", sets: "4", reps: "30s", rest: "30s" },
-        { name: "Afundo", sets: "3", reps: "12", rest: "45s" },
-        { name: "Mountain climber", sets: "4", reps: "20s", rest: "30s" },
-      ],
-      criteria: { location: "Casa (Sem Equipamento)" }
-    },
-  ]
 
   useEffect(() => {
     const savedWorkouts = localStorage.getItem("nutritrain-workouts")
     if (savedWorkouts) {
-      try { setGeneratedWorkouts(JSON.parse(savedWorkouts)) }
-      catch (e) { 
-        console.error("Failed to load workouts:", e)
+      try {
+        setGeneratedWorkouts(JSON.parse(savedWorkouts))
+      } catch {
         setGeneratedWorkouts(sampleWorkouts)
       }
     } else {
@@ -122,18 +121,12 @@ export function TrainingTab({ metabolicPlan, scanHistory, userGoal }: TrainingTa
     setIsGenerating(true)
     setGenerationError(null)
     setShowGeneratorModal(false)
-    if (criteria.location === "Academia" || criteria.location === "Gym") setActiveFilter("gym")
-    else if (criteria.location === "Casa (Halteres)" || criteria.location.includes("Halteres") || criteria.location.includes("Dumbbell")) setActiveFilter("dumbbells")
-    else if (criteria.location === "Casa (Sem Equipamento)" || criteria.location.includes("Sem Equipamento") || criteria.location.includes("Bodyweight")) setActiveFilter("bodyweight")
-    else setActiveFilter("home")
 
     try {
-      let token = ''
-      
-      // Get token from localStorage directly
+      let token = ""
       for (let i = 0; i < localStorage.length; i++) {
         const key = localStorage.key(i)
-        if (key && key.includes('sb-') && key.includes('-auth-token')) {
+        if (key && key.includes("sb-") && key.includes("-auth-token")) {
           const storedSession = localStorage.getItem(key)
           if (storedSession) {
             const parsed = JSON.parse(storedSession)
@@ -147,18 +140,18 @@ export function TrainingTab({ metabolicPlan, scanHistory, userGoal }: TrainingTa
 
       if (!token) {
         const { data: { session } } = await supabase.auth.getSession()
-        token = session?.access_token || ''
+        token = session?.access_token || ""
       }
 
       if (!token) {
         throw new Error(locale === "en-US" ? "Please sign in again before generating a workout." : "Entre novamente antes de gerar um treino.")
       }
-      
+
       const response = await fetch("/api/generate-workouts", {
         method: "POST",
-        headers: { 
+        headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`
+          "Authorization": `Bearer ${token}`,
         },
         body: JSON.stringify({ ...criteria, goal: userGoal || "Hypertrophy & Definition", locale }),
       })
@@ -174,11 +167,10 @@ export function TrainingTab({ metabolicPlan, scanHistory, userGoal }: TrainingTa
         throw new Error(locale === "en-US" ? "The AI did not return a workout. Try different options." : "A IA nao retornou um treino. Tente outras opcoes.")
       }
 
-      setGeneratedWorkouts(data.workouts.map((w: any) => ({ ...w, criteria })))
+      setGeneratedWorkouts(data.workouts.map((workout: any) => ({ ...workout, criteria })))
       setActiveFilter("all")
       toast.success(locale === "en-US" ? "Workout generated!" : "Treino gerado!")
     } catch (error) {
-      console.error("Error generating workouts:", error)
       const message = error instanceof Error ? error.message : t("training_error_ai")
       setGenerationError(message)
       toast.error(message)
@@ -195,165 +187,125 @@ export function TrainingTab({ metabolicPlan, scanHistory, userGoal }: TrainingTa
     { id: "bodyweight", label: t("filter_bodyweight"), icon: User },
   ]
 
-  const filteredWorkouts = generatedWorkouts.filter(workout => {
+  const filteredWorkouts = generatedWorkouts.filter((workout) => {
     if (activeFilter === "all") return true
     const location = (workout.criteria?.location || "").toLowerCase()
     switch (activeFilter) {
       case "gym": return location === "academia" || location === "gym"
       case "home": return location.includes("casa") || location.includes("home")
-      case "dumbbells": return location === "casa (halteres)" || location === "casa (halteres)" || location.includes("dumbbell")
-      case "bodyweight": return location === "casa (sem equipamento)" || location.includes("sem equipamento") || location.includes("bodyweight") || location.includes("body weight")
+      case "dumbbells": return location.includes("halteres") || location.includes("dumbbell")
+      case "bodyweight": return location.includes("sem equipamento") || location.includes("bodyweight") || location.includes("body weight")
       default: return false
     }
   })
 
   return (
-    <div className="space-y-6 md:space-y-10 pb-safe-nav">
-      {/* Header */}
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-        <h1 className="text-2xl md:text-4xl font-black text-foreground tracking-tight leading-none">
-          Bio<span className="text-primary italic">{t("training_title").replace("Bio", "")}</span>
-        </h1>
-        <p className="text-xs md:text-lg font-bold text-muted-foreground mt-2 md:mt-3 opacity-50 uppercase tracking-[0.2em]">
-          {t("training_subtitle")}
-        </p>
-      </motion.div>
+    <div className="relative space-y-5 pb-safe-nav md:space-y-7">
+      <div className="pointer-events-none absolute inset-x-[-1rem] top-[-5rem] h-72 bg-[radial-gradient(circle_at_24%_10%,rgba(255,149,0,0.22),transparent_42%),radial-gradient(circle_at_86%_2%,rgba(251,191,36,0.12),transparent_36%)]" />
 
-      {/* Filter Pills — horizontally scrollable on mobile */}
-      <div className="flex gap-3 overflow-x-auto no-scrollbar pb-1 px-0.5 mobile-scroll-x">
-        {filters.map(filter => {
+      <motion.section
+        initial={{ opacity: 0, y: 18 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="relative overflow-hidden rounded-[2rem] border border-orange-300/22 bg-black/50 p-5 shadow-[inset_0_1px_0_rgba(251,146,60,0.16),0_28px_90px_rgba(0,0,0,0.32)] backdrop-blur-2xl md:rounded-[2.5rem] md:p-7"
+      >
+        <div className="absolute inset-y-0 left-0 w-1.5 bg-gradient-to-b from-amber-300 via-orange-500 to-orange-900" />
+        <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(251,146,60,0.12),transparent_34%,rgba(245,158,11,0.08))]" />
+        <div className="relative flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+          <div>
+            <Badge className="mb-4 rounded-full border border-orange-300/20 bg-orange-500/10 px-3 py-1.5 text-[9px] font-black uppercase tracking-[0.24em] text-orange-100">
+              AI Training
+            </Badge>
+            <h1 className="text-4xl font-black leading-none tracking-tight text-foreground md:text-6xl">
+              Bio<span className="text-primary italic">{t("training_title").replace("Bio", "")}</span>
+            </h1>
+            <p className="mt-4 max-w-2xl text-sm font-bold leading-relaxed text-orange-50/52 md:text-base">
+              {t("training_subtitle")}
+            </p>
+          </div>
+          <Button onClick={() => setShowGeneratorModal(true)} className="h-12 rounded-2xl bg-orange-500 px-6 text-sm font-black uppercase tracking-[0.16em] text-black hover:bg-amber-300">
+            {t("training_new_workout")}
+            <Zap className="ml-2 h-4 w-4" />
+          </Button>
+        </div>
+      </motion.section>
+
+      <div className="flex gap-2 overflow-x-auto pb-1">
+        {filters.map((filter) => {
           const Icon = filter.icon
           const isActive = activeFilter === filter.id
           return (
-            <motion.button
+            <button
               key={filter.id}
-              whileTap={{ scale: 0.95 }}
+              type="button"
               onClick={() => setActiveFilter(filter.id)}
               className={cn(
-                "flex items-center gap-2 md:gap-3 px-5 md:px-8 py-3 md:py-4 rounded-full text-[10px] md:text-xs font-black uppercase tracking-widest transition-all duration-500 shadow-xl whitespace-nowrap shrink-0",
+                "flex shrink-0 items-center gap-2 rounded-2xl border px-4 py-3 text-[10px] font-black uppercase tracking-widest transition",
                 isActive
-                  ? "mesh-gradient text-white shadow-primary/20 scale-105"
-                  : "glass-strong border-white/10 text-muted-foreground opacity-60 hover:opacity-100"
+                  ? "border-orange-300/28 bg-orange-500 text-black"
+                  : "border-orange-300/14 bg-black/42 text-orange-100/50 hover:bg-orange-500/10 hover:text-orange-100"
               )}
             >
-              <Icon className="h-3.5 w-3.5 md:h-4 md:w-4" />
+              <Icon className="h-4 w-4" />
               {filter.label}
-            </motion.button>
+            </button>
           )
         })}
       </div>
 
-      {isGenerating && (
-        <motion.div
-          initial={{ opacity: 0, y: -8 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="glass-strong border border-primary/20 rounded-2xl p-4 flex items-center gap-3"
-        >
-          <Activity className="w-5 h-5 text-primary animate-pulse" />
-          <div>
-            <p className="text-sm font-black text-foreground">
-              {locale === "en-US" ? "Generating your workout..." : "Gerando seu treino..."}
-            </p>
-            <p className="text-xs font-bold text-muted-foreground opacity-60">
-              {locale === "en-US" ? "This can take a few seconds." : "Isso pode levar alguns segundos."}
-            </p>
-          </div>
-        </motion.div>
-      )}
-
-      {!isGenerating && generationError && (
-        <motion.div
-          initial={{ opacity: 0, y: -8 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="glass-strong border border-red-500/20 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center gap-3 justify-between"
-        >
-          <div className="flex items-start gap-3">
-            <Activity className="w-5 h-5 text-red-400 shrink-0 mt-0.5" />
-            <div>
-              <p className="text-sm font-black text-foreground">
-                {locale === "en-US" ? "Could not generate workout" : "Nao foi possivel gerar o treino"}
-              </p>
-              <p className="text-xs font-bold text-muted-foreground opacity-70">{generationError}</p>
-            </div>
-          </div>
-          <Button
-            onClick={() => {
-              setGenerationError(null)
-              setShowGeneratorModal(true)
-            }}
-            className="h-10 rounded-full text-xs font-black uppercase tracking-widest"
-          >
-            {locale === "en-US" ? "Try again" : "Tentar novamente"}
-          </Button>
-        </motion.div>
-      )}
-
-      {/* Empty State */}
       <AnimatePresence>
-        {!isGenerating && generatedWorkouts.length === 0 && (
-          <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="w-full max-w-2xl mx-auto pt-4 md:pt-12">
-            <div className="relative glass-strong border-white/20 rounded-[3rem] md:rounded-[4rem] p-10 md:p-16 text-center shadow-[0_40px_100px_rgba(0,0,0,0.3)] overflow-hidden group">
-              <div className="absolute inset-0 mesh-gradient opacity-5 blur-3xl animate-pulse" />
-              <div className="relative z-10 flex flex-col items-center">
-                <div className="w-16 h-16 md:w-24 md:h-24 rounded-[1.5rem] md:rounded-[2rem] bg-primary/10 flex items-center justify-center mb-6 md:mb-8 border border-primary/20 shadow-inner">
-                  <Swords className="w-8 h-8 md:w-12 md:h-12 text-primary" />
-                </div>
-                <h3 className="text-3xl md:text-4xl font-black tracking-tight text-foreground mb-3 md:mb-4">{t("training_empty_title")}</h3>
-                <p className="text-base md:text-lg text-muted-foreground font-bold opacity-60 mb-8 md:mb-12">
-                  {t("training_empty_body")}
-                </p>
-                <Dialog open={showGeneratorModal} onOpenChange={setShowGeneratorModal}>
-                  <DialogTrigger asChild>
-                    <Button className="w-full h-16 md:h-24 rounded-[2rem] mesh-gradient text-white font-black text-lg md:text-2xl shadow-2xl haptic-press group luminous-edge">
-                      {t("training_sync_btn")}
-                      <Zap className="w-6 h-6 md:w-8 md:h-8 ml-3 md:ml-4" />
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className="glass-strong text-foreground sm:max-w-2xl lg:max-w-3xl xl:max-w-4xl rounded-[3rem] md:rounded-[4rem] border-white/10 p-0 shadow-2xl overflow-hidden backdrop-blur-3xl mx-3 md:mx-0">
-                    <div className="p-8 md:p-12 pb-0">
-                      <h2 className="text-3xl md:text-4xl font-black tracking-tighter">{t("training_generator_title")}</h2>
-                      <p className="text-muted-foreground text-sm md:text-lg font-bold opacity-40 uppercase tracking-widest mt-2">{t("training_generator_subtitle")}</p>
-                    </div>
-                    <ScrollArea className="max-h-[70vh] p-8 md:p-12 pt-6 md:pt-8">
-                      <WorkoutGenerator onGenerate={handleGenerateWorkouts} isLoading={isGenerating} />
-                    </ScrollArea>
-                  </DialogContent>
-                </Dialog>
+        {isGenerating && (
+          <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} className="rounded-2xl border border-orange-300/18 bg-orange-500/10 p-4 backdrop-blur-xl">
+            <div className="flex items-center gap-3">
+              <Activity className="h-5 w-5 animate-pulse text-amber-200" />
+              <div>
+                <p className="text-sm font-black text-orange-50">{locale === "en-US" ? "Generating your workout..." : "Gerando seu treino..."}</p>
+                <p className="text-xs font-bold text-orange-50/45">{locale === "en-US" ? "This can take a few seconds." : "Isso pode levar alguns segundos."}</p>
               </div>
+            </div>
+          </motion.div>
+        )}
+
+        {!isGenerating && generationError && (
+          <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} className="rounded-2xl border border-red-300/20 bg-red-500/10 p-4 backdrop-blur-xl">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <p className="text-sm font-black text-red-100">{locale === "en-US" ? "Could not generate workout" : "Nao foi possivel gerar o treino"}</p>
+                <p className="text-xs font-bold text-red-50/60">{generationError}</p>
+              </div>
+              <Button onClick={() => { setGenerationError(null); setShowGeneratorModal(true) }} className="h-10 rounded-2xl bg-orange-500 text-xs font-black uppercase tracking-widest text-black hover:bg-amber-300">
+                {locale === "en-US" ? "Try again" : "Tentar novamente"}
+              </Button>
             </div>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Workout Cards */}
-      {filteredWorkouts.length > 0 && (
-        <div className="space-y-6">
-          <div className="flex items-center justify-between">
-            <p className="text-xs font-black uppercase tracking-widest opacity-40">{generatedWorkouts.length} {t("training_title").toLowerCase()}s</p>
-            <Button 
-              onClick={() => setShowGeneratorModal(true)}
-              className="h-10 px-4 rounded-full glass border border-white/10 text-xs font-black uppercase tracking-widest"
-            >
-              {t("training_new_workout")}
-            </Button>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-8">
+      {filteredWorkouts.length > 0 ? (
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
           {filteredWorkouts.map((workout, index) => (
-            <motion.div key={index} initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.1 }}>
-              <WorkoutCard workout={workout} onStart={setActiveSessionWorkout} onExerciseClick={setSelectedExerciseDetail} />
-            </motion.div>
+            <WorkoutCard key={`${workout.name}-${index}`} workout={workout} index={index} onStart={setActiveSessionWorkout} onExerciseClick={setSelectedExerciseDetail} />
           ))}
+        </div>
+      ) : (
+        <div className="mx-auto max-w-2xl rounded-[2rem] border border-orange-300/18 bg-black/42 p-8 text-center shadow-xl backdrop-blur-2xl">
+          <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl border border-orange-300/16 bg-orange-500/10 text-amber-100">
+            <Swords className="h-8 w-8" />
           </div>
+          <h3 className="text-3xl font-black tracking-tight text-foreground">{t("training_empty_title")}</h3>
+          <p className="mx-auto mt-3 max-w-md text-sm font-bold text-orange-50/50">{t("training_empty_body")}</p>
+          <Button onClick={() => setShowGeneratorModal(true)} className="mt-6 h-12 rounded-2xl bg-orange-500 px-6 text-sm font-black uppercase tracking-widest text-black hover:bg-amber-300">
+            {t("training_sync_btn")}
+          </Button>
         </div>
       )}
 
       <Dialog open={showGeneratorModal} onOpenChange={setShowGeneratorModal}>
-        <DialogContent className="glass-strong text-foreground sm:max-w-2xl lg:max-w-3xl xl:max-w-4xl rounded-[3rem] md:rounded-[4rem] border-white/10 p-0 shadow-2xl overflow-hidden backdrop-blur-3xl mx-3 md:mx-0">
-          <div className="p-8 md:p-12 pb-0">
-            <h2 className="text-3xl md:text-4xl font-black tracking-tighter">{t("training_generator_title")}</h2>
-            <p className="text-muted-foreground text-sm md:text-lg font-bold opacity-40 uppercase tracking-widest mt-2">{t("training_generator_subtitle")}</p>
+        <DialogContent className="max-w-4xl overflow-hidden rounded-[2rem] border border-orange-300/18 bg-[#070604]/96 p-0 text-foreground shadow-2xl backdrop-blur-2xl">
+          <div className="border-b border-orange-300/12 p-6">
+            <h2 className="text-3xl font-black tracking-tight">{t("training_generator_title")}</h2>
+            <p className="mt-2 text-[10px] font-black uppercase tracking-[0.24em] text-orange-100/38">{t("training_generator_subtitle")}</p>
           </div>
-          <ScrollArea className="max-h-[70vh] p-8 md:p-12 pt-6 md:pt-8">
+          <ScrollArea className="max-h-[70vh] p-6">
             <WorkoutGenerator onGenerate={handleGenerateWorkouts} isLoading={isGenerating} />
           </ScrollArea>
         </DialogContent>
@@ -379,68 +331,68 @@ export function TrainingTab({ metabolicPlan, scanHistory, userGoal }: TrainingTa
   )
 }
 
-function WorkoutCard({ workout, onStart, onExerciseClick }: { workout: Workout; onStart: (w: Workout) => void; onExerciseClick: (ex: Exercise) => void }) {
+function WorkoutCard({ workout, index, onStart, onExerciseClick }: { workout: Workout; index: number; onStart: (workout: Workout) => void; onExerciseClick: (exercise: Exercise) => void }) {
   const { t } = useTranslation()
+
   return (
-    <motion.div
-      whileHover={{ y: -8, scale: 1.02 }}
-      whileTap={{ scale: 0.98 }}
-      className="relative glass-strong border-white/20 rounded-[2.5rem] md:rounded-[3.5rem] overflow-hidden shadow-[0_40px_100px_rgba(0,0,0,0.3)] group cursor-pointer h-full flex flex-col"
+    <motion.article
+      initial={{ opacity: 0, y: 18 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: index * 0.05 }}
+      whileHover={{ y: -4 }}
+      className="relative flex min-h-[440px] flex-col overflow-hidden rounded-[2rem] border border-orange-300/18 bg-black/50 shadow-xl backdrop-blur-2xl"
     >
-      {/* Card visual header */}
-      <div className="relative h-40 md:h-64 w-full bg-primary/5 overflow-hidden">
-        <div className="absolute inset-0 mesh-gradient opacity-10 group-hover:opacity-20 transition-opacity" />
-        <div className="absolute inset-0 flex items-center justify-center">
-          <Dumbbell className="w-16 h-16 md:w-24 md:h-24 text-primary opacity-20 group-hover:scale-110 transition-transform duration-700" />
-        </div>
-        <div className="absolute top-5 right-5 md:top-8 md:right-8">
-          <Badge className="bg-primary text-white border-none font-black text-[10px] tracking-widest px-3 md:px-4 py-1.5 md:py-2 rounded-full shadow-lg">
-            {workout.category.toUpperCase()}
-          </Badge>
-        </div>
+      <div className="absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r from-orange-300 via-orange-500 to-amber-600" />
+      <div className="absolute inset-0 bg-gradient-to-br from-orange-500/12 via-transparent to-amber-300/8" />
+      <div className="relative flex h-36 items-center justify-center border-b border-orange-300/10 bg-orange-950/14">
+        <Dumbbell className="h-20 w-20 text-primary/28" />
+        <Badge className="absolute right-5 top-5 rounded-full border border-orange-300/18 bg-orange-500/10 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-orange-100">
+          {workout.category}
+        </Badge>
       </div>
 
-      <div className="p-6 md:p-10 flex-1 flex flex-col">
-        <div className="mb-4 md:mb-6">
-          <h3 className="text-2xl md:text-3xl font-black tracking-tight text-foreground group-hover:text-primary transition-colors">{workout.name}</h3>
-          <div className="flex items-center gap-3 md:gap-4 mt-2 md:mt-3 text-[10px] md:text-xs font-black uppercase tracking-widest opacity-40">
-            <span className="flex items-center gap-1"><Clock className="w-3 h-3 md:w-4 md:h-4" /> {workout.duration}</span>
-            <span className="flex items-center gap-1"><Flame className="w-3 h-3 md:w-4 md:h-4" /> {workout.calories}{t("training_kcal_unit")}</span>
-          </div>
+      <div className="relative flex flex-1 flex-col p-5">
+        <h3 className="text-2xl font-black leading-tight tracking-tight text-foreground">{workout.name}</h3>
+        <div className="mt-3 flex flex-wrap gap-2 text-[10px] font-black uppercase tracking-widest text-orange-50/45">
+          <span className="flex items-center gap-1.5 rounded-full border border-orange-300/12 bg-orange-950/18 px-2.5 py-1.5">
+            <Clock className="h-3.5 w-3.5 text-amber-200" />
+            {workout.duration}
+          </span>
+          <span className="flex items-center gap-1.5 rounded-full border border-orange-300/12 bg-orange-950/18 px-2.5 py-1.5">
+            <Flame className="h-3.5 w-3.5 text-orange-300" />
+            {workout.calories}
+          </span>
         </div>
 
-        <div className="glass-strong bg-white/5 p-4 md:p-6 rounded-2xl md:rounded-3xl border border-white/10 mb-5 md:mb-8">
-          <p className="text-xs md:text-sm font-bold text-muted-foreground leading-relaxed italic opacity-80">"{workout.aiVerdict}"</p>
-        </div>
+        <p className="mt-4 rounded-2xl border border-orange-300/10 bg-orange-950/14 p-3 text-sm font-bold italic leading-relaxed text-orange-50/58">
+          "{workout.aiVerdict}"
+        </p>
 
-        <div className="space-y-2 md:space-y-4 mb-6 md:mb-10 flex-1">
-          {workout.exercises.slice(0, 3).map((ex, i) => (
-            <div
-              key={i}
-              onClick={(e) => { e.stopPropagation(); onExerciseClick(ex) }}
-              className="flex items-center justify-between p-3 md:p-4 rounded-xl md:rounded-2xl hover:bg-white/5 transition-all group/item cursor-pointer"
+        <div className="mt-4 flex-1 space-y-2">
+          {workout.exercises.slice(0, 3).map((exercise, exerciseIndex) => (
+            <button
+              key={`${exercise.name}-${exerciseIndex}`}
+              type="button"
+              onClick={() => onExerciseClick(exercise)}
+              className="flex w-full items-center justify-between rounded-2xl border border-orange-300/10 bg-black/22 p-3 text-left transition hover:bg-orange-500/8"
             >
-              <div className="flex items-center gap-3 md:gap-4">
-                <div className="w-8 h-8 md:w-10 md:h-10 rounded-lg md:rounded-xl bg-primary/10 flex items-center justify-center text-primary font-black text-xs md:text-sm">
-                  {i + 1}
-                </div>
-                <div>
-                  <p className="font-black text-xs md:text-sm tracking-tight">{ex.name}</p>
-                  <p className="text-[9px] md:text-[10px] font-bold opacity-40 uppercase tracking-widest">{ex.sets}x{ex.reps} • {ex.rest}</p>
+              <div className="flex min-w-0 items-center gap-3">
+                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-orange-500/10 text-xs font-black text-amber-100">{exerciseIndex + 1}</span>
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-black text-orange-50">{exercise.name}</p>
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-orange-50/38">{exercise.sets}x{exercise.reps} - {exercise.rest}</p>
                 </div>
               </div>
-              <ArrowRight className="w-3 h-3 md:w-4 md:h-4 opacity-0 group-hover:opacity-100 transition-all" />
-            </div>
+              <ArrowRight className="h-4 w-4 text-orange-100/30" />
+            </button>
           ))}
         </div>
 
-        <Button
-          className="w-full h-14 md:h-20 rounded-[1.75rem] md:rounded-[2rem] mesh-gradient text-white font-black text-base md:text-lg shadow-2xl haptic-press luminous-edge"
-          onClick={(e) => { e.stopPropagation(); onStart(workout) }}
-        >
-          <Play className="w-5 h-5 md:w-6 md:h-6 mr-2 md:mr-3 fill-white" /> {t("training_start_btn")}
+        <Button onClick={() => onStart(workout)} className="mt-5 h-12 rounded-2xl bg-orange-500 text-sm font-black uppercase tracking-widest text-black hover:bg-amber-300">
+          <Play className="mr-2 h-4 w-4 fill-black" />
+          {t("training_start_btn")}
         </Button>
       </div>
-    </motion.div>
+    </motion.article>
   )
 }

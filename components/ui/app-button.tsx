@@ -37,11 +37,11 @@ export function AppButton({
   const baseStyles = "inline-flex items-center justify-center gap-2 font-black uppercase tracking-wider transition-all duration-300 rounded-full focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-neutral-900 disabled:pointer-events-none disabled:opacity-50"
   
   const variantStyles = {
-    primary: "bg-primary text-white hover:bg-primary/90 shadow-lg shadow-primary/30",
-    secondary: "bg-white/10 text-foreground hover:bg-white/20 border border-white/20",
-    ghost: "bg-transparent text-foreground hover:bg-white/10 border-transparent",
+    primary: "bg-orange-500 text-black hover:bg-amber-300 shadow-lg shadow-primary/30",
+    secondary: "bg-orange-500/10 text-foreground hover:bg-orange-500/16 border border-orange-300/16",
+    ghost: "bg-transparent text-foreground hover:bg-orange-500/10 border-transparent",
     danger: "bg-red-500 text-white hover:bg-red-600 shadow-lg shadow-red-500/20",
-    outline: "glass border-white/20 text-foreground hover:bg-white/10"
+    outline: "glass border-orange-300/18 text-foreground hover:bg-orange-500/10"
   }
   
   const sizeStyles = {
@@ -71,7 +71,7 @@ export function AppButton({
       <span>{children || label}</span>
       {icon && iconPosition === "right" && !loading && icon}
       {comingSoon && (
-        <span className="ml-2 text-[10px] bg-white/20 px-2 py-0.5 rounded-full">
+        <span className="ml-2 text-[10px] bg-orange-500/20 px-2 py-0.5 rounded-full">
           {locale === "en-US" ? "Soon" : "Em breve"}
         </span>
       )}

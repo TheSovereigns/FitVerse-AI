@@ -5,19 +5,19 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-3 whitespace-nowrap rounded-full text-xs font-black uppercase tracking-[0.2em] transition-all duration-300 ease-out disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-5 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-primary/50 aria-invalid:ring-destructive/20 shadow-xl border border-white/10 hover:scale-[1.05] active:scale-90 select-none",
+  "inline-flex items-center justify-center gap-3 whitespace-nowrap rounded-full text-xs font-black uppercase tracking-[0.2em] transition-all duration-300 ease-out disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-5 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-primary/50 aria-invalid:ring-destructive/20 shadow-xl border border-orange-300/14 hover:scale-[1.05] active:scale-90 select-none",
   {
     variants: {
       variant: {
-        default: "bg-primary text-white shadow-[0_10px_30px_-10px_rgba(255,149,0,0.6)] hover:bg-primary/90 hover:shadow-[0_15px_40px_-10px_rgba(255,149,0,0.8)]",
+        default: "bg-orange-500 text-black shadow-[0_10px_30px_-10px_rgba(255,149,0,0.6)] hover:bg-amber-300 hover:shadow-[0_15px_40px_-10px_rgba(255,149,0,0.8)]",
         destructive:
           "bg-red-500 text-white hover:bg-red-600 shadow-lg shadow-red-500/20",
         outline:
-          "glass border-white/20 hover:bg-white/10 text-foreground",
+          "glass border-orange-300/18 hover:bg-orange-500/10 text-foreground",
         secondary:
-          "bg-white/10 dark:bg-black/40 text-foreground hover:bg-white/20 backdrop-blur-3xl",
+          "bg-orange-500/10 dark:bg-black/40 text-foreground hover:bg-orange-500/16 backdrop-blur-3xl",
         ghost:
-          "border-transparent bg-transparent hover:bg-white/10 text-foreground shadow-none backdrop-blur-none",
+          "border-transparent bg-transparent hover:bg-orange-500/10 text-foreground shadow-none backdrop-blur-none",
         link: "text-foreground underline-offset-4 hover:underline border-transparent shadow-none backdrop-blur-none hover:scale-100 active:scale-100",
       },
       size: {

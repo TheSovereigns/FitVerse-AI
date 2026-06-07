@@ -1,31 +1,22 @@
 "use client"
 
-import { useState, useMemo } from "react"
-import { motion, AnimatePresence } from "framer-motion"
-import { ProgressCircle } from "@/components/progress-circle"
+import { useMemo, useState } from "react"
+import { motion } from "framer-motion"
 import { Badge } from "@/components/ui/badge"
-import { HeroSection } from "@/components/hero-section"
-import { TrustBadgesSection } from "@/components/trust-badges-section"
-import { BenefitsSection } from "@/components/benefits-section"
-import { HowItWorksSection } from "@/components/how-it-works-section"
-import { SocialProofSection } from "@/components/social-proof-section"
-import { FooterCTASection } from "@/components/footer-cta-section"
-import { FloatingCTAMobile } from "@/components/floating-cta-mobile"
-import { Gamification } from "@/components/gamification"
 import { Button } from "@/components/ui/button"
-import { cn } from "@/lib/utils"
 import { useTranslation } from "@/lib/i18n"
 import {
+  ArrowRight,
+  Calculator,
+  ChefHat,
   Droplet,
-  Zap,
+  Dumbbell,
+  Flame,
+  ScanLine,
+  Sparkles,
   Target,
   Trophy,
-  ChevronRight,
-  ScanLine,
-  Dumbbell,
-  ChefHat,
-  Flame,
-  Sparkles,
+  Zap,
 } from "lucide-react"
 
 type View = "home" | "dashboard" | "result" | "recipes" | "training" | "profile" | "planner" | "settings" | "store" | "chatbot"
@@ -68,317 +59,209 @@ export function HomeDashboard({
 
   const dateString = new Date().toLocaleDateString(locale, { weekday: "long", day: "numeric", month: "long" })
 
-  // Se não tem plano metabólico, mostrar as páginas de onboarding (Hero + Trust Badges + Benefícios + Como funciona + Social Proof + CTA final)
-  if (!goals) {
-    return (
-      <div className="min-h-screen">
-        <HeroSection />
-        <TrustBadgesSection />
-        <BenefitsSection id="por-que-fitverse" />
-        <HowItWorksSection id="como-funciona" />
-        <SocialProofSection />
-        <FooterCTASection id="cta-final" />
-        <FloatingCTAMobile />
-      </div>
-    )
-  }
+  const quickActions = [
+    { label: t("dopamine_quick_scan"), desc: t("dopamine_quick_scan_desc"), icon: ScanLine, view: "dashboard" as View },
+    { label: t("dopamine_quick_workout"), desc: t("dopamine_quick_workout_desc"), icon: Dumbbell, view: "training" as View },
+    { label: t("dopamine_quick_recipe"), desc: t("dopamine_quick_recipe_desc"), icon: ChefHat, view: "recipes" as View },
+    { label: t("dopamine_quick_plan"), desc: t("dopamine_quick_plan_desc"), icon: Calculator, view: "planner" as View },
+  ]
 
   return (
-    <div className="space-y-6 md:space-y-10 pb-safe-nav">
-      {/* Gamification Bar - Streak & XP */}
-      <motion.div
-        initial={{ opacity: 0, y: -10 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="flex items-center justify-between gap-4 p-4 glass-strong rounded-2xl border border-primary/20 bg-gradient-to-r from-primary/5 to-transparent"
-      >
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-orange-500/20 flex items-center justify-center">
-            <span className="text-xl">{t("dopamine_streak_fire")}</span>
-          </div>
-          <div>
-            <p className="text-xs font-black text-muted-foreground uppercase tracking-wider">{t("dopamine_streak_text").replace(" dias seguidos!", "")} 3{t("dopamine_streak_text").slice(-1)}</p>
-            <p className="text-xs text-primary font-bold">{t("dopamine_level")} 5</p>
-          </div>
-        </div>
-        <div className="flex-1 max-w-[150px]">
-          <div className="h-2 bg-white/10 rounded-full overflow-hidden">
-            <motion.div 
-              initial={{ width: 0 }}
-              animate={{ width: "65%" }}
-              className="h-full bg-gradient-to-r from-primary to-yellow-500"
-            />
-          </div>
-          <p className="text-[9px] text-muted-foreground opacity-50 mt-1 text-right">{t("dopamine_xp_to_next")}</p>
-        </div>
-      </motion.div>
+    <div className="relative space-y-5 pb-safe-nav md:space-y-7">
+      <div className="pointer-events-none absolute inset-x-[-1rem] top-[-5rem] h-72 bg-[radial-gradient(circle_at_24%_10%,rgba(255,149,0,0.22),transparent_42%),radial-gradient(circle_at_86%_2%,rgba(251,191,36,0.12),transparent_36%)]" />
 
-      {/* AI Insight of the Day */}
-      <motion.div
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ delay: 0.2 }}
-        className="relative p-4 md:p-6 glass-strong border border-purple-500/20 bg-purple-500/5 rounded-2xl md:rounded-3xl overflow-hidden cursor-pointer"
-        onClick={() => onNavigate("chatbot")}
+      <motion.section
+        initial={{ opacity: 0, y: 18 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="relative overflow-hidden rounded-[2rem] border border-orange-300/22 bg-black/50 p-5 shadow-[inset_0_1px_0_rgba(251,146,60,0.16),0_28px_90px_rgba(0,0,0,0.32)] backdrop-blur-2xl md:rounded-[2.5rem] md:p-7"
       >
-        <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-transparent" />
-        <div className="relative z-10 flex items-start gap-4">
-          <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-purple-500/20 flex items-center justify-center shrink-0">
-            <Sparkles className="w-5 h-5 md:w-6 md:h-6 text-purple-400" />
-          </div>
-          <div className="flex-1">
-            <p className="text-[10px] font-black text-purple-400 uppercase tracking-wider mb-1">{t("dopamine_ai_insight_title")}</p>
-            <p className="text-sm md:text-base font-bold text-foreground leading-relaxed">
-              {locale === "en-US" 
-                ? "Today is protein day! Your muscles need fuel. Consider adding chicken breast or eggs to your next meal."
-                : "Hoje é dia de proteína! Seus músculos precisam de combustível. Queijo adicionar frango ou ovos na próxima refeição."}
+        <div className="absolute inset-y-0 left-0 w-1.5 bg-gradient-to-b from-amber-300 via-orange-500 to-orange-900" />
+        <div className="absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-orange-300/55 to-transparent" />
+        <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(251,146,60,0.12),transparent_34%,rgba(245,158,11,0.08))]" />
+
+        <div className="relative grid gap-6 lg:grid-cols-[1fr_360px] lg:items-end">
+          <div>
+            <Badge className="mb-4 rounded-full border border-orange-300/20 bg-orange-500/10 px-3 py-1.5 text-[9px] font-black uppercase tracking-[0.24em] text-orange-100">
+              FitVerse AI
+            </Badge>
+            <h1 className="max-w-3xl text-4xl font-black leading-[0.95] tracking-tight text-foreground md:text-6xl">
+              {t("home_greeting")} <span className="text-primary">{t("home_biohacker")}</span>
+            </h1>
+            <p className="mt-4 max-w-2xl text-xs font-black uppercase tracking-[0.22em] text-orange-50/45 md:text-sm">
+              {dateString}
             </p>
           </div>
-          <ChevronRight className="w-5 h-5 text-purple-400 opacity-50" />
-        </div>
-      </motion.div>
 
-      {/* Hero Header */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="mb-6 md:mb-12"
-      >
-        <h1 className="text-hero-xl font-black text-foreground tracking-[-0.06em] leading-none">
-          {t("home_greeting")} <span className="text-primary">{t("home_biohacker")}</span>
-        </h1>
-        <p className="text-sm md:text-lg font-black text-muted-foreground mt-3 opacity-50 uppercase tracking-[0.3em]">
-          {dateString}
-        </p>
-      </motion.div>
-
-      {/* Main Calorie Ring - mobile-optimized */}
-      <motion.div
-        whileHover={{ scale: 1.01 }}
-        className="relative glass-strong border-white/20 p-5 md:p-7 lg:p-10 rounded-[2rem] md:rounded-[3rem] overflow-hidden shadow-[0_30px_80px_rgba(0,0,0,0.4)] group cursor-pointer"
-        onClick={() => onNavigate("dashboard")}
-      >
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-purple-500/5 opacity-50" />
-        <div className="relative z-10 flex flex-col sm:flex-row items-center justify-between gap-4 md:gap-10">
-          <div className="flex-1 text-center sm:text-left">
-            <span className="text-[9px] font-black text-primary uppercase tracking-[0.5em] mb-1 md:mb-3 block">
-              {t("home_calorie_label")}
-            </span>
-            <h2 className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl leading-none font-black text-foreground tracking-tighter mb-1 flex items-baseline gap-2 justify-center sm:justify-start">
-              {Math.round(remainingCalories)}
-              <span className="text-sm md:text-xl opacity-20 tracking-normal font-bold">{t("home_kcal")}</span>
-            </h2>
-            <div className="h-1.5 md:h-2.5 w-full bg-white/5 rounded-full overflow-hidden border border-white/10 mt-1.5 md:mt-3">
-              <motion.div
-                initial={{ width: 0 }}
-                animate={{ width: `${progressPercent}%` }}
-                transition={{ duration: 1.5, ease: "circOut" }}
-                className="h-full mesh-gradient shadow-[0_0_15px_var(--primary)]"
-              />
-            </div>
-          </div>
-
-          <div className="relative w-24 h-24 md:w-40 md:h-40 flex items-center justify-center">
-            <div className="absolute inset-0 rounded-full border-[0.5rem] md:border-[0.75rem] border-white/5" />
-            <motion.div
-              animate={{ rotate: 360 }}
-              transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-              className="absolute inset-0 rounded-full border-[0.5rem] md:border-[0.75rem] border-transparent border-t-primary border-r-primary/50 blur-[2px] shadow-[inset_0_0_15px_rgba(255,149,0,0.5)]"
-            />
-            <div className="text-center">
-              <Target className="w-5 h-5 md:w-8 md:h-8 text-primary mx-auto mb-0.5 animate-pulse" />
-              <span className="text-lg md:text-2xl font-black">{progressPercent}%</span>
-            </div>
+          <div className="grid grid-cols-3 gap-2">
+            <MiniMetric label={t("home_longevity")} value={averageLongevityScore || "-"} icon={Trophy} />
+            <MiniMetric label={t("home_water")} value={`${waterCups * 250}ml`} icon={Droplet} />
+            <MiniMetric label={t("home_kcal")} value={goals ? remainingCalories : "-"} icon={Flame} />
           </div>
         </div>
+      </motion.section>
 
-        {/* CTA Button */}
-        <div className="relative z-10 mt-4 md:mt-6 flex justify-center">
-          <div className="flex items-center gap-2 py-2 px-4 bg-primary/20 rounded-xl border border-primary/30">
-            <span className="text-primary font-black text-[10px] md:text-xs uppercase tracking-wider">{t("home_start_btn")} →</span>
-          </div>
-        </div>
-      </motion.div>
-
-      {/* Widget Grid */}
-      <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2.5 md:gap-4">
-        {/* Water Widget */}
-        <motion.div
-          whileTap={{ scale: 0.95 }}
-          className="relative h-36 md:h-48 glass-strong border-white/20 rounded-[1.25rem] md:rounded-[2rem] overflow-hidden group cursor-pointer flex flex-col justify-between p-3 md:p-5 shadow-xl"
-          onClick={() => setWaterCups(prev => prev + 1)}
+      <section className="grid gap-4 lg:grid-cols-[1.05fr_0.95fr]">
+        <motion.button
+          type="button"
+          whileHover={{ y: -3 }}
+          whileTap={{ scale: 0.99 }}
+          onClick={() => onNavigate(goals ? "dashboard" : "planner")}
+          className="relative min-h-[280px] overflow-hidden rounded-[2rem] border border-orange-300/18 bg-black/48 p-5 text-left shadow-xl backdrop-blur-2xl md:p-6"
         >
-          <div className="absolute inset-0 bg-gradient-to-b from-blue-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-          <div className="relative z-10">
-            <Droplet className="w-5 h-5 md:w-7 md:h-7 text-[#0A84FF] mb-1 drop-shadow-[0_0_10px_rgba(10,132,255,0.8)]" />
-            <h3 className="text-base md:text-lg font-black text-foreground tracking-tight">{t("home_water")}</h3>
-            <p className="text-muted-foreground font-bold text-[9px] md:text-xs mt-0.5">{waterCups * 250}ml / 3000ml</p>
-          </div>
-          <div className="relative z-10 w-full h-1.5 bg-white/5 rounded-full overflow-hidden border border-white/10 mb-2">
-            <motion.div
-              initial={{ width: 0 }}
-              animate={{ width: `${Math.min((waterCups * 250 / 3000) * 100, 100)}%` }}
-              className="h-full bg-[#0A84FF]"
-            />
-          </div>
-          <div className="relative z-10 flex items-center justify-center gap-1.5 py-1.5 bg-[#0A84FF]/20 rounded-lg border border-[#0A84FF]/30">
-            <span className="text-[#0A84FF] font-black text-[9px] uppercase tracking-wider">{t("home_water_cta")}</span>
-          </div>
-        </motion.div>
-
-        {/* Protein Widget */}
-        <div className="relative h-36 md:h-44 lg:h-48 glass-strong border-white/20 rounded-[1.25rem] md:rounded-[2rem] p-4 md:p-5 flex flex-col justify-between group overflow-hidden shadow-2xl cursor-pointer"
-          onClick={() => onNavigate("planner")}
-        >
-          <div className="absolute inset-0 bg-gradient-to-t from-[#0A84FF]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
-          <div className="relative z-10">
-            <Zap className="w-5 h-5 md:w-7 md:h-7 text-[#0A84FF] mb-1.5" />
-            <h3 className="text-base md:text-lg font-black text-foreground tracking-tight">{t("home_protein")}</h3>
-            <p className="text-muted-foreground font-bold text-[9px] md:text-xs mt-0.5">{Math.round(dailyTotals.protein)}g / {goals?.proteinGrams}g</p>
-          </div>
-          <div className="relative z-10 w-full h-1.5 bg-white/5 rounded-full overflow-hidden border border-white/10 mb-2">
-            <motion.div
-              initial={{ width: 0 }}
-              animate={{ width: `${Math.min((dailyTotals.protein / goals?.proteinGrams) * 100, 100)}%` }}
-              className="h-full bg-[#0A84FF] shadow-[0_0_15px_rgba(10,132,255,0.6)]"
-            />
-          </div>
-          <div className="relative z-10 flex items-center justify-center gap-1.5 py-1.5 bg-[#0A84FF]/20 rounded-lg border border-[#0A84FF]/30">
-            <span className="text-[#0A84FF] font-black text-[9px] uppercase tracking-wider">{t("home_protein_cta")}</span>
-          </div>
-        </div>
-
-        {/* Longevity Score - spans full width on mobile if 3rd item */}
-        <div className="relative h-36 md:h-44 lg:h-48 mesh-gradient rounded-[1.25rem] md:rounded-[2rem] p-4 md:p-5 flex flex-col items-center justify-between text-center text-white haptic-press glass-reflection shadow-2xl overflow-hidden col-span-2 md:col-span-1 cursor-pointer"
-          onClick={() => onNavigate("dashboard")}
-        >
-          <div className="absolute inset-0 bg-black/10 backdrop-blur-[2px]" />
-          <div className="relative z-10 flex flex-col items-center">
-            <Trophy className="w-6 h-6 md:w-8 md:h-8 mb-1 text-yellow-300" />
-            <h3 className="text-[8px] font-black uppercase tracking-[0.4em] opacity-80">{t("home_longevity")}</h3>
-            <span className="text-3xl md:text-4xl font-black tracking-tighter leading-none drop-shadow-2xl">{averageLongevityScore}</span>
-          </div>
-          <div className="relative z-10 flex items-center justify-center gap-1.5 py-1.5 bg-white/20 rounded-lg border border-white/30">
-            <span className="text-white font-black text-[9px] uppercase tracking-wider">{t("home_longevity_cta")}</span>
-          </div>
-        </div>
-      </div>
-
-      {/* Gamification Widget */}
-      <div className="mt-6">
-        <Gamification />
-      </div>
-
-      {/* Quick Actions Bento Grid */}
-      <div>
-        <h3 className="text-[9px] md:text-xs font-black text-muted-foreground uppercase tracking-[0.3em] mb-3">{t("dopamine_quick_scan_title")}</h3>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-3">
-          {/* Scan */}
-          <motion.div whileTap={{ scale: 0.95 }} className="relative p-3 md:p-4 glass-strong border border-blue-500/20 rounded-xl cursor-pointer group overflow-hidden" onClick={() => onNavigate("dashboard")}>
-            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-            <div className="relative z-10">
-              <ScanLine className="w-5 h-5 md:w-7 md:h-7 text-blue-400 mb-1.5" />
-              <p className="text-[10px] md:text-xs font-black text-foreground">{t("dopamine_quick_scan")}</p>
-              <p className="text-[8px] text-muted-foreground opacity-50">{t("dopamine_quick_scan_desc")}</p>
+          <div className="absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r from-orange-300 via-orange-500 to-amber-600" />
+          <div className="absolute inset-0 bg-gradient-to-br from-orange-500/12 via-transparent to-amber-300/8" />
+          <div className="relative flex h-full flex-col justify-between gap-8">
+            <div>
+              <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-2xl border border-orange-300/18 bg-orange-500/10 text-amber-100">
+                <Target className="h-7 w-7" />
+              </div>
+              <p className="text-[10px] font-black uppercase tracking-[0.26em] text-orange-100/45">
+                {goals ? t("home_calorie_label") : t("view_planner")}
+              </p>
+              <h2 className="mt-3 text-4xl font-black leading-none tracking-tight text-orange-50 md:text-6xl">
+                {goals ? Math.round(remainingCalories) : t("home_new_plan")}
+                {goals && <span className="ml-2 text-base text-orange-100/35">{t("home_kcal")}</span>}
+              </h2>
+              <p className="mt-4 max-w-xl text-sm font-bold leading-relaxed text-orange-50/52">
+                {goals
+                  ? `${progressPercent}% ${t("home_start_btn").toLowerCase()}`
+                  : "Crie seu plano metabolico para liberar metas, macros e progresso diario."}
+              </p>
             </div>
-          </motion.div>
-          
-          {/* Workout */}
-          <motion.div whileTap={{ scale: 0.95 }} className="relative p-3 md:p-4 glass-strong border border-orange-500/20 rounded-xl cursor-pointer group overflow-hidden" onClick={() => onNavigate("training")}>
-            <div className="absolute inset-0 bg-gradient-to-br from-orange-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-            <div className="relative z-10">
-              <Dumbbell className="w-5 h-5 md:w-7 md:h-7 text-orange-400 mb-1.5" />
-              <p className="text-[10px] md:text-xs font-black text-foreground">{t("dopamine_quick_workout")}</p>
-              <p className="text-[8px] text-muted-foreground opacity-50">{t("dopamine_quick_workout_desc")}</p>
-            </div>
-          </motion.div>
-          
-          {/* Recipes */}
-          <motion.div whileTap={{ scale: 0.95 }} className="relative p-3 md:p-4 glass-strong border border-emerald-500/20 rounded-xl cursor-pointer group overflow-hidden" onClick={() => onNavigate("recipes")}>
-            <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-            <div className="relative z-10">
-              <ChefHat className="w-5 h-5 md:w-7 md:h-7 text-emerald-400 mb-1.5" />
-              <p className="text-[10px] md:text-xs font-black text-foreground">{t("dopamine_quick_recipe")}</p>
-              <p className="text-[8px] text-muted-foreground opacity-50">{t("dopamine_quick_recipe_desc")}</p>
-            </div>
-          </motion.div>
-          
-          {/* My Plan */}
-          <motion.div whileTap={{ scale: 0.95 }} className="relative p-3 md:p-4 glass-strong border border-purple-500/20 rounded-xl cursor-pointer group overflow-hidden" onClick={() => onNavigate("planner")}>
-            <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-            <div className="relative z-10">
-              <Flame className="w-5 h-5 md:w-7 md:h-7 text-purple-400 mb-1.5" />
-              <p className="text-[10px] md:text-xs font-black text-foreground">{t("dopamine_quick_plan")}</p>
-              <p className="text-[8px] text-muted-foreground opacity-50">{t("dopamine_quick_plan_desc")}</p>
-            </div>
-          </motion.div>
-        </div>
-      </div>
 
-      {/* Bio-Logs Recent */}
-      <div className="mt-8 md:mt-10">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex flex-col">
-            <h3 className="text-lg md:text-2xl font-black text-foreground tracking-tighter">{t("home_bio_logs")}</h3>
-            <span className="text-[8px] md:text-[10px] font-black text-primary/60 uppercase tracking-[0.3em]">{t("home_last_24h")}</span>
+            <div>
+              <div className="mb-4 h-2 overflow-hidden rounded-full bg-orange-950/70">
+                <motion.div
+                  initial={{ width: 0 }}
+                  animate={{ width: `${goals ? progressPercent : 18}%` }}
+                  className="h-full rounded-full bg-orange-400"
+                />
+              </div>
+              <div className="inline-flex items-center gap-2 rounded-2xl border border-orange-300/16 bg-orange-500/10 px-4 py-3 text-[10px] font-black uppercase tracking-widest text-orange-100">
+                {goals ? t("home_start_btn") : t("view_planner")}
+                <ArrowRight className="h-4 w-4 text-primary" />
+              </div>
+            </div>
           </div>
-          <Button variant="ghost" className="text-[8px] md:text-[9px] font-black uppercase tracking-[0.3em] opacity-40 hover:opacity-100 hover:bg-white/5 rounded-full px-3 md:px-5 py-2 md:py-3">
-            {t("home_see_history")}
-          </Button>
-        </div>
+        </motion.button>
 
-        <div className="bg-black/5 dark:bg-white/5 rounded-[2.5rem] md:rounded-[3.5rem] p-4 md:p-6 shadow-inner">
+        <div className="grid grid-cols-2 gap-3">
+          <ActionTile icon={Droplet} label={t("home_water")} desc={`${waterCups * 250}ml / 3000ml`} onClick={() => setWaterCups((prev) => prev + 1)} />
+          <ActionTile icon={Zap} label={t("home_protein")} desc={`${Math.round(dailyTotals.protein)}g / ${goals?.proteinGrams || 0}g`} onClick={() => onNavigate("planner")} />
+          <ActionTile icon={Trophy} label={t("home_longevity")} desc={`${averageLongevityScore || 0} ${t("scan_score_label")}`} onClick={() => onNavigate("dashboard")} />
+          <ActionTile icon={Sparkles} label={t("dopamine_empty_title")} desc={t("dopamine_empty_xp_hint")} onClick={() => onNavigate("dashboard")} />
+        </div>
+      </section>
+
+      <section>
+        <div className="mb-3 flex items-center justify-between">
+          <h2 className="text-lg font-black uppercase tracking-tight text-foreground md:text-2xl">{t("dopamine_quick_scan_title")}</h2>
+          <span className="text-[10px] font-black uppercase tracking-[0.24em] text-orange-100/35">FitVerse</span>
+        </div>
+        <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+          {quickActions.map((action) => (
+            <button
+              key={action.view}
+              type="button"
+              onClick={() => onNavigate(action.view)}
+              className="group relative overflow-hidden rounded-[1.5rem] border border-orange-300/14 bg-black/42 p-4 text-left shadow-xl backdrop-blur-2xl transition hover:border-orange-300/35 hover:bg-orange-500/8"
+            >
+              <action.icon className="mb-4 h-6 w-6 text-amber-200" />
+              <p className="text-sm font-black text-orange-50">{action.label}</p>
+              <p className="mt-1 line-clamp-2 text-[10px] font-bold text-orange-50/42">{action.desc}</p>
+            </button>
+          ))}
+        </div>
+      </section>
+
+      <section className="relative overflow-hidden rounded-[2rem] border border-orange-300/16 bg-black/42 p-4 shadow-xl backdrop-blur-2xl md:p-6">
+        <div className="absolute inset-0 bg-gradient-to-br from-orange-500/10 via-transparent to-transparent" />
+        <div className="relative">
+          <div className="mb-5 flex items-center justify-between gap-3">
+            <div>
+              <h2 className="text-2xl font-black tracking-tight text-foreground">{t("home_bio_logs")}</h2>
+              <p className="mt-1 text-[10px] font-black uppercase tracking-[0.24em] text-orange-100/38">{t("home_last_24h")}</p>
+            </div>
+            <Button variant="ghost" onClick={() => onNavigate("profile")} className="h-10 rounded-2xl border border-orange-300/14 bg-orange-500/8 px-4 text-[10px] font-black uppercase tracking-widest text-orange-100 hover:bg-orange-500/16">
+              {t("home_see_history")}
+            </Button>
+          </div>
+
           {dailyActivity.scannedProducts.length > 0 ? (
-            <div className="space-y-3 md:space-y-4">
+            <div className="space-y-3">
               {dailyActivity.scannedProducts.slice(0, 3).map((product: any, index: number) => (
                 <motion.div
-                  key={index}
-                  initial={{ opacity: 0, x: -20 }}
+                  key={`${product.productName}-${index}`}
+                  initial={{ opacity: 0, x: -16 }}
                   animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                  className="flex items-center gap-4 md:gap-6 p-4 md:p-6 glass-strong border-white/10 rounded-[2rem] md:rounded-[2.5rem] hover:scale-[1.01] transition-all cursor-pointer haptic-press group"
+                  transition={{ delay: index * 0.06 }}
+                  className="flex items-center gap-4 rounded-[1.5rem] border border-orange-300/12 bg-orange-950/14 p-3"
                 >
                   <img
                     src={product.image || "/placeholder.svg?width=100&height=100"}
                     alt={product.productName}
-                    className="w-16 h-16 md:w-24 md:h-24 rounded-[1.5rem] md:rounded-[2rem] object-cover shadow-2xl group-hover:scale-105 transition-transform duration-500"
+                    className="h-14 w-14 rounded-2xl object-cover"
                   />
-                  <div className="flex-1 min-w-0">
-                    <p className="font-black text-lg md:text-2xl text-foreground truncate tracking-tight">{product.productName}</p>
-                    <div className="flex gap-2 md:gap-3 mt-1 md:mt-2">
-                      <Badge variant="outline" className="bg-primary/10 text-primary border-primary/30 font-black text-[10px] px-2 md:px-3 py-1 rounded-full">
-                        {product.longevityScore} {t("scan_score_label")}
-                      </Badge>
-                      <span className="text-[10px] font-bold opacity-30 mt-1 uppercase tracking-[0.2em]">
-                        {new Date().toLocaleTimeString(locale, { hour: "2-digit", minute: "2-digit" })}
-                      </span>
-                    </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-base font-black text-orange-50">{product.productName}</p>
+                    <Badge className="mt-1 rounded-full border border-orange-300/16 bg-orange-500/10 text-[10px] font-black text-orange-100">
+                      {product.longevityScore} {t("scan_score_label")}
+                    </Badge>
                   </div>
-                  <ChevronRight className="w-6 h-6 md:w-8 md:h-8 opacity-20 group-hover:opacity-100 group-hover:translate-x-2 transition-all duration-300" />
+                  <ArrowRight className="h-5 w-5 text-orange-100/35" />
                 </motion.div>
               ))}
             </div>
           ) : (
-            <div className="py-16 md:py-24 text-center">
-              <motion.div 
-                initial={{ scale: 0.9, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                className="w-20 h-20 md:w-24 md:h-24 bg-gradient-to-br from-primary/20 to-purple-500/20 rounded-full flex items-center justify-center mx-auto mb-4 md:mb-6"
-              >
-                <Sparkles className="w-10 h-10 md:w-12 md:h-12 text-primary" />
-              </motion.div>
-              <h4 className="text-lg md:text-2xl font-black text-foreground mb-2">{t("dopamine_empty_title")}</h4>
-              <p className="text-sm text-muted-foreground opacity-60 mb-6 max-w-xs mx-auto">{t("dopamine_empty_subtitle")}</p>
-              <button
-                onClick={() => onNavigate("dashboard")}
-                className="inline-flex items-center gap-2 py-3 px-6 bg-primary text-white rounded-2xl font-black text-xs uppercase tracking-wider hover:bg-primary/90 transition-all active:scale-95 mb-3"
-              >
+            <div className="py-12 text-center">
+              <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl border border-orange-300/16 bg-orange-500/10 text-amber-100">
+                <Sparkles className="h-8 w-8" />
+              </div>
+              <h3 className="text-xl font-black text-foreground">{t("dopamine_empty_title")}</h3>
+              <p className="mx-auto mt-2 max-w-sm text-sm font-bold text-orange-50/48">{t("dopamine_empty_subtitle")}</p>
+              <Button onClick={() => onNavigate("dashboard")} className="mt-5 h-12 rounded-2xl bg-orange-500 px-6 text-sm font-black uppercase tracking-widest text-black hover:bg-amber-300">
                 {t("dopamine_empty_cta")}
-              </button>
-              <p className="text-[10px] text-muted-foreground opacity-40">{t("dopamine_empty_xp_hint")}</p>
+              </Button>
             </div>
           )}
         </div>
-      </div>
+      </section>
     </div>
+  )
+}
+
+function MiniMetric({ icon: Icon, label, value }: { icon: React.ElementType; label: string; value: string | number }) {
+  return (
+    <div className="rounded-2xl border border-orange-300/14 bg-orange-950/20 p-3 backdrop-blur-xl">
+      <Icon className="h-4 w-4 text-amber-200" />
+      <p className="mt-3 text-lg font-black text-orange-50 md:text-2xl">{value}</p>
+      <p className="mt-1 truncate text-[9px] font-black uppercase tracking-widest text-orange-100/38">{label}</p>
+    </div>
+  )
+}
+
+function ActionTile({
+  icon: Icon,
+  label,
+  desc,
+  onClick,
+}: {
+  icon: React.ElementType
+  label: string
+  desc: string
+  onClick: () => void
+}) {
+  return (
+    <motion.button
+      type="button"
+      whileHover={{ y: -3 }}
+      whileTap={{ scale: 0.98 }}
+      onClick={onClick}
+      className="min-h-[136px] rounded-[1.5rem] border border-orange-300/14 bg-black/42 p-4 text-left shadow-xl backdrop-blur-2xl transition hover:border-orange-300/35 hover:bg-orange-500/8"
+    >
+      <Icon className="mb-4 h-6 w-6 text-amber-200" />
+      <p className="text-sm font-black text-orange-50">{label}</p>
+      <p className="mt-1 text-[10px] font-bold text-orange-50/42">{desc}</p>
+    </motion.button>
   )
 }

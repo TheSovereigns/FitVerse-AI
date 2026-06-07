@@ -43,23 +43,23 @@
   --sidebar-border: rgba(0, 0, 0, 0.1);
   --sidebar-ring: #FF9500;
   
-  --fitverse-primary: #FF8C00; /* FitVerse Orange */
-  --fitverse-secondary: #FFD700; /* Gold */
-  --fitverse-accent: #00D4FF; /* Cyan Contrast */
-  --fitverse-highlight: #FF375F; /* Pink accent */
-  --mesh-1: rgba(255, 140, 0, 0.8);
-  --mesh-2: rgba(255, 215, 0, 0.6);
-  --mesh-3: rgba(0, 212, 255, 0.4);
-  --mesh-4: rgba(255, 55, 95, 0.3);
+  --fitverse-primary: #FF9500;
+  --fitverse-secondary: #FFB020;
+  --fitverse-accent: #FF6B00;
+  --fitverse-highlight: #F97316;
+  --mesh-1: rgba(255, 149, 0, 0.92);
+  --mesh-2: rgba(255, 176, 32, 0.72);
+  --mesh-3: rgba(255, 107, 0, 0.52);
+  --mesh-4: rgba(8, 6, 3, 0.9);
   
   /* Premium FitVerse Mesh */
-  --gradient-primary: linear-gradient(135deg, #FF9500 0%, #FFCC00 100%);
-  --gradient-secondary: linear-gradient(135deg, #8E8E93 0%, #C7C7CC 100%);
-  --gradient-success: linear-gradient(135deg, #34C759 0%, #30D158 100%);
-  --gradient-mesh: radial-gradient(circle at 50% 50%, rgba(255,149,0,0.15) 0%, transparent 50%),
-                   radial-gradient(circle at 0% 0%, rgba(0,212,255,0.1) 0%, transparent 50%),
-                   radial-gradient(circle at 100% 100%, rgba(175,82,222,0.1) 0%, transparent 50%),
-                   radial-gradient(circle at 100% 0%, rgba(255,45,85,0.1) 0%, transparent 50%);
+  --gradient-primary: linear-gradient(135deg, #FF9500 0%, #FFB020 55%, #F97316 100%);
+  --gradient-secondary: linear-gradient(135deg, rgba(255,149,0,0.18) 0%, rgba(8,6,3,0.88) 100%);
+  --gradient-success: linear-gradient(135deg, #FF9500 0%, #FFB020 100%);
+  --gradient-mesh: radial-gradient(circle at 12% 10%, rgba(255,149,0,0.36) 0%, transparent 46%),
+                   radial-gradient(circle at 88% 12%, rgba(249,115,22,0.24) 0%, transparent 42%),
+                   radial-gradient(circle at 50% 50%, rgba(255,176,32,0.12) 0%, transparent 56%),
+                   radial-gradient(circle at 50% 100%, rgba(0,0,0,0.92) 0%, transparent 62%);
   --liquid-blur: 80px;
 }
 
@@ -119,9 +119,9 @@ aside.group:hover .sidebar-nav-label {
   --sidebar-ring: #FF9F0A;
   
   --fitverse-primary: #FF9F0A;
-  --fitverse-secondary: #FF375F;
-  --fitverse-accent: #5E5CE6;
-  --fitverse-highlight: #64D2FF;
+  --fitverse-secondary: #FFB020;
+  --fitverse-accent: #FF6B00;
+  --fitverse-highlight: #F97316;
   
   /* Premium FitVerse Mesh Dark */
   /* Premium FitVerse Mesh (Dark) - FitVerse Brand */
@@ -332,47 +332,47 @@ aside.group:hover .sidebar-nav-label {
   /* Advanced Glassmorphism */
   /* Advanced Liquid Glassmorphism - Extreme Blur */
   .glass {
-    background: rgba(255, 255, 255, 0.45);
-    backdrop-filter: blur(50px) saturate(220%);
-    -webkit-backdrop-filter: blur(50px) saturate(220%);
-    border: 1px solid rgba(255, 255, 255, 0.5);
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+    background: rgba(8, 6, 3, 0.54);
+    backdrop-filter: blur(44px) saturate(170%);
+    -webkit-backdrop-filter: blur(44px) saturate(170%);
+    border: 1px solid rgba(251, 146, 60, 0.14);
+    box-shadow:
+      inset 0 1px 0 rgba(251, 146, 60, 0.1),
+      0 16px 48px rgba(0, 0, 0, 0.3);
   }
   
   .dark .glass {
-    background: rgba(20, 20, 20, 0.6);
-    backdrop-filter: blur(50px) saturate(240%);
-    -webkit-backdrop-filter: blur(50px) saturate(240%);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+    background: rgba(8, 6, 3, 0.58);
+    border: 1px solid rgba(251, 146, 60, 0.16);
+    box-shadow:
+      inset 0 1px 0 rgba(251, 146, 60, 0.12),
+      0 18px 54px rgba(0, 0, 0, 0.42);
   }
   
   .glass-strong {
-    background: rgba(255, 255, 255, 0.55);
-    backdrop-filter: blur(80px) saturate(250%);
-    -webkit-backdrop-filter: blur(80px) saturate(250%);
-    border: 1px solid rgba(255, 255, 255, 0.6);
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+    background: rgba(8, 6, 3, 0.68);
+    backdrop-filter: blur(64px) saturate(180%);
+    -webkit-backdrop-filter: blur(64px) saturate(180%);
+    border: 1px solid rgba(251, 146, 60, 0.2);
+    box-shadow:
+      inset 0 1px 0 rgba(251, 146, 60, 0.14),
+      0 24px 72px rgba(0, 0, 0, 0.42);
   }
   
   .dark .glass-strong {
-    background: rgba(15, 15, 15, 0.7);
-    backdrop-filter: blur(80px) saturate(260%);
-    -webkit-backdrop-filter: blur(80px) saturate(260%);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    box-shadow: 0 25px 80px rgba(0, 0, 0, 0.6);
+    background: rgba(8, 6, 3, 0.72);
+    border: 1px solid rgba(251, 146, 60, 0.22);
+    box-shadow:
+      inset 0 1px 0 rgba(251, 146, 60, 0.16),
+      0 26px 84px rgba(0, 0, 0, 0.56);
   }
 
-  .glass-subtle {
-    background: rgba(255, 255, 255, 0.3);
-    backdrop-filter: blur(20px) saturate(150%);
-    -webkit-backdrop-filter: blur(20px) saturate(150%);
-    border: 1px solid rgba(255, 255, 255, 0.5);
-  }
-
+  .glass-subtle,
   .dark .glass-subtle {
-    background: rgba(20, 20, 22, 0.4);
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    background: rgba(8, 6, 3, 0.36);
+    backdrop-filter: blur(22px) saturate(150%);
+    -webkit-backdrop-filter: blur(22px) saturate(150%);
+    border: 1px solid rgba(251, 146, 60, 0.1);
   }
 
   /* Neon & Border Effects */
@@ -685,13 +685,7 @@ aside.group:hover .sidebar-nav-label {
 
   /* Evolutionary Styles */
   .mesh-gradient {
-    background: linear-gradient(
-      -45deg, 
-      var(--mesh-1), 
-      var(--mesh-2), 
-      var(--mesh-3), 
-      var(--mesh-4)
-    );
+    background: linear-gradient(-45deg, #FF9500, #FFB020, #F97316, #090603);
     background-size: 400% 400%;
     animation: mesh-move 10s ease infinite;
   }
@@ -708,12 +702,7 @@ aside.group:hover .sidebar-nav-label {
     left: 0;
     width: 40%;
     height: 100%;
-    background: linear-gradient(
-      to right,
-      transparent,
-      rgba(255, 255, 255, 0.3),
-      transparent
-    );
+    background: linear-gradient(to right, transparent, rgba(251, 146, 60, 0.28), transparent);
     transform: skewX(-25deg);
     transition: 0.75s;
     pointer-events: none;
@@ -740,7 +729,7 @@ aside.group:hover .sidebar-nav-label {
       var(--fitverse-primary),
       var(--fitverse-secondary),
       var(--fitverse-accent),
-      var(--fitverse-highlight),
+      rgba(8,6,3,0.8),
       var(--fitverse-primary)
     );
     -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
@@ -762,7 +751,7 @@ aside.group:hover .sidebar-nav-label {
       var(--fitverse-primary),
       var(--fitverse-secondary),
       var(--fitverse-accent),
-      var(--fitverse-highlight),
+      rgba(8,6,3,0.8),
       var(--fitverse-primary)
     );
     border-radius: inherit;
@@ -825,6 +814,73 @@ aside.group:hover .sidebar-nav-label {
 
   .haptic-press:hover {
     transform: scale(1.02);
+  }
+
+  /* FitVerse visual normalization: keep old utility-heavy screens in the same black/orange language. */
+  .border-white\/5,
+  .border-white\/8,
+  .border-white\/10,
+  .border-white\/20,
+  .border-white\/30 {
+    border-color: rgba(251, 146, 60, 0.16) !important;
+  }
+
+  .bg-white\/5,
+  .bg-white\/7,
+  .bg-white\/8,
+  .bg-white\/10,
+  .dark .bg-white\/5,
+  .dark .bg-white\/10 {
+    background-color: rgba(249, 115, 22, 0.08) !important;
+  }
+
+  .hover\:bg-white\/5:hover,
+  .hover\:bg-white\/10:hover,
+  .hover\:bg-white\/20:hover {
+    background-color: rgba(249, 115, 22, 0.14) !important;
+  }
+
+  .text-blue-400,
+  .text-purple-400,
+  .text-emerald-400,
+  .text-cyan-400,
+  .text-\[\#0A84FF\],
+  .text-\[\#5E5CE6\] {
+    color: #FDBA74 !important;
+  }
+
+  .bg-blue-500\/10,
+  .bg-purple-500\/10,
+  .bg-emerald-500\/10,
+  .bg-cyan-500\/10,
+  .bg-blue-500\/20,
+  .bg-purple-500\/20,
+  .bg-emerald-500\/20,
+  .bg-cyan-500\/20 {
+    background-color: rgba(249, 115, 22, 0.1) !important;
+  }
+
+  .border-blue-500\/20,
+  .border-purple-500\/20,
+  .border-emerald-500\/20,
+  .border-cyan-500\/20,
+  .border-blue-500\/30,
+  .border-purple-500\/30,
+  .border-emerald-500\/30,
+  .border-cyan-500\/30 {
+    border-color: rgba(251, 146, 60, 0.18) !important;
+  }
+
+  .from-blue-500\/20,
+  .from-purple-500\/20,
+  .from-emerald-500\/20,
+  .from-cyan-500\/20,
+  .to-blue-500\/10,
+  .to-purple-500\/10,
+  .to-emerald-500\/10,
+  .to-cyan-500\/10 {
+    --tw-gradient-from: rgba(249, 115, 22, 0.18) var(--tw-gradient-from-position) !important;
+    --tw-gradient-to: rgba(8, 6, 3, 0) var(--tw-gradient-to-position) !important;
   }
 
   @media (max-width: 767px) {

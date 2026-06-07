@@ -415,7 +415,7 @@ export default function DashboardPage() {
 
   return (
     <div className={cn(
-      "min-h-screen bg-transparent text-gray-900 dark:text-white font-sans selection:bg-primary/30 flex transition-all duration-700",
+      "min-h-screen bg-transparent text-white font-sans selection:bg-primary/30 flex transition-all duration-700",
       isDocked ? "pt-2" : "pt-0"
     )}>
       <DynamicIsland 
@@ -433,7 +433,7 @@ export default function DashboardPage() {
       />
 
       {/* Floating Sidebar (Desktop) */}
-      <aside className="hidden md:flex flex-col w-20 lg:w-24 hover:w-64 lg:hover:w-72 fixed top-1/2 -translate-y-1/2 left-4 lg:left-6 glass-strong border-white/20 z-50 rounded-[2rem] lg:rounded-[3rem] transition-all duration-700 ease-in-out group overflow-hidden shadow-[0_0_60px_rgba(0,0,0,0.3)]">
+      <aside className="hidden md:flex flex-col w-20 lg:w-24 hover:w-64 lg:hover:w-72 fixed top-1/2 -translate-y-1/2 left-4 lg:left-6 glass-strong border-orange-300/18 z-50 rounded-[2rem] lg:rounded-[2.5rem] transition-all duration-700 ease-in-out group overflow-hidden shadow-[0_24px_80px_rgba(0,0,0,0.45)]">
         <div className="p-4 lg:p-6 flex items-center justify-start gap-3 font-black text-xl tracking-tighter text-foreground mb-6 lg:mb-8 overflow-hidden">
           <div className="w-6 h-6 flex items-center justify-center shrink-0">
             <ScanLine className="text-primary size-5 lg:size-6" />
@@ -451,7 +451,7 @@ export default function DashboardPage() {
           <NavButton icon={Bot} label={t("nav_aichat")} active={currentView === "chatbot"} onClick={() => setCurrentView("chatbot")} />
         </nav>
 
-        <div className="p-2 lg:p-3 mb-3 lg:mb-4 space-y-2 border-t border-white/10 pt-4 flex flex-col items-center">
+        <div className="p-2 lg:p-3 mb-3 lg:mb-4 space-y-2 border-t border-orange-300/12 pt-4 flex flex-col items-center">
           <NavButton icon={User} label={t("nav_profile")} active={currentView === "profile"} onClick={() => setCurrentView("profile")} />
           <NavButton icon={Settings} label={t("nav_settings")} active={currentView === "settings"} onClick={() => setCurrentView("settings")} />
         </div>
@@ -474,7 +474,7 @@ export default function DashboardPage() {
                   variant="ghost" 
                   size="icon" 
                   onClick={() => router.push("/admin-dashboard")} 
-                  className="w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl hover:bg-white/10 active:scale-90 haptic-press transition-all font-sans text-foreground/60 hover:text-foreground"
+                  className="w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl border border-orange-300/12 bg-orange-500/8 hover:bg-orange-500/16 active:scale-90 haptic-press transition-all font-sans text-orange-100/70 hover:text-orange-50"
                   aria-label={t("home_access_admin")}
                 >
                   <Shield className="w-5 h-5 md:w-6 md:h-6" />
@@ -484,7 +484,7 @@ export default function DashboardPage() {
               variant="ghost" 
               size="icon" 
               onClick={() => setCurrentView("profile")}
-              className="w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl hover:bg-white/10 active:scale-90 haptic-press transition-all font-sans text-foreground/60 hover:text-foreground"
+              className="w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl border border-orange-300/12 bg-orange-500/8 hover:bg-orange-500/16 active:scale-90 haptic-press transition-all font-sans text-orange-100/70 hover:text-orange-50"
               aria-label={t("home_view_profile")}
             >
               <User className="w-5 h-5 md:w-6 md:h-6" />
@@ -542,7 +542,7 @@ export default function DashboardPage() {
                       setUserMetabolicPlanState(null);
                       localStorage.removeItem("userMetabolicPlan");
                     }}
-                    className="w-full h-12 glass-strong border border-white/20 text-muted-foreground font-black text-xs uppercase tracking-widest rounded-full"
+                    className="w-full h-12 glass-strong border border-orange-300/16 text-orange-100/70 font-black text-xs uppercase tracking-widest rounded-2xl hover:bg-orange-500/10"
                   >
                     {t("home_new_plan")}
                   </Button>
@@ -567,7 +567,7 @@ export default function DashboardPage() {
       {/* Floating Action Button */}
       <Button 
         onClick={handleNavScan} 
-        className="fixed bottom-28 right-8 md:bottom-10 md:right-10 xl:bottom-12 xl:right-12 z-50 h-16 w-16 md:h-16 md:w-16 lg:h-14 lg:w-14 rounded-full glass-strong bg-primary text-white shadow-2xl transition-all duration-500 hover:scale-110 active:scale-75 border border-white/30"
+        className="fixed bottom-28 right-8 md:bottom-10 md:right-10 xl:bottom-12 xl:right-12 z-50 h-16 w-16 md:h-16 md:w-16 lg:h-14 lg:w-14 rounded-full bg-orange-500 text-black shadow-[0_18px_44px_rgba(255,149,0,0.32)] transition-all duration-500 hover:scale-110 hover:bg-amber-300 active:scale-75 border border-orange-200/30"
           aria-label={t("home_scan_product")}
       >
         <ScanLine className="h-8 w-8 md:h-10 md:w-10 text-white" />
@@ -582,7 +582,7 @@ export default function DashboardPage() {
         onDragEnd={(_, info) => {
           if (info.offset.y < -30) setIsMenuExpanded(true)
         }}
-        className="md:hidden fixed bottom-6 left-4 right-4 glass-strong rounded-[2rem] z-40 shadow-2xl border border-white/20 h-16 px-2 flex items-center justify-around max-w-md mx-auto active:cursor-grab"
+        className="md:hidden fixed bottom-6 left-4 right-4 glass-strong rounded-[2rem] z-40 shadow-2xl border border-orange-300/18 h-16 px-2 flex items-center justify-around max-w-md mx-auto active:cursor-grab"
       >
         <button onClick={() => setCurrentView("home")} className="flex flex-col items-center justify-center p-2">
           <Home className={cn("w-6 h-6", currentView === "home" ? "text-primary" : "text-muted-foreground")} />
@@ -591,7 +591,7 @@ export default function DashboardPage() {
           <Dumbbell className={cn("w-6 h-6", currentView === "training" ? "text-primary" : "text-muted-foreground")} />
         </button>
         <button onClick={() => setIsMenuExpanded(true)} className="flex flex-col items-center justify-center p-2 -mt-2">
-          <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
+          <div className="w-10 h-10 rounded-full bg-orange-500/18 border border-orange-300/16 flex items-center justify-center">
             <ChevronUp className="w-5 h-5 text-primary" />
           </div>
         </button>
@@ -612,7 +612,7 @@ function NavButton({ icon: Icon, label, active, onClick }: { icon: any, label: s
       onClick={onClick}
       className={cn(
         "flex items-center justify-center lg:justify-start w-full h-10 lg:h-12 px-2 lg:px-3 rounded-xl lg:rounded-[1.25rem] transition-all duration-500 relative haptic-press",
-        active ? "text-primary bg-white/10" : "text-foreground/50 hover:text-foreground hover:bg-white/5"
+        active ? "text-primary bg-orange-500/12" : "text-orange-50/48 hover:text-orange-50 hover:bg-orange-500/8"
       )}
     >
       {active && <div className="absolute left-0 w-1 h-4 lg:h-6 bg-primary rounded-full" />}
