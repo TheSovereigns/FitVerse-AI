@@ -16,11 +16,9 @@ interface ExportFilters {
 const SYSTEM_PROMPT_PT = 'Você é o FitVerse AI, um assistente especializado em fitness, nutrição, saúde, emagrecimento e academia. Forneça conselhos seguros, motivadores e baseados em evidências.'
 const SYSTEM_PROMPT_EN = 'You are FitVerse AI, an assistant specialized in fitness, nutrition, health, weight loss and gym training. Provide safe, motivating, evidence-based advice.'
 
-function getSupabaseAdmin(): SupabaseClient | null {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL
-  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_KEY
-
-  if (!supabaseUrl || !serviceKey) return null
+function getSupabaseAdmin(): SupabaseClient {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL || ''
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_KEY || ''
 
   return createClient(supabaseUrl, serviceKey, {
     auth: { autoRefreshToken: false, persistSession: false },
@@ -87,10 +85,6 @@ function formatCSV(messages: Array<{ id: string; user_message: string; ai_respon
 
 export async function POST(req: Request) {
   const supabaseAdmin = getSupabaseAdmin()
-
-  if (!supabaseAdmin) {
-    return NextResponse.json({ error: 'Supabase admin client not configured' }, { status: 500 })
-  }
 
   const isAdmin = await verifyAdmin(req, supabaseAdmin)
   if (!isAdmin) {

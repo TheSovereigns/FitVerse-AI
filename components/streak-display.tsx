@@ -9,7 +9,7 @@ import { useTranslation } from "@/lib/i18n"
 
 interface StreakDisplayProps {
   compact?: boolean
-  onNavigate?: (view: string) => void
+  onNavigate?: (view: any) => void
 }
 
 export function StreakDisplay({ compact = false, onNavigate }: StreakDisplayProps) {

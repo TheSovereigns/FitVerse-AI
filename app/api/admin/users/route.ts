@@ -1,19 +1,15 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_KEY
-const supabaseAdmin = supabaseUrl && supabaseServiceKey
-  ? createClient(supabaseUrl, supabaseServiceKey, {
-      auth: { autoRefreshToken: false, persistSession: false },
-    })
-  : null
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL || ''
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_KEY || ''
+const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey, {
+  auth: { autoRefreshToken: false, persistSession: false },
+})
 
 const allowedPlans = ['free', 'pro', 'premium', 'banned']
 
 async function getAdmin(req: Request) {
-  if (!supabaseAdmin) return null
-
   const token = req.headers.get('Authorization')?.replace('Bearer ', '')
   if (!token) return null
 
@@ -30,10 +26,6 @@ async function getAdmin(req: Request) {
 }
 
 export async function PATCH(req: Request) {
-  if (!supabaseAdmin) {
-    return NextResponse.json({ error: 'Supabase admin is not configured' }, { status: 500 })
-  }
-
   const admin = await getAdmin(req)
   if (!admin) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })

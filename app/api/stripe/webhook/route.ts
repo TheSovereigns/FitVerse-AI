@@ -6,13 +6,11 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
   apiVersion: '2024-06-20',
 });
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_KEY;
-const supabaseAdmin = supabaseUrl && supabaseServiceKey
-  ? createClient(supabaseUrl, supabaseServiceKey, {
-      auth: { autoRefreshToken: false, persistSession: false },
-    })
-  : null;
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL || '';
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_KEY || '';
+const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey, {
+  auth: { autoRefreshToken: false, persistSession: false },
+});
 
 type PaidPlan = 'pro' | 'premium';
 
@@ -33,10 +31,6 @@ function normalizeSubscriptionStatus(status: Stripe.Subscription.Status) {
 }
 
 async function syncSubscription(subscription: Stripe.Subscription) {
-  if (!supabaseAdmin) {
-    throw new Error('Supabase admin is not configured');
-  }
-
   const subscriptionWithPeriod = subscription as Stripe.Subscription & {
     current_period_start?: number | null;
     current_period_end?: number | null;
@@ -78,13 +72,6 @@ export async function POST(req: Request) {
   if (!process.env.STRIPE_SECRET_KEY || !process.env.STRIPE_WEBHOOK_SECRET) {
     return NextResponse.json(
       { error: 'Stripe webhook is not configured' },
-      { status: 500 }
-    );
-  }
-
-  if (!supabaseAdmin) {
-    return NextResponse.json(
-      { error: 'Supabase admin is not configured' },
       { status: 500 }
     );
   }

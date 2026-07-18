@@ -19,7 +19,7 @@ interface BodyPhoto {
 }
 
 interface BodyMetric {
-  date: string
+  date?: string
   weight?: number
   bodyFat?: number
   chest?: number

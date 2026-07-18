@@ -8,20 +8,11 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
 
 export const maxDuration = 20;
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_KEY;
-const hasSupabaseConfig = Boolean(
-  supabaseUrl &&
-    supabaseServiceKey &&
-    !supabaseUrl.includes('placeholder') &&
-    !supabaseServiceKey.includes('placeholder') &&
-    !supabaseServiceKey.includes('your_')
-);
-const supabaseAdmin = hasSupabaseConfig
-  ? createClient(supabaseUrl!, supabaseServiceKey!, {
-      auth: { autoRefreshToken: false, persistSession: false },
-    })
-  : null;
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL || '';
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_KEY || '';
+const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey, {
+  auth: { autoRefreshToken: false, persistSession: false },
+});
 
 const PRICE_IDS = {
   pro: process.env.STRIPE_PRO_PRICE_ID,
@@ -61,13 +52,6 @@ export async function POST(req: Request) {
   if (!isConfiguredStripeValue(process.env.STRIPE_SECRET_KEY)) {
     return NextResponse.json(
       { error: 'Stripe nao configurado. Configure STRIPE_SECRET_KEY no ambiente.' },
-      { status: 500, headers: responseHeaders }
-    );
-  }
-
-  if (!supabaseAdmin) {
-    return NextResponse.json(
-      { error: 'Supabase admin nao configurado. Configure SUPABASE_SERVICE_ROLE_KEY no ambiente.' },
       { status: 500, headers: responseHeaders }
     );
   }

@@ -16,10 +16,10 @@ import { useTranslation } from "@/lib/i18n"
 
 interface Exercise {
   name: string
-  sets: number
-  reps?: string
+  sets: number | string
+  reps?: string | number
   duration?: string
-  rest?: number
+  rest?: number | string
   notes?: string
 }
 
@@ -48,7 +48,7 @@ export function LiveWorkout({ workout, onBack }: LiveWorkoutProps) {
 
   const currentExercise = workout.exercises[currentExerciseIndex]
   const totalExercises = workout.exercises.length
-  const progressPercent = ((currentExerciseIndex + (currentSet - 1) / (currentExercise?.sets || 1)) / totalExercises) * 100
+  const progressPercent = ((currentExerciseIndex + (currentSet - 1) / Number(currentExercise?.sets || 1)) / totalExercises) * 100
 
   useEffect(() => {
     if (isFinished || isResting) return
@@ -67,7 +67,7 @@ export function LiveWorkout({ workout, onBack }: LiveWorkoutProps) {
   const handleSetComplete = () => {
     if (!currentExercise) return
 
-    if (currentSet < currentExercise.sets) {
+    if (currentSet < Number(currentExercise.sets)) {
       setIsResting(true)
     } else {
       const newCompleted = [...completedExercises, currentExerciseIndex]
@@ -85,7 +85,7 @@ export function LiveWorkout({ workout, onBack }: LiveWorkoutProps) {
     setIsResting(false)
     if (!currentExercise) return
 
-    if (currentSet < currentExercise.sets) {
+    if (currentSet < Number(currentExercise.sets)) {
       setCurrentSet((prev) => prev + 1)
     } else {
       setCurrentSet(1)
@@ -97,7 +97,7 @@ export function LiveWorkout({ workout, onBack }: LiveWorkoutProps) {
     setIsResting(false)
     if (!currentExercise) return
 
-    if (currentSet < currentExercise.sets) {
+    if (currentSet < Number(currentExercise.sets)) {
       setCurrentSet((prev) => prev + 1)
     } else {
       setCurrentSet(1)
@@ -299,7 +299,7 @@ export function LiveWorkout({ workout, onBack }: LiveWorkoutProps) {
                 className="w-full h-14 rounded-2xl bg-foreground text-lg font-black uppercase tracking-widest text-background hover:bg-foreground/80 active:scale-[0.98] transition-all"
               >
                 <Check className="h-5 w-5 mr-2" />
-                {currentSet < (currentExercise?.sets || 1)
+                {currentSet < Number(currentExercise?.sets || 1)
                   ? (isEnglish ? "Complete Set" : "Concluir Serie")
                   : (isEnglish ? "Complete Exercise" : "Concluir Exercicio")}
               </Button>

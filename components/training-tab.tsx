@@ -18,9 +18,11 @@ import { useTranslation } from "@/lib/i18n"
 
 interface Exercise {
   name: string
-  sets: string
-  reps: string
-  rest: string
+  sets: string | number
+  reps?: string
+  duration?: string
+  rest?: string | number
+  notes?: string
 }
 
 interface Workout {
