@@ -41,7 +41,7 @@ export const PLAN_LIMITS: Record<Plan, PlanLimits> = {
     scansPerDay: 5,
     analysisLevel: 'basic',
     historyDays: 7,
-    workoutsPerMonth: 2,
+    workoutsPerMonth: 1,
     dietsPerMonth: 2,
     mealPlansPerWeek: 0,
     hasAds: true,

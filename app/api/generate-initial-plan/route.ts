@@ -35,9 +35,10 @@ export async function POST(req: Request) {
 
     const body = await req.json()
     const {
-      weight, height, age, gender, activityLevel, goal,
-      sleepHours, sleepQuality, stressLevel, injuries, equipment,
-      dietaryRestrictions, experience, workoutsPerWeek, locale = "pt-BR",
+      weight, height, age, gender, activityLevel = "moderate", goal,
+      sleepHours = 7, sleepQuality = "good", stressLevel = "moderate",
+      injuries = [], equipment = [], dietaryRestrictions = [],
+      experience = "beginner", workoutsPerWeek = 3, locale = "pt-BR",
     } = body
 
     const isEnglish = locale === "en-US"

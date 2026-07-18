@@ -19,7 +19,7 @@ import { StoreTab } from "@/components/store-tab"
 import { ChatbotTab } from "@/components/chatbot-tab"
 import { ClansTab } from "@/components/clans-tab"
 import { OnboardingFlow } from "@/components/onboarding-flow"
-import { ProfileSetup } from "@/components/profile-setup"
+
 import { SleepTracker } from "@/components/sleep-tracker"
 import { StressTracker } from "@/components/stress-tracker"
 import { HealthCheckin } from "@/components/health-checkin"
@@ -82,7 +82,7 @@ export default function DashboardPage() {
     { id: "3", name: "Iogurte Natural", scannedAt: new Date(Date.now() - 25 * 60 * 60 * 1000).toISOString(), score: 88, image: "/placeholder.svg?height=80&width=80", status: "healthy" },
   ])
   const [userMetabolicPlanState, setUserMetabolicPlanState] = useState<any>(null)
-  const [showProfileSetup, setShowProfileSetup] = useState(false)
+
   const [showUpgradeModal, setShowUpgradeModal] = useState(false)
   const bottomNavInputRef = useRef<HTMLInputElement>(null)
 
@@ -126,9 +126,7 @@ export default function DashboardPage() {
     }
   }, [user, profile, plan])
 
-  useEffect(() => {
-    if (user && profile && !profile.profile_setup_completed) setShowProfileSetup(true)
-  }, [user, profile])
+
 
   useEffect(() => {
     const saved = localStorage.getItem("userMetabolicPlan")
@@ -347,7 +345,7 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen bg-background text-foreground font-sans selection:bg-primary/10">
       <OnboardingFlow onComplete={() => {}} />
-      {showProfileSetup && <ProfileSetup onComplete={() => setShowProfileSetup(false)} />}
+
 
       {/* Desktop sidebar */}
       <aside className="hidden md:flex flex-col w-16 fixed top-0 left-0 h-full bg-card z-50 border-r border-border overflow-hidden">
