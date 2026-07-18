@@ -74,7 +74,7 @@ export function ProductResult({ result, onBack, imageData }: ProductResultProps)
     switch (s?.toLowerCase()) {
       case "excelente": case "excellent": return "text-emerald-400"
       case "bom": case "good": return "text-blue-400"
-      case "neutro": case "neutral": return "text-foreground/60"
+      case "neutro": case "neutral": return "text-muted-foreground"
       case "ruim": case "poor": return "text-rose-400"
       default: return "text-muted-foreground"
     }
@@ -90,10 +90,10 @@ export function ProductResult({ result, onBack, imageData }: ProductResultProps)
   }
 
   return (
-    <div className="w-full max-w-4xl lg:max-w-5xl xl:max-w-6xl mx-auto space-y-12 pb-32 animate-in fade-in zoom-in duration-1000">
+    <div className="w-full max-w-3xl mx-auto space-y-12 pb-32 animate-in fade-in zoom-in duration-1000">
       {/* Revolutionary Header */}
       <div className="flex items-center justify-between mb-8">
-        <Button variant="ghost" size="icon" onClick={onBack} className="w-14 h-14 rounded-2xl glass-strong border-white/10 haptic-press" aria-label="Voltar para scan">
+        <Button variant="ghost" size="icon" onClick={onBack} className="w-14 h-14 rounded-2xl bg-card border border-border haptic-press" aria-label="Voltar para scan">
           <ArrowLeft className="w-8 h-8" />
         </Button>
         <div className="flex items-center gap-3">
@@ -106,7 +106,7 @@ export function ProductResult({ result, onBack, imageData }: ProductResultProps)
             }}
           />
            <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-           <span className="text-[10px] font-black uppercase tracking-[0.4em] opacity-40">{t("pr_neural_sync")}</span>
+           <span className="text-xs font-black uppercase tracking-[0.4em] opacity-40">{t("pr_neural_sync")}</span>
         </div>
       </div>
 
@@ -114,7 +114,7 @@ export function ProductResult({ result, onBack, imageData }: ProductResultProps)
       <motion.div 
         initial={{ y: 40, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        className="relative glass-strong border-white/20 rounded-3xl md:rounded-[4rem] p-6 md:p-12 shadow-[0_50px_100px_rgba(0,0,0,0.4)] overflow-hidden group"
+        className="relative bg-card border border-border rounded-3xl md:rounded-2xl p-6 md:p-12 shadow-sm overflow-hidden group"
       >
         <div className="absolute inset-0 mesh-gradient opacity-10 group-hover:opacity-20 transition-opacity" />
         
@@ -122,9 +122,9 @@ export function ProductResult({ result, onBack, imageData }: ProductResultProps)
            {/* High-Fidelity Score Ring */}
            <div className="relative shrink-0">
               <div className="absolute inset-0 bg-primary/20 blur-[40px] rounded-full" />
-         <div className="relative w-36 h-36 md:w-48 md:h-48 rounded-full border-8 border-white/10 flex flex-col items-center justify-center bg-background/50 shadow-2xl backdrop-blur-xl">
+         <div className="relative w-36 h-36 md:w-48 md:h-48 rounded-full border-8 border-border flex flex-col items-center justify-center bg-background/50 shadow-2xl">
                   <span className="text-5xl md:text-7xl font-black text-foreground tracking-tighter leading-none">{score}</span>
-                  <span className="text-[10px] font-black text-primary uppercase tracking-[0.3em] mt-2">{t("pr_score_bio")}</span>
+                  <span className="text-xs font-black text-primary uppercase tracking-[0.3em] mt-2">{t("pr_score_bio")}</span>
                </div>
                <svg className="absolute inset-0 w-full h-full -rotate-90" viewBox="0 0 144 144">
                   <circle 
@@ -138,7 +138,7 @@ export function ProductResult({ result, onBack, imageData }: ProductResultProps)
            </div>
 
            <div className="flex-1 text-center md:text-left">
-              <Badge className="bg-primary/20 text-primary border-none font-black text-[10px] tracking-widest px-4 py-2 rounded-full mb-6">
+               <Badge className="bg-primary/20 text-primary border-none font-black text-xs tracking-widest px-4 py-2 rounded-full mb-6">
                  {t("pr_complete_synthesis")}
               </Badge>
                <h1 className="text-4xl sm:text-5xl md:text-6xl font-black text-foreground tracking-[-0.06em] leading-tight mb-4 break-words">
@@ -155,7 +155,7 @@ export function ProductResult({ result, onBack, imageData }: ProductResultProps)
           <motion.div 
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            className="glass-strong border-white/20 rounded-[3rem] p-4 md:p-6 flex flex-col items-center gap-4"
+            className="bg-card border border-border rounded-2xl p-4 md:p-6 flex flex-col items-center gap-4"
           >
             <div className="flex items-center gap-3">
               <Scale className="w-6 h-6 text-primary" />
@@ -167,7 +167,7 @@ export function ProductResult({ result, onBack, imageData }: ProductResultProps)
             <div className="flex items-center gap-6">
               <button 
                 onClick={decrementGrams}
-                className="w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors"
+                className="w-12 h-12 rounded-full bg-muted/50 hover:bg-muted/50 flex items-center justify-center transition-colors"
                 aria-label="Diminuir 10g"
               >
                 <Minus className="w-6 h-6" />
@@ -182,7 +182,7 @@ export function ProductResult({ result, onBack, imageData }: ProductResultProps)
               
               <button 
                 onClick={incrementGrams}
-                className="w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors"
+                className="w-12 h-12 rounded-full bg-muted/50 hover:bg-muted/50 flex items-center justify-center transition-colors"
                 aria-label="Aumentar 10g"
               >
                 <Plus className="w-6 h-6" />
@@ -203,7 +203,7 @@ export function ProductResult({ result, onBack, imageData }: ProductResultProps)
           <motion.div 
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            className="glass-strong border-primary/30 rounded-[3rem] p-4 md:p-6 flex flex-col items-center gap-4"
+            className="bg-card border border-border rounded-2xl border-primary/30 p-4 md:p-6 flex flex-col items-center gap-4"
           >
             <div className="flex items-center gap-3">
               <Lock className="w-6 h-6 text-primary" />
@@ -231,14 +231,14 @@ export function ProductResult({ result, onBack, imageData }: ProductResultProps)
              <motion.div 
                key={i}
                whileHover={{ y: -10 }}
-                className="glass-strong border-white/20 rounded-[3rem] p-4 md:p-6 lg:p-8 flex flex-col items-center justify-center gap-4 shadow-xl"
+                 className="bg-card border border-border rounded-2xl p-4 md:p-6 lg:p-8 flex flex-col items-center justify-center gap-4 shadow-sm"
              >
-                <div className={cn("w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center", m.color)}>
+                 <div className={cn("w-12 h-12 rounded-2xl bg-muted/50 flex items-center justify-center", m.color)}>
                    <m.icon className="w-7 h-7" />
                 </div>
                 <div className="text-center">
                    <p className="text-3xl font-black text-foreground tracking-tighter leading-none">{m.val}</p>
-                   <p className="text-[10px] font-black opacity-30 mt-2 uppercase tracking-widest">{m.label}</p>
+                   <p className="text-xs font-black opacity-30 mt-2 uppercase tracking-widest">{m.label}</p>
                 </div>
              </motion.div>
            ))}
@@ -247,10 +247,10 @@ export function ProductResult({ result, onBack, imageData }: ProductResultProps)
 
       {/* Neural Alignment Protocol */}
       {result.fitnessAlignment && result.fitnessAlignment[0] && (
-         <div className="glass-strong border-white/20 rounded-3xl md:rounded-[4rem] p-6 md:p-12 shadow-2xl relative overflow-hidden group">
+         <div className="bg-card border border-border rounded-3xl md:rounded-2xl p-6 md:p-12 shadow-sm relative overflow-hidden group">
             <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity" />
             <div className="flex flex-col md:flex-row gap-10 items-start">
-               <div className="w-20 h-20 rounded-[2.5rem] bg-primary/10 flex items-center justify-center text-primary shrink-0">
+               <div className="w-20 h-20 rounded-2xl bg-primary/10 flex items-center justify-center text-primary shrink-0">
                   <Target className="w-10 h-10" />
                </div>
                <div className="flex-1">
@@ -278,7 +278,7 @@ export function ProductResult({ result, onBack, imageData }: ProductResultProps)
                   <motion.div 
                     key={i}
                     whileHover={{ x: 10 }}
-                    className="p-4 md:p-8 rounded-3xl glass-strong border-rose-500/20 bg-rose-500/5 flex items-start gap-4 md:gap-6"
+                    className="p-4 md:p-8 rounded-2xl bg-card border border-border border-rose-500/20 bg-rose-500/5 flex items-start gap-4 md:gap-6"
                   >
                      <AlertCircle className="w-8 h-8 text-rose-500 shrink-0" />
                      <div>
@@ -298,7 +298,7 @@ export function ProductResult({ result, onBack, imageData }: ProductResultProps)
                   <motion.div 
                     key={i}
                     whileHover={{ x: 10 }}
-                    className="p-4 md:p-8 rounded-3xl glass-strong border-emerald-500/20 bg-emerald-500/5 flex items-start gap-4 md:gap-6"
+                    className="p-4 md:p-8 rounded-2xl bg-card border border-border border-emerald-500/20 bg-emerald-500/5 flex items-start gap-4 md:gap-6"
                   >
                      <Check className="w-8 h-8 text-emerald-500 shrink-0" />
                      <div>
@@ -317,7 +317,7 @@ export function ProductResult({ result, onBack, imageData }: ProductResultProps)
           
           {/* Vitamins */}
           {result.benefits.vitamins && result.benefits.vitamins.length > 0 && (
-            <div className="glass-strong border-white/20 rounded-3xl p-6 md:p-10">
+            <div className="bg-card border border-border rounded-3xl p-6 md:p-10">
               <div className="flex items-center gap-3 mb-6">
                 <div className="w-12 h-12 rounded-2xl bg-foreground/10 flex items-center justify-center">
                    <Sparkles className="w-6 h-6 text-foreground" />
@@ -334,7 +334,7 @@ export function ProductResult({ result, onBack, imageData }: ProductResultProps)
                       className="p-4 rounded-2xl bg-foreground/5 border border-foreground/10"
                     >
                       <p className="text-lg font-black text-foreground">{name}</p>
-                      {benefit && <p className="text-sm font-bold text-foreground/60 mt-1">{benefit}</p>}
+                      {benefit && <p className="text-sm font-bold text-muted-foreground mt-1">{benefit}</p>}
                     </motion.div>
                   )
                 })}
@@ -344,7 +344,7 @@ export function ProductResult({ result, onBack, imageData }: ProductResultProps)
 
           {/* Minerals */}
           {result.benefits.minerals && result.benefits.minerals.length > 0 && (
-            <div className="glass-strong border-white/20 rounded-3xl p-6 md:p-10">
+            <div className="bg-card border border-border rounded-3xl p-6 md:p-10">
               <div className="flex items-center gap-3 mb-6">
                 <div className="w-12 h-12 rounded-2xl bg-cyan-500/20 flex items-center justify-center">
                   <Droplet className="w-6 h-6 text-cyan-400" />
@@ -371,7 +371,7 @@ export function ProductResult({ result, onBack, imageData }: ProductResultProps)
 
           {/* Proteins */}
           {result.benefits.proteins && result.benefits.proteins.length > 0 && (
-            <div className="glass-strong border-white/20 rounded-3xl p-6 md:p-10">
+            <div className="bg-card border border-border rounded-3xl p-6 md:p-10">
               <div className="flex items-center gap-3 mb-6">
                 <div className="w-12 h-12 rounded-2xl bg-blue-500/20 flex items-center justify-center">
                   <Dumbbell className="w-6 h-6 text-blue-400" />
@@ -394,7 +394,7 @@ export function ProductResult({ result, onBack, imageData }: ProductResultProps)
 
           {/* Other Benefits */}
           {result.benefits.other && result.benefits.other.length > 0 && (
-            <div className="glass-strong border-white/20 rounded-3xl p-6 md:p-10">
+            <div className="bg-card border border-border rounded-3xl p-6 md:p-10">
               <div className="flex items-center gap-3 mb-6">
                 <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 flex items-center justify-center">
                   <Leaf className="w-6 h-6 text-emerald-400" />

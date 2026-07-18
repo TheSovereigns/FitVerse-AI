@@ -157,10 +157,10 @@ export function MetabolicPlanner({ onPlanCreated }: MetabolicPlannerProps) {
   ];
 
   return (
-    <div className="w-full max-w-4xl lg:max-w-5xl xl:max-w-6xl mx-auto space-y-5 animate-fade-in px-2 md:px-4">
+    <div className="w-full max-w-3xl mx-auto space-y-5 animate-fade-in px-2 md:px-4">
       {/* Header */}
       <div className="text-center space-y-2 mb-6 group cursor-default">
-        <div className="inline-flex items-center justify-center p-4 rounded-full glass-strong mb-1 apple-glow transition-transform duration-700 group-hover:scale-105">
+        <div className="inline-flex items-center justify-center p-4 rounded-full mb-1 apple-glow transition-transform duration-700 group-hover:scale-105">
           <Target className="w-6 h-6 text-primary" />
         </div>
         <h1 className="text-2xl md:text-4xl font-black tracking-tight text-foreground bg-clip-text">
@@ -173,7 +173,7 @@ export function MetabolicPlanner({ onPlanCreated }: MetabolicPlannerProps) {
 
       <div className="grid gap-5">
         {/* Section 1: Basic Info */}
-        <div className="bg-card glass-strong border-white/20 shadow-xl rounded-[1.5rem] md:rounded-[2rem] p-4 md:p-6 space-y-5 haptic-press transition-all duration-500">
+        <div className="bg-card border-border shadow-sm rounded-2xl md:rounded-2xl p-4 md:p-6 space-y-5 haptic-press transition-all duration-500">
           <div className="flex items-center justify-between">
             <h2 className="text-lg md:text-xl font-black flex items-center gap-3 tracking-tight">
               <div className="p-2 bg-primary/20 rounded-xl">
@@ -183,7 +183,7 @@ export function MetabolicPlanner({ onPlanCreated }: MetabolicPlannerProps) {
             </h2>
             <button
               onClick={() => setManualInput(!manualInput)}
-              className="text-[10px] md:text-xs font-black uppercase tracking-widest px-3 py-1.5 rounded-full border border-white/20 hover:border-primary/50 transition-all"
+              className="text-xs md:text-xs font-black uppercase tracking-widest px-3 py-1.5 rounded-full border border-border hover:border-primary/50 transition-all"
             >
               {manualInput ? t("mp_toggle_scroll") : t("mp_toggle_manual")}
             </button>
@@ -192,30 +192,30 @@ export function MetabolicPlanner({ onPlanCreated }: MetabolicPlannerProps) {
           {manualInput ? (
             <div className="grid grid-cols-3 gap-3 md:gap-5 py-2">
               <div className="space-y-2">
-                <Label className="text-[8px] font-black uppercase tracking-widest opacity-40 block text-center">{t('mp_weight')}</Label>
+                <Label className="text-xs font-black uppercase tracking-widest opacity-40 block text-center">{t('mp_weight')}</Label>
                 <Input
                   type="number"
                   value={manualWeight}
                   onChange={(e) => setManualWeight(e.target.value)}
-                  className="text-center font-black text-lg bg-white/5 border-white/10 rounded-xl h-12"
+                  className="text-center font-black text-lg bg-muted/50 border-border rounded-xl h-12"
                 />
               </div>
               <div className="space-y-2">
-                <Label className="text-[8px] font-black uppercase tracking-widest opacity-40 block text-center">{t('mp_height')}</Label>
+                <Label className="text-xs font-black uppercase tracking-widest opacity-40 block text-center">{t('mp_height')}</Label>
                 <Input
                   type="number"
                   value={manualHeight}
                   onChange={(e) => setManualHeight(e.target.value)}
-                  className="text-center font-black text-lg bg-white/5 border-white/10 rounded-xl h-12"
+                  className="text-center font-black text-lg bg-muted/50 border-border rounded-xl h-12"
                 />
               </div>
               <div className="space-y-2">
-                <Label className="text-[8px] font-black uppercase tracking-widest opacity-40 block text-center">{t('mp_age')}</Label>
+                <Label className="text-xs font-black uppercase tracking-widest opacity-40 block text-center">{t('mp_age')}</Label>
                 <Input
                   type="number"
                   value={manualAge}
                   onChange={(e) => setManualAge(e.target.value)}
-                  className="text-center font-black text-lg bg-white/5 border-white/10 rounded-xl h-12"
+                  className="text-center font-black text-lg bg-muted/50 border-border rounded-xl h-12"
                 />
               </div>
             </div>
@@ -246,8 +246,8 @@ export function MetabolicPlanner({ onPlanCreated }: MetabolicPlannerProps) {
           )}
 
           <div className="pt-4">
-            <Label className="text-[8px] font-black uppercase tracking-[0.3em] mb-4 block opacity-40 text-center">{t('mp_gender')}</Label>
-            <div className="grid grid-cols-2 gap-2 p-1.5 bg-black/5 dark:bg-white/5 rounded-[1.25rem] md:rounded-[1.5rem] relative">
+            <Label className="text-xs font-black uppercase tracking-[0.3em] mb-4 block opacity-40 text-center">{t('mp_gender')}</Label>
+            <div className="grid grid-cols-2 gap-2 p-1.5 bg-muted/50 dark:bg-muted/50 rounded-2xl md:rounded-2xl relative">
               {[
                 { value: 'male', label: t('mp_male') },
                 { value: 'female', label: t('mp_female') }
@@ -256,8 +256,8 @@ export function MetabolicPlanner({ onPlanCreated }: MetabolicPlannerProps) {
                   key={g.value}
                   onClick={() => setGender(g.value)}
                   className={cn(
-                    "relative flex items-center justify-center py-2.5 md:py-3 rounded-[1rem] md:rounded-[1.25rem] transition-all duration-500 font-black tracking-tight z-10 text-xs",
-                    gender === g.value ? "text-primary bg-background shadow-lg" : "text-foreground/30 hover:text-foreground/60"
+                    "relative flex items-center justify-center py-2.5 md:py-3 rounded-xl md:rounded-2xl transition-all duration-500 font-black tracking-tight z-10 text-xs",
+                    gender === g.value ? "text-primary bg-background shadow-lg" : "text-muted-foreground hover:text-muted-foreground"
                   )}
                 >
                   {g.label}
@@ -268,7 +268,7 @@ export function MetabolicPlanner({ onPlanCreated }: MetabolicPlannerProps) {
         </div>
 
         {/* Section 2: Activity Level */}
-        <div className="bg-card glass-strong border-white/20 shadow-xl rounded-[1.5rem] md:rounded-[2rem] p-4 md:p-6">
+        <div className="bg-card border-border shadow-sm rounded-2xl md:rounded-2xl p-4 md:p-6">
           <h2 className="text-lg md:text-xl font-black tracking-tight flex items-center gap-3 mb-4">
             <div className="p-2 bg-primary/20 rounded-xl">
               <Activity className="w-4 h-4 md:w-5 md:h-5 text-primary" />
@@ -281,29 +281,29 @@ export function MetabolicPlanner({ onPlanCreated }: MetabolicPlannerProps) {
                 key={option.value}
                 onClick={() => setActivityLevel(option.value)}
                 className={cn(
-                  "flex flex-col items-center text-center p-3 md:p-4 rounded-[1rem] md:rounded-[1.25rem] border-2 transition-all duration-500 h-full haptic-press group",
+                  "flex flex-col items-center text-center p-3 md:p-4 rounded-xl md:rounded-2xl border-2 transition-all duration-500 h-full haptic-press group",
                   activityLevel === option.value
-                    ? "border-primary bg-primary/10 shadow-[0_0_15px_rgba(255,255,255,0.1)]"
-                    : "border-white/10 hover:border-primary/40 bg-white/5"
+                    ? "border-primary bg-primary/10 shadow-sm"
+                    : "border-border hover:border-primary/40 bg-muted/50"
                 )}
               >
                 <div className={cn(
                   "p-2 md:p-3 rounded-lg md:rounded-xl mb-2 transition-all duration-500 group-hover:scale-105",
-                  activityLevel === option.value ? "bg-primary text-white" : "bg-white/10 text-muted-foreground"
+                  activityLevel === option.value ? "bg-primary text-white" : "bg-muted/50 text-muted-foreground"
                 )}>
                   <option.icon className="w-4 h-4 md:w-5 md:h-5" />
                 </div>
                 <span className={cn("font-black tracking-tight mb-1 text-xs", activityLevel === option.value ? "text-primary" : "text-foreground")}>
                   {option.label}
                 </span>
-                <span className="text-[7px] md:text-[8px] text-muted-foreground font-black uppercase tracking-widest leading-tight opacity-60 group-hover:opacity-100">{option.desc}</span>
+                <span className="text-xs md:text-xs text-muted-foreground font-black uppercase tracking-widest leading-tight opacity-60 group-hover:opacity-100">{option.desc}</span>
               </button>
             ))}
           </div>
         </div>
 
         {/* Section 3: Goal */}
-        <div className="bg-card glass-strong border-white/20 shadow-xl rounded-[1.5rem] md:rounded-[2rem] p-4 md:p-6">
+        <div className="bg-card border-border shadow-sm rounded-2xl md:rounded-2xl p-4 md:p-6">
           <h2 className="text-lg md:text-xl font-black tracking-tight flex items-center gap-3 mb-4">
             <div className="p-2 bg-primary/20 rounded-xl">
               <Target className="w-4 h-4 md:w-5 md:h-5 text-primary" />
@@ -316,15 +316,15 @@ export function MetabolicPlanner({ onPlanCreated }: MetabolicPlannerProps) {
                 key={option.value}
                 onClick={() => setGoal(option.value)}
                 className={cn(
-                  "flex items-center gap-3 p-3 md:p-4 rounded-[1rem] md:rounded-[1.25rem] border-2 transition-all duration-500 text-left haptic-press group relative overflow-hidden",
+                  "flex items-center gap-3 p-3 md:p-4 rounded-xl md:rounded-2xl border-2 transition-all duration-500 text-left haptic-press group relative overflow-hidden",
                   goal === option.value
-                    ? "border-primary bg-primary/10 shadow-[0_0_15px_rgba(255,255,255,0.1)]"
-                    : "border-white/10 hover:border-primary/40 bg-white/5"
+                    ? "border-primary bg-primary/10 shadow-sm"
+                    : "border-border hover:border-primary/40 bg-muted/50"
                 )}
               >
                 <div className={cn(
                   "p-2 md:p-3 rounded-lg transition-all duration-500 group-hover:scale-105",
-                  goal === option.value ? "bg-primary text-white" : "bg-white/10 text-muted-foreground"
+                  goal === option.value ? "bg-primary text-white" : "bg-muted/50 text-muted-foreground"
                 )}>
                   <option.icon className="w-4 h-4 md:w-5 md:h-5" />
                 </div>
@@ -352,7 +352,7 @@ export function MetabolicPlanner({ onPlanCreated }: MetabolicPlannerProps) {
           <Button
             onClick={handleCalculate}
             disabled={isLoading}
-            className="w-full h-12 md:h-16 text-base md:text-xl font-black rounded-full shadow-[0_15px_40px_rgba(0,0,0,0.3)] transition-all mesh-gradient text-white haptic-press luminous-edge glass-reflection border border-white/20 uppercase tracking-[0.2em] relative z-10"
+            className="w-full h-12 md:h-16 text-base md:text-xl font-black rounded-full shadow-sm transition-all bg-primary text-primary-foreground haptic-press border border-border uppercase tracking-[0.2em] relative z-10"
           >
             {isLoading ? (
               <>
@@ -366,7 +366,7 @@ export function MetabolicPlanner({ onPlanCreated }: MetabolicPlannerProps) {
               </>
             )}
           </Button>
-          <p className="text-[8px] text-center text-muted-foreground mt-3 uppercase tracking-widest opacity-60">
+          <p className="text-xs text-center text-muted-foreground mt-3 uppercase tracking-widest opacity-60">
             {t('mp_privacy')}
           </p>
         </div>

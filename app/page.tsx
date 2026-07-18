@@ -262,12 +262,11 @@ export default function DashboardPage() {
       {showProfileSetup && <ProfileSetup onComplete={() => setShowProfileSetup(false)} />}
 
       {/* Desktop sidebar */}
-      <aside className="hidden md:flex flex-col w-[72px] hover:w-60 fixed top-0 left-0 h-full glass-strong z-50 transition-all duration-300 ease-out overflow-hidden group">
-        <div className="p-4 flex items-center gap-3 mb-6 overflow-hidden">
-          <div className="w-8 h-8 rounded-xl bg-primary flex items-center justify-center shrink-0">
+      <aside className="hidden md:flex flex-col w-16 fixed top-0 left-0 h-full glass-strong z-50 border-r border-border overflow-hidden">
+        <div className="p-3 flex items-center justify-center mb-4">
+          <div className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center">
             <ScanLine className="w-4 h-4 text-primary-foreground" />
           </div>
-          <span className="text-sm font-bold tracking-tight opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">FitVerse</span>
         </div>
 
         <nav className="flex-1 px-2 space-y-1">
@@ -276,12 +275,12 @@ export default function DashboardPage() {
               key={item.view}
               onClick={() => setCurrentView(item.view)}
               className={cn(
-                "flex items-center gap-3 w-full h-10 px-2 rounded-xl transition-all duration-200 haptic-press",
+                "flex flex-col items-center gap-1 w-full py-2 rounded-xl transition-all duration-200 haptic-press",
                 currentView === item.view ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
               )}
             >
-              <item.icon className="w-5 h-5 shrink-0" />
-              <span className="text-xs font-semibold opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">{item.label}</span>
+              <item.icon className="w-5 h-5" />
+              <span className="text-[9px] font-medium leading-none">{item.label.split(' ')[0]}</span>
             </button>
           ))}
         </nav>
@@ -289,23 +288,23 @@ export default function DashboardPage() {
         <div className="px-2 py-3 space-y-1 border-t border-border pt-3">
           <button
             onClick={() => setCurrentView("profile")}
-            className={cn("flex items-center gap-3 w-full h-10 px-2 rounded-xl transition-all duration-200 haptic-press", currentView === "profile" ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted/50")}
+            className={cn("flex flex-col items-center gap-1 w-full py-2 rounded-xl transition-all duration-200 haptic-press", currentView === "profile" ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted/50")}
           >
-            <User className="w-5 h-5 shrink-0" />
-            <span className="text-xs font-semibold opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">{t("nav_profile")}</span>
+            <User className="w-5 h-5" />
+            <span className="text-[9px] font-medium leading-none">{t("nav_profile").split(' ')[0]}</span>
           </button>
           <button
             onClick={() => setCurrentView("settings")}
-            className={cn("flex items-center gap-3 w-full h-10 px-2 rounded-xl transition-all duration-200 haptic-press", currentView === "settings" ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted/50")}
+            className={cn("flex flex-col items-center gap-1 w-full py-2 rounded-xl transition-all duration-200 haptic-press", currentView === "settings" ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted/50")}
           >
-            <Settings className="w-5 h-5 shrink-0" />
-            <span className="text-xs font-semibold opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">{t("nav_settings")}</span>
+            <Settings className="w-5 h-5" />
+            <span className="text-[9px] font-medium leading-none">{t("nav_settings").split(' ')[0]}</span>
           </button>
         </div>
       </aside>
 
       {/* Main */}
-      <div className="flex-1 md:ml-[72px] lg:ml-[72px] flex flex-col min-h-screen transition-all duration-300 max-w-[1400px] mx-auto w-full">
+      <div className="md:ml-16 flex flex-col min-h-screen transition-all duration-300 max-w-[1200px] mx-auto w-full">
         {/* Header */}
         <header className="sticky top-0 z-40 flex h-14 items-center justify-between px-4 bg-background/80 backdrop-blur-xl border-b border-border md:border-none md:bg-transparent md:backdrop-blur-none">
           <div className="md:hidden flex items-center gap-2.5">
@@ -331,7 +330,7 @@ export default function DashboardPage() {
         </header>
 
         {/* Content */}
-        <main className="flex-1 overflow-y-auto px-4 pb-safe-nav pt-4 md:p-6 md:pb-8 lg:p-8">
+        <main className="flex-1 overflow-y-auto px-4 pb-safe-nav pt-4 md:px-8 md:pb-8 lg:px-12 lg:pb-8">
           {currentView === "home" && <HomeDashboard userMetabolicPlan={userMetabolicPlanState} dailyActivity={dailyActivity} onNavigate={setCurrentView} />}
           {currentView === "dashboard" && <ScanDashboard onScan={handleScan} isScanning={isAnalyzing} />}
           {currentView === "result" && (
