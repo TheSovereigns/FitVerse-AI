@@ -45,24 +45,23 @@ type SettingRowProps = {
 }
 
 const SettingRow = ({ icon: Icon, title, description, children, isLast }: SettingRowProps) => (
-  <motion.div
-    whileHover={{ backgroundColor: "rgba(255, 255, 255, 0.05)" }}
+  <div
     className={cn(
-      "flex flex-col gap-4 px-4 py-4 transition-all sm:flex-row sm:items-center sm:justify-between md:px-6 md:py-5",
-      !isLast && "border-b border-white/10"
+      "flex flex-col gap-4 px-4 py-4 sm:flex-row sm:items-center sm:justify-between md:px-6 md:py-5",
+      !isLast && "border-b border-border"
     )}
   >
     <div className="flex min-w-0 items-center gap-4">
-      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-white/10 bg-white/5 text-foreground/60 shadow-inner">
+      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-muted text-muted-foreground">
         <Icon className="h-5 w-5" />
       </div>
       <div className="min-w-0">
-        <h4 className="text-base font-black leading-tight tracking-tight text-foreground md:text-lg">{title}</h4>
-        <p className="mt-1 text-[10px] font-black uppercase tracking-[0.22em] text-foreground/40">{description}</p>
+        <h4 className="text-base font-semibold leading-tight text-foreground md:text-lg">{title}</h4>
+        <p className="mt-1 text-xs text-muted-foreground">{description}</p>
       </div>
     </div>
     <div className="flex shrink-0 items-center justify-end gap-3">{children}</div>
-  </motion.div>
+  </div>
 )
 
 export function SettingsPage({ onBack }: { onBack?: () => void }) {
@@ -76,7 +75,7 @@ export function SettingsPage({ onBack }: { onBack?: () => void }) {
   const [adsEnabled, setAdsEnabled] = useState(true)
   const [isAdsLoading, setAdsLoading] = useState(false)
   const [isAdmin, setIsAdmin] = useState(false)
-  
+
   const [profileData, setProfileData] = useState({
     age: null as number | null,
     weight: null as number | null,
@@ -267,46 +266,38 @@ export function SettingsPage({ onBack }: { onBack?: () => void }) {
 
   return (
     <div className="relative mx-auto w-full max-w-5xl space-y-5 pb-safe-nav animate-in fade-in duration-700 md:space-y-7">
-      <div className="pointer-events-none absolute inset-x-[-1rem] top-[-5rem] h-72 bg-[radial-gradient(circle_at_24%_10%,rgba(255,255,255,0.08),transparent_42%),radial-gradient(circle_at_86%_2%,rgba(255,255,255,0.05),transparent_36%)]" />
-
       <motion.section
         initial={{ opacity: 0, y: 18 }}
         animate={{ opacity: 1, y: 0 }}
-        className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-black/50 p-5 text-center shadow-[inset_0_1px_0_rgba(255,255,255,0.1),0_28px_90px_rgba(0,0,0,0.32)] backdrop-blur-2xl md:rounded-[2.5rem] md:p-7"
+        className="relative overflow-hidden rounded-3xl bg-card border border-border p-5 text-center md:rounded-[2.5rem] md:p-7"
       >
-        <div className="absolute inset-y-0 left-0 w-1.5 bg-gradient-to-b from-white/20 via-white/10 to-white/5" />
-        <div className="absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
-        <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(255,255,255,0.06),transparent_34%,rgba(255,255,255,0.04))]" />
-
-        <div className="relative">
-          <div className="mb-4 flex items-center justify-between gap-3">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => onBack?.()}
-              className={cn(
-                "h-11 w-11 rounded-2xl border border-white/10 bg-white/5 text-foreground/60 hover:bg-white/10",
-                !onBack && "invisible"
-              )}
-            >
-              <ArrowLeft className="h-5 w-5" />
-            </Button>
-            <Badge className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-[9px] font-black uppercase tracking-[0.24em] text-foreground/60">
-              Control Center
-            </Badge>
-            <div className="h-11 w-11" />
-          </div>
-
-          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-[1.4rem] border border-white/10 bg-white/5 text-foreground/60 shadow-xl md:h-20 md:w-20 md:rounded-[1.8rem]">
-            <Smartphone className="h-7 w-7 md:h-9 md:w-9" />
-          </div>
-          <h1 className="text-3xl font-black leading-none tracking-tight text-foreground md:text-5xl">
-            {t("settings_title")}<span className="text-primary italic">{t("settings_accent")}</span>
-          </h1>
-          <p className="mx-auto mt-3 max-w-2xl text-xs font-black uppercase tracking-[0.24em] text-foreground/50 md:text-sm">
-            {t("settings_subtitle")}
-          </p>
+        <div className="mb-4 flex items-center justify-between gap-3">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => onBack?.()}
+            className={cn(
+              "h-11 w-11 rounded-2xl border border-border text-muted-foreground hover:bg-accent",
+              !onBack && "invisible"
+            )}
+          >
+            <ArrowLeft className="h-5 w-5" />
+          </Button>
+          <Badge className="rounded-full border border-border bg-muted px-3 py-1.5 text-xs text-muted-foreground">
+            Control Center
+          </Badge>
+          <div className="h-11 w-11" />
         </div>
+
+        <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-muted text-muted-foreground md:h-20 md:w-20">
+          <Smartphone className="h-7 w-7 md:h-9 md:w-9" />
+        </div>
+        <h1 className="text-3xl font-bold leading-none tracking-tight text-foreground md:text-5xl">
+          {t("settings_title")}<span className="text-primary">{t("settings_accent")}</span>
+        </h1>
+        <p className="mx-auto mt-3 max-w-2xl text-xs text-muted-foreground md:text-sm">
+          {t("settings_subtitle")}
+        </p>
       </motion.section>
 
       <section className="grid gap-4 md:grid-cols-3">
@@ -315,10 +306,10 @@ export function SettingsPage({ onBack }: { onBack?: () => void }) {
           { label: "Ads", value: adsEnabled ? "ON" : "OFF", icon: Zap },
           { label: "Lang", value: locale === "pt-BR" ? "PT-BR" : "EN-US", icon: Globe },
         ].map((item) => (
-          <div key={item.label} className="rounded-[1.5rem] border border-white/10 bg-black/38 p-4 shadow-xl backdrop-blur-2xl">
-            <item.icon className="h-5 w-5 text-foreground/60" />
-            <p className="mt-4 text-2xl font-black tracking-tight text-foreground">{item.value}</p>
-            <p className="mt-1 text-[10px] font-black uppercase tracking-[0.24em] text-foreground/40">{item.label}</p>
+          <div key={item.label} className="rounded-2xl border border-border bg-card p-4">
+            <item.icon className="h-5 w-5 text-muted-foreground" />
+            <p className="mt-4 text-2xl font-bold tracking-tight text-foreground">{item.value}</p>
+            <p className="mt-1 text-xs text-muted-foreground">{item.label}</p>
           </div>
         ))}
       </section>
@@ -327,7 +318,7 @@ export function SettingsPage({ onBack }: { onBack?: () => void }) {
         <SettingRow icon={ShieldCheck} title={t("settings_premium")} description={t("settings_premium_desc")}>
           <div className="flex items-center gap-3">
             {userSubscription === "free" && (
-              <Badge className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-foreground/60">
+              <Badge className="rounded-full border border-border bg-muted px-3 py-1 text-xs text-muted-foreground">
                 {t("settings_upgrade_badge")}
               </Badge>
             )}
@@ -346,54 +337,54 @@ export function SettingsPage({ onBack }: { onBack?: () => void }) {
           <div className="p-4 md:p-6 space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <label className="text-[10px] font-black uppercase tracking-[0.2em] text-foreground/50">
+                <label className="text-xs text-muted-foreground">
                   {locale === "en-US" ? "Age" : "Idade"}
                 </label>
                 <Input
                   type="number"
                   value={editProfileData.age}
                   onChange={(e) => setEditProfileData({ ...editProfileData, age: e.target.value })}
-                  className="h-12 rounded-xl border-white/10 bg-white/5 text-foreground"
+                  className="h-12 rounded-xl border-border bg-background text-foreground"
                   min={10}
                   max={120}
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-[10px] font-black uppercase tracking-[0.2em] text-foreground/50">
+                <label className="text-xs text-muted-foreground">
                   {locale === "en-US" ? "Weight (kg)" : "Peso (kg)"}
                 </label>
                 <Input
                   type="number"
                   value={editProfileData.weight}
                   onChange={(e) => setEditProfileData({ ...editProfileData, weight: e.target.value })}
-                  className="h-12 rounded-xl border-white/10 bg-white/5 text-foreground"
+                  className="h-12 rounded-xl border-border bg-background text-foreground"
                   min={20}
                   max={300}
                   step={0.1}
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-[10px] font-black uppercase tracking-[0.2em] text-foreground/50">
+                <label className="text-xs text-muted-foreground">
                   {locale === "en-US" ? "Height (cm)" : "Altura (cm)"}
                 </label>
                 <Input
                   type="number"
                   value={editProfileData.height}
                   onChange={(e) => setEditProfileData({ ...editProfileData, height: e.target.value })}
-                  className="h-12 rounded-xl border-white/10 bg-white/5 text-foreground"
+                  className="h-12 rounded-xl border-border bg-background text-foreground"
                   min={100}
                   max={250}
                   step={0.1}
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-[10px] font-black uppercase tracking-[0.2em] text-foreground/50">
+                <label className="text-xs text-muted-foreground">
                   {locale === "en-US" ? "Gender" : "Genero"}
                 </label>
                 <select
                   value={editProfileData.gender}
                   onChange={(e) => setEditProfileData({ ...editProfileData, gender: e.target.value })}
-                  className="flex h-12 w-full rounded-xl border border-white/10 bg-white/5 px-3 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/50"
+                  className="flex h-12 w-full rounded-xl border border-border bg-background px-3 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/50"
                 >
                   <option value="">{locale === "en-US" ? "Select" : "Selecionar"}</option>
                   <option value="male">{locale === "en-US" ? "Male" : "Masculino"}</option>
@@ -402,13 +393,13 @@ export function SettingsPage({ onBack }: { onBack?: () => void }) {
                 </select>
               </div>
               <div className="space-y-2">
-                <label className="text-[10px] font-black uppercase tracking-[0.2em] text-foreground/50">
+                <label className="text-xs text-muted-foreground">
                   {locale === "en-US" ? "Goal" : "Objetivo"}
                 </label>
                 <select
                   value={editProfileData.fitness_goal}
                   onChange={(e) => setEditProfileData({ ...editProfileData, fitness_goal: e.target.value })}
-                  className="flex h-12 w-full rounded-xl border border-white/10 bg-white/5 px-3 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/50"
+                  className="flex h-12 w-full rounded-xl border border-border bg-background px-3 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/50"
                 >
                   <option value="">{locale === "en-US" ? "Select" : "Selecionar"}</option>
                   <option value="lose_weight">{locale === "en-US" ? "Lose Weight" : "Perder Peso"}</option>
@@ -422,14 +413,14 @@ export function SettingsPage({ onBack }: { onBack?: () => void }) {
               <Button
                 onClick={handleSaveProfile}
                 disabled={isSavingProfile}
-                className="h-12 flex-1 rounded-2xl bg-primary text-sm font-black text-white hover:bg-primary/80"
+                className="h-12 flex-1 rounded-2xl bg-primary text-sm font-semibold text-primary-foreground hover:bg-primary/90"
               >
                 {isSavingProfile ? "..." : locale === "en-US" ? "Save" : "Salvar"}
               </Button>
               <Button
                 onClick={() => setIsEditingProfile(false)}
                 variant="ghost"
-                className="h-12 rounded-2xl border border-white/10 bg-white/8 text-foreground/60 hover:bg-white/16"
+                className="h-12 rounded-2xl border border-border text-muted-foreground hover:bg-accent"
               >
                 {locale === "en-US" ? "Cancel" : "Cancelar"}
               </Button>
@@ -452,7 +443,7 @@ export function SettingsPage({ onBack }: { onBack?: () => void }) {
             <SettingRow icon={Target} title={locale === "en-US" ? "Goal" : "Objetivo"} description={getGoalLabel(profileData.fitness_goal)} isLast>
               <Button
                 onClick={handleStartEditProfile}
-                className="h-11 rounded-2xl border border-white/10 bg-white/5 px-5 text-[10px] font-black uppercase tracking-widest text-foreground/60 hover:bg-white/10 hover:text-foreground"
+                className="h-11 rounded-2xl border border-border bg-muted px-5 text-xs text-muted-foreground hover:bg-accent hover:text-foreground"
               >
                 {locale === "en-US" ? "Edit" : "Editar"}
               </Button>
@@ -470,7 +461,7 @@ export function SettingsPage({ onBack }: { onBack?: () => void }) {
           <Button
             variant="ghost"
             onClick={() => setTheme(isDark ? "light" : "dark")}
-            className="h-11 rounded-2xl border border-white/10 bg-white/5 px-5 text-[10px] font-black uppercase tracking-widest text-foreground/60 hover:bg-white/10 hover:text-foreground"
+            className="h-11 rounded-2xl border border-border bg-muted px-5 text-xs text-muted-foreground hover:bg-accent hover:text-foreground"
           >
             {t("settings_theme_btn")}
           </Button>
@@ -489,7 +480,7 @@ export function SettingsPage({ onBack }: { onBack?: () => void }) {
           <Button
             variant="ghost"
             onClick={handleClearCache}
-            className="h-11 rounded-2xl border border-red-300/18 bg-red-500/10 px-5 text-[10px] font-black uppercase tracking-widest text-red-200 hover:bg-red-500 hover:text-white"
+            className="h-11 rounded-2xl border border-destructive/20 bg-destructive/10 px-5 text-xs text-destructive hover:bg-destructive hover:text-destructive-foreground"
           >
             {t("settings_clear_btn")}
           </Button>
@@ -497,7 +488,7 @@ export function SettingsPage({ onBack }: { onBack?: () => void }) {
         <SettingRow icon={Globe} title={t("settings_region")} description={t("settings_region_desc")} isLast>
           <button
             onClick={handleLanguageToggle}
-            className="flex h-11 items-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-4 text-[10px] font-black uppercase tracking-widest text-foreground/60 transition hover:bg-white/10"
+            className="flex h-11 items-center gap-2 rounded-2xl border border-border bg-muted px-4 text-xs text-muted-foreground transition hover:bg-accent"
           >
             <span>{locale === "pt-BR" ? "PT-BR" : "EN-US"}</span>
             <ChevronRight className="h-4 w-4" />
@@ -511,7 +502,7 @@ export function SettingsPage({ onBack }: { onBack?: () => void }) {
             <Button
               variant="ghost"
               onClick={() => router.push("/admin-dashboard")}
-              className="h-11 rounded-2xl border border-white/10 bg-white/5 px-5 text-[10px] font-black uppercase tracking-widest text-foreground/60 hover:bg-white/10 hover:text-foreground"
+              className="h-11 rounded-2xl border border-border bg-muted px-5 text-xs text-muted-foreground hover:bg-accent hover:text-foreground"
             >
               {locale === "en-US" ? "Access" : "Acessar"}
               <ChevronRight className="ml-2 h-4 w-4" />
@@ -524,15 +515,15 @@ export function SettingsPage({ onBack }: { onBack?: () => void }) {
         <Button
           variant="ghost"
           onClick={handleLogout}
-          className="h-16 w-full rounded-[1.75rem] border border-red-300/18 bg-red-500/10 text-base font-black uppercase tracking-[0.2em] text-red-200 shadow-xl backdrop-blur-2xl hover:bg-red-500 hover:text-white md:h-[4.5rem]"
+          className="h-16 w-full rounded-2xl border border-destructive/20 bg-destructive/10 text-base font-semibold uppercase tracking-wider text-destructive hover:bg-destructive hover:text-destructive-foreground md:h-[4.5rem]"
         >
           {t("settings_logout")}
           <LogOut className="ml-3 h-5 w-5" />
         </Button>
 
         <div className="text-center">
-          <p className="text-[10px] font-black uppercase tracking-[0.38em] text-foreground/24">{t("settings_version")}</p>
-          <p className="mt-2 text-[8px] font-bold text-foreground/18">{t("settings_copyright")}</p>
+          <p className="text-xs text-muted-foreground">{t("settings_version")}</p>
+          <p className="mt-2 text-xs text-muted-foreground">{t("settings_copyright")}</p>
         </div>
       </div>
     </div>
@@ -551,11 +542,10 @@ function SettingsGroup({
   return (
     <section>
       <div className="mb-3 flex items-center gap-3 px-2 md:px-4">
-        <Icon className="h-4 w-4 text-foreground/60" />
-        <h3 className="text-[10px] font-black uppercase tracking-[0.32em] text-foreground/40">{title}</h3>
+        <Icon className="h-4 w-4 text-muted-foreground" />
+        <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{title}</h3>
       </div>
-      <div className="relative overflow-hidden rounded-[1.75rem] border border-white/10 bg-black/42 shadow-xl backdrop-blur-2xl">
-        <div className="absolute inset-x-0 top-0 h-1 bg-white/10" />
+      <div className="relative overflow-hidden rounded-2xl border border-border bg-card">
         {children}
       </div>
     </section>
