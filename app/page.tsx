@@ -20,7 +20,28 @@ import { ChatbotTab } from "@/components/chatbot-tab"
 import { ClansTab } from "@/components/clans-tab"
 import { OnboardingFlow } from "@/components/onboarding-flow"
 import { ProfileSetup } from "@/components/profile-setup"
-import { ScanLine, User, Calculator, ChefHat, Dumbbell, Loader2, ShoppingBag, Settings, Bot, Home, ChevronUp, Shield, Users } from "lucide-react"
+import { SleepTracker } from "@/components/sleep-tracker"
+import { StressTracker } from "@/components/stress-tracker"
+import { HealthCheckin } from "@/components/health-checkin"
+import { SupplementRecommender } from "@/components/supplement-recommender"
+import { MealPlanner } from "@/components/meal-planner"
+import { DietaryRestrictions } from "@/components/dietary-restrictions"
+import { MicronutrientAnalysis } from "@/components/micronutrient-analysis"
+import { SmartSubstitutions } from "@/components/smart-substitutions"
+import { PeriodizationEngine } from "@/components/periodization-engine"
+import { WorkoutFeedback } from "@/components/workout-feedback"
+import { EquipmentSelector } from "@/components/equipment-selector"
+import { MobilityRoutines } from "@/components/mobility-routines"
+import { LongevityScore } from "@/components/longevity-score"
+import { FastingTracker } from "@/components/fasting-tracker"
+import { BiologicalAge } from "@/components/biological-age"
+import { MoodTracker } from "@/components/mood-tracker"
+import { HabitBuilder } from "@/components/habit-builder"
+import { GuidedMeditation } from "@/components/guided-meditation"
+import { SeasonSystem } from "@/components/season-system"
+import { BossBattles } from "@/components/boss-battles"
+import { RewardShop } from "@/components/reward-shop"
+import { ScanLine, User, Calculator, ChefHat, Dumbbell, Loader2, ShoppingBag, Settings, Bot, Home, ChevronUp, Shield, Users, Moon, Brain, Apple, Activity, Zap, Heart, Timer, Smile, ListChecks, Wind, Trophy, Swords, Gift, Lock } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { HomeDashboard } from "@/components/home-dashboard"
 import { useTranslation } from "@/lib/i18n"
@@ -30,13 +51,19 @@ import { supabase } from "@/lib/supabase"
 import { usePlanLimits } from "@/hooks/usePlanLimits"
 
 type View = "home" | "dashboard" | "result" | "recipes" | "training" | "profile" | "planner" | "settings" | "store" | "chatbot" | "clans"
+  | "sleep" | "stress" | "health-checkin" | "supplements"
+  | "meal-planner" | "dietary" | "micronutrients" | "substitutions"
+  | "periodization" | "workout-feedback" | "equipment" | "mobility"
+  | "longevity" | "fasting" | "biological-age"
+  | "mood" | "habits" | "meditation"
+  | "seasons" | "boss-battles" | "reward-shop"
 
 export default function DashboardPage() {
   const router = useRouter()
   const { user, isLoading: authLoading, profile } = useAuth()
   const { t, locale } = useTranslation()
   const isEnglish = locale === "en-US"
-  const { plan, scansToday, canScan: checkCanScan, incrementScans, isLoading: planLoading } = usePlanLimits()
+  const { plan, limits, scansToday, canScan: checkCanScan, incrementScans, isLoading: planLoading } = usePlanLimits()
   const [currentView, setCurrentView] = useState<View>("home")
   const [authTimedOut, setAuthTimedOut] = useState(false)
   const [isAnalyzing, setIsAnalyzing] = useState(false)
@@ -56,6 +83,7 @@ export default function DashboardPage() {
   ])
   const [userMetabolicPlanState, setUserMetabolicPlanState] = useState<any>(null)
   const [showProfileSetup, setShowProfileSetup] = useState(false)
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false)
   const bottomNavInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
@@ -102,33 +130,44 @@ export default function DashboardPage() {
     if (user && profile && !profile.profile_setup_completed) setShowProfileSetup(true)
   }, [user, profile])
 
+  useEffect(() => {
+    const saved = localStorage.getItem("userMetabolicPlan")
+    if (saved) {
+      try { setUserMetabolicPlanState(JSON.parse(saved)) } catch {}
+    }
+  }, [])
+
   const setUserMetabolicPlan = (plan: any, perfil?: any) => {
     const fullPlan = plan && perfil ? { ...plan, perfil } : plan
     setUserMetabolicPlanState(fullPlan)
     if (fullPlan) {
       localStorage.setItem("userMetabolicPlan", JSON.stringify(fullPlan))
-      if (plan?.diet) {
-        setDailyActivity((prev: any) => {
-          const updated = { ...prev, generatedDiets: prev.generatedDiets.some((d: any) => d.title === plan.diet.title) ? prev.generatedDiets : [...prev.generatedDiets, plan.diet] }
-          localStorage.setItem("dailyActivity", JSON.stringify(updated))
-          return updated
-        })
-      }
     } else localStorage.removeItem("userMetabolicPlan")
   }
 
   const getViewTitle = () => {
-    switch (currentView) {
-      case "home": return t("view_home")
-      case "dashboard": return t("view_bioscan")
-      case "recipes": return t("view_recipes")
-      case "training": return t("view_training")
-      case "profile": return t("view_profile")
-      case "planner": return t("view_planner")
-      case "settings": return t("view_settings")
-      case "chatbot": return t("view_chatbot")
-      default: return t("view_fitverse")
+    const titles: Record<string, string> = {
+      home: t("view_home"), dashboard: t("view_bioscan"), recipes: t("view_recipes"),
+      training: t("view_training"), profile: t("view_profile"), planner: t("view_planner"),
+      settings: t("view_settings"), chatbot: t("view_chatbot"), clans: "Clans",
+      sleep: isEnglish ? "Sleep" : "Sono", stress: isEnglish ? "Stress" : "Estresse",
+      "health-checkin": isEnglish ? "Health Check" : "Check-in de Saude",
+      supplements: isEnglish ? "Supplements" : "Suplementos",
+      "meal-planner": isEnglish ? "Meal Plan" : "Plano de Refeicoes",
+      dietary: isEnglish ? "Diet" : "Dieta", micronutrients: isEnglish ? "Micronutrients" : "Micronutrientes",
+      substitutions: isEnglish ? "Substitutes" : "Substituicoes",
+      periodization: isEnglish ? "Periodization" : "Periodizacao",
+      "workout-feedback": isEnglish ? "Feedback" : "Feedback",
+      equipment: isEnglish ? "Equipment" : "Equipamento", mobility: isEnglish ? "Mobility" : "Mobilidade",
+      longevity: isEnglish ? "Longevity" : "Longevidade", fasting: isEnglish ? "Fasting" : "Jejum",
+      "biological-age": isEnglish ? "Bio Age" : "Idade Biologica",
+      mood: isEnglish ? "Mood" : "Humor", habits: isEnglish ? "Habits" : "Habitos",
+      meditation: isEnglish ? "Meditation" : "Meditacao",
+      seasons: isEnglish ? "Seasons" : "Temporadas",
+      "boss-battles": isEnglish ? "Boss Battles" : "Batalhas",
+      "reward-shop": isEnglish ? "Shop" : "Loja",
     }
+    return titles[currentView] || t("view_fitverse")
   }
 
   const handleScan = async (fileOrUrl?: File | string): Promise<void> => {
@@ -237,6 +276,17 @@ export default function DashboardPage() {
     if (file) handleScan(file)
   }
 
+  const isFeatureLocked = (feature: string): boolean => {
+    if (plan === "premium") return false
+    if (plan === "pro") {
+      const proFeatures = ["sleep", "stress", "health-checkin", "meal-planner", "dietary", "smart-substitutions",
+        "periodization", "workout-feedback", "mobility", "fasting", "mood", "seasons", "boss-battles"]
+      return !proFeatures.includes(feature)
+    }
+    const freeFeatures = ["longevity", "habits", "workout-feedback", "seasons"]
+    return !freeFeatures.includes(feature)
+  }
+
   if (authLoading && !authTimedOut) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -247,13 +297,51 @@ export default function DashboardPage() {
 
   if (!user) return null
 
-  const navItems: { view: View; icon: any; label: string }[] = [
+  const mainNavItems: { view: View; icon: any; label: string }[] = [
     { view: "home", icon: Home, label: t("nav_home") },
     { view: "dashboard", icon: ScanLine, label: t("nav_bioscan") },
     { view: "training", icon: Dumbbell, label: t("nav_workouts") },
     { view: "planner", icon: Calculator, label: t("nav_diet") },
     { view: "recipes", icon: ChefHat, label: t("nav_recipes") },
-    { view: "chatbot", icon: Bot, label: t("nav_aichat") },
+  ]
+
+  const healthFeatures: { view: View; icon: any; label: string; feature: string }[] = [
+    { view: "sleep", icon: Moon, label: isEnglish ? "Sleep" : "Sono", feature: "sleep" },
+    { view: "stress", icon: Brain, label: isEnglish ? "Stress" : "Estresse", feature: "stress" },
+    { view: "health-checkin", icon: Activity, label: isEnglish ? "Check-in" : "Check-in", feature: "health-checkin" },
+    { view: "supplements", icon: Apple, label: isEnglish ? "Supplements" : "Suplementos", feature: "supplements" },
+  ]
+
+  const nutritionFeatures: { view: View; icon: any; label: string; feature: string }[] = [
+    { view: "meal-planner", icon: ChefHat, label: isEnglish ? "Meal Plan" : "Refeicoes", feature: "meal-planner" },
+    { view: "dietary", icon: Apple, label: isEnglish ? "Diet" : "Dieta", feature: "dietary" },
+    { view: "micronutrients", icon: Zap, label: isEnglish ? "Micros" : "Micros", feature: "micronutrients" },
+    { view: "substitutions", icon: Zap, label: isEnglish ? "Swap" : "Troca", feature: "substitutions" },
+  ]
+
+  const trainingFeatures: { view: View; icon: any; label: string; feature: string }[] = [
+    { view: "periodization", icon: Activity, label: isEnglish ? "Periodize" : "Periodizar", feature: "periodization" },
+    { view: "workout-feedback", icon: Zap, label: isEnglish ? "Feedback" : "Feedback", feature: "workout-feedback" },
+    { view: "equipment", icon: Dumbbell, label: isEnglish ? "Equipment" : "Equipamento", feature: "equipment" },
+    { view: "mobility", icon: Wind, label: isEnglish ? "Mobility" : "Mobilidade", feature: "mobility" },
+  ]
+
+  const biohackingFeatures: { view: View; icon: any; label: string; feature: string }[] = [
+    { view: "longevity", icon: Heart, label: isEnglish ? "Longevity" : "Longevidade", feature: "longevity" },
+    { view: "fasting", icon: Timer, label: isEnglish ? "Fasting" : "Jejum", feature: "fasting" },
+    { view: "biological-age", icon: Zap, label: isEnglish ? "Bio Age" : "Bio Idade", feature: "biological-age" },
+  ]
+
+  const mentalFeatures: { view: View; icon: any; label: string; feature: string }[] = [
+    { view: "mood", icon: Smile, label: isEnglish ? "Mood" : "Humor", feature: "mood" },
+    { view: "habits", icon: ListChecks, label: isEnglish ? "Habits" : "Habitos", feature: "habits" },
+    { view: "meditation", icon: Wind, label: isEnglish ? "Meditate" : "Meditacao", feature: "meditation" },
+  ]
+
+  const gamificationFeatures: { view: View; icon: any; label: string; feature: string }[] = [
+    { view: "seasons", icon: Trophy, label: isEnglish ? "Seasons" : "Temporadas", feature: "seasons" },
+    { view: "boss-battles", icon: Swords, label: isEnglish ? "Boss" : "Batalha", feature: "boss-battles" },
+    { view: "reward-shop", icon: Gift, label: isEnglish ? "Shop" : "Loja", feature: "reward-shop" },
   ]
 
   return (
@@ -262,40 +350,59 @@ export default function DashboardPage() {
       {showProfileSetup && <ProfileSetup onComplete={() => setShowProfileSetup(false)} />}
 
       {/* Desktop sidebar */}
-      <aside className="hidden md:flex flex-col w-16 fixed top-0 left-0 h-full glass-strong z-50 border-r border-border overflow-hidden">
+      <aside className="hidden md:flex flex-col w-16 fixed top-0 left-0 h-full bg-card z-50 border-r border-border overflow-hidden">
         <div className="p-3 flex items-center justify-center mb-4">
           <div className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center">
             <ScanLine className="w-4 h-4 text-primary-foreground" />
           </div>
         </div>
 
-        <nav className="flex-1 px-2 space-y-1">
-          {navItems.map((item) => (
-            <button
-              key={item.view}
-              onClick={() => setCurrentView(item.view)}
-              className={cn(
-                "flex flex-col items-center gap-1 w-full py-2 rounded-xl transition-all duration-200 haptic-press",
-                currentView === item.view ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
-              )}
+        <nav className="flex-1 px-2 space-y-1 overflow-y-auto">
+          {mainNavItems.map((item) => (
+            <button key={item.view} onClick={() => setCurrentView(item.view)}
+              className={cn("flex flex-col items-center gap-1 w-full py-2 rounded-xl transition-all", currentView === item.view ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted/50")}
             >
               <item.icon className="w-5 h-5" />
               <span className="text-[9px] font-medium leading-none">{item.label.split(' ')[0]}</span>
             </button>
           ))}
+
+          <div className="pt-2 pb-1 px-1">
+            <span className="text-[8px] font-semibold uppercase tracking-wider text-muted-foreground">{isEnglish ? "Health" : "Saude"}</span>
+          </div>
+          {healthFeatures.map((item) => (
+            <button key={item.view} onClick={() => setCurrentView(item.view)}
+              className={cn("flex flex-col items-center gap-1 w-full py-2 rounded-xl transition-all relative", currentView === item.view ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted/50")}
+            >
+              {isFeatureLocked(item.feature) && <Lock className="w-2.5 h-2.5 absolute top-0.5 right-0.5 text-primary/50" />}
+              <item.icon className="w-5 h-5" />
+              <span className="text-[9px] font-medium leading-none">{item.label}</span>
+            </button>
+          ))}
+
+          <div className="pt-2 pb-1 px-1">
+            <span className="text-[8px] font-semibold uppercase tracking-wider text-muted-foreground">{isEnglish ? "Training" : "Treino"}</span>
+          </div>
+          {trainingFeatures.map((item) => (
+            <button key={item.view} onClick={() => setCurrentView(item.view)}
+              className={cn("flex flex-col items-center gap-1 w-full py-2 rounded-xl transition-all relative", currentView === item.view ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted/50")}
+            >
+              {isFeatureLocked(item.feature) && <Lock className="w-2.5 h-2.5 absolute top-0.5 right-0.5 text-primary/50" />}
+              <item.icon className="w-5 h-5" />
+              <span className="text-[9px] font-medium leading-none">{item.label}</span>
+            </button>
+          ))}
         </nav>
 
         <div className="px-2 py-3 space-y-1 border-t border-border pt-3">
-          <button
-            onClick={() => setCurrentView("profile")}
-            className={cn("flex flex-col items-center gap-1 w-full py-2 rounded-xl transition-all duration-200 haptic-press", currentView === "profile" ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted/50")}
+          <button onClick={() => setCurrentView("profile")}
+            className={cn("flex flex-col items-center gap-1 w-full py-2 rounded-xl transition-all", currentView === "profile" ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted/50")}
           >
             <User className="w-5 h-5" />
             <span className="text-[9px] font-medium leading-none">{t("nav_profile").split(' ')[0]}</span>
           </button>
-          <button
-            onClick={() => setCurrentView("settings")}
-            className={cn("flex flex-col items-center gap-1 w-full py-2 rounded-xl transition-all duration-200 haptic-press", currentView === "settings" ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted/50")}
+          <button onClick={() => setCurrentView("settings")}
+            className={cn("flex flex-col items-center gap-1 w-full py-2 rounded-xl transition-all", currentView === "settings" ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted/50")}
           >
             <Settings className="w-5 h-5" />
             <span className="text-[9px] font-medium leading-none">{t("nav_settings").split(' ')[0]}</span>
@@ -305,7 +412,6 @@ export default function DashboardPage() {
 
       {/* Main */}
       <div className="md:ml-16 flex flex-col min-h-screen transition-all duration-300 max-w-[1200px] mx-auto w-full">
-        {/* Header */}
         <header className="sticky top-0 z-40 flex h-14 items-center justify-between px-4 bg-background/80 backdrop-blur-xl border-b border-border md:border-none md:bg-transparent md:backdrop-blur-none">
           <div className="md:hidden flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
@@ -319,18 +425,18 @@ export default function DashboardPage() {
           <div className="hidden md:block" />
           <div className="flex items-center gap-1.5">
             {(isAdmin || user?.user_metadata?.is_admin) && (
-              <button onClick={() => router.push("/admin-dashboard")} className="w-9 h-9 rounded-xl flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-all haptic-press">
+              <button onClick={() => router.push("/admin-dashboard")} className="w-9 h-9 rounded-xl flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-all">
                 <Shield className="w-[18px] h-[18px]" />
               </button>
             )}
-            <button onClick={() => setCurrentView("profile")} className="w-9 h-9 rounded-xl flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-all haptic-press">
+            <button onClick={() => setCurrentView("profile")} className="w-9 h-9 rounded-xl flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-all">
               <User className="w-[18px] h-[18px]" />
             </button>
           </div>
         </header>
 
-        {/* Content */}
         <main className="flex-1 overflow-y-auto px-4 pb-safe-nav pt-4 md:px-8 md:pb-8 lg:px-12 lg:pb-8">
+          {/* Core views */}
           {currentView === "home" && <HomeDashboard userMetabolicPlan={userMetabolicPlanState} dailyActivity={dailyActivity} onNavigate={setCurrentView} />}
           {currentView === "dashboard" && <ScanDashboard onScan={handleScan} isScanning={isAnalyzing} />}
           {currentView === "result" && (
@@ -354,28 +460,59 @@ export default function DashboardPage() {
           {currentView === "recipes" && <RecipesTab />}
           {currentView === "training" && <TrainingTab />}
           {currentView === "planner" && (
-            userMetabolicPlanState?.macros && localStorage.getItem("userMetabolicPlan") !== null
+            userMetabolicPlanState?.macros
               ? <div className="space-y-4">
-                  <MetabolicDashboard plan={userMetabolicPlanState} perfil={userMetabolicPlanState.perfil} onBack={() => setCurrentView("home")} />
+                  <MetabolicDashboard plan={userMetabolicPlanState} perfil={userMetabolicPlanState.perfil} onBack={() => setCurrentView("home")} planLevel={limits.planDetailLevel} onUpgrade={() => router.push("/subscription")} />
                   <Button onClick={() => { setUserMetabolicPlanState(null); localStorage.removeItem("userMetabolicPlan") }} variant="ghost" className="w-full h-11 rounded-xl text-muted-foreground text-xs font-semibold">
                     {t("home_new_plan")}
                   </Button>
                 </div>
               : <MetabolicPlanner onPlanCreated={setUserMetabolicPlan} />
           )}
-          {currentView === "store" && <StoreTab />}
           {currentView === "settings" && <SettingsPage onBack={() => setCurrentView("profile")} />}
           {currentView === "chatbot" && <ChatbotTab />}
           {currentView === "clans" && <ClansTab />}
           {currentView === "profile" && <div className="pt-4 md:pt-8"><HealthProfile scanHistory={scanHistory} onNavigateToSettings={() => setCurrentView("settings")} onNavigateToSubscription={() => router.push('/subscription')} /></div>}
+
+          {/* Health features */}
+          {currentView === "sleep" && <SleepTracker isLocked={isFeatureLocked("sleep")} />}
+          {currentView === "stress" && <StressTracker isLocked={isFeatureLocked("stress")} />}
+          {currentView === "health-checkin" && <HealthCheckin isLocked={isFeatureLocked("health-checkin")} />}
+          {currentView === "supplements" && <SupplementRecommender isLocked={isFeatureLocked("supplements")} />}
+
+          {/* Nutrition features */}
+          {currentView === "meal-planner" && <MealPlanner isLocked={isFeatureLocked("meal-planner")} macros={userMetabolicPlanState?.macros} />}
+          {currentView === "dietary" && <DietaryRestrictions />}
+          {currentView === "micronutrients" && <MicronutrientAnalysis isLocked={isFeatureLocked("micronutrients")} />}
+          {currentView === "substitutions" && <SmartSubstitutions isLocked={isFeatureLocked("substitutions")} />}
+
+          {/* Training features */}
+          {currentView === "periodization" && <PeriodizationEngine isLocked={isFeatureLocked("periodization")} />}
+          {currentView === "workout-feedback" && <WorkoutFeedback isPro={plan !== "free"} />}
+          {currentView === "equipment" && <EquipmentSelector />}
+          {currentView === "mobility" && <MobilityRoutines isLocked={isFeatureLocked("mobility")} />}
+
+          {/* Biohacking features */}
+          {currentView === "longevity" && <LongevityScore />}
+          {currentView === "fasting" && <FastingTracker isLocked={isFeatureLocked("fasting")} />}
+          {currentView === "biological-age" && <BiologicalAge isLocked={isFeatureLocked("biological-age")} />}
+
+          {/* Mental features */}
+          {currentView === "mood" && <MoodTracker isLocked={isFeatureLocked("mood")} />}
+          {currentView === "habits" && <HabitBuilder />}
+          {currentView === "meditation" && <GuidedMeditation isLocked={isFeatureLocked("meditation")} />}
+
+          {/* Gamification */}
+          {currentView === "seasons" && <SeasonSystem />}
+          {currentView === "boss-battles" && <BossBattles isLocked={isFeatureLocked("boss-battles")} />}
+          {currentView === "reward-shop" && <RewardShop isLocked={isFeatureLocked("reward-shop")} />}
         </main>
       </div>
 
       <input type="file" ref={bottomNavInputRef} className="hidden" accept="image/*" capture="environment" onChange={handleBottomNavFileChange} />
 
       {/* FAB - Scan */}
-      <button
-        onClick={handleNavScan}
+      <button onClick={handleNavScan}
         className="mobile-fab-safe fixed right-4 z-50 w-14 h-14 rounded-2xl bg-primary text-primary-foreground shadow-lg flex items-center justify-center transition-all duration-200 hover:scale-105 active:scale-95 md:bottom-8 md:right-8"
         aria-label={t("home_scan_product")}
       >
@@ -390,21 +527,16 @@ export default function DashboardPage() {
           { view: "recipes" as View, icon: ChefHat, label: t("nav_recipes") },
           { view: "clans" as View, icon: Users, label: t("nav_clans") },
         ].map((item) => (
-          <button
-            key={item.view}
-            onClick={() => setCurrentView(item.view)}
+          <button key={item.view} onClick={() => setCurrentView(item.view)}
             className="relative flex h-12 w-12 flex-col items-center justify-center rounded-xl p-2 transition-colors"
-            aria-label={item.label}
           >
             <item.icon className={cn("w-5 h-5 transition-colors", currentView === item.view ? "text-primary" : "text-muted-foreground")} />
             {currentView === item.view && <span className="absolute bottom-1 h-1 w-1 rounded-full bg-primary" />}
           </button>
         ))}
-        <button onClick={() => setCurrentView("chatbot")} className="relative flex h-12 w-12 flex-col items-center justify-center rounded-xl p-2" aria-label="Menu">
-          <div className={cn("w-5 h-5 transition-colors", currentView === "chatbot" ? "text-primary" : "text-muted-foreground")}>
-            <Bot className="w-5 h-5" />
-          </div>
-          {currentView === "chatbot" && <span className="absolute bottom-1 h-1 w-1 rounded-full bg-primary" />}
+        <button onClick={() => setCurrentView("settings")} className="relative flex h-12 w-12 flex-col items-center justify-center rounded-xl p-2">
+          <Settings className={cn("w-5 h-5 transition-colors", currentView === "settings" ? "text-primary" : "text-muted-foreground")} />
+          {currentView === "settings" && <span className="absolute bottom-1 h-1 w-1 rounded-full bg-primary" />}
         </button>
       </nav>
     </div>
