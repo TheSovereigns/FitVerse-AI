@@ -41,7 +41,6 @@ export function HomeDashboard({
     if (!dailyActivity.scannedProducts || dailyActivity.scannedProducts.length === 0) {
       return { calories: 0, protein: 0, carbs: 0, fat: 0 }
     }
-
     return dailyActivity.scannedProducts.reduce((acc: any, product: any) => {
       const macros = product.macros || { calories: 0, protein: 0, carbs: 0, fat: 0 }
       acc.calories += macros.calories || 0
@@ -74,36 +73,29 @@ export function HomeDashboard({
   ]
 
   return (
-    <div className="mx-auto w-full max-w-6xl space-y-4 pb-safe-nav md:space-y-6">
+    <div className="mx-auto w-full max-w-3xl space-y-5 pb-safe-nav md:space-y-6">
+      {/* Header card */}
       <motion.section
-        initial={{ opacity: 0, y: 12 }}
+        initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
-        className="mobile-glass-glow rounded-[1.35rem] border border-white/10 bg-black/40 p-4 shadow-[0_18px_54px_rgba(0,0,0,0.28)] backdrop-blur-2xl md:rounded-[1.5rem] md:p-6"
+        className="rounded-2xl border border-border bg-card p-5 md:p-6"
       >
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
-            <Badge className="mb-3 rounded-full border border-white/10 bg-white/8 px-3 py-1 text-[9px] font-black uppercase tracking-[0.2em] text-foreground/50">
+            <Badge className="mb-2 rounded-lg border border-border bg-muted px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
               FitVerse AI
             </Badge>
-            <h1 className="text-2xl font-black tracking-tight text-foreground md:text-4xl">
+            <h1 className="text-2xl font-bold tracking-tight text-foreground md:text-3xl">
               {isEnglish ? "Today" : "Hoje"}
             </h1>
-            <p className="mt-1 text-sm font-bold capitalize text-foreground/45">{dateString}</p>
+            <p className="mt-0.5 text-sm text-muted-foreground capitalize">{dateString}</p>
           </div>
-
-          <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-row">
-            <Button
-              onClick={() => onNavigate("dashboard")}
-              className="h-11 min-w-0 rounded-2xl bg-foreground px-3 text-[10px] font-black uppercase tracking-widest text-black hover:bg-white/10 sm:px-5"
-            >
+          <div className="flex gap-2">
+            <Button onClick={() => onNavigate("dashboard")} className="h-10 rounded-xl px-4 text-xs">
               <ScanLine className="h-4 w-4" />
               {t("dopamine_quick_scan")}
             </Button>
-            <Button
-              variant="ghost"
-              onClick={() => onNavigate("planner")}
-              className="h-11 min-w-0 rounded-2xl border border-white/10 bg-white/8 px-3 text-[10px] font-black uppercase tracking-widest text-foreground/50 hover:bg-white/10 sm:px-5"
-            >
+            <Button variant="outline" onClick={() => onNavigate("planner")} className="h-10 rounded-xl px-4 text-xs">
               <Target className="h-4 w-4" />
               {t("view_planner")}
             </Button>
@@ -112,26 +104,26 @@ export function HomeDashboard({
       </motion.section>
 
       <StreakDisplay compact onNavigate={onNavigate} />
-
       <BeginnerChecklist />
 
-      <section className="grid gap-3 md:gap-4 lg:grid-cols-[1.25fr_0.75fr]">
+      {/* Calorie + Health */}
+      <section className="grid gap-4 lg:grid-cols-[1.25fr_0.75fr]">
         <Panel>
           <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
             <div className="min-w-0">
-              <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-2xl border border-white/10 bg-white/8 text-foreground/60">
+              <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-muted text-muted-foreground">
                 <Flame className="h-5 w-5" />
               </div>
-              <p className="text-[10px] font-black uppercase tracking-[0.22em] text-foreground/38">
+              <p className="text-xs font-medium text-muted-foreground">
                 {goals ? t("home_calorie_label") : t("view_planner")}
               </p>
-              <div className="mt-2 flex items-end gap-2">
-                <span className="text-4xl font-black tracking-tight text-foreground md:text-5xl">
+              <div className="mt-1.5 flex items-end gap-1.5">
+                <span className="text-3xl font-bold tracking-tight text-foreground md:text-4xl">
                   {goals ? remainingCalories : "--"}
                 </span>
-                <span className="mb-1 text-sm font-bold text-foreground/38">{t("home_kcal")}</span>
+                <span className="mb-0.5 text-sm text-muted-foreground">{t("home_kcal")}</span>
               </div>
-              <p className="mt-3 max-w-xl text-sm font-bold leading-relaxed text-foreground/48">
+              <p className="mt-2 text-sm text-muted-foreground">
                 {goals
                   ? `${consumedCalories} ${t("home_kcal")} ${isEnglish ? "logged today" : "registradas hoje"}.`
                   : isEnglish
@@ -140,37 +132,37 @@ export function HomeDashboard({
               </p>
             </div>
 
-            <div className="w-full rounded-[1.15rem] border border-white/10 bg-white/5 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] md:w-72 md:rounded-[1.25rem]">
-              <div className="mb-3 flex items-center justify-between">
-                <span className="text-[10px] font-black uppercase tracking-widest text-foreground/38">
+            <div className="w-full rounded-xl border border-border bg-muted/50 p-4 md:w-64">
+              <div className="mb-2.5 flex items-center justify-between">
+                <span className="text-xs font-medium text-muted-foreground">
                   {isEnglish ? "Daily progress" : "Progresso diario"}
                 </span>
-                <span className="text-sm font-black text-foreground">{goals ? `${progressPercent}%` : "--"}</span>
+                <span className="text-sm font-bold text-foreground">{goals ? `${progressPercent}%` : "--"}</span>
               </div>
-              <Progress value={goals ? progressPercent : 0} className="h-2 bg-white/10" indicatorClassName="bg-white/30" />
+              <Progress value={goals ? progressPercent : 0} className="h-1.5 bg-border" indicatorClassName="bg-primary" />
               <Button
                 onClick={() => onNavigate(goals ? "dashboard" : "planner")}
                 variant="ghost"
-                className="mt-4 h-10 w-full rounded-xl border border-white/10 bg-white/8 text-[10px] font-black uppercase tracking-widest text-foreground/50 hover:bg-white/10"
+                className="mt-3 h-9 w-full rounded-lg text-xs"
               >
                 {goals ? t("home_start_btn") : t("home_new_plan")}
-                <ArrowRight className="h-4 w-4" />
+                <ArrowRight className="h-3.5 w-3.5" />
               </Button>
             </div>
           </div>
         </Panel>
 
         <Panel>
-          <div className="mb-4 flex items-center justify-between">
+          <div className="mb-3 flex items-center justify-between">
             <div>
-              <h2 className="text-lg font-black tracking-tight text-foreground">
+              <h2 className="text-base font-bold text-foreground">
                 {isEnglish ? "Health snapshot" : "Resumo de saude"}
               </h2>
-              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-foreground/35">
+              <p className="text-xs text-muted-foreground">
                 {isEnglish ? "Last activity" : "Atividade recente"}
               </p>
             </div>
-            <ShieldCheck className="h-5 w-5 text-foreground/60" />
+            <ShieldCheck className="h-4 w-4 text-muted-foreground" />
           </div>
           <div className="grid grid-cols-3 gap-2">
             <Metric label={t("home_longevity")} value={averageLongevityScore || "-"} icon={Trophy} />
@@ -182,42 +174,39 @@ export function HomeDashboard({
 
       <HydrationTracker />
 
+      {/* Quick actions */}
       <section>
         <div className="mb-3 flex items-center justify-between">
-          <h2 className="text-base font-black tracking-tight text-foreground md:text-xl">
+          <h2 className="text-base font-bold text-foreground md:text-lg">
             {isEnglish ? "Quick actions" : "Acoes rapidas"}
           </h2>
-          <span className="text-[10px] font-black uppercase tracking-[0.2em] text-foreground/30">FitVerse</span>
         </div>
-        <div className="grid grid-cols-2 gap-2.5 md:grid-cols-4 md:gap-3">
+        <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
           {quickActions.map((action) => (
             <button
               key={action.view}
               type="button"
               onClick={() => onNavigate(action.view)}
-              className="min-h-[118px] rounded-[1.15rem] border border-white/10 bg-black/40 p-3.5 text-left shadow-[0_14px_38px_rgba(0,0,0,0.22)] backdrop-blur-xl transition active:scale-[0.98] hover:border-white/20 hover:bg-white/8 md:rounded-[1.25rem] md:p-4"
+              className="min-h-[100px] rounded-2xl border border-border bg-card p-4 text-left transition-all duration-200 hover:bg-muted/50 active:scale-[0.98]"
             >
-              <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-2xl border border-white/10 bg-white/10">
-                <action.icon className="h-4 w-4 text-foreground/60" />
+              <div className="mb-2.5 flex h-9 w-9 items-center justify-center rounded-xl bg-muted">
+                <action.icon className="h-4 w-4 text-muted-foreground" />
               </div>
-              <p className="text-sm font-black text-foreground">{action.label}</p>
-              <p className="mt-1 line-clamp-2 text-[10px] font-bold leading-relaxed text-foreground/38">{action.desc}</p>
+              <p className="text-sm font-semibold text-foreground">{action.label}</p>
+              <p className="mt-0.5 line-clamp-2 text-xs text-muted-foreground">{action.desc}</p>
             </button>
           ))}
         </div>
       </section>
 
+      {/* Bio logs */}
       <Panel>
-        <div className="mb-4 flex items-center justify-between gap-3">
+        <div className="mb-3 flex items-center justify-between">
           <div>
-            <h2 className="text-lg font-black tracking-tight text-foreground md:text-xl">{t("home_bio_logs")}</h2>
-            <p className="mt-1 text-[10px] font-black uppercase tracking-[0.2em] text-foreground/35">{t("home_last_24h")}</p>
+            <h2 className="text-base font-bold text-foreground md:text-lg">{t("home_bio_logs")}</h2>
+            <p className="text-xs text-muted-foreground">{t("home_last_24h")}</p>
           </div>
-          <Button
-            variant="ghost"
-            onClick={() => onNavigate("profile")}
-            className="h-10 rounded-xl border border-white/10 bg-white/8 px-4 text-[10px] font-black uppercase tracking-widest text-foreground/50 hover:bg-white/10"
-          >
+          <Button variant="ghost" onClick={() => onNavigate("profile")} className="h-9 rounded-lg px-3 text-xs">
             {t("home_see_history")}
           </Button>
         </div>
@@ -227,35 +216,32 @@ export function HomeDashboard({
             {dailyActivity.scannedProducts.slice(0, 4).map((product: any, index: number) => (
               <motion.div
                 key={`${product.productName}-${index}`}
-                initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: index * 0.04 }}
-                className="flex items-center gap-3 rounded-[1rem] border border-white/10 bg-white/5 p-3"
+                initial={{ opacity: 0, y: 4 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.03 }}
+                className="flex items-center gap-3 rounded-xl border border-border bg-muted/30 p-3"
               >
                 <img
                   src={product.image || "/placeholder.svg?width=100&height=100"}
                   alt={product.productName}
-                  className="h-12 w-12 rounded-xl object-cover"
+                  className="h-10 w-10 rounded-lg object-cover"
                 />
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-black text-foreground">{product.productName}</p>
-                  <p className="mt-0.5 text-[10px] font-bold uppercase tracking-widest text-foreground/32">
+                  <p className="truncate text-sm font-semibold text-foreground">{product.productName}</p>
+                  <p className="mt-0.5 text-xs text-muted-foreground">
                     {product.longevityScore} {t("scan_score_label")}
                   </p>
                 </div>
-                <ArrowRight className="h-4 w-4 text-foreground/28" />
+                <ArrowRight className="h-4 w-4 text-muted-foreground/50" />
               </motion.div>
             ))}
           </div>
         ) : (
-          <div className="rounded-[1.15rem] border border-white/10 bg-white/5 p-5 text-center md:rounded-[1.25rem] md:p-6">
-            <ScanLine className="mx-auto mb-3 h-8 w-8 text-foreground/60" />
-            <h3 className="text-base font-black text-foreground">{t("dopamine_empty_title")}</h3>
-            <p className="mx-auto mt-2 max-w-md text-sm font-bold text-foreground/42">{t("dopamine_empty_subtitle")}</p>
-            <Button
-              onClick={() => onNavigate("dashboard")}
-              className="mt-5 h-11 rounded-xl bg-foreground px-5 text-[10px] font-black uppercase tracking-widest text-black hover:bg-white/10"
-            >
+          <div className="rounded-2xl border border-dashed border-border p-6 text-center">
+            <ScanLine className="mx-auto mb-2 h-8 w-8 text-muted-foreground/50" />
+            <h3 className="text-sm font-semibold text-foreground">{t("dopamine_empty_title")}</h3>
+            <p className="mt-1 text-xs text-muted-foreground">{t("dopamine_empty_subtitle")}</p>
+            <Button onClick={() => onNavigate("dashboard")} className="mt-4 h-10 rounded-xl px-5 text-xs">
               {t("dopamine_empty_cta")}
             </Button>
           </div>
@@ -268,9 +254,9 @@ export function HomeDashboard({
 function Panel({ children }: { children: React.ReactNode }) {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 12 }}
+      initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
-      className="mobile-glass-glow rounded-[1.35rem] border border-white/10 bg-black/40 p-4 shadow-[0_18px_54px_rgba(0,0,0,0.26)] backdrop-blur-2xl md:rounded-[1.5rem] md:p-5"
+      className="rounded-2xl border border-border bg-card p-4 md:p-5"
     >
       {children}
     </motion.div>
@@ -279,10 +265,10 @@ function Panel({ children }: { children: React.ReactNode }) {
 
 function Metric({ icon: Icon, label, value }: { icon: React.ElementType; label: string; value: string | number }) {
   return (
-    <div className="min-w-0 rounded-[1rem] border border-white/10 bg-white/5 p-2.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] md:p-3">
-      <Icon className="h-4 w-4 text-foreground/60" />
-      <p className="mt-3 truncate text-base font-black text-foreground md:text-lg">{value}</p>
-      <p className="mt-1 truncate text-[8px] font-black uppercase tracking-widest text-foreground/34 md:text-[9px]">{label}</p>
+    <div className="min-w-0 rounded-xl bg-muted/50 p-3">
+      <Icon className="h-4 w-4 text-muted-foreground" />
+      <p className="mt-2 truncate text-lg font-bold text-foreground">{value}</p>
+      <p className="mt-0.5 truncate text-[10px] font-medium uppercase tracking-wider text-muted-foreground">{label}</p>
     </div>
   )
 }

@@ -1,11 +1,8 @@
 ﻿"use client"
 
-// FitVerse AI - Main Dashboard
-// Auth-protected dashboard with BioScan, training, diet, and more
-
 import { useState, useEffect, useRef } from "react"
 import { useRouter } from "next/navigation"
-import { motion, AnimatePresence } from "framer-motion"
+import { AnimatePresence } from "framer-motion"
 import { cn } from "@/lib/utils"
 import { ScanDashboard } from "@/components/scan-dashboard"
 import { ProductResult, type ProductAnalysis } from "@/components/product-result"
@@ -26,8 +23,6 @@ import { ProfileSetup } from "@/components/profile-setup"
 import { ScanLine, User, Calculator, ChefHat, Dumbbell, Loader2, ShoppingBag, Settings, Bot, Home, ChevronUp, Shield, Users } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { HomeDashboard } from "@/components/home-dashboard"
-import { DynamicIsland, type IslandState } from "@/components/dynamic-island"
-import { LiquidLaunchpad } from "@/components/liquid-launchpad"
 import { useTranslation } from "@/lib/i18n"
 import { toast } from "sonner"
 import { useAuth } from "@/hooks/useAuth"
@@ -43,9 +38,6 @@ export default function DashboardPage() {
   const isEnglish = locale === "en-US"
   const { plan, scansToday, canScan: checkCanScan, incrementScans, isLoading: planLoading } = usePlanLimits()
   const [currentView, setCurrentView] = useState<View>("home")
-  const [islandState, setIslandState] = useState<IslandState>("idle")
-  const [isDocked, setIsDocked] = useState(false)
-  const [isMenuExpanded, setIsMenuExpanded] = useState(false)
   const [authTimedOut, setAuthTimedOut] = useState(false)
   const [isAnalyzing, setIsAnalyzing] = useState(false)
   const [isAdmin, setIsAdmin] = useState(false)
@@ -58,110 +50,37 @@ export default function DashboardPage() {
     generatedWorkouts: [],
   })
   const [scanHistory, setScanHistory] = useState<any[]>([
-    {
-      id: "1",
-      name: "Whey Protein Isolate",
-      scannedAt: new Date(Date.now() - 10 * 60 * 1000).toISOString(),
-      score: 92,
-      image: "/placeholder.svg?height=80&width=80",
-      status: "healthy",
-    },
-    {
-      id: "2",
-      name: "Barra de Cereal",
-      scannedAt: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
-      score: 45,
-      image: "/placeholder.svg?height=80&width=80",
-      status: "avoid",
-    },
-    {
-      id: "3",
-      name: "Iogurte Natural",
-      scannedAt: new Date(Date.now() - 25 * 60 * 60 * 1000).toISOString(),
-      score: 88,
-      image: "/placeholder.svg?height=80&width=80",
-      status: "healthy",
-    },
+    { id: "1", name: "Whey Protein Isolate", scannedAt: new Date(Date.now() - 10 * 60 * 1000).toISOString(), score: 92, image: "/placeholder.svg?height=80&width=80", status: "healthy" },
+    { id: "2", name: "Barra de Cereal", scannedAt: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(), score: 45, image: "/placeholder.svg?height=80&width=80", status: "avoid" },
+    { id: "3", name: "Iogurte Natural", scannedAt: new Date(Date.now() - 25 * 60 * 60 * 1000).toISOString(), score: 88, image: "/placeholder.svg?height=80&width=80", status: "healthy" },
   ])
   const [userMetabolicPlanState, setUserMetabolicPlanState] = useState<any>(null)
   const [showProfileSetup, setShowProfileSetup] = useState(false)
   const bottomNavInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setAuthTimedOut(true)
-    }, 8000)
+    const timer = setTimeout(() => setAuthTimedOut(true), 8000)
     return () => clearTimeout(timer)
   }, [])
 
   useEffect(() => {
-    if ((!authLoading || authTimedOut) && !user) {
-      router.push("/auth/login")
-    }
+    if ((!authLoading || authTimedOut) && !user) router.push("/auth/login")
   }, [user, authLoading, authTimedOut, router])
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
     const view = params.get("view")
-    if (view) {
-      setCurrentView(view as View)
-    }
+    if (view) setCurrentView(view as View)
   }, [])
 
-  // Check admin status - don't block on this
   useEffect(() => {
     if (user) {
       const userMetaAdmin = user.user_metadata?.is_admin === true
-      if (userMetaAdmin) {
-        setIsAdmin(true)
-      }
-      supabase
-        .from('profiles')
-        .select('is_admin')
-        .eq('id', user.id)
-        .single()
-        .then(({ data }) => {
-          if (data?.is_admin) {
-            setIsAdmin(true)
-          }
-        })
+      if (userMetaAdmin) setIsAdmin(true)
+      supabase.from('profiles').select('is_admin').eq('id', user.id).single()
+        .then(({ data }) => { if (data?.is_admin) setIsAdmin(true) })
     }
   }, [user])
-
-  // Handle view from URL params
-  useEffect(() => {
-    const handleRouteChange = () => {
-      const params = new URLSearchParams(window.location.search)
-      const view = params.get("view")
-      if (view) {
-        setCurrentView(view as View)
-      }
-    }
-    window.addEventListener("popstate", handleRouteChange)
-    const origPush = window.history.pushState
-    window.history.pushState = function(...args) {
-      origPush.apply(window.history, args)
-      handleRouteChange()
-    }
-    return () => {
-      window.removeEventListener("popstate", handleRouteChange)
-      window.history.pushState = origPush
-    }
-  }, [])
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsDocked(window.scrollY > 80)
-    }
-    window.addEventListener("scroll", handleScroll)
-    return () => window.removeEventListener("scroll", handleScroll)
-  }, [])
-
-  useEffect(() => {
-    if (user && profile && !profile.profile_setup_completed) {
-      setShowProfileSetup(true)
-    }
-  }, [user, profile])
 
   useEffect(() => {
     const savedActivity = localStorage.getItem("dailyActivity")
@@ -169,32 +88,19 @@ export default function DashboardPage() {
     if (savedActivity) {
       try {
         const activity = JSON.parse(savedActivity)
-        if (activity.date === today) {
-          setDailyActivity(activity)
-        } else {
-          const newDailyActivity = { date: today, scannedProducts: [], generatedDiets: [], generatedWorkouts: [] }
-          setDailyActivity(newDailyActivity)
-          localStorage.setItem("dailyActivity", JSON.stringify(newDailyActivity))
+        if (activity.date === today) setDailyActivity(activity)
+        else {
+          const fresh = { date: today, scannedProducts: [], generatedDiets: [], generatedWorkouts: [] }
+          setDailyActivity(fresh)
+          localStorage.setItem("dailyActivity", JSON.stringify(fresh))
         }
-      } catch {
-        console.error(t("page_error_load_activity"))
-      }
-    }
-
-    if (user) {
-      // Check admin from profile (this is stable)
-      supabase
-        .from('profiles')
-        .select('is_admin')
-        .eq('id', user.id)
-        .single()
-        .then(({ data }) => {
-          if (data) {
-            setIsAdmin(data.is_admin === true)
-          }
-        })
+      } catch {}
     }
   }, [user, profile, plan])
+
+  useEffect(() => {
+    if (user && profile && !profile.profile_setup_completed) setShowProfileSetup(true)
+  }, [user, profile])
 
   const setUserMetabolicPlan = (plan: any, perfil?: any) => {
     const fullPlan = plan && perfil ? { ...plan, perfil } : plan
@@ -203,19 +109,12 @@ export default function DashboardPage() {
       localStorage.setItem("userMetabolicPlan", JSON.stringify(fullPlan))
       if (plan?.diet) {
         setDailyActivity((prev: any) => {
-          const updatedActivity = {
-            ...prev,
-            generatedDiets: prev.generatedDiets.some((d: any) => d.title === plan.diet.title)
-              ? prev.generatedDiets
-              : [...prev.generatedDiets, plan.diet]
-          }
-          localStorage.setItem("dailyActivity", JSON.stringify(updatedActivity))
-          return updatedActivity
+          const updated = { ...prev, generatedDiets: prev.generatedDiets.some((d: any) => d.title === plan.diet.title) ? prev.generatedDiets : [...prev.generatedDiets, plan.diet] }
+          localStorage.setItem("dailyActivity", JSON.stringify(updated))
+          return updated
         })
       }
-    } else {
-      localStorage.removeItem("userMetabolicPlan")
-    }
+    } else localStorage.removeItem("userMetabolicPlan")
   }
 
   const getViewTitle = () => {
@@ -234,21 +133,16 @@ export default function DashboardPage() {
 
   const handleScan = async (fileOrUrl?: File | string): Promise<void> => {
     if (!checkCanScan()) {
-      setIslandState("error")
-      setTimeout(() => setIslandState("idle"), 3000)
-      alert(t("page_limit_reached") || "Limite diário de scans atingido. Atualize para um plano superior!")
+      alert(t("page_limit_reached") || "Limite diario de scans atingido.")
       return
     }
-
     setIsAnalyzing(true)
-    setIslandState("scanning")
     setCurrentView("result")
     setAnalysisResult(null)
     setScanError(null)
 
     let displayImage = "/placeholder.svg?height=80&width=80"
     let imageMimeType = "image/jpeg"
-
     const toBase64 = (file: File): Promise<string> =>
       new Promise((resolve, reject) => {
         const reader = new FileReader()
@@ -259,7 +153,6 @@ export default function DashboardPage() {
 
     try {
       let imageData: string | undefined
-
       if (fileOrUrl instanceof File) {
         displayImage = URL.createObjectURL(fileOrUrl)
         imageMimeType = fileOrUrl.type || "image/jpeg"
@@ -268,128 +161,68 @@ export default function DashboardPage() {
         displayImage = fileOrUrl
         imageData = fileOrUrl
       }
+      if (!imageData) throw new Error(t("page_error_no_image"))
 
-      if (!imageData) {
-        throw new Error(t("page_error_no_image"))
-      }
-
-      // Try to get token directly from localStorage
       let token = ''
-      
       try {
-        // Find Supabase auth token in localStorage
         for (let i = 0; i < localStorage.length; i++) {
           const key = localStorage.key(i)
           if (key && key.includes('sb-') && key.includes('-auth-token')) {
             const storedSession = localStorage.getItem(key)
             if (storedSession) {
               const parsed = JSON.parse(storedSession)
-              if (parsed?.access_token) {
-                token = parsed.access_token
-                break
-              }
+              if (parsed?.access_token) { token = parsed.access_token; break }
             }
           }
         }
-        
-        // If no token, try supabase.auth.getSession() with timeout
         if (!token) {
           const sessionPromise = supabase.auth.getSession()
-          const timeoutPromise = new Promise<never>((_, reject) => 
-            setTimeout(() => reject(new Error('Timeout')), 8000)
-          )
-          
+          const timeoutPromise = new Promise<never>((_, reject) => setTimeout(() => reject(new Error('Timeout')), 8000))
           try {
             const { data: sessionData } = await Promise.race([sessionPromise, timeoutPromise])
             token = sessionData.session?.access_token || ''
-          } catch (getSessionError) {
-            console.error('DEBUG: getSession failed:', getSessionError)
-          }
+          } catch {}
         }
-      } catch (e) {
-        console.error('Error getting token:', e)
-      }
-      
-      if (!token) {
-        throw new Error(isEnglish ? "Please sign in again before scanning." : "Entre novamente antes de escanear.")
-      }
+      } catch (e) { console.error('Error getting token:', e) }
+      if (!token) throw new Error(isEnglish ? "Please sign in again before scanning." : "Entre novamente antes de escanear.")
 
       const controller = new AbortController()
-      const timeoutId = setTimeout(() => {
-        controller.abort()
-      }, 60000)
-
+      const timeoutId = setTimeout(() => controller.abort(), 60000)
       let response
       try {
         response = await fetch('/api/analyze-product', {
           method: 'POST',
-          headers: { 
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          },
-          body: JSON.stringify({
-            imageData: imageData,
-            mimeType: imageMimeType,
-            metabolicPlan: userMetabolicPlanState,
-            locale,
-          }),
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+          body: JSON.stringify({ imageData, mimeType: imageMimeType, metabolicPlan: userMetabolicPlanState, locale }),
           signal: controller.signal,
         })
       } catch (fetchError) {
         clearTimeout(timeoutId)
         const message = fetchError instanceof Error && fetchError.name === 'AbortError'
-          ? (isEnglish ? "The scan took too long. Please try again with a clearer image." : "A analise demorou demais. Tente novamente com uma imagem mais nitida.")
-          : (isEnglish ? "Connection error. Please check your internet." : "Erro de conexao. Verifique sua internet.")
-
-        if (fetchError instanceof Error && fetchError.name === 'AbortError') {
-          toast.error(message)
-        } else {
-          toast.error(message)
-        }
-        setIslandState("error")
-        setTimeout(() => setIslandState("idle"), 3000)
+          ? (isEnglish ? "Scan took too long. Try again." : "Analise demorou. Tente novamente.")
+          : (isEnglish ? "Connection error." : "Erro de conexao.")
+        toast.error(message)
         setScanError(message)
         setCurrentView("result")
         setIsAnalyzing(false)
         return
       }
       clearTimeout(timeoutId)
-
       if (!response.ok) {
         const errorData = await response.json().catch(() => null)
         throw new Error(errorData?.error || t("page_error_ai_fail"))
       }
-
       const analysis: ProductAnalysis = await response.json()
-
       setDailyActivity((prev: any) => {
-        const updatedActivity = {
-          ...prev,
-          scannedProducts: [...prev.scannedProducts, analysis]
-        }
-        localStorage.setItem("dailyActivity", JSON.stringify(updatedActivity))
-        return updatedActivity
+        const updated = { ...prev, scannedProducts: [...prev.scannedProducts, analysis] }
+        localStorage.setItem("dailyActivity", JSON.stringify(updated))
+        return updated
       })
-
       setAnalysisResult(analysis)
-      setIslandState("success")
-      setTimeout(() => setIslandState("idle"), 2000)
-      setScanHistory(prev => [
-        {
-          id: `${prev.length + 1}`,
-          name: analysis.productName,
-          scannedAt: new Date().toISOString(),
-          score: analysis.longevityScore,
-          image: displayImage,
-        },
-        ...prev
-      ])
+      setScanHistory(prev => [{ id: `${prev.length + 1}`, name: analysis.productName, scannedAt: new Date().toISOString(), score: analysis.longevityScore, image: displayImage }, ...prev])
       incrementScans()
     } catch (error) {
-      console.error("Erro durante a análise:", error)
       const message = error instanceof Error ? error.message : t("page_error_retry")
-      setIslandState("error")
-      setTimeout(() => setIslandState("idle"), 3000)
       setScanError(message)
       toast.error(message)
       setCurrentView("result")
@@ -398,174 +231,134 @@ export default function DashboardPage() {
     }
   }
 
-  const handleNavScan = () => {
-    bottomNavInputRef.current?.click()
-  }
-
+  const handleNavScan = () => bottomNavInputRef.current?.click()
   const handleBottomNavFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
-    if (file) {
-      handleScan(file)
-    }
+    if (file) handleScan(file)
   }
-
-  const currentAnalysis = analysisResult
 
   if (authLoading && !authTimedOut) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-background via-background to-background flex items-center justify-center">
-        <Loader2 className="w-8 h-8 text-primary animate-spin" />
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Loader2 className="w-6 h-6 text-muted-foreground animate-spin" />
       </div>
     )
   }
 
-  if (!user) {
-    return null
-  }
+  if (!user) return null
+
+  const navItems: { view: View; icon: any; label: string }[] = [
+    { view: "home", icon: Home, label: t("nav_home") },
+    { view: "dashboard", icon: ScanLine, label: t("nav_bioscan") },
+    { view: "training", icon: Dumbbell, label: t("nav_workouts") },
+    { view: "planner", icon: Calculator, label: t("nav_diet") },
+    { view: "recipes", icon: ChefHat, label: t("nav_recipes") },
+    { view: "chatbot", icon: Bot, label: t("nav_aichat") },
+  ]
 
   return (
-    <div className={cn(
-      "min-h-screen bg-transparent text-white font-sans selection:bg-primary/30 flex transition-all duration-700",
-      isDocked ? "pt-2" : "pt-0"
-    )}>
+    <div className="min-h-screen bg-background text-foreground font-sans selection:bg-primary/10">
       <OnboardingFlow onComplete={() => {}} />
+      {showProfileSetup && <ProfileSetup onComplete={() => setShowProfileSetup(false)} />}
 
-      {showProfileSetup && (
-        <ProfileSetup onComplete={() => setShowProfileSetup(false)} />
-      )}
-
-      <DynamicIsland 
-        state={islandState} 
-        onNavigate={setCurrentView} 
-        isDocked={isDocked} 
-        title={getViewTitle()} 
-      />
-
-      <LiquidLaunchpad 
-        isOpen={isMenuExpanded} 
-        onClose={() => setIsMenuExpanded(false)} 
-        onNavigate={setCurrentView} 
-        currentView={currentView}
-      />
-
-      {/* Floating Sidebar (Desktop) */}
-      <aside className="hidden md:flex flex-col w-20 lg:w-24 hover:w-64 lg:hover:w-72 fixed top-1/2 -translate-y-1/2 left-4 lg:left-6 glass-strong border-white/10 z-50 rounded-[2rem] lg:rounded-[2.5rem] transition-all duration-700 ease-in-out group overflow-hidden shadow-[0_24px_80px_rgba(0,0,0,0.45)]">
-        <div className="p-4 lg:p-6 flex items-center justify-start gap-3 font-black text-xl tracking-tighter text-foreground mb-6 lg:mb-8 overflow-hidden">
-          <div className="w-6 h-6 flex items-center justify-center shrink-0">
-            <ScanLine className="text-primary size-5 lg:size-6" />
+      {/* Desktop sidebar */}
+      <aside className="hidden md:flex flex-col w-[72px] hover:w-60 fixed top-0 left-0 h-full glass-strong z-50 transition-all duration-300 ease-out overflow-hidden group">
+        <div className="p-4 flex items-center gap-3 mb-6 overflow-hidden">
+          <div className="w-8 h-8 rounded-xl bg-primary flex items-center justify-center shrink-0">
+            <ScanLine className="w-4 h-4 text-primary-foreground" />
           </div>
-            <span className="sidebar-brand-label text-sm lg:text-base">{t("home_brand")}</span>
+          <span className="text-sm font-bold tracking-tight opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">FitVerse</span>
         </div>
 
-        <nav className="flex-1 px-1 lg:px-2 space-y-1 lg:space-y-2 flex flex-col">
-          <NavButton icon={Home} label={t("nav_home")} active={currentView === "home"} onClick={() => setCurrentView("home")} />
-          <NavButton icon={ScanLine} label={t("nav_bioscan")} active={currentView === "dashboard"} onClick={() => setCurrentView("dashboard")} />
-          <NavButton icon={Dumbbell} label={t("nav_workouts")} active={currentView === "training"} onClick={() => setCurrentView("training")} />
-          <NavButton icon={Calculator} label={t("nav_diet")} active={currentView === "planner"} onClick={() => setCurrentView("planner")} />
-          <NavButton icon={ChefHat} label={t("nav_recipes")} active={currentView === "recipes"} onClick={() => setCurrentView("recipes")} />
-          <NavButton icon={ShoppingBag} label={t("nav_store")} active={currentView === "store"} onClick={() => setCurrentView("store")} />
-          <NavButton icon={Bot} label={t("nav_aichat")} active={currentView === "chatbot"} onClick={() => setCurrentView("chatbot")} />
-          <NavButton icon={Users} label={t("nav_clans")} active={currentView === "clans"} onClick={() => setCurrentView("clans")} />
+        <nav className="flex-1 px-2 space-y-1">
+          {navItems.map((item) => (
+            <button
+              key={item.view}
+              onClick={() => setCurrentView(item.view)}
+              className={cn(
+                "flex items-center gap-3 w-full h-10 px-2 rounded-xl transition-all duration-200 haptic-press",
+                currentView === item.view ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+              )}
+            >
+              <item.icon className="w-5 h-5 shrink-0" />
+              <span className="text-xs font-semibold opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">{item.label}</span>
+            </button>
+          ))}
         </nav>
 
-        <div className="p-2 lg:p-3 mb-3 lg:mb-4 space-y-2 border-t border-white/10 pt-4 flex flex-col items-center">
-          <NavButton icon={User} label={t("nav_profile")} active={currentView === "profile"} onClick={() => setCurrentView("profile")} />
-          <NavButton icon={Settings} label={t("nav_settings")} active={currentView === "settings"} onClick={() => setCurrentView("settings")} />
+        <div className="px-2 py-3 space-y-1 border-t border-border pt-3">
+          <button
+            onClick={() => setCurrentView("profile")}
+            className={cn("flex items-center gap-3 w-full h-10 px-2 rounded-xl transition-all duration-200 haptic-press", currentView === "profile" ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted/50")}
+          >
+            <User className="w-5 h-5 shrink-0" />
+            <span className="text-xs font-semibold opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">{t("nav_profile")}</span>
+          </button>
+          <button
+            onClick={() => setCurrentView("settings")}
+            className={cn("flex items-center gap-3 w-full h-10 px-2 rounded-xl transition-all duration-200 haptic-press", currentView === "settings" ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted/50")}
+          >
+            <Settings className="w-5 h-5 shrink-0" />
+            <span className="text-xs font-semibold opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">{t("nav_settings")}</span>
+          </button>
         </div>
       </aside>
 
-      {/* Main Content */}
-      <div className="flex-1 md:pl-24 lg:pl-32 xl:pl-36 flex flex-col min-h-screen relative transition-all duration-500 max-w-[1600px] xl:max-w-[1800px] mx-auto w-full">
-        {/* Header - Visible on all screens */}
-        <header className="sticky top-0 z-40 flex h-16 items-center justify-between border-b border-white/10 bg-black/60 px-3 backdrop-blur-2xl md:h-16 md:border-none md:bg-transparent md:px-6 lg:h-14">
-          <div className="md:hidden flex min-w-0 items-center gap-2 text-foreground">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl border border-white/10 bg-white/5 shadow-[0_12px_28px_rgba(0,0,0,0.2)]">
-              <ScanLine className="size-5 text-primary" />
+      {/* Main */}
+      <div className="flex-1 md:ml-[72px] lg:ml-[72px] flex flex-col min-h-screen transition-all duration-300 max-w-[1400px] mx-auto w-full">
+        {/* Header */}
+        <header className="sticky top-0 z-40 flex h-14 items-center justify-between px-4 bg-background/80 backdrop-blur-xl border-b border-border md:border-none md:bg-transparent md:backdrop-blur-none">
+          <div className="md:hidden flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
+              <ScanLine className="w-4 h-4 text-primary-foreground" />
             </div>
-            <div className="min-w-0">
-              <span className="block truncate text-lg font-black tracking-tight">{t("home_brand")}</span>
-              <span className="block text-[9px] font-black uppercase tracking-[0.22em] text-foreground/50">{getViewTitle()}</span>
+            <div>
+              <span className="block text-sm font-bold tracking-tight">{t("home_brand")}</span>
+              <span className="block text-[10px] font-medium text-muted-foreground">{getViewTitle()}</span>
             </div>
           </div>
-          <div className="hidden md:block">
-             {/* Large title or scroll transition space */}
-          </div>
-            <div className="flex items-center gap-2 md:gap-6">
-              {(isAdmin || user?.user_metadata?.is_admin) && (
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  onClick={() => router.push("/admin-dashboard")} 
-                  className="w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl border border-white/10 bg-white/5 hover:bg-white/12 active:scale-90 haptic-press transition-all font-sans text-foreground/50 hover:text-foreground"
-                  aria-label={t("home_access_admin")}
-                >
-                  <Shield className="w-5 h-5 md:w-6 md:h-6" />
-                </Button>
-              )}
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              onClick={() => setCurrentView("profile")}
-              className="w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl border border-white/10 bg-white/5 hover:bg-white/12 active:scale-90 haptic-press transition-all font-sans text-foreground/50 hover:text-foreground"
-              aria-label={t("home_view_profile")}
-            >
-              <User className="w-5 h-5 md:w-6 md:h-6" />
-            </Button>
+          <div className="hidden md:block" />
+          <div className="flex items-center gap-1.5">
+            {(isAdmin || user?.user_metadata?.is_admin) && (
+              <button onClick={() => router.push("/admin-dashboard")} className="w-9 h-9 rounded-xl flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-all haptic-press">
+                <Shield className="w-[18px] h-[18px]" />
+              </button>
+            )}
+            <button onClick={() => setCurrentView("profile")} className="w-9 h-9 rounded-xl flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-all haptic-press">
+              <User className="w-[18px] h-[18px]" />
+            </button>
           </div>
         </header>
 
-        <main className="flex-1 overflow-y-auto px-3 pb-safe-nav pt-3 md:p-6 md:pb-8 lg:p-8 xl:p-12">
+        {/* Content */}
+        <main className="flex-1 overflow-y-auto px-4 pb-safe-nav pt-4 md:p-6 md:pb-8 lg:p-8">
           {currentView === "home" && <HomeDashboard userMetabolicPlan={userMetabolicPlanState} dailyActivity={dailyActivity} onNavigate={setCurrentView} />}
           {currentView === "dashboard" && <ScanDashboard onScan={handleScan} isScanning={isAnalyzing} />}
           {currentView === "result" && (
             scanError ? (
-              <div className="min-h-[60vh] flex items-center justify-center">
-                <div className="w-full max-w-md glass-strong border border-red-500/20 rounded-[2rem] p-6 text-center space-y-5">
-                  <div className="w-14 h-14 mx-auto rounded-2xl bg-red-500/10 flex items-center justify-center">
-                    <ScanLine className="w-7 h-7 text-red-400" />
+              <div className="min-h-[50vh] flex items-center justify-center">
+                <div className="w-full max-w-sm rounded-2xl border border-border bg-card p-6 text-center space-y-4">
+                  <div className="w-12 h-12 mx-auto rounded-xl bg-destructive/10 flex items-center justify-center">
+                    <ScanLine className="w-6 h-6 text-destructive" />
                   </div>
                   <div>
-                    <h2 className="text-2xl font-black text-foreground tracking-tight">
-                      {isEnglish ? "Scan failed" : "Nao foi possivel analisar"}
-                    </h2>
-                    <p className="mt-2 text-sm font-bold text-muted-foreground">
-                      {scanError}
-                    </p>
+                    <h2 className="text-lg font-bold text-foreground">{isEnglish ? "Scan failed" : "Nao foi possivel analisar"}</h2>
+                    <p className="mt-1.5 text-sm text-muted-foreground">{scanError}</p>
                   </div>
-                  <Button
-                    onClick={() => {
-                      setScanError(null)
-                      setCurrentView("dashboard")
-                    }}
-                    className="w-full h-12 rounded-2xl font-black"
-                  >
-                    {isEnglish ? "Try another image" : "Tentar outra imagem"}
+                  <Button onClick={() => { setScanError(null); setCurrentView("dashboard") }} className="w-full h-11 rounded-xl">
+                    {isEnglish ? "Try again" : "Tentar novamente"}
                   </Button>
                 </div>
               </div>
-            ) : (
-              isAnalyzing || !currentAnalysis
-                ? <ProductSkeleton />
-                : <ProductResult result={currentAnalysis} onBack={() => setCurrentView("dashboard")} />
-            )
+            ) : isAnalyzing || !analysisResult ? <ProductSkeleton /> : <ProductResult result={analysisResult} onBack={() => setCurrentView("dashboard")} />
           )}
           {currentView === "recipes" && <RecipesTab />}
           {currentView === "training" && <TrainingTab />}
           {currentView === "planner" && (
-            userMetabolicPlanState && userMetabolicPlanState.macros && localStorage.getItem("userMetabolicPlan") !== null
+            userMetabolicPlanState?.macros && localStorage.getItem("userMetabolicPlan") !== null
               ? <div className="space-y-4">
-                  <MetabolicDashboard 
-                    plan={userMetabolicPlanState} 
-                    perfil={userMetabolicPlanState.perfil} 
-                    onBack={() => setCurrentView("home")} 
-                  />
-                  <Button 
-                    onClick={() => {
-                      setUserMetabolicPlanState(null);
-                      localStorage.removeItem("userMetabolicPlan");
-                    }}
-                    className="w-full h-12 glass-strong border border-white/10 text-foreground/50 font-black text-xs uppercase tracking-widest rounded-2xl hover:bg-white/10"
-                  >
+                  <MetabolicDashboard plan={userMetabolicPlanState} perfil={userMetabolicPlanState.perfil} onBack={() => setCurrentView("home")} />
+                  <Button onClick={() => { setUserMetabolicPlanState(null); localStorage.removeItem("userMetabolicPlan") }} variant="ghost" className="w-full h-11 rounded-xl text-muted-foreground text-xs font-semibold">
                     {t("home_new_plan")}
                   </Button>
                 </div>
@@ -575,94 +368,46 @@ export default function DashboardPage() {
           {currentView === "settings" && <SettingsPage onBack={() => setCurrentView("profile")} />}
           {currentView === "chatbot" && <ChatbotTab />}
           {currentView === "clans" && <ClansTab />}
-          {currentView === "profile" && (<div className="pt-4 md:pt-8 lg:pt-12"><HealthProfile scanHistory={scanHistory} onNavigateToSettings={() => setCurrentView("settings")} onNavigateToSubscription={() => router.push('/subscription')} /></div>)}
+          {currentView === "profile" && <div className="pt-4 md:pt-8"><HealthProfile scanHistory={scanHistory} onNavigateToSettings={() => setCurrentView("settings")} onNavigateToSubscription={() => router.push('/subscription')} /></div>}
         </main>
       </div>
 
-      <input
-        type="file"
-        ref={bottomNavInputRef}
-        className="hidden"
-        accept="image/*"
-        capture="environment"
-        onChange={handleBottomNavFileChange}
-      />
+      <input type="file" ref={bottomNavInputRef} className="hidden" accept="image/*" capture="environment" onChange={handleBottomNavFileChange} />
 
-      {/* Floating Action Button */}
-      <Button 
-        onClick={handleNavScan} 
-        className="mobile-fab-safe fixed right-5 z-50 h-14 w-14 rounded-full border border-white/10 bg-foreground text-background shadow-[0_18px_44px_rgba(0,0,0,0.3)] transition-all duration-500 hover:scale-105 hover:bg-white/80 active:scale-90 md:bottom-10 md:right-10 md:h-16 md:w-16 xl:bottom-12 xl:right-12"
-          aria-label={t("home_scan_product")}
+      {/* FAB - Scan */}
+      <button
+        onClick={handleNavScan}
+        className="mobile-fab-safe fixed right-4 z-50 w-14 h-14 rounded-2xl bg-primary text-primary-foreground shadow-lg flex items-center justify-center transition-all duration-200 hover:scale-105 active:scale-95 md:bottom-8 md:right-8"
+        aria-label={t("home_scan_product")}
       >
-        <ScanLine className="h-7 w-7 text-background md:h-9 md:w-9" />
-      </Button>
+        <ScanLine className="w-6 h-6" />
+      </button>
 
-      {/* Mobile Bottom Nav - Opens menu on swipe up */}
-      <motion.nav
-        id="mobile-bottom-nav"
-        drag="y"
-        dragConstraints={{ top: 0, bottom: 0 }}
-        dragElastic={0.2}
-        onDragEnd={(_, info) => {
-          if (info.offset.y < -30) setIsMenuExpanded(true)
-        }}
-        className="mobile-bottom-safe md:hidden fixed left-3 right-3 z-40 mx-auto flex h-16 max-w-md items-center justify-around rounded-[1.65rem] border border-white/10 bg-black/60 px-2 shadow-[0_20px_56px_rgba(0,0,0,0.55)] backdrop-blur-2xl active:cursor-grab"
-      >
-        <button onClick={() => setCurrentView("home")} className="relative flex h-12 w-12 flex-col items-center justify-center rounded-2xl p-2" aria-label={t("nav_home")}>
-          <Home className={cn("w-5 h-5", currentView === "home" ? "text-primary" : "text-foreground/50")} />
-          {currentView === "home" && <span className="absolute bottom-1 h-1 w-1 rounded-full bg-primary" />}
-        </button>
-        <button onClick={() => setCurrentView("training")} className="relative flex h-12 w-12 flex-col items-center justify-center rounded-2xl p-2" aria-label={t("nav_workouts")}>
-          <Dumbbell className={cn("w-5 h-5", currentView === "training" ? "text-primary" : "text-foreground/50")} />
-          {currentView === "training" && <span className="absolute bottom-1 h-1 w-1 rounded-full bg-primary" />}
-        </button>
-        <button onClick={() => setIsMenuExpanded(true)} className="-mt-2 flex h-12 w-12 flex-col items-center justify-center rounded-2xl p-1" aria-label="Abrir menu">
-          <div className="flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-white/10 shadow-[0_10px_28px_rgba(0,0,0,0.2)]">
-            <ChevronUp className="w-5 h-5 text-primary" />
+      {/* Mobile bottom nav */}
+      <nav className="mobile-bottom-safe md:hidden fixed left-3 right-3 z-40 mx-auto flex h-16 max-w-md items-center justify-around rounded-2xl border border-border bg-card/90 backdrop-blur-xl px-2 shadow-lg">
+        {[
+          { view: "home" as View, icon: Home, label: t("nav_home") },
+          { view: "training" as View, icon: Dumbbell, label: t("nav_workouts") },
+          { view: "recipes" as View, icon: ChefHat, label: t("nav_recipes") },
+          { view: "clans" as View, icon: Users, label: t("nav_clans") },
+        ].map((item) => (
+          <button
+            key={item.view}
+            onClick={() => setCurrentView(item.view)}
+            className="relative flex h-12 w-12 flex-col items-center justify-center rounded-xl p-2 transition-colors"
+            aria-label={item.label}
+          >
+            <item.icon className={cn("w-5 h-5 transition-colors", currentView === item.view ? "text-primary" : "text-muted-foreground")} />
+            {currentView === item.view && <span className="absolute bottom-1 h-1 w-1 rounded-full bg-primary" />}
+          </button>
+        ))}
+        <button onClick={() => setCurrentView("chatbot")} className="relative flex h-12 w-12 flex-col items-center justify-center rounded-xl p-2" aria-label="Menu">
+          <div className={cn("w-5 h-5 transition-colors", currentView === "chatbot" ? "text-primary" : "text-muted-foreground")}>
+            <Bot className="w-5 h-5" />
           </div>
+          {currentView === "chatbot" && <span className="absolute bottom-1 h-1 w-1 rounded-full bg-primary" />}
         </button>
-        <button onClick={() => setCurrentView("recipes")} className="relative flex h-12 w-12 flex-col items-center justify-center rounded-2xl p-2" aria-label={t("nav_recipes")}>
-          <ChefHat className={cn("w-5 h-5", currentView === "recipes" ? "text-primary" : "text-foreground/50")} />
-          {currentView === "recipes" && <span className="absolute bottom-1 h-1 w-1 rounded-full bg-primary" />}
-        </button>
-        <button onClick={() => setCurrentView("clans")} className="relative flex h-12 w-12 flex-col items-center justify-center rounded-2xl p-2" aria-label={t("nav_clans")}>
-          <Users className={cn("w-5 h-5", currentView === "clans" ? "text-primary" : "text-foreground/50")} />
-          {currentView === "clans" && <span className="absolute bottom-1 h-1 w-1 rounded-full bg-primary" />}
-        </button>
-      </motion.nav>
+      </nav>
     </div>
-  )
-}
-
-function NavButton({ icon: Icon, label, active, onClick }: { icon: any, label: string, active: boolean, onClick: () => void }) {
-  return (
-    <button 
-      onClick={onClick}
-      className={cn(
-        "flex items-center justify-center lg:justify-start w-full h-10 lg:h-12 px-2 lg:px-3 rounded-xl lg:rounded-[1.25rem] transition-all duration-500 relative haptic-press",
-        active ? "text-primary bg-white/8" : "text-foreground/50 hover:text-foreground hover:bg-white/8"
-      )}
-    >
-      {active && <div className="absolute left-0 w-1 h-4 lg:h-6 bg-primary rounded-full" />}
-      <Icon className={cn("w-5 h-5 lg:w-6 lg:h-6 shrink-0", active && "drop-shadow-[0_0_6px_rgba(255,255,255,0.15)]")} />
-      <span className="sidebar-nav-label font-black text-[10px] uppercase tracking-[0.15em] whitespace-nowrap text-xs">
-        {label}
-      </span>
-    </button>
-  )
-}
-
-function TabButton({ icon: Icon, active, onClick }: { icon: any, active: boolean, onClick: () => void }) {
-  return (
-    <button 
-      onClick={onClick}
-      className={cn(
-        "flex flex-col items-center justify-center size-14 rounded-full transition-all duration-500 relative",
-        active ? "text-primary" : "text-muted-foreground"
-      )}
-    >
-      {active && <div className="absolute top-0 w-1 h-1 bg-primary rounded-full animate-pulse" />}
-      <Icon className={cn("size-7 transition-all duration-500", active ? "scale-125 drop-shadow-[0_0_8px_rgba(255,255,255,0.15)]" : "opacity-60")} />
-    </button>
   )
 }

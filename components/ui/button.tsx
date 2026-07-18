@@ -1,32 +1,27 @@
 import * as React from "react"
 import { Slot } from "@radix-ui/react-slot"
 import { cva, type VariantProps } from "class-variance-authority"
-
 import { cn } from "@/lib/utils"
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-3 whitespace-nowrap rounded-full text-xs font-black uppercase tracking-[0.2em] transition-all duration-300 ease-out disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-5 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-primary/50 aria-invalid:ring-destructive/20 shadow-xl border border-white/14 hover:scale-[1.05] active:scale-90 select-none",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-xl text-sm font-semibold transition-all duration-200 ease-out disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-5 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-primary/30 select-none haptic-press",
   {
     variants: {
       variant: {
-        default: "bg-foreground text-background shadow-black/20 hover:bg-neutral-200 hover:shadow-black/30",
-        destructive:
-          "bg-red-500 text-white hover:bg-red-600 shadow-lg shadow-red-500/20",
-        outline:
-          "glass border-white/18 hover:bg-neutral-500/10 text-foreground",
-        secondary:
-          "bg-neutral-500/10 dark:bg-black/40 text-foreground hover:bg-neutral-500/16 backdrop-blur-3xl",
-        ghost:
-          "border-transparent bg-transparent hover:bg-neutral-500/10 text-foreground shadow-none backdrop-blur-none",
-        link: "text-foreground underline-offset-4 hover:underline border-transparent shadow-none backdrop-blur-none hover:scale-100 active:scale-100",
+        default: "bg-primary text-primary-foreground shadow-sm hover:opacity-90",
+        destructive: "bg-destructive text-destructive-foreground shadow-sm hover:opacity-90",
+        outline: "border border-border bg-transparent hover:bg-muted text-foreground",
+        secondary: "bg-muted text-foreground hover:bg-muted/80",
+        ghost: "hover:bg-muted text-foreground",
+        link: "text-foreground underline-offset-4 hover:underline",
       },
       size: {
-        default: "h-14 px-10",
-        sm: "h-11 px-6",
-        lg: "h-16 px-12 text-sm",
-        icon: "size-12",
-        "icon-sm": "size-10",
-        "icon-lg": "size-14",
+        default: "h-12 px-6",
+        sm: "h-10 px-4 text-xs",
+        lg: "h-14 px-8",
+        icon: "h-10 w-10",
+        "icon-sm": "h-9 w-9",
+        "icon-lg": "h-12 w-12",
       },
     },
     defaultVariants: {
@@ -47,7 +42,6 @@ function Button({
     asChild?: boolean
   }) {
   const Comp = asChild ? Slot : "button"
-
   return (
     <Comp
       data-slot="button"
