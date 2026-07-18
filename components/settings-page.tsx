@@ -1,9 +1,7 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, Suspense } from "react"
 import { useRouter } from "next/navigation"
-import { useTheme } from "next-themes"
-import { motion } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
@@ -27,14 +25,20 @@ import {
   Trash2,
   User,
   Zap,
+  Palette,
+  Watch,
+  Check,
+  Monitor,
+  RefreshCw,
+  Loader2,
+  Heart,
+  Activity,
+  Footprints,
 } from "lucide-react"
 import { toast } from "sonner"
 import { cn } from "@/lib/utils"
 import { useTranslation } from "@/lib/i18n"
 import { useAuth } from "@/hooks/useAuth"
-import { usePlanLimits } from "@/hooks/usePlanLimits"
-import { ThemeCustomizer } from "@/components/theme-customizer"
-import { WearableIntegrations } from "@/components/wearable-integrations"
 
 type SettingRowProps = {
   icon: React.ElementType
@@ -64,12 +68,190 @@ const SettingRow = ({ icon: Icon, title, description, children, isLast }: Settin
   </div>
 )
 
+function SettingsGroup({
+  icon: Icon,
+  title,
+  children,
+}: {
+  icon: React.ElementType
+  title: string
+  children: React.ReactNode
+}) {
+  return (
+    <section>
+      <div className="mb-3 flex items-center gap-3 px-2 md:px-4">
+        <Icon className="h-4 w-4 text-muted-foreground" />
+        <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{title}</h3>
+      </div>
+      <div className="relative overflow-hidden rounded-2xl border border-border bg-card">
+        {children}
+      </div>
+    </section>
+  )
+}
+
+function ThemeSection() {
+  const { locale } = useTranslation()
+  const isEnglish = locale === "en-US"
+  const [theme, setThemeState] = useState<string>("dark")
+  const [accent, setAccent] = useState("orange")
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem("fitverse-accent")
+      if (saved) setAccent(saved)
+      const html = document.documentElement
+      if (html.classList.contains("dark")) setThemeState("dark")
+      else if (html.classList.contains("light")) setThemeState("light")
+      else setThemeState("system")
+    } catch {}
+  }, [])
+
+  const toggleTheme = () => {
+    const next = theme === "dark" ? "light" : "dark"
+    setThemeState(next)
+    document.documentElement.classList.toggle("dark", next === "dark")
+    document.documentElement.classList.toggle("light", next === "light")
+  }
+
+  const ACCENT_COLORS = [
+    { id: "orange", color: "#FF9500" },
+    { id: "blue", color: "#0A84FF" },
+    { id: "green", color: "#30D158" },
+    { id: "purple", color: "#BF5AF2" },
+    { id: "pink", color: "#FF375F" },
+    { id: "red", color: "#FF453A" },
+  ]
+
+  return (
+    <div className="rounded-2xl border border-border bg-card p-5">
+      <div className="flex items-center gap-2 mb-5">
+        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-muted">
+          <Palette className="h-4 w-4 text-muted-foreground" />
+        </div>
+        <div>
+          <h3 className="text-sm font-semibold text-foreground">
+            {isEnglish ? "Appearance" : "Aparencia"}
+          </h3>
+          <p className="text-xs text-muted-foreground">
+            {isEnglish ? "Customize your look" : "Personalize sua aparencia"}
+          </p>
+        </div>
+      </div>
+
+      <div className="mb-5">
+        <p className="text-xs text-muted-foreground mb-3">{isEnglish ? "Theme" : "Tema"}</p>
+        <div className="grid grid-cols-3 gap-2">
+          {[
+            { id: "dark", icon: Moon, label: isEnglish ? "Dark" : "Escuro" },
+            { id: "light", icon: Sun, label: isEnglish ? "Light" : "Claro" },
+          ].map(({ id, icon: Icon, label }) => (
+            <button
+              key={id}
+              onClick={id === "dark" ? toggleTheme : toggleTheme}
+              className={cn(
+                "flex flex-col items-center gap-2 rounded-xl p-3 transition-all border",
+                theme === id ? "border-primary bg-primary/10 text-primary" : "border-border text-muted-foreground hover:bg-accent"
+              )}
+            >
+              <Icon className="h-5 w-5" />
+              <span className="text-xs font-medium">{label}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div>
+        <p className="text-xs text-muted-foreground mb-3">{isEnglish ? "Accent Color" : "Cor de Destaque"}</p>
+        <div className="flex gap-2">
+          {ACCENT_COLORS.map((color) => (
+            <button
+              key={color.id}
+              onClick={() => { setAccent(color.id); localStorage.setItem("fitverse-accent", color.id) }}
+              className={cn(
+                "relative h-10 w-10 rounded-xl transition-all border-2",
+                accent === color.id ? "border-foreground scale-110" : "border-transparent hover:scale-105"
+              )}
+              style={{ backgroundColor: color.color }}
+            >
+              {accent === color.id && <Check className="h-4 w-4 text-white absolute inset-0 m-auto" />}
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function WearableSection() {
+  const { locale } = useTranslation()
+  const isEnglish = locale === "en-US"
+  const [connected, setConnected] = useState<Record<string, boolean>>({})
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem("wearableIntegrations")
+      if (saved) setConnected(JSON.parse(saved))
+    } catch {}
+  }, [])
+
+  const toggle = (id: string) => {
+    const next = { ...connected, [id]: !connected[id] }
+    setConnected(next)
+    localStorage.setItem("wearableIntegrations", JSON.stringify(next))
+  }
+
+  const items = [
+    { id: "google_fit", name: "Google Fit", icon: Activity },
+    { id: "apple_health", name: "Apple Health", icon: Heart },
+    { id: "fitbit", name: "Fitbit", icon: Watch },
+  ]
+
+  return (
+    <div className="rounded-2xl border border-border bg-card p-5">
+      <div className="flex items-center gap-2 mb-4">
+        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-muted">
+          <Watch className="h-4 w-4 text-muted-foreground" />
+        </div>
+        <div>
+          <h3 className="text-sm font-semibold text-foreground">Wearables</h3>
+          <p className="text-xs text-muted-foreground">
+            {Object.values(connected).some(Boolean) ? (isEnglish ? "Connected" : "Conectado") : (isEnglish ? "Not connected" : "Nao conectado")}
+          </p>
+        </div>
+      </div>
+      <div className="space-y-2">
+        {items.map((item) => (
+          <button
+            key={item.id}
+            onClick={() => toggle(item.id)}
+            className="w-full flex items-center gap-3 rounded-xl border border-border bg-muted/50 p-3 hover:bg-accent transition-all"
+          >
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-muted">
+              <item.icon className="h-4 w-4 text-muted-foreground" />
+            </div>
+            <div className="flex-1 text-left">
+              <p className="text-sm font-medium text-foreground">{item.name}</p>
+            </div>
+            {connected[item.id] ? (
+              <div className="flex items-center gap-1.5">
+                <Check className="h-3.5 w-3.5 text-green-500" />
+                <span className="text-xs text-green-500">{isEnglish ? "On" : "Ligado"}</span>
+              </div>
+            ) : (
+              <span className="text-xs text-muted-foreground">{isEnglish ? "Connect" : "Conectar"}</span>
+            )}
+          </button>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 export function SettingsPage({ onBack }: { onBack?: () => void }) {
   const { t, locale, setLocale } = useTranslation()
-  const { signOut, user, profile: authProfile } = useAuth()
-  const { plan: planFromHook } = usePlanLimits()
+  const { signOut, user } = useAuth()
   const router = useRouter()
-  const { theme, setTheme } = useTheme()
   const [userSubscription, setUserSubscription] = useState<string>("free")
   const [notificationsEnabled, setNotificationsEnabled] = useState(true)
   const [adsEnabled, setAdsEnabled] = useState(true)
@@ -85,65 +267,55 @@ export function SettingsPage({ onBack }: { onBack?: () => void }) {
   })
   const [isEditingProfile, setIsEditingProfile] = useState(false)
   const [editProfileData, setEditProfileData] = useState({
-    age: "",
-    weight: "",
-    height: "",
-    gender: "",
-    fitness_goal: "",
+    age: "", weight: "", height: "", gender: "", fitness_goal: "",
   })
   const [isSavingProfile, setIsSavingProfile] = useState(false)
 
   useEffect(() => {
-    if (planFromHook) setUserSubscription(planFromHook)
-  }, [planFromHook])
-
-  useEffect(() => {
-    const storedNotifications = localStorage.getItem("notificationsEnabled")
-    if (storedNotifications) setNotificationsEnabled(JSON.parse(storedNotifications))
+    try {
+      const storedNotifications = localStorage.getItem("notificationsEnabled")
+      if (storedNotifications) setNotificationsEnabled(JSON.parse(storedNotifications))
+    } catch {}
   }, [])
 
   useEffect(() => {
     if (!user?.id) return
-
-    supabase
-      .from("profiles")
-      .select("ads_enabled, plan, is_admin")
-      .eq("id", user.id)
-      .single()
-      .then(({ data }) => {
-        if (!data) return
-        setUserSubscription(data.plan || "free")
-        setAdsEnabled(data.ads_enabled !== false)
-        setIsAdmin(data.is_admin === true)
-        localStorage.setItem("adsEnabled", JSON.stringify(data.ads_enabled !== false))
-      })
-  }, [user, planFromHook])
+    const fetchProfile = async () => {
+      try {
+        const { data } = await supabase
+          .from("profiles")
+          .select("ads_enabled, plan, is_admin")
+          .eq("id", user.id)
+          .single()
+        if (data) {
+          setUserSubscription(data.plan || "free")
+          setAdsEnabled(data.ads_enabled !== false)
+          setIsAdmin(data.is_admin === true)
+        }
+      } catch {}
+    }
+    fetchProfile()
+  }, [user])
 
   useEffect(() => {
-    if (user?.user_metadata?.is_admin === true || authProfile?.is_admin) {
-      setIsAdmin(true)
-    }
-  }, [user, authProfile])
+    if (user?.user_metadata?.is_admin === true) setIsAdmin(true)
+  }, [user])
 
   useEffect(() => {
     if (!user?.id) return
-    const loadProfileData = async () => {
-      const { data } = await supabase
-        .from("profiles")
-        .select("age, weight, height, gender, fitness_goal")
-        .eq("id", user.id)
-        .single()
-      if (data) {
-        setProfileData({
-          age: data.age,
-          weight: data.weight,
-          height: data.height,
-          gender: data.gender,
-          fitness_goal: data.fitness_goal,
-        })
-      }
+    const loadProfile = async () => {
+      try {
+        const { data } = await supabase
+          .from("profiles")
+          .select("age, weight, height, gender, fitness_goal")
+          .eq("id", user.id)
+          .single()
+        if (data) {
+          setProfileData({ age: data.age, weight: data.weight, height: data.height, gender: data.gender, fitness_goal: data.fitness_goal })
+        }
+      } catch {}
     }
-    loadProfileData()
+    loadProfile()
   }, [user])
 
   const handleSaveProfile = async () => {
@@ -160,7 +332,6 @@ export function SettingsPage({ onBack }: { onBack?: () => void }) {
           fitness_goal: editProfileData.fitness_goal || null,
         })
         .eq("id", user.id)
-
       if (!error) {
         setProfileData({
           age: parseInt(editProfileData.age) || null,
@@ -173,7 +344,6 @@ export function SettingsPage({ onBack }: { onBack?: () => void }) {
         toast.success(t("settings_profile_saved") || "Perfil atualizado!")
       }
     } catch (error) {
-      console.error("Error updating profile:", error)
       toast.error("Erro ao salvar")
     } finally {
       setIsSavingProfile(false)
@@ -222,15 +392,10 @@ export function SettingsPage({ onBack }: { onBack?: () => void }) {
       })
       return
     }
-
     setAdsLoading(true)
     try {
       const nextAdsEnabled = !checked
-      await supabase
-        .from("profiles")
-        .update({ ads_enabled: nextAdsEnabled })
-        .eq("id", user?.id)
-
+      await supabase.from("profiles").update({ ads_enabled: nextAdsEnabled }).eq("id", user?.id)
       setAdsEnabled(nextAdsEnabled)
       localStorage.setItem("adsEnabled", JSON.stringify(nextAdsEnabled))
       toast.success(nextAdsEnabled ? t("settings_protocol_on") : t("settings_protocol_off"))
@@ -262,24 +427,16 @@ export function SettingsPage({ onBack }: { onBack?: () => void }) {
     setLocale(locale === "pt-BR" ? "en-US" : "pt-BR")
   }
 
-  const isDark = theme === "dark"
+  const isEnglish = locale === "en-US"
 
   return (
-    <div className="relative mx-auto w-full max-w-5xl space-y-5 pb-safe-nav animate-in fade-in duration-700 md:space-y-7">
-      <motion.section
-        initial={{ opacity: 0, y: 18 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="relative overflow-hidden rounded-3xl bg-card border border-border p-5 text-center md:rounded-[2.5rem] md:p-7"
-      >
+    <div className="relative mx-auto w-full max-w-5xl space-y-5 pb-safe-nav animate-in fade-in duration-500 md:space-y-7">
+      {/* Header */}
+      <div className="rounded-3xl bg-card border border-border p-5 text-center md:rounded-[2.5rem] md:p-7">
         <div className="mb-4 flex items-center justify-between gap-3">
           <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => onBack?.()}
-            className={cn(
-              "h-11 w-11 rounded-2xl border border-border text-muted-foreground hover:bg-accent",
-              !onBack && "invisible"
-            )}
+            variant="ghost" size="icon" onClick={() => onBack?.()}
+            className={cn("h-11 w-11 rounded-2xl border border-border text-muted-foreground hover:bg-accent", !onBack && "invisible")}
           >
             <ArrowLeft className="h-5 w-5" />
           </Button>
@@ -288,7 +445,6 @@ export function SettingsPage({ onBack }: { onBack?: () => void }) {
           </Badge>
           <div className="h-11 w-11" />
         </div>
-
         <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-muted text-muted-foreground md:h-20 md:w-20">
           <Smartphone className="h-7 w-7 md:h-9 md:w-9" />
         </div>
@@ -298,8 +454,9 @@ export function SettingsPage({ onBack }: { onBack?: () => void }) {
         <p className="mx-auto mt-3 max-w-2xl text-xs text-muted-foreground md:text-sm">
           {t("settings_subtitle")}
         </p>
-      </motion.section>
+      </div>
 
+      {/* Status Cards */}
       <section className="grid gap-4 md:grid-cols-3">
         {[
           { label: "Plan", value: userSubscription.toUpperCase(), icon: ShieldCheck },
@@ -314,6 +471,7 @@ export function SettingsPage({ onBack }: { onBack?: () => void }) {
         ))}
       </section>
 
+      {/* Account */}
       <SettingsGroup icon={User} title={t("settings_account")}>
         <SettingRow icon={ShieldCheck} title={t("settings_premium")} description={t("settings_premium_desc")}>
           <div className="flex items-center gap-3">
@@ -332,137 +490,71 @@ export function SettingsPage({ onBack }: { onBack?: () => void }) {
         </SettingRow>
       </SettingsGroup>
 
-      <SettingsGroup icon={User} title={locale === "en-US" ? "My Data" : "Meus Dados"}>
+      {/* My Data */}
+      <SettingsGroup icon={User} title={isEnglish ? "My Data" : "Meus Dados"}>
         {isEditingProfile ? (
           <div className="p-4 md:p-6 space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <label className="text-xs text-muted-foreground">
-                  {locale === "en-US" ? "Age" : "Idade"}
-                </label>
-                <Input
-                  type="number"
-                  value={editProfileData.age}
-                  onChange={(e) => setEditProfileData({ ...editProfileData, age: e.target.value })}
-                  className="h-12 rounded-xl border-border bg-background text-foreground"
-                  min={10}
-                  max={120}
-                />
+                <label className="text-xs text-muted-foreground">{isEnglish ? "Age" : "Idade"}</label>
+                <Input type="number" value={editProfileData.age} onChange={(e) => setEditProfileData({ ...editProfileData, age: e.target.value })} className="h-12 rounded-xl border-border bg-background text-foreground" min={10} max={120} />
               </div>
               <div className="space-y-2">
-                <label className="text-xs text-muted-foreground">
-                  {locale === "en-US" ? "Weight (kg)" : "Peso (kg)"}
-                </label>
-                <Input
-                  type="number"
-                  value={editProfileData.weight}
-                  onChange={(e) => setEditProfileData({ ...editProfileData, weight: e.target.value })}
-                  className="h-12 rounded-xl border-border bg-background text-foreground"
-                  min={20}
-                  max={300}
-                  step={0.1}
-                />
+                <label className="text-xs text-muted-foreground">{isEnglish ? "Weight (kg)" : "Peso (kg)"}</label>
+                <Input type="number" value={editProfileData.weight} onChange={(e) => setEditProfileData({ ...editProfileData, weight: e.target.value })} className="h-12 rounded-xl border-border bg-background text-foreground" min={20} max={300} step={0.1} />
               </div>
               <div className="space-y-2">
-                <label className="text-xs text-muted-foreground">
-                  {locale === "en-US" ? "Height (cm)" : "Altura (cm)"}
-                </label>
-                <Input
-                  type="number"
-                  value={editProfileData.height}
-                  onChange={(e) => setEditProfileData({ ...editProfileData, height: e.target.value })}
-                  className="h-12 rounded-xl border-border bg-background text-foreground"
-                  min={100}
-                  max={250}
-                  step={0.1}
-                />
+                <label className="text-xs text-muted-foreground">{isEnglish ? "Height (cm)" : "Altura (cm)"}</label>
+                <Input type="number" value={editProfileData.height} onChange={(e) => setEditProfileData({ ...editProfileData, height: e.target.value })} className="h-12 rounded-xl border-border bg-background text-foreground" min={100} max={250} step={0.1} />
               </div>
               <div className="space-y-2">
-                <label className="text-xs text-muted-foreground">
-                  {locale === "en-US" ? "Gender" : "Genero"}
-                </label>
-                <select
-                  value={editProfileData.gender}
-                  onChange={(e) => setEditProfileData({ ...editProfileData, gender: e.target.value })}
-                  className="flex h-12 w-full rounded-xl border border-border bg-background px-3 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/50"
-                >
-                  <option value="">{locale === "en-US" ? "Select" : "Selecionar"}</option>
-                  <option value="male">{locale === "en-US" ? "Male" : "Masculino"}</option>
-                  <option value="female">{locale === "en-US" ? "Female" : "Feminino"}</option>
-                  <option value="other">{locale === "en-US" ? "Other" : "Outro"}</option>
+                <label className="text-xs text-muted-foreground">{isEnglish ? "Gender" : "Genero"}</label>
+                <select value={editProfileData.gender} onChange={(e) => setEditProfileData({ ...editProfileData, gender: e.target.value })} className="flex h-12 w-full rounded-xl border border-border bg-background px-3 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/50">
+                  <option value="">{isEnglish ? "Select" : "Selecionar"}</option>
+                  <option value="male">{isEnglish ? "Male" : "Masculino"}</option>
+                  <option value="female">{isEnglish ? "Female" : "Feminino"}</option>
+                  <option value="other">{isEnglish ? "Other" : "Outro"}</option>
                 </select>
               </div>
               <div className="space-y-2">
-                <label className="text-xs text-muted-foreground">
-                  {locale === "en-US" ? "Goal" : "Objetivo"}
-                </label>
-                <select
-                  value={editProfileData.fitness_goal}
-                  onChange={(e) => setEditProfileData({ ...editProfileData, fitness_goal: e.target.value })}
-                  className="flex h-12 w-full rounded-xl border border-border bg-background px-3 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/50"
-                >
-                  <option value="">{locale === "en-US" ? "Select" : "Selecionar"}</option>
-                  <option value="lose_weight">{locale === "en-US" ? "Lose Weight" : "Perder Peso"}</option>
-                  <option value="gain_muscle">{locale === "en-US" ? "Gain Muscle" : "Ganhar Massa"}</option>
-                  <option value="maintain">{locale === "en-US" ? "Maintain" : "Manter"}</option>
-                  <option value="improve_health">{locale === "en-US" ? "Improve Health" : "Melhorar Saude"}</option>
+                <label className="text-xs text-muted-foreground">{isEnglish ? "Goal" : "Objetivo"}</label>
+                <select value={editProfileData.fitness_goal} onChange={(e) => setEditProfileData({ ...editProfileData, fitness_goal: e.target.value })} className="flex h-12 w-full rounded-xl border border-border bg-background px-3 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/50">
+                  <option value="">{isEnglish ? "Select" : "Selecionar"}</option>
+                  <option value="lose_weight">{isEnglish ? "Lose Weight" : "Perder Peso"}</option>
+                  <option value="gain_muscle">{isEnglish ? "Gain Muscle" : "Ganhar Massa"}</option>
+                  <option value="maintain">{isEnglish ? "Maintain" : "Manter"}</option>
+                  <option value="improve_health">{isEnglish ? "Improve Health" : "Melhorar Saude"}</option>
                 </select>
               </div>
             </div>
             <div className="flex gap-3">
-              <Button
-                onClick={handleSaveProfile}
-                disabled={isSavingProfile}
-                className="h-12 flex-1 rounded-2xl bg-primary text-sm font-semibold text-primary-foreground hover:bg-primary/90"
-              >
-                {isSavingProfile ? "..." : locale === "en-US" ? "Save" : "Salvar"}
+              <Button onClick={handleSaveProfile} disabled={isSavingProfile} className="h-12 flex-1 rounded-2xl bg-primary text-sm font-semibold text-primary-foreground hover:bg-primary/90">
+                {isSavingProfile ? "..." : isEnglish ? "Save" : "Salvar"}
               </Button>
-              <Button
-                onClick={() => setIsEditingProfile(false)}
-                variant="ghost"
-                className="h-12 rounded-2xl border border-border text-muted-foreground hover:bg-accent"
-              >
-                {locale === "en-US" ? "Cancel" : "Cancelar"}
+              <Button onClick={() => setIsEditingProfile(false)} variant="ghost" className="h-12 rounded-2xl border border-border text-muted-foreground hover:bg-accent">
+                {isEnglish ? "Cancel" : "Cancelar"}
               </Button>
             </div>
           </div>
         ) : (
           <>
-            <SettingRow icon={Calendar} title={locale === "en-US" ? "Age" : "Idade"} description={profileData.age ? `${profileData.age} ${locale === "en-US" ? "years" : "anos"}` : "—"}>
-              <div />
-            </SettingRow>
-            <SettingRow icon={Scale} title={locale === "en-US" ? "Weight" : "Peso"} description={profileData.weight ? `${profileData.weight} kg` : "—"}>
-              <div />
-            </SettingRow>
-            <SettingRow icon={Ruler} title={locale === "en-US" ? "Height" : "Altura"} description={profileData.height ? `${profileData.height} cm` : "—"}>
-              <div />
-            </SettingRow>
-            <SettingRow icon={User} title={locale === "en-US" ? "Gender" : "Genero"} description={getGenderLabel(profileData.gender)}>
-              <div />
-            </SettingRow>
-            <SettingRow icon={Target} title={locale === "en-US" ? "Goal" : "Objetivo"} description={getGoalLabel(profileData.fitness_goal)} isLast>
-              <Button
-                onClick={handleStartEditProfile}
-                className="h-11 rounded-2xl border border-border bg-muted px-5 text-xs text-muted-foreground hover:bg-accent hover:text-foreground"
-              >
-                {locale === "en-US" ? "Edit" : "Editar"}
+            <SettingRow icon={Calendar} title={isEnglish ? "Age" : "Idade"} description={profileData.age ? `${profileData.age} ${isEnglish ? "years" : "anos"}` : "—"}><div /></SettingRow>
+            <SettingRow icon={Scale} title={isEnglish ? "Weight" : "Peso"} description={profileData.weight ? `${profileData.weight} kg` : "—"}><div /></SettingRow>
+            <SettingRow icon={Ruler} title={isEnglish ? "Height" : "Altura"} description={profileData.height ? `${profileData.height} cm` : "—"}><div /></SettingRow>
+            <SettingRow icon={User} title={isEnglish ? "Gender" : "Genero"} description={getGenderLabel(profileData.gender)}><div /></SettingRow>
+            <SettingRow icon={Target} title={isEnglish ? "Goal" : "Objetivo"} description={getGoalLabel(profileData.fitness_goal)} isLast>
+              <Button onClick={handleStartEditProfile} className="h-11 rounded-2xl border border-border bg-muted px-5 text-xs text-muted-foreground hover:bg-accent hover:text-foreground">
+                {isEnglish ? "Edit" : "Editar"}
               </Button>
             </SettingRow>
           </>
         )}
       </SettingsGroup>
 
+      {/* Preferences */}
       <SettingsGroup icon={Zap} title={t("settings_prefs")}>
-        <SettingRow
-          icon={isDark ? Moon : Sun}
-          title={t("settings_theme")}
-          description={isDark ? t("settings_theme_desc_dark") : t("settings_theme_desc_light")}
-        >
-          <Button
-            variant="ghost"
-            onClick={() => setTheme(isDark ? "light" : "dark")}
-            className="h-11 rounded-2xl border border-border bg-muted px-5 text-xs text-muted-foreground hover:bg-accent hover:text-foreground"
-          >
+        <SettingRow icon={Sun} title={t("settings_theme")} description={t("settings_theme_desc_light")}>
+          <Button variant="ghost" onClick={() => document.documentElement.classList.toggle("dark")} className="h-11 rounded-2xl border border-border bg-muted px-5 text-xs text-muted-foreground hover:bg-accent hover:text-foreground">
             {t("settings_theme_btn")}
           </Button>
         </SettingRow>
@@ -471,25 +563,19 @@ export function SettingsPage({ onBack }: { onBack?: () => void }) {
         </SettingRow>
       </SettingsGroup>
 
-      <ThemeCustomizer />
+      {/* Theme & Wearables */}
+      <ThemeSection />
+      <WearableSection />
 
-      <WearableIntegrations />
-
+      {/* Data */}
       <SettingsGroup icon={ShieldAlert} title={t("settings_data")}>
         <SettingRow icon={Trash2} title={t("settings_clear_cache")} description={t("settings_clear_cache_desc")}>
-          <Button
-            variant="ghost"
-            onClick={handleClearCache}
-            className="h-11 rounded-2xl border border-destructive/20 bg-destructive/10 px-5 text-xs text-destructive hover:bg-destructive hover:text-destructive-foreground"
-          >
+          <Button variant="ghost" onClick={handleClearCache} className="h-11 rounded-2xl border border-destructive/20 bg-destructive/10 px-5 text-xs text-destructive hover:bg-destructive hover:text-destructive-foreground">
             {t("settings_clear_btn")}
           </Button>
         </SettingRow>
         <SettingRow icon={Globe} title={t("settings_region")} description={t("settings_region_desc")} isLast>
-          <button
-            onClick={handleLanguageToggle}
-            className="flex h-11 items-center gap-2 rounded-2xl border border-border bg-muted px-4 text-xs text-muted-foreground transition hover:bg-accent"
-          >
+          <button onClick={handleLanguageToggle} className="flex h-11 items-center gap-2 rounded-2xl border border-border bg-muted px-4 text-xs text-muted-foreground transition hover:bg-accent">
             <span>{locale === "pt-BR" ? "PT-BR" : "EN-US"}</span>
             <ChevronRight className="h-4 w-4" />
           </button>
@@ -499,12 +585,8 @@ export function SettingsPage({ onBack }: { onBack?: () => void }) {
       {isAdmin && (
         <SettingsGroup icon={ShieldCheck} title="Admin">
           <SettingRow icon={ShieldCheck} title="Admin Dashboard" description="Acessar painel administrativo" isLast>
-            <Button
-              variant="ghost"
-              onClick={() => router.push("/admin-dashboard")}
-              className="h-11 rounded-2xl border border-border bg-muted px-5 text-xs text-muted-foreground hover:bg-accent hover:text-foreground"
-            >
-              {locale === "en-US" ? "Access" : "Acessar"}
+            <Button variant="ghost" onClick={() => router.push("/admin-dashboard")} className="h-11 rounded-2xl border border-border bg-muted px-5 text-xs text-muted-foreground hover:bg-accent hover:text-foreground">
+              {isEnglish ? "Access" : "Acessar"}
               <ChevronRight className="ml-2 h-4 w-4" />
             </Button>
           </SettingRow>
@@ -512,42 +594,15 @@ export function SettingsPage({ onBack }: { onBack?: () => void }) {
       )}
 
       <div className="space-y-5 pt-2">
-        <Button
-          variant="ghost"
-          onClick={handleLogout}
-          className="h-16 w-full rounded-2xl border border-destructive/20 bg-destructive/10 text-base font-semibold uppercase tracking-wider text-destructive hover:bg-destructive hover:text-destructive-foreground md:h-[4.5rem]"
-        >
+        <Button variant="ghost" onClick={handleLogout} className="h-16 w-full rounded-2xl border border-destructive/20 bg-destructive/10 text-base font-semibold uppercase tracking-wider text-destructive hover:bg-destructive hover:text-destructive-foreground md:h-[4.5rem]">
           {t("settings_logout")}
           <LogOut className="ml-3 h-5 w-5" />
         </Button>
-
         <div className="text-center">
           <p className="text-xs text-muted-foreground">{t("settings_version")}</p>
           <p className="mt-2 text-xs text-muted-foreground">{t("settings_copyright")}</p>
         </div>
       </div>
     </div>
-  )
-}
-
-function SettingsGroup({
-  icon: Icon,
-  title,
-  children,
-}: {
-  icon: React.ElementType
-  title: string
-  children: React.ReactNode
-}) {
-  return (
-    <section>
-      <div className="mb-3 flex items-center gap-3 px-2 md:px-4">
-        <Icon className="h-4 w-4 text-muted-foreground" />
-        <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{title}</h3>
-      </div>
-      <div className="relative overflow-hidden rounded-2xl border border-border bg-card">
-        {children}
-      </div>
-    </section>
   )
 }
