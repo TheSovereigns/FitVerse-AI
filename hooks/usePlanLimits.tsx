@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react"
 import { supabase } from "@/lib/supabase"
 import { useAuth } from "@/hooks/useAuth"
+import { logger } from "@/lib/logger"
 import type { Plan } from "@/lib/plan-limits"
 import { PLAN_LIMITS, getPlanLimits, canScanToday, canGenerateWorkout, canGenerateDiet } from "@/lib/plan-limits"
 
@@ -18,23 +19,23 @@ export function usePlanLimits() {
     if (!user) return
     
     try {
-      console.log("[usePlanLimits] Refreshing plan for user:", user.id)
+      logger.info("[usePlanLimits] Refreshing plan for user:", user.id)
       const { data, error } = await supabase
         .from('profiles')
         .select('plan')
         .eq('id', user.id)
         .single()
 
-      console.log("[usePlanLimits] Refresh result:", { data, error })
+      logger.info("[usePlanLimits] Refresh result:", { data, error })
 
       if (data?.plan) {
         const userPlan = data.plan as Plan
         setPlan(userPlan)
         setLimits(getPlanLimits(userPlan))
-        console.log("[usePlanLimits] Plan refreshed to:", userPlan)
+        logger.info("[usePlanLimits] Plan refreshed to:", userPlan)
       }
     } catch (e) {
-      console.error("[usePlanLimits] Refresh error:", e)
+      logger.error("[usePlanLimits] Refresh error:", e)
     }
   }, [user])
 
@@ -53,11 +54,11 @@ export function usePlanLimits() {
           .eq('id', user.id)
           .single()
 
-        console.log("[usePlanLimits] Fetch result:", { data, error })
+        logger.info("[usePlanLimits] Fetch result:", { data, error })
 
         // If profile doesn't exist, create it
         if (error?.code === 'PGRST116' || !data) {
-          console.log("[usePlanLimits] Creating profile for user:", user.id)
+          logger.info("[usePlanLimits] Creating profile for user:", user.id)
           const { data: newProfile, error: insertError } = await supabase
             .from('profiles')
             .insert({
@@ -79,10 +80,10 @@ export function usePlanLimits() {
           const userPlan = data.plan as Plan
           setPlan(userPlan)
           setLimits(getPlanLimits(userPlan))
-          console.log("[usePlanLimits] Plan set to:", userPlan)
+          logger.info("[usePlanLimits] Plan set to:", userPlan)
         }
       } catch (e) {
-        console.error("[usePlanLimits] Error:", e)
+        logger.error("[usePlanLimits] Error:", e)
       } finally {
         setIsLoading(false)
       }
@@ -111,7 +112,7 @@ export function usePlanLimits() {
 
         setScansToday(count || 0)
       } catch (e) {
-        // ignore
+        logger.error("[usePlanLimits] Failed to fetch scans:", e)
       }
     }
 

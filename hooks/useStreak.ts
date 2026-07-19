@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect, useCallback, useMemo } from "react"
+import { logger } from "@/lib/logger"
 
 interface StreakData {
   currentStreak: number
@@ -17,7 +18,7 @@ interface DayActivity {
 }
 
 function getDateKey(date: Date): string {
-  return date.toISOString().split("T")[0]
+  return date.toISOString().split("T")[0]!
 }
 
 function getTodayKey(): string {
@@ -36,7 +37,9 @@ function loadStreakData(): StreakData {
     if (saved) {
       return JSON.parse(saved)
     }
-  } catch {}
+  } catch (e) {
+    logger.error("[useStreak] Failed to parse streakData:", e)
+  }
   return {
     currentStreak: 0,
     longestStreak: 0,
@@ -62,7 +65,9 @@ function collectActiveDays(): Set<string> {
         })
       }
     }
-  } catch {}
+  } catch (e) {
+    logger.error("[useStreak] Failed to parse dailyActivity:", e)
+  }
 
   try {
     const workouts = localStorage.getItem("generatedWorkouts")
@@ -74,7 +79,9 @@ function collectActiveDays(): Set<string> {
         })
       }
     }
-  } catch {}
+  } catch (e) {
+    logger.error("[useStreak] Failed to parse generatedWorkouts:", e)
+  }
 
   try {
     const diets = localStorage.getItem("generatedDiets")
@@ -86,7 +93,9 @@ function collectActiveDays(): Set<string> {
         })
       }
     }
-  } catch {}
+  } catch (e) {
+    logger.error("[useStreak] Failed to parse generatedDiets:", e)
+  }
 
   try {
     const scanHistory = localStorage.getItem("scanHistory")
@@ -98,7 +107,9 @@ function collectActiveDays(): Set<string> {
         })
       }
     }
-  } catch {}
+  } catch (e) {
+    logger.error("[useStreak] Failed to parse scanHistory:", e)
+  }
 
   return activeDays
 }
@@ -134,8 +145,8 @@ function calculateStreak(activeDays: Set<string>): { currentStreak: number; long
     if (i === 0) {
       tempStreak = 1
     } else {
-      const prev = new Date(allDates[i - 1])
-      const curr = new Date(allDates[i])
+      const prev = new Date(allDates[i - 1]!)
+      const curr = new Date(allDates[i]!)
       const diffDays = Math.round((curr.getTime() - prev.getTime()) / (1000 * 60 * 60 * 24))
       if (diffDays === 1) {
         tempStreak++
@@ -204,7 +215,9 @@ export function useStreak() {
           const list = JSON.parse(workouts)
           hasWorkout = Array.isArray(list) && list.some((w: any) => w.createdAt?.split("T")[0] === dateKey)
         }
-      } catch {}
+      } catch (e) {
+        logger.error("[useStreak] Failed to parse workouts for week:", e)
+      }
 
       try {
         const diets = localStorage.getItem("generatedDiets")
@@ -212,7 +225,9 @@ export function useStreak() {
           const list = JSON.parse(diets)
           hasDiet = Array.isArray(list) && list.some((d: any) => d.createdAt?.split("T")[0] === dateKey)
         }
-      } catch {}
+      } catch (e) {
+        logger.error("[useStreak] Failed to parse diets for week:", e)
+      }
 
       days.push({
         date: dateKey,

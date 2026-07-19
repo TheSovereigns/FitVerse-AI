@@ -20,6 +20,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
 import { useTranslation } from "@/lib/i18n"
+import { logger } from "@/lib/logger"
 
 interface BioAgeEntry {
   date: string
@@ -120,15 +121,19 @@ export function BiologicalAge({ isLocked = false }: { isLocked?: boolean }) {
     try {
       const saved = localStorage.getItem("biologicalAgeHistory")
       if (saved) setHistory(JSON.parse(saved))
-    } catch {}
+    } catch (e) {
+      logger.error("[BiologicalAge] Failed to parse biologicalAgeHistory:", e)
+    }
   }, [])
 
-  const saveHistory = useCallback((entry: BioAgeEntry) => {
+  const addEntry = useCallback((entry: BioAgeEntry) => {
     setHistory((prev) => {
       const updated = [entry, ...prev].slice(0, 50)
       try {
         localStorage.setItem("biologicalAgeHistory", JSON.stringify(updated))
-      } catch {}
+      } catch (e) {
+        logger.error("[BiologicalAge] Failed to save biologicalAgeHistory:", e)
+      }
       return updated
     })
   }, [])
@@ -149,14 +154,14 @@ export function BiologicalAge({ isLocked = false }: { isLocked?: boolean }) {
 
   const handleCalculate = () => {
     setHasCalculated(true)
-    const today = new Date().toISOString().split("T")[0]
+    const today = new Date().toISOString().split("T")[0]!
     const entry: BioAgeEntry = {
       date: today,
       chronologicalAge,
       biologicalAge,
       factors,
     }
-    saveHistory(entry)
+    addEntry(entry)
   }
 
   if (isLocked) {

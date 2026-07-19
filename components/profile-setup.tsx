@@ -50,7 +50,7 @@ export function ProfileSetup({ onComplete }: ProfileSetupProps) {
   const handleNext = () => {
     const idx = steps.indexOf(currentStep)
     if (idx < steps.length - 1) {
-      setCurrentStep(steps[idx + 1])
+      setCurrentStep(steps[idx + 1]!)
     } else {
       handleSave()
     }
@@ -59,7 +59,7 @@ export function ProfileSetup({ onComplete }: ProfileSetupProps) {
   const handleBack = () => {
     const idx = steps.indexOf(currentStep)
     if (idx > 0) {
-      setCurrentStep(steps[idx - 1])
+      setCurrentStep(steps[idx - 1]!)
     }
   }
 

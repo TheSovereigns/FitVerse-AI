@@ -6,6 +6,7 @@ import { ClipboardCheck, Lock, Lightbulb, TrendingUp } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts"
 import { useTranslation } from "@/lib/i18n"
+import { logger } from "@/lib/logger"
 import { cn } from "@/lib/utils"
 
 interface HealthScores {
@@ -83,7 +84,9 @@ export function HealthCheckin({ isLocked = false }: { isLocked?: boolean }) {
     try {
       const saved = localStorage.getItem(STORAGE_KEY)
       if (saved) setEntries(JSON.parse(saved))
-    } catch {}
+    } catch (e) {
+      logger.error("[HealthCheckin] Failed to parse localStorage data:", e)
+    }
   }, [])
 
   const saveEntries = useCallback((data: HealthCheckinEntry[]) => {
@@ -112,7 +115,7 @@ export function HealthCheckin({ isLocked = false }: { isLocked?: boolean }) {
   const recommendation = useMemo(() => getRecommendation(todayEntry?.scores || scores, isEnglish), [todayEntry, scores, isEnglish])
 
   const handleLog = () => {
-    const today = new Date().toISOString().split("T")[0]
+    const today = new Date().toISOString().split("T")[0]!
     const entry: HealthCheckinEntry = { date: today, scores, notes, totalScore }
     const existing = entries.findIndex((e) => e.date === today)
     const updated = [...entries]

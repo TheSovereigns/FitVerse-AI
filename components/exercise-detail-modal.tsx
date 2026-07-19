@@ -35,6 +35,7 @@ import {
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useTranslation } from "@/lib/i18n"
+import { EXERCISE_TRANSLATIONS, EXERCISE_SEARCH_TERMS } from "@/lib/exercise-translations"
 
 interface Exercise {
   id: string
@@ -103,45 +104,10 @@ export function ExerciseDetailModal({ exercise, topProducts, onClose, onFeedback
     "burpee": "https://media.giphy.com/media/23hPPMRp2I7y3/giphy.gif",
   }
 
-  const exerciseNameMap: Record<string, string> = {
-    "agachamento livre": "barbell back squat",
-    "agachamento": "barbell squat",
-    "agachamento com halteres": "goblet squat",
-    "agachamento com halteres (goblet squat)": "goblet squat",
-    "flexão de braço": "push up",
-    "flexão": "push up",
-    "polichinelos": "jumping jacks",
-    "polichinelo": "jumping jacks",
-    "supino": "bench press",
-    "supino com halteres": "dumbbell bench press",
-    "abdominal supra": "crunch",
-    "abdominal": "crunch",
-    "burpee": "burpee",
-    "prancha": "plank",
-    "elevação de perna": "leg raise",
-    "afundo": "lunge",
-    "afundos": "lunge",
-    "remada": "barbell row",
-    "remada curvada": "barbell row",
-    "desenvolvimento": "overhead press",
-    "rosca": "bicep curl",
-    "rosca direta": "bicep curl",
-    "tríceps": "tricep extension",
-    "extensão de tríceps": "tricep extension",
-    "crucifixo": "dumbbell fly",
-    "voador": "dumbbell fly",
-    "stiff": "stiff leg deadlift",
-    "leg press": "leg press",
-    "extensora": "leg extension",
-    "flexora": "leg curl",
-    "panturrilha": "calf raise",
-    "elevação de calcanhar": "calf raise",
-  }
-
   const getSearchTerm = () => {
     const name = exercise.name.toLowerCase().trim()
     if (locale === "en-US") {
-      for (const [pt, en] of Object.entries(exerciseNameMap)) {
+      for (const [pt, en] of Object.entries(EXERCISE_TRANSLATIONS)) {
         if (name.includes(pt)) return en
       }
       return name
@@ -170,26 +136,8 @@ export function ExerciseDetailModal({ exercise, topProducts, onClose, onFeedback
         }
       }
 
-      const termMap: Record<string, string> = {
-        "agachamento": "barbell squat",
-        "flexão": "push up",
-        "abdominal": "crunch",
-        "supino": "bench press",
-        "remada": "row",
-        "desenvolvimento": "shoulder press",
-        "rosca": "curl",
-        "polichinelo": "jumping jack",
-        "prancha": "plank",
-        "puxada": "pull down",
-        "elevação": "raise",
-        "afundo": "lunge",
-        "leg press": "leg press",
-        "extensora": "extension",
-        "flexora": "curl"
-      }
-      
       let searchTerm = cleanName
-      for (const [pt, en] of Object.entries(termMap)) {
+      for (const [pt, en] of Object.entries(EXERCISE_SEARCH_TERMS)) {
         if (cleanName.includes(pt)) {
           searchTerm = en
           break

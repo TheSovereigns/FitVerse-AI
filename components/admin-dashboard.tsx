@@ -327,7 +327,7 @@ export function AdminDashboard() {
                   <CardContent>
                     <div className="h-[300px] w-full flex items-end justify-between gap-2 px-4 pt-8 pb-2">
                       {[45, 60, 55, 80, 65, 75, 90, 70, 85, 60, 95, 75].map((h, i) => (
-                        <ChartBar key={i} height={`${h}%`} color="bg-gradient-to-t from-purple-600 to-blue-500" label={["J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D"][i]} />
+                        <ChartBar key={i} height={`${h}%`} color="bg-gradient-to-t from-purple-600 to-blue-500" label={["J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D"][i] ?? ""} />
                       ))}
                     </div>
                   </CardContent>

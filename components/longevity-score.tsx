@@ -20,6 +20,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { useTranslation } from "@/lib/i18n"
+import { logger } from "@/lib/logger"
 
 interface Factor {
   id: string
@@ -130,11 +131,13 @@ export function LongevityScore() {
     try {
       const saved = localStorage.getItem("longevityHistory")
       if (saved) setHistory(JSON.parse(saved))
-    } catch {}
+    } catch (e) {
+      logger.error("[LongevityScore] Failed to parse longevityHistory:", e)
+    }
   }, [])
 
   const saveHistory = useCallback((score: number, factorValues: { id: string; name: string; value: number }[]) => {
-    const today = new Date().toISOString().split("T")[0]
+    const today = new Date().toISOString().split("T")[0]!
     const entry: ScoreEntry = {
       date: today,
       score,
@@ -145,7 +148,9 @@ export function LongevityScore() {
       const updated = [entry, ...filtered].slice(0, 365)
       try {
         localStorage.setItem("longevityHistory", JSON.stringify(updated))
-      } catch {}
+      } catch (e) {
+        logger.error("[LongevityScore] Failed to save longevityHistory:", e)
+      }
       return updated
     })
   }, [])
@@ -170,7 +175,7 @@ export function LongevityScore() {
   }, [calculatedFactors])
 
   const lowestFactor = useMemo(() => {
-    let min = calculatedFactors[0]
+    let min = calculatedFactors[0]!
     calculatedFactors.forEach((f) => {
       if (f.scored < min.scored) min = f
     })
@@ -207,7 +212,9 @@ export function LongevityScore() {
       } else if (navigator.clipboard) {
         await navigator.clipboard.writeText(text)
       }
-    } catch {}
+    } catch (e) {
+      logger.error("[LongevityScore] Failed to share/copy score:", e)
+    }
   }
 
   const circumference = 2 * Math.PI * 60
@@ -356,10 +363,10 @@ export function LongevityScore() {
           >
             <div className="rounded-xl border border-yellow-500/15 bg-yellow-500/5 p-3">
               <p className="text-xs font-semibold text-foreground mb-2">
-                {isEnglish ? "Focus on:" : "Foque em:"} {lowestFactor.name}
+                {isEnglish ? "Focus on:" : "Foque em:"} {lowestFactor!.name}
               </p>
               <ul className="space-y-1">
-                {(SLIDER_TIPS[lowestFactor.id] || []).map((tip, i) => (
+                {(SLIDER_TIPS[lowestFactor!.id] || []).map((tip, i) => (
                   <li key={i} className="text-[11px] text-muted-foreground flex items-start gap-1.5">
                     <span className="text-yellow-500 mt-0.5">•</span>
                     {tip}

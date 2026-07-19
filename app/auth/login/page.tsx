@@ -7,11 +7,20 @@ import { useRouter } from "next/navigation"
 import { motion } from "framer-motion"
 import Link from "next/link"
 import { Eye, EyeOff, Loader2, Sparkles } from "lucide-react"
+import { z } from "zod"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useAuth } from "@/hooks/useAuth"
 import { useTranslation } from "@/lib/i18n"
+import { cn } from "@/lib/utils"
+
+const loginSchema = z.object({
+  email: z.string().min(1, "validation_required").email("validation_email_invalid"),
+  password: z.string().min(1, "validation_required").min(6, "validation_password_min"),
+})
+
+type LoginErrors = { email?: string; password?: string }
 
 export default function LoginPage() {
   const router = useRouter()
@@ -23,10 +32,29 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [fieldErrors, setFieldErrors] = useState<LoginErrors>({})
+
+  const validate = (values: { email: string; password: string }): LoginErrors => {
+    const result = loginSchema.safeParse(values)
+    if (result.success) return {}
+    const errors: LoginErrors = {}
+    for (const issue of result.error.issues) {
+      const key = issue.path[0] as keyof LoginErrors
+      if (key && !errors[key]) {
+        errors[key] = t(issue.message as any)
+      }
+    }
+    return errors
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError(null)
+
+    const errors = validate({ email, password })
+    setFieldErrors(errors)
+    if (Object.keys(errors).length > 0) return
+
     setIsLoading(true)
 
     const { error } = await signIn(email, password)
@@ -128,10 +156,14 @@ export default function LoginPage() {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
+                  onBlur={() => setFieldErrors(prev => ({ ...prev, ...validate({ email, password }) }))}
                   placeholder={locale === "en-US" ? "you@example.com" : "seu@email.com"}
-                  required
-                  className="h-12 bg-white/5 border-white/10 text-white placeholder:text-white/30 focus:border-primary focus:ring-primary/20 rounded-xl"
+                  className={cn("h-12 bg-white/5 border-white/10 text-white placeholder:text-white/30 focus:border-primary focus:ring-primary/20 rounded-xl", fieldErrors.email && "border-red-500 focus:border-red-500 focus:ring-red-500/20")}
+                  aria-invalid={!!fieldErrors.email}
                 />
+                {fieldErrors.email && (
+                  <p className="text-red-400 text-xs mt-1.5">{fieldErrors.email}</p>
+                )}
               </div>
 
               <div>
@@ -144,9 +176,10 @@ export default function LoginPage() {
                     type={showPassword ? "text" : "password"}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
+                    onBlur={() => setFieldErrors(prev => ({ ...prev, ...validate({ email, password }) }))}
                     placeholder="••••••••"
-                    required
-                    className="h-12 bg-white/5 border-white/10 text-white placeholder:text-white/30 focus:border-primary focus:ring-primary/20 rounded-xl pr-12"
+                    className={cn("h-12 bg-white/5 border-white/10 text-white placeholder:text-white/30 focus:border-primary focus:ring-primary/20 rounded-xl pr-12", fieldErrors.password && "border-red-500 focus:border-red-500 focus:ring-red-500/20")}
+                    aria-invalid={!!fieldErrors.password}
                   />
                   <Button
                     type="button"
@@ -158,6 +191,9 @@ export default function LoginPage() {
                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </Button>
                 </div>
+                {fieldErrors.password && (
+                  <p className="text-red-400 text-xs mt-1.5">{fieldErrors.password}</p>
+                )}
               </div>
 
               <div className="flex items-center justify-end">

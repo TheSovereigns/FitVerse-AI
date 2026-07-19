@@ -11,6 +11,7 @@ import {
   Scale, Ruler, Calendar, User, Target, Rocket, Heart, Dumbbell,
   TrendingDown, TrendingUp, Minus,
 } from "lucide-react"
+import { z } from "zod"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -19,6 +20,18 @@ import { useTranslation } from "@/lib/i18n"
 import { supabase } from "@/lib/supabase"
 import { cn } from "@/lib/utils"
 import { toast } from "sonner"
+
+const signupSchema = z.object({
+  name: z.string().min(1, "validation_required").min(2, "validation_name_min"),
+  email: z.string().min(1, "validation_required").email("validation_email_invalid"),
+  password: z.string().min(1, "validation_required").min(6, "validation_password_min"),
+  confirmPassword: z.string().min(1, "validation_required"),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "validation_password_confirm",
+  path: ["confirmPassword"],
+})
+
+type SignupErrors = { name?: string; email?: string; password?: string; confirmPassword?: string }
 
 type Phase = "form" | "profile" | "generating" | "done"
 type ProfileStep = "gender" | "age" | "weight" | "height" | "goal"
@@ -31,6 +44,7 @@ export default function SignupPage() {
 
   const [phase, setPhase] = useState<Phase>("form")
   const [error, setError] = useState<string | null>(null)
+  const [fieldErrors, setFieldErrors] = useState<SignupErrors>({})
 
   const [name, setName] = useState("")
   const [email, setEmail] = useState("")
@@ -52,18 +66,27 @@ export default function SignupPage() {
   const profileIndex = profileSteps.indexOf(profileStep)
   const profileProgress = ((profileIndex + 1) / profileSteps.length) * 100
 
+  const validate = (values: { name: string; email: string; password: string; confirmPassword: string }): SignupErrors => {
+    const result = signupSchema.safeParse(values)
+    if (result.success) return {}
+    const errors: SignupErrors = {}
+    for (const issue of result.error.issues) {
+      const key = issue.path[0] as keyof SignupErrors
+      if (key && !errors[key]) {
+        errors[key] = t(issue.message as any)
+      }
+    }
+    return errors
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError(null)
 
-    if (password !== confirmPassword) {
-      setError(isEnglish ? "Passwords do not match" : "As senhas não coincidem")
-      return
-    }
-    if (password.length < 8) {
-      setError(isEnglish ? "Password must be at least 8 characters" : "A senha deve ter pelo menos 8 caracteres")
-      return
-    }
+    const errors = validate({ name, email, password, confirmPassword })
+    setFieldErrors(errors)
+    if (Object.keys(errors).length > 0) return
+
     if (!acceptTerms) {
       setError(isEnglish ? "You must accept the terms of use" : "Você deve aceitar os termos de uso")
       return
@@ -107,7 +130,7 @@ export default function SignupPage() {
   const handleProfileNext = () => {
     const idx = profileSteps.indexOf(profileStep)
     if (idx < profileSteps.length - 1) {
-      setProfileStep(profileSteps[idx + 1])
+      setProfileStep(profileSteps[idx + 1]!)
     } else {
       saveProfileAndGeneratePlan()
     }
@@ -116,7 +139,7 @@ export default function SignupPage() {
   const handleProfileBack = () => {
     const idx = profileSteps.indexOf(profileStep)
     if (idx > 0) {
-      setProfileStep(profileSteps[idx - 1])
+      setProfileStep(profileSteps[idx - 1]!)
     }
   }
 
@@ -446,10 +469,14 @@ export default function SignupPage() {
                         type="text"
                         value={name}
                         onChange={(e) => setName(e.target.value)}
+                        onBlur={() => setFieldErrors(prev => ({ ...prev, ...validate({ name, email, password, confirmPassword }) }))}
                         placeholder={isEnglish ? "John Doe" : "João Silva"}
-                        required
-                        className="h-12 bg-white/5 border-white/10 text-white placeholder:text-white/30 focus:border-primary focus:ring-primary/20 rounded-xl"
+                        className={cn("h-12 bg-white/5 border-white/10 text-white placeholder:text-white/30 focus:border-primary focus:ring-primary/20 rounded-xl", fieldErrors.name && "border-red-500 focus:border-red-500 focus:ring-red-500/20")}
+                        aria-invalid={!!fieldErrors.name}
                       />
+                      {fieldErrors.name && (
+                        <p className="text-red-400 text-xs mt-1.5">{fieldErrors.name}</p>
+                      )}
                     </div>
                     <div>
                       <Label className="text-white/80 text-sm font-medium mb-2 block">Email</Label>
@@ -457,10 +484,14 @@ export default function SignupPage() {
                         type="email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
+                        onBlur={() => setFieldErrors(prev => ({ ...prev, ...validate({ name, email, password, confirmPassword }) }))}
                         placeholder={isEnglish ? "you@example.com" : "seu@email.com"}
-                        required
-                        className="h-12 bg-white/5 border-white/10 text-white placeholder:text-white/30 focus:border-primary focus:ring-primary/20 rounded-xl"
+                        className={cn("h-12 bg-white/5 border-white/10 text-white placeholder:text-white/30 focus:border-primary focus:ring-primary/20 rounded-xl", fieldErrors.email && "border-red-500 focus:border-red-500 focus:ring-red-500/20")}
+                        aria-invalid={!!fieldErrors.email}
                       />
+                      {fieldErrors.email && (
+                        <p className="text-red-400 text-xs mt-1.5">{fieldErrors.email}</p>
+                      )}
                     </div>
                     <div>
                       <Label className="text-white/80 text-sm font-medium mb-2 block">
@@ -471,9 +502,10 @@ export default function SignupPage() {
                           type={showPassword ? "text" : "password"}
                           value={password}
                           onChange={(e) => setPassword(e.target.value)}
+                          onBlur={() => setFieldErrors(prev => ({ ...prev, ...validate({ name, email, password, confirmPassword }) }))}
                           placeholder="••••••••"
-                          required
-                          className="h-12 bg-white/5 border-white/10 text-white placeholder:text-white/30 focus:border-primary focus:ring-primary/20 rounded-xl pr-12"
+                          className={cn("h-12 bg-white/5 border-white/10 text-white placeholder:text-white/30 focus:border-primary focus:ring-primary/20 rounded-xl pr-12", fieldErrors.password && "border-red-500 focus:border-red-500 focus:ring-red-500/20")}
+                          aria-invalid={!!fieldErrors.password}
                         />
                         <Button
                           type="button"
@@ -485,6 +517,9 @@ export default function SignupPage() {
                           {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                         </Button>
                       </div>
+                      {fieldErrors.password && (
+                        <p className="text-red-400 text-xs mt-1.5">{fieldErrors.password}</p>
+                      )}
                     </div>
                     <div>
                       <Label className="text-white/80 text-sm font-medium mb-2 block">
@@ -494,10 +529,14 @@ export default function SignupPage() {
                         type="password"
                         value={confirmPassword}
                         onChange={(e) => setConfirmPassword(e.target.value)}
+                        onBlur={() => setFieldErrors(prev => ({ ...prev, ...validate({ name, email, password, confirmPassword }) }))}
                         placeholder="••••••••"
-                        required
-                        className="h-12 bg-white/5 border-white/10 text-white placeholder:text-white/30 focus:border-primary focus:ring-primary/20 rounded-xl"
+                        className={cn("h-12 bg-white/5 border-white/10 text-white placeholder:text-white/30 focus:border-primary focus:ring-primary/20 rounded-xl", fieldErrors.confirmPassword && "border-red-500 focus:border-red-500 focus:ring-red-500/20")}
+                        aria-invalid={!!fieldErrors.confirmPassword}
                       />
+                      {fieldErrors.confirmPassword && (
+                        <p className="text-red-400 text-xs mt-1.5">{fieldErrors.confirmPassword}</p>
+                      )}
                     </div>
                     <div className="flex items-start gap-3">
                       <input

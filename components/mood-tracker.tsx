@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTranslation } from "@/lib/i18n";
+import { logger } from "@/lib/logger";
 import {
   LineChart,
   Line,
@@ -51,7 +52,9 @@ export function MoodTracker({ isLocked = false }: MoodTrackerProps) {
     try {
       const stored = localStorage.getItem("mood_entries");
       if (stored) setEntries(JSON.parse(stored));
-    } catch {}
+    } catch (e) {
+      logger.error("[MoodTracker] Failed to parse mood_entries:", e)
+    }
   }, []);
 
   const saveEntries = useCallback((newEntries: MoodEntry[]) => {
@@ -61,7 +64,7 @@ export function MoodTracker({ isLocked = false }: MoodTrackerProps) {
 
   const addEntry = () => {
     if (!selectedMood) return;
-    const today = new Date().toISOString().split("T")[0];
+    const today = new Date().toISOString().split("T")[0]!;
     const existing = entries.findIndex((e) => e.date === today);
     const newEntry: MoodEntry = { date: today, mood: selectedMood, note: note || undefined };
     let updated: MoodEntry[];
@@ -88,9 +91,9 @@ export function MoodTracker({ isLocked = false }: MoodTrackerProps) {
 
   const trend =
     entries.length >= 2
-      ? entries[entries.length - 1].mood < entries[entries.length - 2].mood
+      ? entries[entries.length - 1]!.mood < entries[entries.length - 2]!.mood
         ? "up"
-        : entries[entries.length - 1].mood > entries[entries.length - 2].mood
+        : entries[entries.length - 1]!.mood > entries[entries.length - 2]!.mood
         ? "down"
         : "flat"
       : "flat";

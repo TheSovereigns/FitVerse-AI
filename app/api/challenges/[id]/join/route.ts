@@ -1,11 +1,13 @@
 import { NextRequest, NextResponse } from "next/server"
-import { supabaseAdmin } from "@/lib/supabase"
+import { getSupabaseAdmin } from "@/lib/supabase-server"
 
 async function authUser(req: NextRequest) {
   const auth = req.headers.get("authorization")
   if (!auth?.startsWith("Bearer ")) return null
   const token = auth.slice(7)
-  const { data } = await supabaseAdmin.auth.getUser(token)
+  const supabase = getSupabaseAdmin()
+  if (!supabase) return null
+  const { data } = await supabase.auth.getUser(token)
   return data.user ?? null
 }
 
@@ -13,7 +15,10 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
   const user = await authUser(req)
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
-  const { data: existing } = await supabaseAdmin
+  const supabase = getSupabaseAdmin()
+  if (!supabase) return NextResponse.json({ error: "Server configuration error" }, { status: 500 })
+
+  const { data: existing } = await supabase
     .from("challenge_participants")
     .select("id")
     .eq("challenge_id", params.id)
@@ -22,7 +27,7 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
 
   if (existing) return NextResponse.json({ error: "Already joined" }, { status: 409 })
 
-  const { data: challenge } = await supabaseAdmin
+  const { data: challenge } = await supabase
     .from("challenges")
     .select("clan_id, is_active, end_date")
     .eq("id", params.id)
@@ -37,7 +42,7 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
   }
 
   if (challenge.clan_id) {
-    const { data: member } = await supabaseAdmin
+    const { data: member } = await supabase
       .from("clan_members")
       .select("id")
       .eq("clan_id", challenge.clan_id)
@@ -47,7 +52,7 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
     if (!member) return NextResponse.json({ error: "Not a clan member" }, { status: 403 })
   }
 
-  const { error } = await supabaseAdmin
+  const { error } = await supabase
     .from("challenge_participants")
     .insert({ challenge_id: params.id, user_id: user.id })
 

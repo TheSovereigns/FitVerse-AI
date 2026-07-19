@@ -16,6 +16,7 @@ import {
   Check,
 } from "lucide-react"
 import { useTranslation } from "@/lib/i18n"
+import { logger } from "@/lib/logger"
 
 interface EquipmentOption {
   id: string
@@ -191,7 +192,9 @@ export function EquipmentSelector({
         setSelected(parsed)
         onSelectionChange?.(parsed)
       }
-    } catch {}
+    } catch (e) {
+      logger.error("[EquipmentSelector] Failed to parse saved equipment:", e)
+    }
   }, [])
 
   const toggle = useCallback(
@@ -202,7 +205,9 @@ export function EquipmentSelector({
           : [...prev, id]
         try {
           localStorage.setItem(STORAGE_KEY, JSON.stringify(next))
-        } catch {}
+        } catch (e) {
+          logger.error("[EquipmentSelector] Failed to save equipment:", e)
+        }
         onSelectionChange?.(next)
         return next
       })
@@ -211,7 +216,7 @@ export function EquipmentSelector({
   )
 
   const getAvailableExercises = () => {
-    if (selected.length === 0) return EQUIPMENT[0].exercises
+    if (selected.length === 0) return EQUIPMENT[0]!.exercises
     const exercises: string[] = []
     selected.forEach((id) => {
       const eq = EQUIPMENT.find((e) => e.id === id)

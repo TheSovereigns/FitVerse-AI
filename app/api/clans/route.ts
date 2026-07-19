@@ -1,11 +1,13 @@
 import { NextRequest, NextResponse } from "next/server"
-import { supabaseAdmin } from "@/lib/supabase"
+import { getSupabaseAdmin } from "@/lib/supabase-server"
 
 async function authUser(req: NextRequest) {
   const auth = req.headers.get("authorization")
   if (!auth?.startsWith("Bearer ")) return null
   const token = auth.slice(7)
-  const { data } = await supabaseAdmin.auth.getUser(token)
+  const supabase = getSupabaseAdmin()
+  if (!supabase) return null
+  const { data } = await supabase.auth.getUser(token)
   return data.user ?? null
 }
 
@@ -13,11 +15,14 @@ export async function GET(req: NextRequest) {
   const user = await authUser(req)
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
+  const supabase = getSupabaseAdmin()
+  if (!supabase) return NextResponse.json({ error: "Server configuration error" }, { status: 500 })
+
   const { searchParams } = new URL(req.url)
   const view = searchParams.get("view") || "my"
 
   if (view === "my") {
-    const { data: memberships } = await supabaseAdmin
+    const { data: memberships } = await supabase
       .from("clan_members")
       .select("clan_id, role")
       .eq("user_id", user.id)
@@ -27,15 +32,15 @@ export async function GET(req: NextRequest) {
     }
 
     const clanIds = memberships.map((m) => m.clan_id)
-    const { data: clans } = await supabaseAdmin
+    const { data: clans } = await supabase
       .from("clans")
       .select("*")
       .in("id", clanIds)
 
-    const userMembership = memberships[0]
+    const userMembership = memberships[0]!
     const userClan = clans?.find((c) => c.id === userMembership.clan_id) || null
 
-    const { count: memberCount } = await supabaseAdmin
+    const { count: memberCount } = await supabase
       .from("clan_members")
       .select("*", { count: "exact", head: true })
       .eq("clan_id", userMembership.clan_id)
@@ -47,14 +52,14 @@ export async function GET(req: NextRequest) {
   }
 
   if (view === "discover") {
-    const { data: myMemberships } = await supabaseAdmin
+    const { data: myMemberships } = await supabase
       .from("clan_members")
       .select("clan_id")
       .eq("user_id", user.id)
 
     const myClanIds = myMemberships?.map((m) => m.clan_id) || []
 
-    let query = supabaseAdmin
+    let query = supabase
       .from("clans")
       .select("*")
       .eq("is_public", true)
@@ -71,7 +76,7 @@ export async function GET(req: NextRequest) {
     const counts: Record<string, number> = {}
 
     if (clanIds.length > 0) {
-      const { data: members } = await supabaseAdmin
+      const { data: members } = await supabase
         .from("clan_members")
         .select("clan_id")
         .in("clan_id", clanIds)
@@ -96,6 +101,9 @@ export async function POST(req: NextRequest) {
   const user = await authUser(req)
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
+  const supabase = getSupabaseAdmin()
+  if (!supabase) return NextResponse.json({ error: "Server configuration error" }, { status: 500 })
+
   const body = await req.json()
   const { name, description, isPublic } = body
 
@@ -103,7 +111,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Name must be at least 3 characters" }, { status: 400 })
   }
 
-  const { data: existing } = await supabaseAdmin
+  const { data: existing } = await supabase
     .from("clans")
     .select("id")
     .eq("name", name.trim())
@@ -113,7 +121,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Clan name already taken" }, { status: 409 })
   }
 
-  const { data: clan, error: clanError } = await supabaseAdmin
+  const { data: clan, error: clanError } = await supabase
     .from("clans")
     .insert({
       name: name.trim(),
@@ -128,7 +136,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: clanError.message }, { status: 500 })
   }
 
-  const { error: memberError } = await supabaseAdmin
+  const { error: memberError } = await supabase
     .from("clan_members")
     .insert({
       clan_id: clan.id,
@@ -137,11 +145,11 @@ export async function POST(req: NextRequest) {
     })
 
   if (memberError) {
-    await supabaseAdmin.from("clans").delete().eq("id", clan.id)
+    await supabase.from("clans").delete().eq("id", clan.id)
     return NextResponse.json({ error: memberError.message }, { status: 500 })
   }
 
-  await supabaseAdmin.rpc("log_event", {
+  await supabase.rpc("log_event", {
     p_type: "clan_created",
     p_user_id: user.id,
     p_metadata: { clan_id: clan.id, clan_name: clan.name },

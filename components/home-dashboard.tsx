@@ -63,7 +63,6 @@ export function HomeDashboard({
   }, [dailyActivity.scannedProducts])
 
   const dateString = new Date().toLocaleDateString(locale, { weekday: "long", day: "numeric", month: "long" })
-  const isEnglish = locale === "en-US"
 
   const quickActions = [
     { label: t("dopamine_quick_scan"), desc: t("dopamine_quick_scan_desc"), icon: ScanLine, view: "dashboard" as View },
@@ -82,16 +81,16 @@ export function HomeDashboard({
       >
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
-            <Badge className="mb-2 rounded-lg border border-border bg-muted px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+            <Badge className="mb-2 rounded-lg border border-brand/20 bg-brand-muted px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-brand">
               FitVerse AI
             </Badge>
             <h1 className="text-2xl font-bold tracking-tight text-foreground md:text-3xl">
-              {isEnglish ? "Today" : "Hoje"}
+              {t("hd_today")}
             </h1>
             <p className="mt-0.5 text-sm text-muted-foreground capitalize">{dateString}</p>
           </div>
           <div className="flex gap-2">
-            <Button onClick={() => onNavigate("dashboard")} className="h-10 rounded-xl px-4 text-xs">
+            <Button onClick={() => onNavigate("dashboard")} className="h-10 rounded-xl px-4 text-xs bg-brand text-brand-foreground hover:bg-brand/90">
               <ScanLine className="h-4 w-4" />
               {t("dopamine_quick_scan")}
             </Button>
@@ -125,17 +124,15 @@ export function HomeDashboard({
               </div>
               <p className="mt-2 text-sm text-muted-foreground">
                 {goals
-                  ? `${consumedCalories} ${t("home_kcal")} ${isEnglish ? "logged today" : "registradas hoje"}.`
-                  : isEnglish
-                    ? "Create your metabolic plan to unlock daily targets."
-                    : "Crie seu plano metabolico para liberar metas diarias."}
+                  ? `${consumedCalories} ${t("home_kcal")} ${t("hd_logged_today")}.`
+                  : t("hd_create_plan_hint")}
               </p>
             </div>
 
             <div className="w-full rounded-xl border border-border bg-muted/50 p-4 md:w-64">
               <div className="mb-2.5 flex items-center justify-between">
                 <span className="text-xs font-medium text-muted-foreground">
-                  {isEnglish ? "Daily progress" : "Progresso diario"}
+                  {t("hd_daily_progress")}
                 </span>
                 <span className="text-sm font-bold text-foreground">{goals ? `${progressPercent}%` : "--"}</span>
               </div>
@@ -156,10 +153,10 @@ export function HomeDashboard({
           <div className="mb-3 flex items-center justify-between">
             <div>
               <h2 className="text-base font-bold text-foreground">
-                {isEnglish ? "Health snapshot" : "Resumo de saude"}
+                {t("hd_health_snapshot")}
               </h2>
               <p className="text-xs text-muted-foreground">
-                {isEnglish ? "Last activity" : "Atividade recente"}
+                {t("hd_last_activity")}
               </p>
             </div>
             <ShieldCheck className="h-4 w-4 text-muted-foreground" />
@@ -178,7 +175,7 @@ export function HomeDashboard({
       <section>
         <div className="mb-3 flex items-center justify-between">
           <h2 className="text-base font-bold text-foreground md:text-lg">
-            {isEnglish ? "Quick actions" : "Acoes rapidas"}
+            {t("hd_quick_actions")}
           </h2>
         </div>
         <div className="grid grid-cols-2 gap-3 md:grid-cols-4">

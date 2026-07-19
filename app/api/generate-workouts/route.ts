@@ -2,20 +2,9 @@ import { NextResponse } from "next/server"
 import { createGoogleGenerativeAI } from "@ai-sdk/google"
 import { generateObject } from "ai"
 import { z } from "zod"
-import { createClient } from '@supabase/supabase-js'
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY;
-const supabase = (supabaseUrl && supabaseKey && !supabaseUrl.includes('placeholder') && !supabaseKey.includes('placeholder'))
-  ? createClient(supabaseUrl, supabaseKey)
-  : null;
-
-const PLAN_LIMITS = {
-  free: { workoutsPerMonth: 2 },
-  pro: { workoutsPerMonth: 5 },
-  premium: { workoutsPerMonth: Infinity },
-  banned: { workoutsPerMonth: 0 },
-}
+import { getSupabaseAdmin } from "@/lib/supabase-server"
+import { PLAN_LIMITS, type Plan } from "@/lib/plan-limits"
+import { getCorsHeaders } from "@/lib/auth-helpers"
 
 const google = createGoogleGenerativeAI({
   apiKey: process.env.GEMINI_API_KEY || process.env.GOOGLE_GENERATIVE_AI_API_KEY,
@@ -24,6 +13,7 @@ const google = createGoogleGenerativeAI({
 export const maxDuration = 30
 
 async function checkWorkoutLimit(userId: string, plan: string): Promise<boolean> {
+  const supabase = getSupabaseAdmin();
   if (!supabase) return true;
   
   const now = new Date()
@@ -35,7 +25,8 @@ async function checkWorkoutLimit(userId: string, plan: string): Promise<boolean>
     .eq('user_id', userId)
     .gte('created_at', startOfMonth.toISOString())
 
-  const limit = PLAN_LIMITS[plan as keyof typeof PLAN_LIMITS]?.workoutsPerMonth ?? 0
+  const planLimits = PLAN_LIMITS[(plan as Plan) || 'free'];
+  const limit = typeof planLimits.workoutsPerMonth === 'number' ? planLimits.workoutsPerMonth : 999;
   return (count ?? 0) < limit
 }
 
@@ -72,10 +63,8 @@ const workoutsSchema = z.object({
 })
 
 export async function POST(req: Request) {
+  const headers = getCorsHeaders();
   try {
-    const headers = {
-      'Access-Control-Allow-Origin': '*',
-    }
 
     const authHeader = req.headers.get('Authorization')
     if (!authHeader) {
@@ -83,11 +72,12 @@ export async function POST(req: Request) {
     }
 
     const token = authHeader.replace('Bearer ', '')
-    
+
+    const supabase = getSupabaseAdmin()
     if (!supabase) {
       return NextResponse.json({ error: 'Configuração do servidor incompleta.' }, { status: 500, headers })
     }
-    
+
     const { data: { user }, error: authError } = await supabase.auth.getUser(token)
 
     if (!user || authError) {
@@ -168,7 +158,7 @@ Para cada exercício no treino:
 Seja específico, técnico e focado em resultados. Os treinos devem ser práticos e eficientes.`
 
     const { object } = await generateObject({
-      model: google("gemini-2.5-flash"),
+      model: google("gemini-3.5-flash"),
       schema: workoutsSchema,
       prompt,
       temperature: 0.7,
@@ -182,12 +172,12 @@ Seja específico, técnico e focado em resultados. Os treinos devem ser prático
       difficulty: object.workouts[0]?.difficulty || 'Intermediário',
     })
 
-    return NextResponse.json({ workouts: object.workouts })
+    return NextResponse.json({ workouts: object.workouts }, { headers })
   } catch (error) {
     console.error("[Fitverse] Error generating workouts:", error)
     return NextResponse.json(
       { error: "Failed to generate workouts", details: error instanceof Error ? error.message : "Unknown error" },
-      { status: 500 },
+      { status: 500, headers },
     )
   }
 }

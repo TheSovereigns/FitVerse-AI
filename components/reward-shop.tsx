@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTranslation } from "@/lib/i18n";
+import { logger } from "@/lib/logger";
 import {
   ShoppingBag,
   Zap,
@@ -99,7 +100,9 @@ export function RewardShop({ isLocked = false }: RewardShopProps) {
       const storedPurchases = localStorage.getItem("shop_purchases");
       if (storedXp) setUserXp(parseInt(storedXp));
       if (storedPurchases) setPurchases(JSON.parse(storedPurchases));
-    } catch {}
+    } catch (e) {
+      logger.error("[RewardShop] Failed to parse user_xp/shop_purchases:", e)
+    }
   }, []);
 
   const isPurchased = (id: string) => purchases.some((p) => p.itemId === id);

@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTranslation } from "@/lib/i18n";
+import { logger } from "@/lib/logger";
 import { Play, Pause, RotateCcw, Lock, Clock, Wind } from "lucide-react";
 
 interface MeditationSession {
@@ -69,7 +70,9 @@ export function GuidedMeditation({ isLocked = false }: GuidedMeditationProps) {
     try {
       const stored = localStorage.getItem("meditation_sessions");
       if (stored) setSessions(JSON.parse(stored));
-    } catch {}
+    } catch (e) {
+      logger.error("[GuidedMeditation] Failed to parse meditation_sessions:", e)
+    }
   }, []);
 
   const stopExercise = useCallback(() => {
@@ -84,7 +87,7 @@ export function GuidedMeditation({ isLocked = false }: GuidedMeditationProps) {
     if (!selectedExercise) return;
     setIsActive(true);
     setCurrentPhase(0);
-    setPhaseTimer(selectedExercise.pattern[0]);
+    setPhaseTimer(selectedExercise.pattern[0]!);
     setTotalElapsed(0);
 
     intervalRef.current = setInterval(() => {
@@ -114,7 +117,7 @@ export function GuidedMeditation({ isLocked = false }: GuidedMeditationProps) {
             return next;
           });
           const nextPhase = (currentPhase + 1) % selectedExercise.phases.length;
-          return selectedExercise.pattern[nextPhase];
+          return selectedExercise.pattern[nextPhase]!;
         }
         return prev - 1;
       });
@@ -130,7 +133,7 @@ export function GuidedMeditation({ isLocked = false }: GuidedMeditationProps) {
   const circleScale = selectedExercise
     ? (() => {
         const phase = selectedExercise.phases[currentPhase];
-        const total = selectedExercise.pattern[currentPhase];
+        const total = selectedExercise.pattern[currentPhase]!
         if (phase === "Inhale") return 0.5 + 0.5 * (1 - phaseTimer / total);
         if (phase === "Exhale") return 1 - 0.5 * (1 - phaseTimer / total);
         return phase === "Hold" ? 1 : 0.5;

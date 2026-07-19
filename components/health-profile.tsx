@@ -403,10 +403,10 @@ export function HealthProfile({ scanHistory, onNavigateToSettings, onNavigateToS
               </div>
               <div>
                 <h3 className="text-lg font-black uppercase tracking-tight text-foreground">
-                  {locale === "en-US" ? "My Data" : "Meus Dados"}
+                  {t("hp_my_data")}
                 </h3>
                 <p className="text-[10px] font-black uppercase tracking-[0.24em] text-foreground/50">
-                  {locale === "en-US" ? "Personal information" : "Informacoes pessoais"}
+                  {t("hp_personal_info")}
                 </p>
               </div>
             </div>
@@ -426,7 +426,7 @@ export function HealthProfile({ scanHistory, onNavigateToSettings, onNavigateToS
             <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
               <div className="space-y-2">
                 <label className="text-[10px] font-black uppercase tracking-[0.2em] text-foreground/50">
-                  {locale === "en-US" ? "Age" : "Idade"}
+                  {t("hp_age")}
                 </label>
                 <Input
                   type="number"
@@ -439,7 +439,7 @@ export function HealthProfile({ scanHistory, onNavigateToSettings, onNavigateToS
               </div>
               <div className="space-y-2">
                 <label className="text-[10px] font-black uppercase tracking-[0.2em] text-foreground/50">
-                  {locale === "en-US" ? "Weight (kg)" : "Peso (kg)"}
+                  {t("hp_weight_kg")}
                 </label>
                 <Input
                   type="number"
@@ -453,7 +453,7 @@ export function HealthProfile({ scanHistory, onNavigateToSettings, onNavigateToS
               </div>
               <div className="space-y-2">
                 <label className="text-[10px] font-black uppercase tracking-[0.2em] text-foreground/50">
-                  {locale === "en-US" ? "Height (cm)" : "Altura (cm)"}
+                  {t("hp_height_cm")}
                 </label>
                 <Input
                   type="number"
@@ -467,33 +467,33 @@ export function HealthProfile({ scanHistory, onNavigateToSettings, onNavigateToS
               </div>
               <div className="space-y-2">
                 <label className="text-[10px] font-black uppercase tracking-[0.2em] text-foreground/50">
-                  {locale === "en-US" ? "Gender" : "Genero"}
+                  {t("hp_gender")}
                 </label>
                 <select
                   value={editProfileData.gender}
                   onChange={(e) => setEditProfileData({ ...editProfileData, gender: e.target.value })}
                   className="flex h-12 w-full rounded-xl border border-white/10 bg-white/5 px-3 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/50"
                 >
-                  <option value="">{locale === "en-US" ? "Select" : "Selecionar"}</option>
-                  <option value="male">{locale === "en-US" ? "Male" : "Masculino"}</option>
-                  <option value="female">{locale === "en-US" ? "Female" : "Feminino"}</option>
-                  <option value="other">{locale === "en-US" ? "Other" : "Outro"}</option>
+                  <option value="">{t("hp_select")}</option>
+                  <option value="male">{t("hp_male")}</option>
+                  <option value="female">{t("hp_female")}</option>
+                  <option value="other">{t("hp_other")}</option>
                 </select>
               </div>
               <div className="space-y-2">
                 <label className="text-[10px] font-black uppercase tracking-[0.2em] text-foreground/50">
-                  {locale === "en-US" ? "Goal" : "Objetivo"}
+                  {t("hp_goal")}
                 </label>
                 <select
                   value={editProfileData.fitness_goal}
                   onChange={(e) => setEditProfileData({ ...editProfileData, fitness_goal: e.target.value })}
                   className="flex h-12 w-full rounded-xl border border-white/10 bg-white/5 px-3 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/50"
                 >
-                  <option value="">{locale === "en-US" ? "Select" : "Selecionar"}</option>
-                  <option value="lose_weight">{locale === "en-US" ? "Lose Weight" : "Perder Peso"}</option>
-                  <option value="gain_muscle">{locale === "en-US" ? "Gain Muscle" : "Ganhar Massa"}</option>
-                  <option value="maintain">{locale === "en-US" ? "Maintain" : "Manter"}</option>
-                  <option value="improve_health">{locale === "en-US" ? "Improve Health" : "Melhorar Saude"}</option>
+                  <option value="">{t("hp_select")}</option>
+                  <option value="lose_weight">{t("hp_lose_weight")}</option>
+                  <option value="gain_muscle">{t("hp_gain_muscle")}</option>
+                  <option value="maintain">{t("hp_maintain")}</option>
+                  <option value="improve_health">{t("hp_improve_health")}</option>
                 </select>
               </div>
               <div className="flex items-end gap-2">
@@ -503,7 +503,7 @@ export function HealthProfile({ scanHistory, onNavigateToSettings, onNavigateToS
                   className="h-12 flex-1 rounded-xl bg-primary text-sm font-black text-white hover:bg-primary/80"
                 >
                   <Check className="h-4 w-4 mr-2" />
-                  {isSavingProfile ? "..." : locale === "en-US" ? "Save" : "Salvar"}
+                  {isSavingProfile ? "..." : t("hp_save")}
                 </Button>
                 <Button
                   onClick={() => setIsEditingProfile(false)}
@@ -517,11 +517,11 @@ export function HealthProfile({ scanHistory, onNavigateToSettings, onNavigateToS
           ) : (
             <div className="grid grid-cols-2 gap-3 md:grid-cols-5">
               {[
-                { icon: Calendar, label: locale === "en-US" ? "Age" : "Idade", value: profileData.age ? `${profileData.age} ${locale === "en-US" ? "yrs" : "anos"}` : "—" },
-                { icon: Scale, label: locale === "en-US" ? "Weight" : "Peso", value: profileData.weight ? `${profileData.weight} kg` : "—" },
-                { icon: Ruler, label: locale === "en-US" ? "Height" : "Altura", value: profileData.height ? `${profileData.height} cm` : "—" },
-                { icon: User, label: locale === "en-US" ? "Gender" : "Genero", value: getGenderLabel(profileData.gender) || "—" },
-                { icon: Target, label: locale === "en-US" ? "Goal" : "Objetivo", value: getGoalLabel(profileData.fitness_goal) || "—" },
+                { icon: Calendar, label: t("hp_age"), value: profileData.age ? `${profileData.age} ${t("hp_years")}` : "—" },
+                { icon: Scale, label: t("hp_weight"), value: profileData.weight ? `${profileData.weight} kg` : "—" },
+                { icon: Ruler, label: t("hp_height"), value: profileData.height ? `${profileData.height} cm` : "—" },
+                { icon: User, label: t("hp_gender"), value: getGenderLabel(profileData.gender) || "—" },
+                { icon: Target, label: t("hp_goal"), value: getGoalLabel(profileData.fitness_goal) || "—" },
               ].map((item) => (
                 <div key={item.label} className="rounded-2xl border border-white/10 bg-white/5 p-3">
                   <item.icon className="h-4 w-4 text-foreground/40" />

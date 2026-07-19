@@ -38,6 +38,7 @@ import {
 import { toast } from "sonner"
 import { cn } from "@/lib/utils"
 import { useTranslation } from "@/lib/i18n"
+import { logger } from "@/lib/logger"
 import { useAuth } from "@/hooks/useAuth"
 
 type SettingRowProps = {
@@ -91,8 +92,7 @@ function SettingsGroup({
 }
 
 function ThemeSection() {
-  const { locale } = useTranslation()
-  const isEnglish = locale === "en-US"
+  const { t } = useTranslation()
   const [theme, setThemeState] = useState<string>("dark")
   const [accent, setAccent] = useState("orange")
 
@@ -104,7 +104,9 @@ function ThemeSection() {
       if (html.classList.contains("dark")) setThemeState("dark")
       else if (html.classList.contains("light")) setThemeState("light")
       else setThemeState("system")
-    } catch {}
+    } catch (e) {
+      logger.error("[SettingsPage] Failed to read theme state:", e)
+    }
   }, [])
 
   const toggleTheme = () => {
@@ -131,20 +133,20 @@ function ThemeSection() {
         </div>
         <div>
           <h3 className="text-sm font-semibold text-foreground">
-            {isEnglish ? "Appearance" : "Aparencia"}
+            {t("sp_appearance")}
           </h3>
           <p className="text-xs text-muted-foreground">
-            {isEnglish ? "Customize your look" : "Personalize sua aparencia"}
+            {t("sp_customize_look")}
           </p>
         </div>
       </div>
 
       <div className="mb-5">
-        <p className="text-xs text-muted-foreground mb-3">{isEnglish ? "Theme" : "Tema"}</p>
+        <p className="text-xs text-muted-foreground mb-3">{t("sp_theme")}</p>
         <div className="grid grid-cols-3 gap-2">
           {[
-            { id: "dark", icon: Moon, label: isEnglish ? "Dark" : "Escuro" },
-            { id: "light", icon: Sun, label: isEnglish ? "Light" : "Claro" },
+            { id: "dark", icon: Moon, label: t("sp_dark") },
+            { id: "light", icon: Sun, label: t("sp_light") },
           ].map(({ id, icon: Icon, label }) => (
             <button
               key={id}
@@ -162,7 +164,7 @@ function ThemeSection() {
       </div>
 
       <div>
-        <p className="text-xs text-muted-foreground mb-3">{isEnglish ? "Accent Color" : "Cor de Destaque"}</p>
+        <p className="text-xs text-muted-foreground mb-3">{t("sp_accent_color")}</p>
         <div className="flex gap-2">
           {ACCENT_COLORS.map((color) => (
             <button
@@ -184,15 +186,16 @@ function ThemeSection() {
 }
 
 function WearableSection() {
-  const { locale } = useTranslation()
-  const isEnglish = locale === "en-US"
+  const { t } = useTranslation()
   const [connected, setConnected] = useState<Record<string, boolean>>({})
 
   useEffect(() => {
     try {
       const saved = localStorage.getItem("wearableIntegrations")
       if (saved) setConnected(JSON.parse(saved))
-    } catch {}
+    } catch (e) {
+      logger.error("[SettingsPage] Failed to parse wearableIntegrations:", e)
+    }
   }, [])
 
   const toggle = (id: string) => {
@@ -216,7 +219,7 @@ function WearableSection() {
         <div>
           <h3 className="text-sm font-semibold text-foreground">Wearables</h3>
           <p className="text-xs text-muted-foreground">
-            {Object.values(connected).some(Boolean) ? (isEnglish ? "Connected" : "Conectado") : (isEnglish ? "Not connected" : "Nao conectado")}
+            {Object.values(connected).some(Boolean) ? t("sp_wearables_connected") : t("sp_wearables_not_connected")}
           </p>
         </div>
       </div>
@@ -236,10 +239,10 @@ function WearableSection() {
             {connected[item.id] ? (
               <div className="flex items-center gap-1.5">
                 <Check className="h-3.5 w-3.5 text-green-500" />
-                <span className="text-xs text-green-500">{isEnglish ? "On" : "Ligado"}</span>
+                <span className="text-xs text-green-500">{t("sp_wearables_on")}</span>
               </div>
             ) : (
-              <span className="text-xs text-muted-foreground">{isEnglish ? "Connect" : "Conectar"}</span>
+              <span className="text-xs text-muted-foreground">{t("sp_wearables_connect")}</span>
             )}
           </button>
         ))}
@@ -275,7 +278,9 @@ export function SettingsPage({ onBack }: { onBack?: () => void }) {
     try {
       const storedNotifications = localStorage.getItem("notificationsEnabled")
       if (storedNotifications) setNotificationsEnabled(JSON.parse(storedNotifications))
-    } catch {}
+    } catch (e) {
+      logger.error("[SettingsPage] Failed to parse notificationsEnabled:", e)
+    }
   }, [])
 
   useEffect(() => {
@@ -292,7 +297,9 @@ export function SettingsPage({ onBack }: { onBack?: () => void }) {
           setAdsEnabled(data.ads_enabled !== false)
           setIsAdmin(data.is_admin === true)
         }
-      } catch {}
+      } catch (e) {
+        logger.error("[SettingsPage] Failed to fetch profile:", e)
+      }
     }
     fetchProfile()
   }, [user])
@@ -313,7 +320,9 @@ export function SettingsPage({ onBack }: { onBack?: () => void }) {
         if (data) {
           setProfileData({ age: data.age, weight: data.weight, height: data.height, gender: data.gender, fitness_goal: data.fitness_goal })
         }
-      } catch {}
+      } catch (e) {
+        logger.error("[SettingsPage] Failed to load profile data:", e)
+      }
     }
     loadProfile()
   }, [user])
@@ -427,8 +436,6 @@ export function SettingsPage({ onBack }: { onBack?: () => void }) {
     setLocale(locale === "pt-BR" ? "en-US" : "pt-BR")
   }
 
-  const isEnglish = locale === "en-US"
-
   return (
     <div className="relative mx-auto w-full max-w-5xl space-y-5 pb-safe-nav animate-in fade-in duration-500 md:space-y-7">
       {/* Header */}
@@ -491,60 +498,60 @@ export function SettingsPage({ onBack }: { onBack?: () => void }) {
       </SettingsGroup>
 
       {/* My Data */}
-      <SettingsGroup icon={User} title={isEnglish ? "My Data" : "Meus Dados"}>
+      <SettingsGroup icon={User} title={t("sp_my_data")}>
         {isEditingProfile ? (
           <div className="p-4 md:p-6 space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <label className="text-xs text-muted-foreground">{isEnglish ? "Age" : "Idade"}</label>
+                <label className="text-xs text-muted-foreground">{t("sp_age")}</label>
                 <Input type="number" value={editProfileData.age} onChange={(e) => setEditProfileData({ ...editProfileData, age: e.target.value })} className="h-12 rounded-xl border-border bg-background text-foreground" min={10} max={120} />
               </div>
               <div className="space-y-2">
-                <label className="text-xs text-muted-foreground">{isEnglish ? "Weight (kg)" : "Peso (kg)"}</label>
+                <label className="text-xs text-muted-foreground">{t("sp_weight_kg")}</label>
                 <Input type="number" value={editProfileData.weight} onChange={(e) => setEditProfileData({ ...editProfileData, weight: e.target.value })} className="h-12 rounded-xl border-border bg-background text-foreground" min={20} max={300} step={0.1} />
               </div>
               <div className="space-y-2">
-                <label className="text-xs text-muted-foreground">{isEnglish ? "Height (cm)" : "Altura (cm)"}</label>
+                <label className="text-xs text-muted-foreground">{t("sp_height_cm")}</label>
                 <Input type="number" value={editProfileData.height} onChange={(e) => setEditProfileData({ ...editProfileData, height: e.target.value })} className="h-12 rounded-xl border-border bg-background text-foreground" min={100} max={250} step={0.1} />
               </div>
               <div className="space-y-2">
-                <label className="text-xs text-muted-foreground">{isEnglish ? "Gender" : "Genero"}</label>
+                <label className="text-xs text-muted-foreground">{t("sp_gender")}</label>
                 <select value={editProfileData.gender} onChange={(e) => setEditProfileData({ ...editProfileData, gender: e.target.value })} className="flex h-12 w-full rounded-xl border border-border bg-background px-3 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/50">
-                  <option value="">{isEnglish ? "Select" : "Selecionar"}</option>
-                  <option value="male">{isEnglish ? "Male" : "Masculino"}</option>
-                  <option value="female">{isEnglish ? "Female" : "Feminino"}</option>
-                  <option value="other">{isEnglish ? "Other" : "Outro"}</option>
+                  <option value="">{t("sp_select")}</option>
+                  <option value="male">{t("sp_male")}</option>
+                  <option value="female">{t("sp_female")}</option>
+                  <option value="other">{t("sp_other")}</option>
                 </select>
               </div>
               <div className="space-y-2">
-                <label className="text-xs text-muted-foreground">{isEnglish ? "Goal" : "Objetivo"}</label>
+                <label className="text-xs text-muted-foreground">{t("sp_goal")}</label>
                 <select value={editProfileData.fitness_goal} onChange={(e) => setEditProfileData({ ...editProfileData, fitness_goal: e.target.value })} className="flex h-12 w-full rounded-xl border border-border bg-background px-3 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/50">
-                  <option value="">{isEnglish ? "Select" : "Selecionar"}</option>
-                  <option value="lose_weight">{isEnglish ? "Lose Weight" : "Perder Peso"}</option>
-                  <option value="gain_muscle">{isEnglish ? "Gain Muscle" : "Ganhar Massa"}</option>
-                  <option value="maintain">{isEnglish ? "Maintain" : "Manter"}</option>
-                  <option value="improve_health">{isEnglish ? "Improve Health" : "Melhorar Saude"}</option>
+                  <option value="">{t("sp_select")}</option>
+                  <option value="lose_weight">{t("sp_lose_weight")}</option>
+                  <option value="gain_muscle">{t("sp_gain_muscle")}</option>
+                  <option value="maintain">{t("sp_maintain")}</option>
+                  <option value="improve_health">{t("sp_improve_health")}</option>
                 </select>
               </div>
             </div>
             <div className="flex gap-3">
               <Button onClick={handleSaveProfile} disabled={isSavingProfile} className="h-12 flex-1 rounded-2xl bg-primary text-sm font-semibold text-primary-foreground hover:bg-primary/90">
-                {isSavingProfile ? "..." : isEnglish ? "Save" : "Salvar"}
+                {isSavingProfile ? "..." : t("sp_save")}
               </Button>
               <Button onClick={() => setIsEditingProfile(false)} variant="ghost" className="h-12 rounded-2xl border border-border text-muted-foreground hover:bg-accent">
-                {isEnglish ? "Cancel" : "Cancelar"}
+                {t("sp_cancel")}
               </Button>
             </div>
           </div>
         ) : (
           <>
-            <SettingRow icon={Calendar} title={isEnglish ? "Age" : "Idade"} description={profileData.age ? `${profileData.age} ${isEnglish ? "years" : "anos"}` : "—"}><div /></SettingRow>
-            <SettingRow icon={Scale} title={isEnglish ? "Weight" : "Peso"} description={profileData.weight ? `${profileData.weight} kg` : "—"}><div /></SettingRow>
-            <SettingRow icon={Ruler} title={isEnglish ? "Height" : "Altura"} description={profileData.height ? `${profileData.height} cm` : "—"}><div /></SettingRow>
-            <SettingRow icon={User} title={isEnglish ? "Gender" : "Genero"} description={getGenderLabel(profileData.gender)}><div /></SettingRow>
-            <SettingRow icon={Target} title={isEnglish ? "Goal" : "Objetivo"} description={getGoalLabel(profileData.fitness_goal)} isLast>
+            <SettingRow icon={Calendar} title={t("sp_age")} description={profileData.age ? `${profileData.age} ${t("sp_years")}` : "—"}><div /></SettingRow>
+            <SettingRow icon={Scale} title={t("sp_weight")} description={profileData.weight ? `${profileData.weight} kg` : "—"}><div /></SettingRow>
+            <SettingRow icon={Ruler} title={t("sp_height")} description={profileData.height ? `${profileData.height} cm` : "—"}><div /></SettingRow>
+            <SettingRow icon={User} title={t("sp_gender")} description={getGenderLabel(profileData.gender)}><div /></SettingRow>
+            <SettingRow icon={Target} title={t("sp_goal")} description={getGoalLabel(profileData.fitness_goal)} isLast>
               <Button onClick={handleStartEditProfile} className="h-11 rounded-2xl border border-border bg-muted px-5 text-xs text-muted-foreground hover:bg-accent hover:text-foreground">
-                {isEnglish ? "Edit" : "Editar"}
+                {t("sp_edit")}
               </Button>
             </SettingRow>
           </>
@@ -586,7 +593,7 @@ export function SettingsPage({ onBack }: { onBack?: () => void }) {
         <SettingsGroup icon={ShieldCheck} title="Admin">
           <SettingRow icon={ShieldCheck} title="Admin Dashboard" description="Acessar painel administrativo" isLast>
             <Button variant="ghost" onClick={() => router.push("/admin-dashboard")} className="h-11 rounded-2xl border border-border bg-muted px-5 text-xs text-muted-foreground hover:bg-accent hover:text-foreground">
-              {isEnglish ? "Access" : "Acessar"}
+              {t("sp_access")}
               <ChevronRight className="ml-2 h-4 w-4" />
             </Button>
           </SettingRow>

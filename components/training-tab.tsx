@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Dialog, DialogContent } from "@/components/ui/dialog"
 import { Activity, ArrowRight, Building2, Clock, Dumbbell, Flame, Home, Play, Swords, User, Zap } from "lucide-react"
+import { logger } from "@/lib/logger"
 import { WorkoutGenerator } from "@/components/workout-generator"
 import { ActiveWorkoutSession } from "@/components/active-workout-session"
 import { LiveWorkout } from "@/components/live-workout"
@@ -107,7 +108,8 @@ export function TrainingTab({ userGoal }: TrainingTabProps) {
     if (savedWorkouts) {
       try {
         setGeneratedWorkouts(JSON.parse(savedWorkouts))
-      } catch {
+      } catch (e) {
+        logger.error("[TrainingTab] Failed to parse nutritrain-workouts:", e)
         setGeneratedWorkouts(sampleWorkouts)
       }
     } else {
@@ -159,7 +161,7 @@ export function TrainingTab({ userGoal }: TrainingTabProps) {
         },
         body: JSON.stringify({ ...criteria, goal: userGoal || "Hypertrophy & Definition", locale }),
       })
-      const data = await response.json().catch(() => null)
+      const data = await response.json().catch((e) => { logger.error("[TrainingTab] Failed to parse workout response:", e); return null })
       if (!response.ok) {
         const message = data?.error || t("training_error_ai")
         setGenerationError(message)

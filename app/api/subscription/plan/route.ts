@@ -1,13 +1,12 @@
 import { NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL || ''
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_KEY || ''
-const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey, {
-  auth: { autoRefreshToken: false, persistSession: false },
-})
+import { getSupabaseAdmin } from '@/lib/supabase-server'
 
 export async function PATCH(req: Request) {
+  const supabaseAdmin = getSupabaseAdmin()
+  if (!supabaseAdmin) {
+    return NextResponse.json({ error: 'Servico indisponivel.' }, { status: 500 })
+  }
+
   const token = req.headers.get('Authorization')?.replace('Bearer ', '')
   if (!token) {
     return NextResponse.json({ error: 'Nao autorizado.' }, { status: 401 })

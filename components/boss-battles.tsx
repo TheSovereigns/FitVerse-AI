@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTranslation } from "@/lib/i18n";
+import { logger } from "@/lib/logger";
 import { Swords, Heart, Shield, Zap, Trophy, RotateCcw, Lock, Dumbbell, ScanLine, Droplets, CheckCircle } from "lucide-react";
 
 interface BattleRecord {
@@ -56,13 +57,15 @@ export function BossBattles({ isLocked = false }: BossBattlesProps) {
   const [showDefeat, setShowDefeat] = useState(false);
   const [battleStarted, setBattleStarted] = useState(false);
 
-  const boss = bosses[currentBossIndex];
+  const boss = bosses[currentBossIndex]!;
 
   useEffect(() => {
     try {
       const stored = localStorage.getItem("boss_history");
       if (stored) setBattleHistory(JSON.parse(stored));
-    } catch {}
+    } catch (e) {
+      logger.error("[BossBattles] Failed to parse boss_history:", e)
+    }
     setBossHp(boss.maxHp);
   }, [currentBossIndex, boss.maxHp]);
 

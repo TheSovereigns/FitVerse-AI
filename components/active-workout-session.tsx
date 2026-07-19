@@ -16,6 +16,7 @@ interface ActiveWorkoutSessionProps {
 }
 
 import { useTranslation } from "@/lib/i18n"
+import { EXERCISE_TRANSLATIONS, EXERCISE_SEARCH_TERMS } from "@/lib/exercise-translations"
 
 export function ActiveWorkoutSession({ workout, onClose, onComplete }: ActiveWorkoutSessionProps) {
   const { t, locale } = useTranslation()
@@ -33,39 +34,10 @@ export function ActiveWorkoutSession({ workout, onClose, onComplete }: ActiveWor
   const timerRef = useRef<NodeJS.Timeout | null>(null)
   const workoutTimerRef = useRef<NodeJS.Timeout | null>(null)
 
-  const exerciseNameMap: Record<string, string> = {
-    "agachamento livre": "barbell back squat",
-    "agachamento": "barbell squat",
-    "agachamento com halteres": "goblet squat",
-    "flexão de braço": "push up",
-    "flexão": "push up",
-    "polichinelos": "jumping jacks",
-    "polichinelo": "jumping jacks",
-    "supino": "bench press",
-    "abdominal supra": "crunch",
-    "abdominal": "crunch",
-    "burpee": "burpee",
-    "prancha": "plank",
-    "afundo": "lunge",
-    "afundos": "lunge",
-    "remada": "barbell row",
-    "desenvolvimento": "overhead press",
-    "rosca": "bicep curl",
-    "tríceps": "tricep extension",
-    "extensão de tríceps": "tricep extension",
-    "crucifixo": "dumbbell fly",
-    "stiff": "stiff leg deadlift",
-    "leg press": "leg press",
-    "extensora": "leg extension",
-    "flexora": "leg curl",
-    "panturrilha": "calf raise",
-    "elevação de calcanhar": "calf raise",
-  }
-
   const getSearchTerm = () => {
     const name = currentExercise.name.toLowerCase().trim()
     if (locale === "en-US") {
-      for (const [pt, en] of Object.entries(exerciseNameMap)) {
+      for (const [pt, en] of Object.entries(EXERCISE_TRANSLATIONS)) {
         if (name.includes(pt)) return en
       }
       return name
@@ -156,28 +128,8 @@ export function ActiveWorkoutSession({ workout, onClose, onComplete }: ActiveWor
       const cleanName = originalName.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z\s]/g, "").trim()
 
       // Tradução simples PT -> EN para melhorar busca na API (ExerciseDB usa inglês)
-      const termMap: Record<string, string> = {
-        "agachamento": "squat",
-        "flexão": "push up",
-        "flexao": "push up",
-        "abdominal": "crunch",
-        "supino": "bench press",
-        "remada": "row",
-        "desenvolvimento": "shoulder press",
-        "rosca": "curl",
-        "polichinelo": "jumping jack",
-        "prancha": "plank",
-        "puxada": "pull down",
-        "elevação": "raise",
-        "elevacao": "raise",
-        "afundo": "lunge",
-        "leg press": "leg press",
-        "extensora": "extension",
-        "flexora": "curl"
-      }
-      
       let searchTerm = cleanName
-      for (const [pt, en] of Object.entries(termMap)) {
+      for (const [pt, en] of Object.entries(EXERCISE_SEARCH_TERMS)) {
         if (cleanName.includes(pt)) {
           searchTerm = en
           break

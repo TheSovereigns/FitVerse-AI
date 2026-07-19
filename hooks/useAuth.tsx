@@ -4,6 +4,8 @@ import { createContext, useContext, useState, useEffect, useRef, ReactNode } fro
 import { User } from "@supabase/supabase-js"
 import { supabase, getUserProfile, Profile } from "@/lib/supabase"
 import { useRouter } from "next/navigation"
+import { clearFitVerseStorage } from "@/lib/auth-helpers"
+import { logger } from "@/lib/logger"
 
 interface AuthContextType {
   user: User | null
@@ -33,7 +35,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (userProfile) {
         setProfile(userProfile)
         setIsAdmin(userProfile.is_admin || false)
-        console.log("[Auth] Profile loaded, is_admin:", userProfile.is_admin)
+        logger.info("[Auth] Profile loaded, is_admin:", userProfile.is_admin)
       } else {
         setProfile(null)
         setIsAdmin(false)
@@ -45,12 +47,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           .single()
         if (data?.is_admin) {
           setIsAdmin(true)
-          console.log("[Auth] Admin from direct query")
+          logger.info("[Auth] Admin from direct query")
         }
       }
       return userProfile
     } catch (e) {
-      console.error("[Auth] Profile load error:", e)
+      logger.error("[Auth] Profile load error:", e)
       setProfile(null)
       setIsAdmin(false)
       return null
@@ -73,12 +75,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
               .from('profiles')
               .update({ last_seen: new Date().toISOString() })
               .eq('id', session.user.id)
-          } catch {
-            // ignore
+          } catch (e) {
+            logger.error("[Auth] Failed to update last_seen:", e)
           }
-        }
-      } catch {
-        // ignore
+      }
+    } catch (e) {
+      logger.error("[Auth] Session init failed:", e)
       } finally {
         if (mounted) {
           setIsLoading(false)
@@ -130,8 +132,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             p_user_id: data.user.id,
             p_metadata: { email }
           })
-        } catch {
-          // ignore
+        } catch (e) {
+          logger.error("[Auth] Failed to log login event:", e)
         }
 
         // Always redirect - don't wait for profile
@@ -173,8 +175,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             p_user_id: data.user.id,
             p_metadata: { email }
           })
-        } catch {
-          // ignore
+        } catch (e) {
+          logger.error("[Auth] Failed to log signup event:", e)
         }
       }
 
@@ -202,14 +204,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signOut = async () => {
     try {
       await supabase.auth.signOut()
-    } catch {
-      // ignore
+    } catch (e) {
+      logger.error("[Auth] signOut failed:", e)
     }
     setUser(null)
     setProfile(null)
     setIsAdmin(false)
     hasRedirectedRef.current = false
-    localStorage.clear()
+    clearFitVerseStorage()
     // Delay to ensure logout completes
     setTimeout(() => {
       window.location.href = "/auth/login"

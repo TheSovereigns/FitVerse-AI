@@ -1,11 +1,13 @@
 import { NextRequest, NextResponse } from "next/server"
-import { supabaseAdmin } from "@/lib/supabase"
+import { getSupabaseAdmin } from "@/lib/supabase-server"
 
 async function authUser(req: NextRequest) {
   const auth = req.headers.get("authorization")
   if (!auth?.startsWith("Bearer ")) return null
   const token = auth.slice(7)
-  const { data } = await supabaseAdmin.auth.getUser(token)
+  const supabase = getSupabaseAdmin()
+  if (!supabase) return null
+  const { data } = await supabase.auth.getUser(token)
   return data.user ?? null
 }
 
@@ -13,16 +15,19 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
   const user = await authUser(req)
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
+  const supabase = getSupabaseAdmin()
+  if (!supabase) return NextResponse.json({ error: "Server configuration error" }, { status: 500 })
+
   const clanId = params.id
 
-  const { data: membership } = await supabaseAdmin
+  const { data: membership } = await supabase
     .from("clan_members")
     .select("role")
     .eq("clan_id", clanId)
     .eq("user_id", user.id)
     .single()
 
-  const { data: clan } = await supabaseAdmin
+  const { data: clan } = await supabase
     .from("clans")
     .select("*")
     .eq("id", clanId)
@@ -34,12 +39,12 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
     return NextResponse.json({ error: "Access denied" }, { status: 403 })
   }
 
-  const { count: memberCount } = await supabaseAdmin
+  const { count: memberCount } = await supabase
     .from("clan_members")
     .select("*", { count: "exact", head: true })
     .eq("clan_id", clanId)
 
-  const { data: owner } = await supabaseAdmin
+  const { data: owner } = await supabase
     .from("profiles")
     .select("name, avatar_url")
     .eq("id", clan.owner_id)
@@ -61,7 +66,10 @@ export async function DELETE(req: NextRequest, { params }: { params: { id: strin
   const user = await authUser(req)
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
-  const { data: membership } = await supabaseAdmin
+  const supabase = getSupabaseAdmin()
+  if (!supabase) return NextResponse.json({ error: "Server configuration error" }, { status: 500 })
+
+  const { data: membership } = await supabase
     .from("clan_members")
     .select("role")
     .eq("clan_id", params.id)
@@ -72,7 +80,7 @@ export async function DELETE(req: NextRequest, { params }: { params: { id: strin
     return NextResponse.json({ error: "Only owner can delete" }, { status: 403 })
   }
 
-  const { error } = await supabaseAdmin.from("clans").delete().eq("id", params.id)
+  const { error } = await supabase.from("clans").delete().eq("id", params.id)
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
   return NextResponse.json({ success: true })

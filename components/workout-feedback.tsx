@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect, useCallback } from "react"
+import { logger } from "@/lib/logger"
 import { motion, AnimatePresence } from "framer-motion"
 import {
   ThumbsUp,
@@ -74,7 +75,9 @@ export function WorkoutFeedback({
     try {
       const saved = localStorage.getItem(STORAGE_KEY)
       if (saved) setHistory(JSON.parse(saved))
-    } catch {}
+    } catch (e) {
+      logger.error("[WorkoutFeedback] Failed to parse workout history:", e)
+    }
   }, [])
 
   const togglePain = (id: string) => {
@@ -143,7 +146,9 @@ export function WorkoutFeedback({
     setHistory(newHistory)
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(newHistory))
-    } catch {}
+    } catch (e) {
+      logger.error("[WorkoutFeedback] Failed to save workout history:", e)
+    }
 
     setSubmitted(true)
     onSubmit?.(entry)
@@ -302,7 +307,7 @@ export function WorkoutFeedback({
                   <div className="p-2 rounded-lg bg-muted/50 text-center">
                     <p className="text-[10px] text-muted-foreground mb-0.5">Previous</p>
                     <p className="text-sm font-semibold text-foreground">
-                      {history[history.length - 2].difficulty}/5
+                      {history[history.length - 2]!.difficulty}/5
                     </p>
                   </div>
                   <div className="p-2 rounded-lg bg-muted/50 text-center">

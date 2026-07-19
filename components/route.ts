@@ -2,6 +2,7 @@ import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
 import { createClient } from "@supabase/supabase-js";
+import { logger } from "@/lib/logger";
 
 // Inicializa o Stripe
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
@@ -34,7 +35,7 @@ export async function POST(req: Request) {
     // Verifica se a requisição veio realmente do Stripe
     event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
   } catch (err: any) {
-    console.log(`❌ Erro no Webhook: ${err.message}`);
+    logger.error(`❌ Erro no Webhook: ${err.message}`);
     return new NextResponse(`Webhook Error: ${err.message}`, { status: 400 });
   }
 
@@ -50,10 +51,10 @@ export async function POST(req: Request) {
           await handleInvoicePayment(invoice);
           break;
         default:
-          console.log(`Evento não tratado: ${event.type}`);
+          logger.info(`Evento não tratado: ${event.type}`);
       }
     } catch (error) {
-      console.error("Erro ao processar webhook:", error);
+      logger.error("Erro ao processar webhook:", error);
       return new NextResponse('Webhook handler failed', { status: 500 });
     }
   }
@@ -69,7 +70,7 @@ async function handleCheckoutSession(session: Stripe.Checkout.Session) {
   // Ou define um padrão caso não venha
   const planName = session.metadata?.planName || "Premium"; 
 
-  console.log(`Processando compra para: ${session.customer_email} - Plano: ${planName}`);
+  logger.info(`Processando compra para: ${session.customer_email} - Plano: ${planName}`);
 
   // 1. Atualiza ou Cria o Usuário com o novo plano
   const { error: userError } = await supabase

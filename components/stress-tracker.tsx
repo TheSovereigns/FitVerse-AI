@@ -6,6 +6,7 @@ import { Brain, Lock, Lightbulb, Calendar } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts"
 import { useTranslation } from "@/lib/i18n"
+import { logger } from "@/lib/logger"
 import { cn } from "@/lib/utils"
 
 interface StressEntry {
@@ -43,7 +44,9 @@ export function StressTracker({ isLocked = false }: { isLocked?: boolean }) {
     try {
       const saved = localStorage.getItem(STORAGE_KEY)
       if (saved) setEntries(JSON.parse(saved))
-    } catch {}
+    } catch (e) {
+      logger.error("[StressTracker] Failed to parse stress data:", e)
+    }
   }, [])
 
   const saveEntries = useCallback((data: StressEntry[]) => {
@@ -65,7 +68,7 @@ export function StressTracker({ isLocked = false }: { isLocked?: boolean }) {
       d.setDate(d.getDate() - i)
       const key = d.toISOString().split("T")[0]
       const found = entries.find((e) => e.date === key)
-      days.push({ name: dayLabels[(d.getDay() + 6) % 7], stress: found?.stress || 0 })
+      days.push({ name: dayLabels[(d.getDay() + 6) % 7]!, stress: found?.stress || 0 })
     }
     return days
   }, [entries, isEnglish])
@@ -87,18 +90,18 @@ export function StressTracker({ isLocked = false }: { isLocked?: boolean }) {
 
   const insight = useMemo(() => {
     if (todayEntry) {
-      if (todayEntry.stress >= 7) return insights.high[Math.floor(Math.random() * insights.high.length)]
-      if (todayEntry.stress >= 4) return insights.medium[Math.floor(Math.random() * insights.medium.length)]
-      return insights.low[Math.floor(Math.random() * insights.low.length)]
+      if (todayEntry.stress >= 7) return insights.high![Math.floor(Math.random() * insights.high!.length)]
+      if (todayEntry.stress >= 4) return insights.medium![Math.floor(Math.random() * insights.medium!.length)]
+      return insights.low![Math.floor(Math.random() * insights.low!.length)]
     }
-    if (stress >= 7) return insights.high[Math.floor(Math.random() * insights.high.length)]
-    if (stress >= 4) return insights.medium[Math.floor(Math.random() * insights.medium.length)]
-    return insights.low[Math.floor(Math.random() * insights.low.length)]
+    if (stress >= 7) return insights.high![Math.floor(Math.random() * insights.high!.length)]
+    if (stress >= 4) return insights.medium![Math.floor(Math.random() * insights.medium!.length)]
+    return insights.low![Math.floor(Math.random() * insights.low!.length)]
   }, [todayEntry, stress])
 
   const handleLog = () => {
     if (!mood) return
-    const today = new Date().toISOString().split("T")[0]
+    const today = new Date().toISOString().split("T")[0]!
     const entry: StressEntry = { date: today, stress, mood, notes }
     const existing = entries.findIndex((e) => e.date === today)
     const updated = [...entries]

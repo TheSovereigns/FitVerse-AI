@@ -1,11 +1,13 @@
 import { NextRequest, NextResponse } from "next/server"
-import { supabaseAdmin } from "@/lib/supabase"
+import { getSupabaseAdmin } from "@/lib/supabase-server"
 
 async function authUser(req: NextRequest) {
   const auth = req.headers.get("authorization")
   if (!auth?.startsWith("Bearer ")) return null
   const token = auth.slice(7)
-  const { data } = await supabaseAdmin.auth.getUser(token)
+  const supabase = getSupabaseAdmin()
+  if (!supabase) return null
+  const { data } = await supabase.auth.getUser(token)
   return data.user ?? null
 }
 
@@ -13,9 +15,12 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
   const user = await authUser(req)
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
+  const supabase = getSupabaseAdmin()
+  if (!supabase) return NextResponse.json({ error: "Server configuration error" }, { status: 500 })
+
   const clanId = params.id
 
-  const { data: membership } = await supabaseAdmin
+  const { data: membership } = await supabase
     .from("clan_members")
     .select("role")
     .eq("clan_id", clanId)
@@ -27,7 +32,7 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
   }
 
   if (membership.role === "owner") {
-    const { count } = await supabaseAdmin
+    const { count } = await supabase
       .from("clan_members")
       .select("*", { count: "exact", head: true })
       .eq("clan_id", clanId)
@@ -37,7 +42,7 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
     }
   }
 
-  const { error } = await supabaseAdmin
+  const { error } = await supabase
     .from("clan_members")
     .delete()
     .eq("clan_id", clanId)

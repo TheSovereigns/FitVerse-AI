@@ -140,6 +140,7 @@ export function Gamification() {
       const timer = setTimeout(() => setNewBadge(null), 3000)
       return () => clearTimeout(timer)
     }
+    return undefined
   }, [newBadge])
 
   const shareAchievement = (badge: Badge) => {

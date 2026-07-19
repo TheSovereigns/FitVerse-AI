@@ -16,6 +16,7 @@ import {
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useTranslation } from "@/lib/i18n"
+import { logger } from "@/lib/logger"
 
 interface Phase {
   id: string
@@ -114,14 +115,18 @@ export function PeriodizationEngine({
       if (saved) {
         setHistory(JSON.parse(saved))
       }
-    } catch {}
+    } catch (e) {
+      logger.error("[PeriodizationEngine] Failed to parse periodization data:", e)
+    }
   }, [])
 
   const saveHistory = useCallback((newHistory: PhaseHistory[]) => {
     setHistory(newHistory)
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(newHistory))
-    } catch {}
+    } catch (e) {
+      logger.error("[PeriodizationEngine] Failed to save periodization data:", e)
+    }
   }, [])
 
   const advancePhase = () => {
@@ -130,7 +135,7 @@ export function PeriodizationEngine({
       saveHistory([
         ...history,
         {
-          phaseId: PHASES[activePhase].id,
+          phaseId: PHASES[activePhase]!.id,
           completedAt: new Date().toISOString(),
           weekNumber: currentWeek,
         },
@@ -350,10 +355,10 @@ export function PeriodizationEngine({
           >
             <div className="p-3 rounded-xl border border-border bg-muted/50">
               <p className="text-[10px] font-medium text-primary uppercase tracking-wider mb-2">
-                AI Generated Workout — {PHASES[activePhase].name}
+                AI Generated Workout — {PHASES[activePhase]!.name}
               </p>
               <ul className="space-y-1.5">
-                {getWorkoutForPhase(PHASES[activePhase]).map((exercise, i) => (
+                {getWorkoutForPhase(PHASES[activePhase]!).map((exercise, i) => (
                   <li
                     key={i}
                     className="text-xs text-muted-foreground flex items-center gap-2"

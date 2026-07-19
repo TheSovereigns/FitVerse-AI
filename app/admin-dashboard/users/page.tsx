@@ -3,6 +3,7 @@
 export const dynamic = 'force-dynamic'
 
 import { useState, useEffect } from "react"
+import { logger } from "@/lib/logger"
 import { useRouter } from "next/navigation"
 import { motion } from "framer-motion"
 import { 
@@ -171,7 +172,7 @@ export default function AdminUsersPage() {
     })
 
     if (!response.ok) {
-      const data = await response.json().catch(() => null)
+      const data = await response.json().catch((e) => { logger.error("[AdminUsers] Failed to parse admin update response:", e); return null })
       throw new Error(data?.error || "Admin update failed")
     }
   }

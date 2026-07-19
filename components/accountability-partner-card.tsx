@@ -52,7 +52,7 @@ export function AccountabilityPartnerCard() {
     await checkin(pairId, "daily_checkin")
     setTodayCheckins((prev) => ({
       ...prev,
-      [pairId]: { ...prev[pairId], userA: true },
+      [pairId]: { ...prev[pairId], userA: true, userB: prev[pairId]?.userB ?? false },
     }))
   }
 

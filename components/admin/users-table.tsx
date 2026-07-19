@@ -89,7 +89,7 @@ function formatRelativeTime(dateString: string | null, locale: string): string {
 function getInitials(name: string | null, email: string): string {
   if (name) {
     const parts = name.split(" ")
-    return parts[0].charAt(0).toUpperCase() + (parts[1] ? parts[1].charAt(0).toUpperCase() : "")
+    return parts[0]!.charAt(0).toUpperCase() + (parts[1] ? parts[1].charAt(0).toUpperCase() : "")
   }
   return email.charAt(0).toUpperCase()
 }

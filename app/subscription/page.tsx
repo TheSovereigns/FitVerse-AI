@@ -25,6 +25,7 @@ import { useAuth } from "@/hooks/useAuth"
 import { usePlanLimits } from "@/hooks/usePlanLimits"
 import { supabase } from "@/lib/supabase"
 import { useTranslation } from "@/lib/i18n"
+import { logger } from "@/lib/logger"
 import { toast } from "sonner"
 
 type Plan = "free" | "pro" | "premium" | "banned"
@@ -197,7 +198,8 @@ export default function SubscriptionPage() {
       setAdsEnabled(checked)
       localStorage.setItem("adsEnabled", JSON.stringify(checked))
       toast.success(checked ? (isEnglish ? "Ads enabled" : "Anuncios ativados") : (isEnglish ? "Ads disabled" : "Anuncios desativados"))
-    } catch {
+    } catch (e) {
+      logger.error("[SubscriptionPage] Failed to toggle ads:", e)
       toast.error(isEnglish ? "Failed to update ads" : "Falha ao atualizar anuncios")
     } finally {
       setAdsLoading(false)
@@ -219,7 +221,7 @@ export default function SubscriptionPage() {
       body: JSON.stringify({ plan: "free" }),
     })
 
-    const data = await response.json().catch(() => null)
+    const data = await response.json().catch((e) => { logger.error("[SubscriptionPage] Failed to parse plan switch response:", e); return null })
     if (!response.ok || data?.error) {
       throw new Error(data?.error || (isEnglish ? "Could not switch plan." : "Nao foi possivel trocar de plano."))
     }
@@ -250,7 +252,7 @@ export default function SubscriptionPage() {
         signal: controller.signal,
       })
 
-      const data = await response.json().catch(() => null)
+      const data = await response.json().catch((e) => { logger.error("[SubscriptionPage] Failed to parse checkout response:", e); return null })
 
       if (!response.ok || data?.error) {
         throw new Error(data?.error || (isEnglish ? "Checkout failed." : "Falha ao iniciar checkout."))

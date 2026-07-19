@@ -26,6 +26,7 @@ import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
 import { useTranslation } from "@/lib/i18n"
+import { logger } from "@/lib/logger"
 import { supabase } from "@/lib/supabase"
 import { useAuth } from "@/hooks/useAuth"
 
@@ -138,7 +139,9 @@ export function DietaryRestrictions({ onRestrictionsChange }: DietaryRestriction
         const parsed = JSON.parse(saved)
         if (Array.isArray(parsed.restrictions)) setSelected(parsed.restrictions)
         if (Array.isArray(parsed.customAllergies)) setCustomAllergies(parsed.customAllergies)
-      } catch {}
+      } catch (e) {
+        logger.error("[DietaryRestrictions] Failed to parse saved restrictions:", e)
+      }
     }
   }, [])
 

@@ -2,6 +2,8 @@
 
 import { useState, useEffect, useCallback } from "react"
 import { subDays, startOfWeek, endOfWeek, format } from "date-fns"
+import { logger } from "@/lib/logger"
+import { supabase } from "@/lib/supabase"
 
 interface DayData {
   date: string
@@ -47,7 +49,7 @@ function collectWeeklyData(): WeeklyReportData {
 
   for (let i = 6; i >= 0; i--) {
     const date = subDays(today, i)
-    const dateKey = date.toISOString().split("T")[0]
+    const dateKey = date.toISOString().split("T")[0]!
     const dayLabel = format(date, "EEE")
 
     let scans = 0
@@ -73,7 +75,9 @@ function collectWeeklyData(): WeeklyReportData {
           scoreCount++
         }
       }
-    } catch {}
+    } catch (e) {
+      logger.error("[useWeeklyReport] Failed to parse dailyActivity:", e)
+    }
 
     try {
       const workoutsData = localStorage.getItem("generatedWorkouts")
@@ -81,7 +85,9 @@ function collectWeeklyData(): WeeklyReportData {
         const list = JSON.parse(workoutsData)
         workouts = Array.isArray(list) ? list.filter((w: any) => w.createdAt?.split("T")[0] === dateKey).length : 0
       }
-    } catch {}
+    } catch (e) {
+      logger.error("[useWeeklyReport] Failed to parse generatedWorkouts:", e)
+    }
 
     try {
       const dietsData = localStorage.getItem("generatedDiets")
@@ -89,7 +95,9 @@ function collectWeeklyData(): WeeklyReportData {
         const list = JSON.parse(dietsData)
         diets = Array.isArray(list) ? list.filter((d: any) => d.createdAt?.split("T")[0] === dateKey).length : 0
       }
-    } catch {}
+    } catch (e) {
+      logger.error("[useWeeklyReport] Failed to parse generatedDiets:", e)
+    }
 
     totalScans += scans
     totalWorkouts += workouts
@@ -115,7 +123,9 @@ function collectWeeklyData(): WeeklyReportData {
       const parsed = JSON.parse(streakData)
       currentStreak = parsed.currentStreak || 0
     }
-  } catch {}
+  } catch (e) {
+    logger.error("[useWeeklyReport] Failed to parse streakData:", e)
+  }
 
   const prevWeekScans = Math.round(totalScans * 0.8)
   const prevWeekWorkouts = Math.round(totalWorkouts * 0.8)
@@ -150,9 +160,20 @@ export function useWeeklyReport() {
     setReport(data)
 
     try {
+      let token = ""
+      try {
+        const { data: sessionData } = await supabase.auth.getSession()
+        token = sessionData.session?.access_token || ""
+      } catch (e) {
+        logger.error("[useWeeklyReport] Failed to get session:", e)
+      }
+
+      const headers: Record<string, string> = { "Content-Type": "application/json" }
+      if (token) headers["Authorization"] = `Bearer ${token}`
+
       const res = await fetch("/api/weekly-report", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers,
         body: JSON.stringify(data),
       })
       const result = await res.json()
@@ -160,7 +181,7 @@ export function useWeeklyReport() {
         setAiInsight(result.insight)
       }
     } catch (e) {
-      console.error("Error generating AI insight:", e)
+      logger.error("Error generating AI insight:", e)
     } finally {
       setIsLoading(false)
     }

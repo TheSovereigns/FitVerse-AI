@@ -8,6 +8,7 @@ import {
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
+import { logger } from "@/lib/logger"
 import { useTranslation } from "@/lib/i18n"
 
 interface WearableData {
@@ -44,7 +45,9 @@ export function WearableIntegrations() {
       if (saved) setIntegrations(JSON.parse(saved))
       const data = localStorage.getItem("wearableData")
       if (data) setWearableData(JSON.parse(data))
-    } catch {}
+    } catch (e) {
+      logger.error("[WearableIntegrations] Failed to parse wearable data:", e)
+    }
   }, [])
 
   const toggleConnection = async (id: string) => {

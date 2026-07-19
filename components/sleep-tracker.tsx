@@ -6,6 +6,7 @@ import { Moon, Star, Lock, TrendingUp, TrendingDown, AlertTriangle, Lightbulb } 
 import { Button } from "@/components/ui/button"
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts"
 import { useTranslation } from "@/lib/i18n"
+import { logger } from "@/lib/logger"
 import { cn } from "@/lib/utils"
 
 interface SleepEntry {
@@ -30,8 +31,8 @@ const sleepTips: Record<number, string[]> = {
 function calculateDuration(bedtime: string, wakeTime: string): number {
   const [bH, bM] = bedtime.split(":").map(Number)
   const [wH, wM] = wakeTime.split(":").map(Number)
-  let bedMinutes = bH * 60 + bM
-  let wakeMinutes = wH * 60 + wM
+  let bedMinutes = bH! * 60 + bM!
+  let wakeMinutes = wH! * 60 + wM!
   if (wakeMinutes <= bedMinutes) wakeMinutes += 24 * 60
   return Math.round(((wakeMinutes - bedMinutes) / 60) * 10) / 10
 }
@@ -55,7 +56,9 @@ export function SleepTracker({ isLocked = false }: { isLocked?: boolean }) {
     try {
       const saved = localStorage.getItem(STORAGE_KEY)
       if (saved) setEntries(JSON.parse(saved))
-    } catch {}
+    } catch (e) {
+      logger.error("[SleepTracker] Failed to parse sleep data:", e)
+    }
   }, [])
 
   const saveEntries = useCallback((data: SleepEntry[]) => {
@@ -79,7 +82,7 @@ export function SleepTracker({ isLocked = false }: { isLocked?: boolean }) {
       d.setDate(d.getDate() - i)
       const key = d.toISOString().split("T")[0]
       const found = entries.find((e) => e.date === key)
-      days.push({ name: dayLabels[(d.getDay() + 6) % 7], hours: found?.duration || 0 })
+      days.push({ name: dayLabels[(d.getDay() + 6) % 7]!, hours: found?.duration || 0 })
     }
     return days
   }, [entries, isEnglish])
@@ -96,12 +99,12 @@ export function SleepTracker({ isLocked = false }: { isLocked?: boolean }) {
 
   const tip = useMemo(() => {
     const q = todayEntry?.quality || quality
-    const tips = sleepTips[q] || sleepTips[3]
+    const tips = sleepTips[q] || sleepTips[3]!
     return tips[Math.floor(Math.random() * tips.length)]
   }, [todayEntry, quality])
 
   const handleLog = () => {
-    const today = new Date().toISOString().split("T")[0]
+    const today = new Date().toISOString().split("T")[0]!
     const entry: SleepEntry = { date: today, bedtime, wakeTime, duration, quality }
     const existing = entries.findIndex((e) => e.date === today)
     const updated = [...entries]

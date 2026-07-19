@@ -5,6 +5,7 @@ import { Palette, Check, Sun, Moon, Monitor } from "lucide-react"
 import { useTheme } from "next-themes"
 import { cn } from "@/lib/utils"
 import { useTranslation } from "@/lib/i18n"
+import { logger } from "@/lib/logger"
 
 const ACCENT_COLORS = [
   { id: "orange", label: "Laranja", color: "#FF9500", css: "rgba(255,149,0,1)" },
@@ -34,7 +35,9 @@ export function ThemeCustomizer() {
       if (saved) setAccent(saved)
       const savedFont = localStorage.getItem("fitverse-font-size")
       if (savedFont) setFontSize(savedFont)
-    } catch {}
+    } catch (e) {
+      logger.error("[ThemeCustomizer] Failed to parse theme settings:", e)
+    }
   }, [])
 
   const changeAccent = (id: string) => {

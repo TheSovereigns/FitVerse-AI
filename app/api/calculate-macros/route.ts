@@ -1,6 +1,7 @@
 import { createGoogleGenerativeAI } from "@ai-sdk/google"
 import { generateText } from "ai"
 import { NextResponse } from "next/server"
+import { authUser, getCorsHeaders } from "@/lib/auth-helpers"
 
 const google = createGoogleGenerativeAI({
   apiKey: process.env.GEMINI_API_KEY || process.env.GOOGLE_GENERATIVE_AI_API_KEY,
@@ -73,6 +74,13 @@ function calculateMacros(tdee: number, goal: string) {
 }
 
 export async function POST(request: Request) {
+  const headers = getCorsHeaders()
+
+  const user = await authUser(request)
+  if (!user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401, headers })
+  }
+
   try {
     const perfil: BioPerfil = await request.json()
 
@@ -81,7 +89,7 @@ export async function POST(request: Request) {
     const macros = calculateMacros(tdee, perfil.goal)
 
     const { text } = await generateText({
-      model: google("gemini-2.5-flash"),
+      model: google("gemini-3.1-flash-lite"),
       prompt: `Você é um nutricionista especialista em longevidade e performance. Analise este perfil:
 
 DADOS DO USUÁRIO:
@@ -119,7 +127,7 @@ Seja científico mas acessível. Foque em resultados realistas e sustentáveis.`
     const explanationMatch = text.match(/EXPLANATION:[\s\S]*?(.+?)(?=MACRO_TIPS:|$)/)
     const tipsMatch = text.match(/MACRO_TIPS:\s*(.+)/)
 
-    const weeks = weeksMatch ? Number.parseInt(weeksMatch[1]) : 12
+    const weeks = weeksMatch ? Number.parseInt(weeksMatch[1] ?? '12') : 12
     const explanation =
       explanationMatch?.[1]?.trim() ||
       "Com base no seu perfil, seguindo consistentemente este plano, deverá alcançar resultados visíveis progressivamente."
@@ -131,18 +139,21 @@ Seja científico mas acessível. Foque em resultados realistas e sustentáveis.`
         .map((tip) => tip.trim())
         .filter(Boolean) || []
 
-    return NextResponse.json({
-      plan: {
-        macros,
-        prediction: {
-          weeks,
-          explanation,
-          macroTips,
+    return NextResponse.json(
+      {
+        plan: {
+          macros,
+          prediction: {
+            weeks,
+            explanation,
+            macroTips,
+          },
         },
       },
-    })
+      { headers },
+    )
   } catch (error) {
     console.error("[Fitverse] Error calculating macros:", error)
-    return NextResponse.json({ error: "Failed to calculate macros" }, { status: 500 })
+    return NextResponse.json({ error: "Failed to calculate macros" }, { status: 500, headers })
   }
 }

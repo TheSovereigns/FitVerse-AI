@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
 import { useTranslation } from "@/lib/i18n";
+import { logger } from "@/lib/logger";
 import {
   Trophy,
   Target,
@@ -51,18 +52,21 @@ const currentSeason = {
   ],
 };
 
-const mockLeaderboard = [
-  { rank: 1, name: "FitQueen", xp: 2450, avatar: "👑" },
-  { rank: 2, name: "GymRat99", xp: 2200, avatar: "🐀" },
-  { rank: 3, name: "YogaMaster", xp: 1980, avatar: "🧘" },
-  { rank: 4, name: "CardioKing", xp: 1750, avatar: "🏃" },
-  { rank: 5, name: "You", xp: 1200, avatar: "💪", isUser: true },
-];
+function getLeaderboard(userXp: number) {
+  const names = ["FitQueen", "GymRat99", "YogaMaster", "CardioKing"]
+  const avatars = ["👑", "🐀", "🧘", "🏃"]
+  const entries = names.map((name, i) => ({
+    rank: i + 1,
+    name,
+    xp: Math.max(0, Math.floor(userXp * (1.8 - i * 0.3))),
+    avatar: avatars[i]!,
+  }))
+  entries.push({ rank: 5, name: "Você", xp: userXp, avatar: "💪" })
+  entries.sort((a, b) => b.xp - a.xp)
+  return entries.map((e, i) => ({ ...e, rank: i + 1, isUser: e.name === "Você" }))
+}
 
-const seasonHistory: SeasonHistoryEntry[] = [
-  { seasonId: "s1", name: "Winter Warrior", completed: true, xpEarned: 800, badge: "Frost Fighter" },
-  { seasonId: "s2", name: "Spring Reset", completed: true, xpEarned: 1200, badge: "Renewal" },
-];
+const seasonHistory: SeasonHistoryEntry[] = [];
 
 export function SeasonSystem({}: SeasonSystemProps) {
   const { t } = useTranslation();
@@ -84,7 +88,9 @@ export function SeasonSystem({}: SeasonSystemProps) {
         setProgress(initial);
         localStorage.setItem("season_progress", JSON.stringify(initial));
       }
-    } catch {}
+    } catch (e) {
+      logger.error("[SeasonSystem] Failed to parse/setItem season_progress:", e)
+    }
   }, []);
 
   const daysElapsed = progress
@@ -103,9 +109,9 @@ export function SeasonSystem({}: SeasonSystemProps) {
     currentSeason.challenges.reduce((best, c) => (c.day <= daysElapsed ? c : best), currentSeason.challenges[0]);
 
   const todayTasks = [
-    { label: `${currentChallenge.workouts} Workout${currentChallenge.workouts > 1 ? "s" : ""}`, icon: Dumbbell, done: false },
-    { label: `${currentChallenge.scans} Food Scan${currentChallenge.scans > 1 ? "s" : ""}`, icon: ScanLine, done: false },
-    { label: `${currentChallenge.water}L Water`, icon: Droplets, done: false },
+    { label: `${currentChallenge!.workouts} Workout${currentChallenge!.workouts > 1 ? "s" : ""}`, icon: Dumbbell, done: false },
+    { label: `${currentChallenge!.scans} Food Scan${currentChallenge!.scans > 1 ? "s" : ""}`, icon: ScanLine, done: false },
+    { label: `${currentChallenge!.water}L Water`, icon: Droplets, done: false },
   ];
 
   return (
@@ -144,7 +150,7 @@ export function SeasonSystem({}: SeasonSystemProps) {
       <div className="mb-6">
         <h3 className="text-sm font-medium text-foreground mb-3">Leaderboard</h3>
         <div className="space-y-2">
-          {mockLeaderboard.map((entry) => (
+          {getLeaderboard(progress?.totalXp || 0).map((entry) => (
             <div
               key={entry.rank}
               className={`flex items-center gap-3 p-3 rounded-xl border ${

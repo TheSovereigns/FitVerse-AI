@@ -1,18 +1,23 @@
 import { NextResponse } from 'next/server'
 import Stripe from 'stripe'
-import { createClient } from '@supabase/supabase-js'
+import { createClient, SupabaseClient } from '@supabase/supabase-js'
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
-  apiVersion: '2024-06-20',
-})
+function getSupabaseAdmin(): SupabaseClient | null {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL || ''
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_KEY || ''
+  if (!url || !key) return null
+  return createClient(url, key, {
+    auth: { autoRefreshToken: false, persistSession: false },
+  })
+}
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL || ''
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_KEY || ''
-const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey, {
-  auth: { autoRefreshToken: false, persistSession: false },
-})
+function getStripe() {
+  const key = process.env.STRIPE_SECRET_KEY
+  if (!key) return null
+  return new Stripe(key, { apiVersion: '2024-06-20' })
+}
 
-async function getAdminUser(req: Request) {
+async function getAdminUser(req: Request, supabaseAdmin: SupabaseClient) {
   const token = req.headers.get('Authorization')?.replace('Bearer ', '')
   if (!token) return null
 
@@ -29,14 +34,23 @@ async function getAdminUser(req: Request) {
 }
 
 export async function GET(req: Request) {
-  if (!process.env.STRIPE_SECRET_KEY) {
+  const stripe = getStripe()
+  if (!stripe) {
     return NextResponse.json(
       { success: false, error: 'Stripe nao configurado.' },
       { status: 500 }
     )
   }
 
-  const adminUser = await getAdminUser(req)
+  const supabaseAdmin = getSupabaseAdmin()
+  if (!supabaseAdmin) {
+    return NextResponse.json(
+      { success: false, error: 'Servidor nao configurado.' },
+      { status: 500 }
+    )
+  }
+
+  const adminUser = await getAdminUser(req, supabaseAdmin)
   if (!adminUser) {
     return NextResponse.json(
       { success: false, error: 'Nao autorizado.' },

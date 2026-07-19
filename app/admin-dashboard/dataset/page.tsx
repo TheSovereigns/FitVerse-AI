@@ -230,7 +230,7 @@ export default function DatasetPage() {
       if (growthRows) {
         const dateMap: Record<string, number> = {}
         growthRows.forEach((r) => {
-          const d = r.created_at.split("T")[0]
+          const d = r.created_at?.split("T")[0] ?? "unknown"
           dateMap[d] = (dateMap[d] || 0) + 1
         })
         let cumulative = 0
@@ -248,22 +248,22 @@ export default function DatasetPage() {
       if (data) {
         data.forEach((m) => {
           if (m.user_rating && m.user_rating >= 1 && m.user_rating <= 5) {
-            ratingCounts[m.user_rating]++
+            ratingCounts[m.user_rating] = (ratingCounts[m.user_rating] || 0) + 1
           }
-          if (m.user_message_lang === "pt") langCounts.pt++
-          else if (m.user_message_lang === "en") langCounts.en++
+          if (m.user_message_lang === "pt") langCounts.pt = (langCounts.pt || 0) + 1
+          else if (m.user_message_lang === "en") langCounts.en = (langCounts.en || 0) + 1
         })
       }
       setRatingData([
-        { rating: "1★", count: ratingCounts[1], color: "#EF4444" },
-        { rating: "2★", count: ratingCounts[2], color: "#F97316" },
-        { rating: "3★", count: ratingCounts[3], color: "#EAB308" },
-        { rating: "4★", count: ratingCounts[4], color: "#22C55E" },
-        { rating: "5★", count: ratingCounts[5], color: "#10B981" },
+        { rating: "1★", count: ratingCounts[1] || 0, color: "#EF4444" },
+        { rating: "2★", count: ratingCounts[2] || 0, color: "#F97316" },
+        { rating: "3★", count: ratingCounts[3] || 0, color: "#EAB308" },
+        { rating: "4★", count: ratingCounts[4] || 0, color: "#22C55E" },
+        { rating: "5★", count: ratingCounts[5] || 0, color: "#10B981" },
       ])
       setLangData([
-        { name: "Português", value: langCounts.pt, color: "#FF9500" },
-        { name: "English", value: langCounts.en, color: "#4ECDC4" },
+        { name: "Português", value: langCounts.pt || 0, color: "#FF9500" },
+        { name: "English", value: langCounts.en || 0, color: "#4ECDC4" },
       ])
     } catch (error) {
       console.error("Failed to fetch dataset:", error)

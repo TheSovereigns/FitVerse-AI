@@ -1,26 +1,19 @@
 import { NextResponse } from 'next/server';
 import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold, Content } from '@google/generative-ai';
-import { createClient } from '@supabase/supabase-js';
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL || '';
-const supabaseKey = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY || '';
-const supabaseAdmin = createClient(supabaseUrl, supabaseKey, { auth: { autoRefreshToken: false, persistSession: false } });
+import { getSupabaseAdmin, getCorsHeaders } from '@/lib/supabase-server';
+import { logger } from '@/lib/logger';
+import { checkRateLimit, getRateLimitKey, RATE_LIMITS } from '@/lib/rate-limit';
+import { detectCategory, detectLanguage } from '@/lib/chat-helpers';
 
 export async function OPTIONS() {
-  return NextResponse.json({}, {
-    headers: {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'POST, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-    },
-  });
+  return NextResponse.json({}, { headers: getCorsHeaders() });
 }
 
 const apiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_GENERATIVE_AI_API_KEY;
 const genAI = apiKey ? new GoogleGenerativeAI(apiKey) : null;
 
 const model = genAI ? genAI.getGenerativeModel({
-  model: 'gemini-2.0-flash',
+  model: 'gemini-3.1-flash-lite',
 }) : null;
 
 const generationConfig = {
@@ -39,69 +32,24 @@ const safetySettings = [
 
 const MAX_HISTORY_LENGTH = 20;
 
-const WORKOUT_KEYWORDS = ['treino', 'exercício', 'exercicio', 'série', 'serie', 'repetição', 'repeticao', 'musculação', 'musculacao', 'academia', 'peso', 'hipertrofia', 'workout', 'exercise', 'set', 'rep', 'gym', 'lifting', 'strength'];
-const NUTRITION_KEYWORDS = ['dieta', 'caloria', 'proteína', 'proteina', 'refeição', 'refeicao', 'carboidrato', 'gordura', 'macro', 'nutrição', 'nutricao', 'comida', 'alimentação', 'alimentacao', 'vitamina', 'suplemento', 'whey', 'creatina', 'nutrition', 'diet', 'calorie', 'protein', 'meal', 'carb', 'fat', 'food', 'eat'];
-const MOTIVATION_KEYWORDS = ['motivação', 'motivacao', 'desânimo', 'desanimo', 'cansado', 'preguiça', 'preguica', 'desistir', 'motivation', 'tired', 'lazy', 'give up', 'depressed', 'sad', 'ansioso', 'ansiedade', 'anxiety'];
-const RECOVERY_KEYWORDS = ['dor', 'lesão', 'lesao', 'recuperação', 'recuperacao', 'descanso', 'alongamento', 'stretching', 'pain', 'injury', 'injured', 'sore', 'rest', 'sleep', 'sono', 'dormir', 'cãibra', 'caimbra', 'cramp', 'inflammation', 'inflamação', 'inflamacao'];
-const SUPPLEMENT_KEYWORDS = ['suplemento', 'suplementação', 'suplementacao', 'creatina', 'whey', 'bcaa', 'beta-alanine', 'glutamina', 'multivitaminico', 'omega 3', 'pre-workout', 'supplement', 'creatine', 'vitamin', 'mineral'];
-
-function detectCategory(message: string): { category: string; subcategory: string } {
-  const lower = message.toLowerCase();
-  if (SUPPLEMENT_KEYWORDS.some(kw => lower.includes(kw))) return { category: 'supplement', subcategory: 'general' };
-  if (WORKOUT_KEYWORDS.some(kw => lower.includes(kw))) {
-    if (lower.includes('peito') || lower.includes('chest')) return { category: 'workout', subcategory: 'chest_workout' };
-    if (lower.includes('costa') || lower.includes('back')) return { category: 'workout', subcategory: 'back_workout' };
-    if (lower.includes('perna') || lower.includes('leg') || lower.includes('quadríceps') || lower.includes('glúteo')) return { category: 'workout', subcategory: 'leg_workout' };
-    if (lower.includes('ombro') || lower.includes('shoulder')) return { category: 'workout', subcategory: 'shoulder_workout' };
-    if (lower.includes('braço') || lower.includes('bíceps') || lower.includes('tríceps') || lower.includes('arm')) return { category: 'workout', subcategory: 'arm_workout' };
-    if (lower.includes('abdômen') || lower.includes('abdominal') || lower.includes('core')) return { category: 'workout', subcategory: 'core_workout' };
-    return { category: 'workout', subcategory: 'general' };
-  }
-  if (NUTRITION_KEYWORDS.some(kw => lower.includes(kw))) {
-    if (lower.includes('proteína') || lower.includes('protein')) return { category: 'nutrition', subcategory: 'protein_intake' };
-    if (lower.includes('caloria') || lower.includes('calorie')) return { category: 'nutrition', subcategory: 'calorie_tracking' };
-    if (lower.includes('receita') || lower.includes('recipe') || lower.includes('cozinhar') || lower.includes('cook')) return { category: 'nutrition', subcategory: 'recipes' };
-    return { category: 'nutrition', subcategory: 'general' };
-  }
-  if (MOTIVATION_KEYWORDS.some(kw => lower.includes(kw))) return { category: 'motivation', subcategory: 'general' };
-  if (RECOVERY_KEYWORDS.some(kw => lower.includes(kw))) {
-    if (lower.includes('dor') || lower.includes('pain') || lower.includes('lesão') || lower.includes('injury')) return { category: 'recovery', subcategory: 'injury_pain' };
-    if (lower.includes('sono') || lower.includes('sleep') || lower.includes('dormir') || lower.includes('rest') || lower.includes('descanso')) return { category: 'recovery', subcategory: 'sleep_rest' };
-    return { category: 'recovery', subcategory: 'general' };
-  }
-  return { category: 'general', subcategory: 'general' };
-}
-
-function detectLanguage(text: string): 'pt' | 'en' {
-  const ptWords = ['o', 'a', 'os', 'as', 'um', 'uma', 'de', 'do', 'da', 'dos', 'das', 'em', 'no', 'na', 'nos', 'nas', 'para', 'por', 'com', 'sem', 'que', 'e', 'ou', 'mas', 'como', 'não', 'sim', 'muito', 'mais', 'menos', 'é', 'são', 'foi', 'ser', 'estar', 'ter', 'fazer', 'poder', 'deve', 'precisa', 'quer', 'treino', 'dieta', 'exercício', 'academia', 'proteína', 'caloria', 'saúde'];
-  const lower = text.toLowerCase();
-  const words = lower.split(/\s+/);
-  let ptCount = 0;
-  let enCount = 0;
-  for (const word of words) {
-    if (ptWords.includes(word)) ptCount++;
-  }
-  if (lower.includes(' the ') || lower.includes(' is ') || lower.includes(' are ') || lower.includes(' was ') || lower.includes(' were ') || lower.includes(' have ') || lower.includes(' has ') || lower.includes(' will ') || lower.includes(' would ') || lower.includes(' could ') || lower.includes(' should ')) {
-    enCount += 2;
-  }
-  return ptCount >= enCount ? 'pt' : 'en';
-}
-
 export async function POST(req: Request) {
-  const headers = {
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Methods': 'POST, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-  };
+  const headers = getCorsHeaders();
+  const supabaseAdmin = getSupabaseAdmin();
 
-  console.log('[Chatbot] API called, apiKey exists:', !!apiKey, 'model exists:', !!model);
+  const rlKey = getRateLimitKey(req, "chatbot")
+  const rl = checkRateLimit(rlKey, RATE_LIMITS.chatbot)
+  if (!rl.allowed) {
+    return NextResponse.json({ error: "Rate limit exceeded" }, { status: 429, headers })
+  }
+
+  logger.info('[Chatbot] API called, apiKey exists:', !!apiKey, 'model exists:', !!model);
 
   if (!apiKey || !model) {
     console.error('[Chatbot] Gemini API not configured');
     return NextResponse.json({ reply: "Erro: Chave de API do Gemini não configurada." }, { status: 500, headers });
   }
 
-  console.log('[Chatbot] Supabase admin configured:', !!supabaseAdmin);
+  logger.info('[Chatbot] Supabase admin configured:', !!supabaseAdmin);
 
   try {
     let body;
@@ -176,7 +124,7 @@ Responda em português ou inglês conforme a pergunta.`;
       };
     });
 
-    if (chatHistory.length > 0 && chatHistory[0].role !== 'user') {
+    if (chatHistory.length > 0 && chatHistory[0]?.role !== 'user') {
       chatHistory.shift();
     }
 
@@ -234,7 +182,7 @@ PERGUNTA: ${message}`;
                 user_context: userContext || {},
                 ai_response: reply,
                 ai_response_lang: aiResponseLang,
-                model_used: 'gemini-2.5-flash',
+                model_used: 'gemini-3.1-flash-lite',
                 tokens_used: tokensUsed,
                 response_time_ms: responseTimeMs,
                 category,

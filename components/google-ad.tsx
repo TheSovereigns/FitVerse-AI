@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react"
 import { usePlanLimits } from "@/hooks/usePlanLimits"
+import { logger } from "@/lib/logger"
 
 interface GoogleAdProps {
   adSlot: string
@@ -22,7 +23,7 @@ export function GoogleAd({ adSlot, format = "auto", className = "" }: GoogleAdPr
           ;(window as any).adsbygoogle.push({})
         }
       } catch (e) {
-        // ignore
+        logger.error("[GoogleAd] Failed to push AdMob ad:", e)
       }
     }
   }, [limits.hasAds])

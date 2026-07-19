@@ -1,15 +1,9 @@
 import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
-import { createClient } from '@supabase/supabase-js';
+import { getSupabaseAdmin } from '@/lib/supabase-server';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
   apiVersion: '2024-06-20',
-});
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL || '';
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_KEY || '';
-const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey, {
-  auth: { autoRefreshToken: false, persistSession: false },
 });
 
 type PaidPlan = 'pro' | 'premium';
@@ -30,7 +24,11 @@ function normalizeSubscriptionStatus(status: Stripe.Subscription.Status) {
   return 'canceled';
 }
 
-async function syncSubscription(subscription: Stripe.Subscription) {
+async function syncSubscription(subscription: Stripe.Subscription, supabaseAdmin: ReturnType<typeof getSupabaseAdmin>) {
+  if (!supabaseAdmin) {
+    throw new Error('Supabase admin client is not configured');
+  }
+
   const subscriptionWithPeriod = subscription as Stripe.Subscription & {
     current_period_start?: number | null;
     current_period_end?: number | null;
@@ -69,6 +67,8 @@ async function syncSubscription(subscription: Stripe.Subscription) {
 }
 
 export async function POST(req: Request) {
+  const supabaseAdmin = getSupabaseAdmin();
+
   if (!process.env.STRIPE_SECRET_KEY || !process.env.STRIPE_WEBHOOK_SECRET) {
     return NextResponse.json(
       { error: 'Stripe webhook is not configured' },
@@ -96,6 +96,13 @@ export async function POST(req: Request) {
   }
 
   try {
+    if (!supabaseAdmin) {
+      return NextResponse.json(
+        { error: 'Servidor nao configurado. Chave Supabase ausente.' },
+        { status: 500 }
+      );
+    }
+
     if (event.type === 'checkout.session.completed') {
       const session = event.data.object as Stripe.Checkout.Session;
 
@@ -103,7 +110,7 @@ export async function POST(req: Request) {
         const subscription = await stripe.subscriptions.retrieve(
           session.subscription.toString()
         );
-        await syncSubscription(subscription);
+        await syncSubscription(subscription, supabaseAdmin);
       }
     }
 
@@ -111,7 +118,7 @@ export async function POST(req: Request) {
       event.type === 'customer.subscription.updated' ||
       event.type === 'customer.subscription.deleted'
     ) {
-      await syncSubscription(event.data.object as Stripe.Subscription);
+      await syncSubscription(event.data.object as Stripe.Subscription, supabaseAdmin);
     }
 
     await supabaseAdmin

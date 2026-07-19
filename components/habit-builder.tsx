@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTranslation } from "@/lib/i18n";
+import { logger } from "@/lib/logger";
 import { Check, Plus, X, Flame, Zap } from "lucide-react";
 
 interface Habit {
@@ -42,7 +43,9 @@ export function HabitBuilder({}: HabitBuilderProps) {
       const storedLogs = localStorage.getItem("habit_logs");
       if (storedHabits) setHabits([...defaultHabits, ...JSON.parse(storedHabits)]);
       if (storedLogs) setLogs(JSON.parse(storedLogs));
-    } catch {}
+    } catch (e) {
+      logger.error("[HabitBuilder] Failed to parse habit_list/habit_logs:", e)
+    }
   }, []);
 
   const saveLogs = useCallback((newLogs: HabitLog[]) => {
@@ -50,7 +53,7 @@ export function HabitBuilder({}: HabitBuilderProps) {
     localStorage.setItem("habit_logs", JSON.stringify(newLogs));
   }, []);
 
-  const today = new Date().toISOString().split("T")[0];
+  const today = new Date().toISOString().split("T")[0]!;
   const todayLog = logs.find((l) => l.date === today);
   const completedToday = todayLog?.completed || [];
 

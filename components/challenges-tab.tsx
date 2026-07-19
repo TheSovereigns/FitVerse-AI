@@ -30,7 +30,7 @@ export function ChallengesTab({ clanId }: { clanId?: string }) {
   useEffect(() => {
     const d = new Date()
     d.setDate(d.getDate() + 7)
-    setNewEndDate(d.toISOString().split("T")[0])
+    setNewEndDate(d.toISOString().split("T")[0]!)
   }, [])
 
   const typeIcons: Record<string, any> = {

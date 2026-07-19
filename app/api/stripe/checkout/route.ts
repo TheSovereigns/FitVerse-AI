@@ -1,18 +1,13 @@
 import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
-import { createClient } from '@supabase/supabase-js';
+import { getSupabaseAdmin } from '@/lib/supabase-server';
+import { getCorsHeaders } from "@/lib/auth-helpers";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
   apiVersion: '2024-06-20',
 });
 
 export const maxDuration = 20;
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL || '';
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_KEY || '';
-const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey, {
-  auth: { autoRefreshToken: false, persistSession: false },
-});
 
 const PRICE_IDS = {
   pro: process.env.STRIPE_PRO_PRICE_ID,
@@ -38,17 +33,15 @@ function withTimeout<T>(promise: Promise<T>, timeoutMs: number, message: string)
   ]);
 }
 
-const responseHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-};
+const responseHeaders = getCorsHeaders();
 
 export async function OPTIONS() {
   return NextResponse.json({}, { headers: responseHeaders });
 }
 
 export async function POST(req: Request) {
+  const supabaseAdmin = getSupabaseAdmin();
+
   if (!isConfiguredStripeValue(process.env.STRIPE_SECRET_KEY)) {
     return NextResponse.json(
       { error: 'Stripe nao configurado. Configure STRIPE_SECRET_KEY no ambiente.' },
@@ -57,6 +50,13 @@ export async function POST(req: Request) {
   }
 
   try {
+    if (!supabaseAdmin) {
+      return NextResponse.json(
+        { error: 'Servidor nao configurado. Chave Supabase ausente.' },
+        { status: 500, headers: responseHeaders }
+      );
+    }
+
     const authHeader = req.headers.get('Authorization');
     const token = authHeader?.replace('Bearer ', '');
 
@@ -125,7 +125,7 @@ export async function POST(req: Request) {
       );
 
       if (existingCustomers.data.length > 0) {
-        customerId = existingCustomers.data[0].id;
+        customerId = existingCustomers.data[0]!.id;
       } else {
         const customer = await withTimeout(
           stripe.customers.create({

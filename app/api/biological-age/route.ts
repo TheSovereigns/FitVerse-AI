@@ -1,18 +1,12 @@
 import { NextResponse } from "next/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { createClient } from '@supabase/supabase-js'
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY;
-const supabase = (supabaseUrl && supabaseKey && !supabaseUrl.includes('placeholder') && !supabaseKey.includes('placeholder'))
-  ? createClient(supabaseUrl, supabaseKey)
-  : null;
+import { getSupabaseAdmin } from "@/lib/supabase-server";
+import { getCorsHeaders } from "@/lib/auth-helpers";
 
 export async function POST(req: Request) {
+  const supabase = getSupabaseAdmin();
+  const headers = getCorsHeaders();
   try {
-    const headers = {
-      'Access-Control-Allow-Origin': '*',
-    }
 
     const authHeader = req.headers.get('Authorization')
     if (!authHeader) {
@@ -31,12 +25,12 @@ export async function POST(req: Request) {
 
     const apiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_GENERATIVE_AI_API_KEY;
     if (!apiKey) {
-      return NextResponse.json({ error: "API Key não configurada" }, { status: 500 });
+      return NextResponse.json({ error: "API Key não configurada" }, { status: 500, headers });
     }
 
     const genAI = new GoogleGenerativeAI(apiKey);
     const model = genAI.getGenerativeModel({ 
-      model: "gemini-2.5-flash",
+      model: "gemini-3.5-flash",
       generationConfig: { responseMimeType: "application/json" }
     });
 
@@ -131,14 +125,14 @@ Base o cálculo em pesquisas estabelecidas sobre como fatores de estilo de vida 
     
     try {
       const data = JSON.parse(cleanedText);
-      return NextResponse.json(data);
+      return NextResponse.json(data, { headers });
     } catch (parseError) {
       console.error("Erro ao processar JSON da IA:", cleanedText);
-      return NextResponse.json({ error: "A IA retornou um formato inválido." }, { status: 500 });
+      return NextResponse.json({ error: "A IA retornou um formato inválido." }, { status: 500, headers });
     }
 
   } catch (error: any) {
     console.error("Erro na rota biological-age:", error);
-    return NextResponse.json({ error: error.message || "Erro interno do servidor" }, { status: 500 });
+    return NextResponse.json({ error: error.message || "Erro interno do servidor" }, { status: 500, headers });
   }
 }

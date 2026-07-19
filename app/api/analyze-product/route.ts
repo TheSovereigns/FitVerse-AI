@@ -1,21 +1,12 @@
 import { NextResponse } from 'next/server';
 import { GoogleGenerativeAI } from '@google/generative-ai';
-import { createClient } from '@supabase/supabase-js';
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY;
-const supabase = (supabaseUrl && supabaseKey && !supabaseUrl.includes('placeholder') && !supabaseKey.includes('placeholder')) 
-  ? createClient(supabaseUrl, supabaseKey) 
-  : null;
-
-const PLAN_LIMITS = {
-  free: { scansPerDay: 5 },
-  pro: { scansPerDay: 50 },
-  premium: { scansPerDay: Infinity },
-  banned: { scansPerDay: 0 },
-};
+import { getSupabaseAdmin } from '@/lib/supabase-server';
+import { checkRateLimit, getRateLimitKey, RATE_LIMITS } from '@/lib/rate-limit';
+import { PLAN_LIMITS, type Plan } from '@/lib/plan-limits';
+import { getCorsHeaders } from "@/lib/auth-helpers";
 
 async function checkScanLimit(userId: string, plan: string): Promise<boolean> {
+  const supabase = getSupabaseAdmin();
   if (!supabase) return true;
   
   const today = new Date();
@@ -27,33 +18,30 @@ async function checkScanLimit(userId: string, plan: string): Promise<boolean> {
     .eq('user_id', userId)
     .gte('created_at', today.toISOString());
 
-  const limit = PLAN_LIMITS[plan as keyof typeof PLAN_LIMITS]?.scansPerDay ?? 5;
+  const planLimits = PLAN_LIMITS[(plan as Plan) || 'free'];
+  const limit = typeof planLimits.scansPerDay === 'number' ? planLimits.scansPerDay : 999;
   return (count ?? 0) < limit;
 }
 
 export async function OPTIONS() {
-  return NextResponse.json({}, {
-    headers: {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'POST, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-    },
-  });
+  return NextResponse.json({}, { headers: getCorsHeaders() });
 }
 
 const apiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_GENERATIVE_AI_API_KEY;
 const genAI = apiKey ? new GoogleGenerativeAI(apiKey) : null;
 
 const model = genAI ? genAI.getGenerativeModel({
-  model: 'gemini-2.5-flash',
+  model: 'gemini-3.5-flash',
 }) : null;
 
 export async function POST(req: Request) {
-  const headers = {
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Methods': 'POST, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-  };
+  const headers = getCorsHeaders();
+
+  const rlKey = getRateLimitKey(req, "scan")
+  const rl = checkRateLimit(rlKey, RATE_LIMITS.scan)
+  if (!rl.allowed) {
+    return NextResponse.json({ error: "Rate limit exceeded" }, { status: 429, headers })
+  }
 
   const authHeader = req.headers.get('Authorization');
   if (!authHeader) {
@@ -62,17 +50,18 @@ export async function POST(req: Request) {
 
   const token = authHeader.replace('Bearer ', '');
   
-  if (!supabase) {
+  const supabaseAdmin = getSupabaseAdmin();
+  if (!supabaseAdmin) {
     return NextResponse.json({ error: 'Configuração do servidor incompleta.' }, { status: 500, headers });
   }
   
-  const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+  const { data: { user }, error: authError } = await supabaseAdmin.auth.getUser(token);
 
   if (!user || authError) {
     return NextResponse.json({ error: 'Token inválido.' }, { status: 401, headers });
   }
 
-  const { data: profile } = await supabase
+  const { data: profile } = await supabaseAdmin
     .from('profiles')
     .select('plan')
     .eq('id', user.id)
@@ -205,7 +194,7 @@ export async function POST(req: Request) {
       })) || []
     };
 
-    await supabase.from('scans').insert({
+    await supabaseAdmin.from('scans').insert({
       user_id: user.id,
       product_name: analysis.productName,
       score: analysis.longevityScore,

@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
 import { useTranslation } from "@/lib/i18n"
+import { logger } from "@/lib/logger"
 
 interface BodyPhoto {
   id: string
@@ -48,7 +49,9 @@ export function BodyEvolution() {
     try {
       const saved = localStorage.getItem("bodyEvolution")
       if (saved) setEntries(JSON.parse(saved))
-    } catch {}
+    } catch (e) {
+      logger.error("[BodyEvolution] Failed to parse bodyEvolution:", e)
+    }
   }, [])
 
   const saveEntries = useCallback((data: EvolutionEntry[]) => {
@@ -59,7 +62,7 @@ export function BodyEvolution() {
   const handlePhotoUpload = async (type: "front" | "side" | "back", file: File) => {
     const reader = new FileReader()
     reader.onload = () => {
-      const today = new Date().toISOString().split("T")[0]
+      const today = new Date().toISOString().split("T")[0]!
       const photo: BodyPhoto = {
         id: Date.now().toString(),
         url: reader.result as string,
@@ -274,7 +277,7 @@ export function BodyEvolution() {
 
             {entries.length > 1 && (
               <Button
-                onClick={() => deleteEntry(currentEntry.date)}
+                onClick={() => deleteEntry(currentEntry!.date)}
                 variant="ghost"
                 className="w-full h-8 rounded-lg text-[9px] font-black uppercase tracking-widest text-red-400/50 hover:text-red-400"
               >

@@ -50,28 +50,28 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0d0705] via-[#1a0f00] to-[#0d0705]">
+    <div className="min-h-screen bg-background">
       {/* Mobile Header */}
-      <header className="md:hidden fixed top-0 left-0 right-0 h-14 bg-[#0d0705]/95 backdrop-blur-xl border-b border-white/5 z-50 flex items-center justify-between px-4">
+      <header className="md:hidden fixed top-0 left-0 right-0 h-14 bg-background/95 backdrop-blur-xl border-b border-border z-50 flex items-center justify-between px-4">
         <button
           onClick={() => setSidebarOpen(true)}
-          className="p-2 hover:bg-white/10 rounded-lg transition-colors"
+          className="p-2 hover:bg-muted rounded-lg transition-colors"
         >
-          <Menu className="w-6 h-6 text-white" />
+          <Menu className="w-6 h-6 text-foreground" />
         </button>
         
         <Link href="/" className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-primary/20 border border-primary/30 flex items-center justify-center">
-            <Sparkles className="w-4 h-4 text-primary" />
+          <div className="w-8 h-8 rounded-lg bg-brand/10 border border-brand/20 flex items-center justify-center">
+            <Sparkles className="w-4 h-4 text-brand" />
           </div>
-          <span className="text-lg font-black text-white">FitVerse</span>
+          <span className="text-lg font-black text-foreground">FitVerse</span>
         </Link>
 
         <button
           onClick={signOut}
-          className="p-2 hover:bg-white/10 rounded-lg transition-colors"
+          className="p-2 hover:bg-muted rounded-lg transition-colors"
         >
-          <LogOut className="w-5 h-5 text-white/60" />
+          <LogOut className="w-5 h-5 text-muted-foreground" />
         </button>
       </header>
 
@@ -91,24 +91,24 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               animate={{ x: 0 }}
               exit={{ x: "-100%" }}
               transition={{ type: "spring", damping: 25, stiffness: 200 }}
-              className="md:hidden fixed left-0 top-0 h-full w-72 bg-[#0d0705]/95 backdrop-blur-xl border-r border-white/5 flex flex-col z-50"
+              className="md:hidden fixed left-0 top-0 h-full w-72 bg-background/95 backdrop-blur-xl border-r border-border flex flex-col z-50"
             >
               {/* Logo */}
-              <div className="p-4 border-b border-white/5 flex items-center justify-between">
+              <div className="p-4 border-b border-border flex items-center justify-between">
                 <Link href="/" className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-primary/20 border border-primary/30 flex items-center justify-center">
-                    <Sparkles className="w-5 h-5 text-primary" />
+                  <div className="w-10 h-10 rounded-xl bg-brand/10 border border-brand/20 flex items-center justify-center">
+                    <Sparkles className="w-5 h-5 text-brand" />
                   </div>
                   <div>
-                    <span className="text-lg font-black text-white">FitVerse</span>
-                    <span className="text-xs text-primary ml-1">AI</span>
+                    <span className="text-lg font-black text-foreground">FitVerse</span>
+                    <span className="text-xs text-brand ml-1">AI</span>
                   </div>
                 </Link>
                 <button
                   onClick={() => setSidebarOpen(false)}
-                  className="p-2 hover:bg-white/10 rounded-lg"
+                  className="p-2 hover:bg-muted rounded-lg"
                 >
-                  <X className="w-5 h-5 text-white/60" />
+                  <X className="w-5 h-5 text-muted-foreground" />
                 </button>
               </div>
 
@@ -124,8 +124,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                       className={cn(
                         "flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200",
                         isActive
-                          ? "bg-primary/20 text-primary border border-primary/20"
-                          : "text-white/60 hover:text-white hover:bg-white/5"
+                          ? "bg-brand/10 text-brand border border-brand/20"
+                          : "text-muted-foreground hover:text-foreground hover:bg-muted"
                       )}
                     >
                       <item.icon className="w-5 h-5" />
@@ -141,16 +141,16 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               </nav>
 
               {/* User Info */}
-              <div className="p-4 border-t border-white/5">
+              <div className="p-4 border-t border-border">
                 <div className="flex items-center gap-3 mb-3">
-                  <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-primary font-black">
+                  <div className="w-10 h-10 rounded-full bg-brand/10 flex items-center justify-center text-brand font-black">
                     {user?.email?.charAt(0).toUpperCase() || "A"}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-white truncate">
+                    <p className="text-sm font-medium text-foreground truncate">
                       {user?.email?.split("@")[0] || "Admin"}
                     </p>
-                    <span className="text-xs text-orange-400 bg-orange-500/10 px-1.5 py-0.5 rounded">
+                    <span className="text-xs text-brand bg-brand-muted px-1.5 py-0.5 rounded">
                       ADMIN
                     </span>
                   </div>
@@ -162,16 +162,16 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       </AnimatePresence>
 
       {/* Desktop Sidebar */}
-      <aside className="hidden md:flex fixed left-0 top-0 h-screen w-64 border-r border-white/5 bg-[#0d0705]/80 backdrop-blur-xl flex flex-col z-50">
+      <aside className="hidden md:flex fixed left-0 top-0 h-screen w-64 border-r border-border bg-card/80 backdrop-blur-xl flex flex-col z-50">
         {/* Logo */}
-        <div className="p-6 border-b border-white/5">
+        <div className="p-6 border-b border-border">
           <Link href="/" className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-primary/20 border border-primary/30 flex items-center justify-center">
-              <Sparkles className="w-5 h-5 text-primary" />
+            <div className="w-10 h-10 rounded-xl bg-brand/10 border border-brand/20 flex items-center justify-center">
+              <Sparkles className="w-5 h-5 text-brand" />
             </div>
             <div>
-              <span className="text-lg font-black text-white">FitVerse</span>
-              <span className="text-xs text-primary ml-1">AI</span>
+              <span className="text-lg font-black text-foreground">FitVerse</span>
+              <span className="text-xs text-brand ml-1">AI</span>
             </div>
           </Link>
         </div>
@@ -187,8 +187,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 className={cn(
                   "flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200",
                   isActive
-                    ? "bg-primary/20 text-primary border border-primary/20"
-                    : "text-white/60 hover:text-white hover:bg-white/5"
+                    ? "bg-brand/10 text-brand border border-brand/20"
+                    : "text-muted-foreground hover:text-foreground hover:bg-muted"
                 )}
               >
                 <item.icon className="w-5 h-5" />
@@ -204,17 +204,17 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </nav>
 
         {/* User Info */}
-        <div className="p-4 border-t border-white/5">
+        <div className="p-4 border-t border-border">
           <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-primary font-black">
+            <div className="w-10 h-10 rounded-full bg-brand/10 flex items-center justify-center text-brand font-black">
               {user?.email?.charAt(0).toUpperCase() || "A"}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-white truncate">
+              <p className="text-sm font-medium text-foreground truncate">
                 {user?.email?.split("@")[0] || "Admin"}
               </p>
               <div className="flex items-center gap-1">
-                <span className="text-xs text-orange-400 bg-orange-500/10 px-1.5 py-0.5 rounded">
+                <span className="text-xs text-brand bg-brand-muted px-1.5 py-0.5 rounded">
                   ADMIN
                 </span>
               </div>
@@ -222,7 +222,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           </div>
           <button
             onClick={signOut}
-            className="flex items-center gap-2 w-full px-4 py-2 rounded-lg text-sm text-white/60 hover:text-white hover:bg-white/5 transition-colors"
+            className="flex items-center gap-2 w-full px-4 py-2 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
           >
             <LogOut className="w-4 h-4" />
             {locale === "en-US" ? "Sign Out" : "Sair"}
@@ -237,23 +237,23 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           <div className="flex items-center gap-4">
             <Link 
               href="/"
-              className="flex items-center gap-2 text-neutral-400 hover:text-white transition-colors"
+              className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
             >
               <ArrowLeft className="w-4 h-4" />
               <span className="text-sm">{locale === "en-US" ? "Back to App" : "Voltar ao App"}</span>
             </Link>
-            <div className="h-4 w-px bg-white/10" />
-            <span className="text-sm text-neutral-500">
+            <div className="h-4 w-px bg-border" />
+            <span className="text-sm text-muted-foreground">
               {getPageTitle()}
             </span>
           </div>
           
           <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2 px-3 py-1.5 bg-green-500/10 border border-green-500/20 rounded-full">
-              <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-              <span className="text-xs text-green-400 font-medium">AO VIVO</span>
+            <div className="flex items-center gap-2 px-3 py-1.5 bg-success/10 border border-success/20 rounded-full">
+              <span className="w-2 h-2 rounded-full bg-success animate-pulse" />
+              <span className="text-xs text-success font-medium">AO VIVO</span>
             </div>
-            <div className="w-8 h-8 rounded-full bg-orange-500/20 flex items-center justify-center text-orange-400 font-bold text-sm">
+            <div className="w-8 h-8 rounded-full bg-brand/20 flex items-center justify-center text-brand font-bold text-sm">
               {user?.email?.charAt(0).toUpperCase() || "A"}
             </div>
           </div>

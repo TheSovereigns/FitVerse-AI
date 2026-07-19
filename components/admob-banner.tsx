@@ -1,21 +1,23 @@
 "use client"
 
 import { useEffect, useState } from 'react'
-import { Capacitor } from '@capacitor/core'
 
 const AdMobBanner = () => {
   const [admob, setAdmob] = useState<any>(null)
 
   useEffect(() => {
     const initAdMob = async () => {
-      if (typeof window !== 'undefined' && Capacitor.isNativePlatform()) {
-        try {
-          const mod = await import('@admob-plus/capacitor')
-          const AdMob = (mod as any).AdMob || mod.default
-          setAdmob(AdMob)
-        } catch (e) {
-          console.warn('AdMob not available:', e)
-        }
+      if (typeof window === 'undefined') return
+      
+      try {
+        const { Capacitor } = await import('@capacitor/core')
+        if (!Capacitor.isNativePlatform()) return
+        
+        const mod = await import('@admob-plus/capacitor')
+        const AdMob = (mod as any).AdMob || mod.default
+        setAdmob(AdMob)
+      } catch (e) {
+        // AdMob not available - this is expected on web builds
       }
     }
     initAdMob()

@@ -18,6 +18,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { useTranslation } from "@/lib/i18n"
+import { logger } from "@/lib/logger"
 
 interface FastingState {
   startTime: number | null
@@ -101,7 +102,9 @@ export function FastingTracker({ isLocked = false }: { isLocked?: boolean }) {
           setState(parsed)
         }
       }
-    } catch {}
+    } catch (e) {
+      logger.error("[FastingTracker] Failed to parse fastingState:", e)
+    }
   }, [])
 
   useEffect(() => {
@@ -119,7 +122,9 @@ export function FastingTracker({ isLocked = false }: { isLocked?: boolean }) {
   const saveState = useCallback((newState: FastingState) => {
     try {
       localStorage.setItem("fastingState", JSON.stringify(newState))
-    } catch {}
+    } catch (e) {
+      logger.error("[FastingTracker] Failed to save fastingState:", e)
+    }
   }, [])
 
   const saveHistory = useCallback((entry: FastingEntry) => {
@@ -127,7 +132,9 @@ export function FastingTracker({ isLocked = false }: { isLocked?: boolean }) {
       const updated = [entry, ...prev].slice(0, 100)
       try {
         localStorage.setItem("fastingHistory", JSON.stringify(updated))
-      } catch {}
+      } catch (e) {
+        logger.error("[FastingTracker] Failed to save fastingHistory:", e)
+      }
       return updated
     })
   }, [])
@@ -187,7 +194,9 @@ export function FastingTracker({ isLocked = false }: { isLocked?: boolean }) {
     setState(newState)
     try {
       localStorage.removeItem("fastingState")
-    } catch {}
+    } catch (e) {
+      logger.error("[FastingTracker] Failed to remove fastingState:", e)
+    }
   }
 
   const protocol = PROTOCOLS.find((p) => p.id === state.protocol)!
@@ -210,12 +219,12 @@ export function FastingTracker({ isLocked = false }: { isLocked?: boolean }) {
       ? Math.max(...completed.map((h) => h.duration))
       : 0
     let streak = 0
-    const today = new Date().toISOString().split("T")[0]
+    const today = new Date().toISOString().split("T")[0]!
     let checkDate = new Date()
     for (let i = 0; i < history.length; i++) {
-      const entryDate = new Date(history[i].date).toISOString().split("T")[0]
+      const entryDate = new Date(history[i]!.date!).toISOString().split("T")[0]!
       const diffDays = Math.floor((checkDate.getTime() - new Date(entryDate).getTime()) / (24 * 60 * 60 * 1000))
-      if (diffDays <= 1 && history[i].completed) {
+      if (diffDays <= 1 && history[i]!.completed) {
         streak++
         checkDate = new Date(entryDate)
       } else if (diffDays > 1) {
@@ -275,7 +284,7 @@ export function FastingTracker({ isLocked = false }: { isLocked?: boolean }) {
             <h3 className="text-sm font-semibold text-foreground">
               {isEnglish ? "Fasting Tracker" : "Rastreador de Jejum"}
             </h3>
-            <p className="text-xs text-muted-foreground">{currentStage.name}</p>
+            <p className="text-xs text-muted-foreground">{currentStage!.name}</p>
           </div>
         </div>
         {isFasting && (
@@ -409,7 +418,7 @@ export function FastingTracker({ isLocked = false }: { isLocked?: boolean }) {
         <div className="w-px h-6 bg-border" />
         <div className="text-center">
           <p className="text-[10px] text-muted-foreground uppercase tracking-wider">{isEnglish ? "Stage" : "Estagio"}</p>
-          <p className="text-sm font-bold text-orange-500">{currentStage.name.split(" ")[0]}</p>
+          <p className="text-sm font-bold text-orange-500">{currentStage!.name.split(" ")[0]}</p>
         </div>
       </div>
 
@@ -435,7 +444,7 @@ export function FastingTracker({ isLocked = false }: { isLocked?: boolean }) {
               <div className="absolute left-6 top-3 bottom-3 w-0.5 bg-border" />
               <div className="space-y-3 relative">
                 {FASTING_STAGES.map((stage, i) => {
-                  const isActive = currentStage.id === stage.id
+                  const isActive = currentStage!.id === stage.id
                   const isPast = elapsedHours >= stage.end
                   return (
                     <div key={stage.id} className="flex items-start gap-3">
@@ -537,9 +546,9 @@ export function FastingTracker({ isLocked = false }: { isLocked?: boolean }) {
       <div className="rounded-xl border border-border p-3">
         <div className="flex items-center gap-2 mb-1">
           <Info className="h-3.5 w-3.5 text-orange-500" />
-          <span className="text-xs font-semibold text-foreground">{currentStage.name}</span>
+          <span className="text-xs font-semibold text-foreground">{currentStage!.name}</span>
         </div>
-        <p className="text-[11px] text-muted-foreground">{currentStage.tip}</p>
+        <p className="text-[11px] text-muted-foreground">{currentStage!.tip}</p>
       </div>
     </motion.div>
   )

@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect, useCallback } from "react"
+import { logger } from "@/lib/logger"
 
 interface OpenFoodFactsProduct {
   code: string
@@ -59,7 +60,8 @@ function getCache(): Record<string, OpenFoodFactsProduct> {
   try {
     const cached = localStorage.getItem(OFF_CACHE_KEY)
     return cached ? JSON.parse(cached) : {}
-  } catch {
+  } catch (e) {
+    logger.error("[useBarcodeScanner] Failed to parse barcode cache:", e)
     return {}
   }
 }
@@ -73,7 +75,9 @@ function setCache(code: string, product: OpenFoodFactsProduct) {
       keys.slice(0, 50).forEach((k) => delete cache[k])
     }
     localStorage.setItem(OFF_CACHE_KEY, JSON.stringify(cache))
-  } catch {}
+  } catch (e) {
+    logger.error("[useBarcodeScanner] Failed to save barcode cache:", e)
+  }
 }
 
 export function useBarcodeScanner() {
@@ -86,7 +90,9 @@ export function useBarcodeScanner() {
     try {
       const saved = localStorage.getItem("barcodeScanHistory")
       if (saved) setScanHistory(JSON.parse(saved))
-    } catch {}
+    } catch (e) {
+      logger.error("[useBarcodeScanner] Failed to parse barcode scan history:", e)
+    }
   }, [])
 
   const lookupBarcode = useCallback(async (barcode: string): Promise<ScannedProduct | null> => {

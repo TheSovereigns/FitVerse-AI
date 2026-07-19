@@ -1,17 +1,22 @@
 import { NextRequest, NextResponse } from "next/server"
-import { supabaseAdmin } from "@/lib/supabase"
+import { getSupabaseAdmin } from "@/lib/supabase-server"
 
 async function authUser(req: NextRequest) {
   const auth = req.headers.get("authorization")
   if (!auth?.startsWith("Bearer ")) return null
   const token = auth.slice(7)
-  const { data } = await supabaseAdmin.auth.getUser(token)
+  const supabase = getSupabaseAdmin()
+  if (!supabase) return null
+  const { data } = await supabase.auth.getUser(token)
   return data.user ?? null
 }
 
 export async function POST(req: NextRequest) {
   const user = await authUser(req)
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+
+  const supabase = getSupabaseAdmin()
+  if (!supabase) return NextResponse.json({ error: "Server configuration error" }, { status: 500 })
 
   const body = await req.json()
   const { pairId, activityType, activityData } = body
@@ -22,7 +27,7 @@ export async function POST(req: NextRequest) {
 
   const today = new Date().toISOString().split("T")[0]
 
-  const { data: existing } = await supabaseAdmin
+  const { data: existing } = await supabase
     .from("accountability_checkins")
     .select("id")
     .eq("pair_id", pairId)
@@ -34,7 +39,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Already checked in today" }, { status: 409 })
   }
 
-  const { data: checkin, error } = await supabaseAdmin
+  const { data: checkin, error } = await supabase
     .from("accountability_checkins")
     .insert({
       pair_id: pairId,
@@ -47,14 +52,14 @@ export async function POST(req: NextRequest) {
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
-  const { data: pair } = await supabaseAdmin
+  const { data: pair } = await supabase
     .from("accountability_pairs")
     .select("user_a_id, user_b_id")
     .eq("id", pairId)
     .single()
 
   if (pair) {
-    const todayA = await supabaseAdmin
+    const todayA = await supabase
       .from("accountability_checkins")
       .select("id")
       .eq("pair_id", pairId)
@@ -62,7 +67,7 @@ export async function POST(req: NextRequest) {
       .eq("checkin_date", today)
       .single()
 
-    const todayB = await supabaseAdmin
+    const todayB = await supabase
       .from("accountability_checkins")
       .select("id")
       .eq("pair_id", pairId)
@@ -71,7 +76,7 @@ export async function POST(req: NextRequest) {
       .single()
 
     if (todayA.data && todayB.data) {
-      await supabaseAdmin.rpc("log_event", {
+      await supabase.rpc("log_event", {
         p_type: "accountability_checkin",
         p_user_id: user.id,
         p_metadata: { pair_id: pairId, both_checked_in: true },

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from 'react';
+import { z } from 'zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -25,6 +26,14 @@ import {
   CheckCircle2,
   Award
 } from 'lucide-react';
+
+const metabolicSchema = z.object({
+  weight: z.coerce.number().min(20, "validation_weight_range").max(300, "validation_weight_range"),
+  height: z.coerce.number().min(100, "validation_height_range").max(250, "validation_height_range"),
+  age: z.coerce.number().min(10, "validation_age_range").max(120, "validation_age_range"),
+})
+
+type MetabolicErrors = { weight?: string; height?: string; age?: string }
 
 export interface BioPerfil {
   weight: number;

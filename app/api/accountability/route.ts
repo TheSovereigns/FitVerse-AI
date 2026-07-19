@@ -1,11 +1,13 @@
 import { NextRequest, NextResponse } from "next/server"
-import { supabaseAdmin } from "@/lib/supabase"
+import { getSupabaseAdmin } from "@/lib/supabase-server"
 
 async function authUser(req: NextRequest) {
   const auth = req.headers.get("authorization")
   if (!auth?.startsWith("Bearer ")) return null
   const token = auth.slice(7)
-  const { data } = await supabaseAdmin.auth.getUser(token)
+  const supabase = getSupabaseAdmin()
+  if (!supabase) return null
+  const { data } = await supabase.auth.getUser(token)
   return data.user ?? null
 }
 
@@ -13,7 +15,10 @@ export async function GET(req: NextRequest) {
   const user = await authUser(req)
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
-  const { data: pairs } = await supabaseAdmin
+  const supabase = getSupabaseAdmin()
+  if (!supabase) return NextResponse.json({ error: "Server configuration error" }, { status: 500 })
+
+  const { data: pairs } = await supabase
     .from("accountability_pairs")
     .select("*, user_a:profiles!accountability_pairs_user_a_id_fkey(id, name, avatar_url), user_b:profiles!accountability_pairs_user_b_id_fkey(id, name, avatar_url)")
     .or(`user_a_id.eq.${user.id},user_b_id.eq.${user.id}`)
@@ -38,13 +43,16 @@ export async function POST(req: NextRequest) {
   const user = await authUser(req)
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
+  const supabase = getSupabaseAdmin()
+  if (!supabase) return NextResponse.json({ error: "Server configuration error" }, { status: 500 })
+
   const body = await req.json()
   const { partnerId, clanId } = body
 
   if (!partnerId) return NextResponse.json({ error: "partnerId required" }, { status: 400 })
   if (partnerId === user.id) return NextResponse.json({ error: "Cannot pair with yourself" }, { status: 400 })
 
-  const { data: existing } = await supabaseAdmin
+  const { data: existing } = await supabase
     .from("accountability_pairs")
     .select("id")
     .or(`and(user_a_id.eq.${user.id},user_b_id.eq.${partnerId}),and(user_a_id.eq.${partnerId},user_b_id.eq.${user.id})`)
@@ -53,7 +61,7 @@ export async function POST(req: NextRequest) {
 
   if (existing) return NextResponse.json({ error: "Already paired" }, { status: 409 })
 
-  const { data: pair, error } = await supabaseAdmin
+  const { data: pair, error } = await supabase
     .from("accountability_pairs")
     .insert({
       user_a_id: user.id,
@@ -72,11 +80,14 @@ export async function DELETE(req: NextRequest) {
   const user = await authUser(req)
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
+  const supabase = getSupabaseAdmin()
+  if (!supabase) return NextResponse.json({ error: "Server configuration error" }, { status: 500 })
+
   const { searchParams } = new URL(req.url)
   const pairId = searchParams.get("pairId")
   if (!pairId) return NextResponse.json({ error: "pairId required" }, { status: 400 })
 
-  const { error } = await supabaseAdmin
+  const { error } = await supabase
     .from("accountability_pairs")
     .update({ status: "ended" })
     .eq("id", pairId)

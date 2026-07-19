@@ -1,17 +1,13 @@
 import { NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL || ''
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_KEY || ''
-const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey, {
-  auth: { autoRefreshToken: false, persistSession: false },
-})
+import { getSupabaseAdmin } from '@/lib/supabase-server'
 
 const allowedPlans = ['free', 'pro', 'premium', 'banned']
 
-async function getAdmin(req: Request) {
+async function getAdmin(req: Request, supabaseAdmin: ReturnType<typeof getSupabaseAdmin>) {
   const token = req.headers.get('Authorization')?.replace('Bearer ', '')
   if (!token) return null
+
+  if (!supabaseAdmin) return null
 
   const { data: { user }, error } = await supabaseAdmin.auth.getUser(token)
   if (error || !user) return null
@@ -26,9 +22,14 @@ async function getAdmin(req: Request) {
 }
 
 export async function PATCH(req: Request) {
-  const admin = await getAdmin(req)
+  const supabaseAdmin = getSupabaseAdmin()
+  const admin = await getAdmin(req, supabaseAdmin)
   if (!admin) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
+  }
+
+  if (!supabaseAdmin) {
+    return NextResponse.json({ error: 'Server configuration error' }, { status: 500 })
   }
 
   const { userId, updates } = await req.json()

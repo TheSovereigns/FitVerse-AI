@@ -120,7 +120,7 @@ export function ActivityFeed({ events, isLoading = false }: ActivityFeedProps) {
             </div>
           ) : (
             events.map((event) => {
-              const config = eventConfig[event.type] || eventConfig.login
+              const config = eventConfig[event.type] ?? eventConfig.login!
               const Icon = config.icon
 
               return (

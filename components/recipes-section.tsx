@@ -9,6 +9,7 @@ import { RecipeModal } from "./recipe-modal"
 import { useTranslation } from "@/lib/i18n"
 import { supabase } from "@/lib/supabase"
 import { toast } from "sonner"
+import { logger } from "@/lib/logger"
 
 interface Recipe {
   name: string
@@ -72,7 +73,7 @@ export function RecipesSection({ productName, dietProfile }: RecipesSectionProps
         toast.error(data.error || (locale === "en-US" ? "Error generating recipes" : "Erro ao gerar receitas"))
         return
       }
-      console.log("[Fitverse] Recipes generated:", data.recipes)
+      logger.info("[Fitverse] Recipes generated:", data.recipes)
       setRecipes(data.recipes)
     } catch (error) {
       console.error("[Fitverse] Error generating recipes:", error)

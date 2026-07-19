@@ -1,65 +1,51 @@
+import { getSupabaseClient } from './supabase-client'
 import { createClient } from '@supabase/supabase-js'
+import { logger } from './logger'
 
-// Environment variables - configure these in your .env.local file
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || ''
-
-// Verify that we have the required environment variables
-if (!supabaseUrl || !supabaseAnonKey) {
-  console.warn(
-    '⚠️ Supabase environment variables are missing!\n' +
-    'Please add the following to your .env.local file:\n' +
-    'NEXT_PUBLIC_SUPABASE_URL=your_supabase_url\n' +
-    'NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key\n' +
-    'SUPABASE_SERVICE_ROLE_KEY=your_service_role_key (server-side only)'
-  )
+// Lazy getter - only creates client on first access
+export function getSupabase() {
+  return getSupabaseClient()
 }
 
-// Client-side Supabase client (public, with anon key)
-export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
-  auth: {
-    autoRefreshToken: true,
-    persistSession: true,
-    detectSessionInUrl: true,
-    // Configure the storage adapter for Next.js
-    storage: {
-      getItem: (key: string) => {
-        if (typeof window === 'undefined') return null
-        try {
-          return localStorage.getItem(key)
-        } catch {
-          return null
-        }
-      },
-      setItem: (key: string, value: string) => {
-        if (typeof window === 'undefined') return
-        try {
-          localStorage.setItem(key, value)
-        } catch {
-          // Ignore storage errors
-        }
-      },
-      removeItem: (key: string) => {
-        if (typeof window === 'undefined') return
-        try {
-          localStorage.removeItem(key)
-        } catch {
-          // Ignore storage errors
-        }
-      },
-    },
+// Lazy proxy that delegates to getSupabaseClient()
+export const supabase = new Proxy({} as ReturnType<typeof getSupabaseClient>, {
+  get(_, prop) {
+    const client = getSupabaseClient()
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const val = (client as any)[prop]
+    if (typeof val === 'function') {
+      return val.bind(client)
+    }
+    return val
   },
 })
 
-// Server-side Supabase client (with service role key - for admin operations)
-// This should only be used in server-side code (API routes, server components)
-export const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey || supabaseAnonKey, {
-  auth: {
-    autoRefreshToken: false,
-    persistSession: false,
-  },
-})
+// Re-export server utilities from supabase-server.ts
+export { getSupabaseAdmin, authUser, getTokenFromRequest, getCorsHeaders } from './supabase-server'
+
+// Legacy server client - use getSupabaseAdmin() instead
+let _supabaseAdmin: ReturnType<typeof createClient> | null = null
+export function getSupabaseAdminLazy() {
+  if (_supabaseAdmin) return _supabaseAdmin
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY || ''
+  if (!url || !key) return null
+  _supabaseAdmin = createClient(url, key, {
+    auth: { autoRefreshToken: false, persistSession: false },
+  })
+  return _supabaseAdmin
+}
+
+// Legacy alias - use getSupabaseAdminLazy() instead
+export const supabaseAdmin = typeof window !== 'undefined' ? null : getSupabaseAdminLazy()
+
+// Legacy server client factory - use getSupabaseAdmin() instead
+export function getServerClient() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL
+  const key = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY
+  if (!url || !key || url.includes('placeholder') || key.includes('placeholder')) return null
+  return createClient(url, key)
+}
 
 // Type definitions for better TypeScript support
 export type Profile = {
@@ -126,9 +112,8 @@ export async function getUserProfile(userId: string): Promise<Profile | null> {
       .eq('id', userId)
       .single()
 
-    // If profile doesn't exist, create it
     if (error?.code === 'PGRST116' || (!data && error?.code === 'PGRST116')) {
-      console.log("[Supabase] Creating profile for user:", userId)
+      logger.info("[Supabase] Creating profile for user:", userId)
       const { data: newProfile, error: insertError } = await supabase
         .from('profiles')
         .insert({

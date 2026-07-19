@@ -1,6 +1,7 @@
 "use client"
 
 import { useMemo, useState } from "react"
+import { logger } from "@/lib/logger"
 import { motion, AnimatePresence } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -108,7 +109,7 @@ export function RecipesTab({ metabolicPlan }: RecipesTabProps) {
         }),
       })
 
-      const data = await response.json().catch(() => null)
+      const data = await response.json().catch((e) => { logger.error("[RecipesTab] Failed to parse recipe response:", e); return null })
       if (!response.ok) {
         const message = data?.error || (isEnglish ? "Could not generate recipes right now." : "Nao foi possivel gerar receitas agora.")
         setGenerationError(message)

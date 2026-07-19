@@ -1,17 +1,20 @@
 import { NextResponse } from "next/server"
 import { GoogleGenerativeAI } from "@google/generative-ai"
-import { createClient } from "@supabase/supabase-js"
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL
-const supabaseKey = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY
-const supabase =
-  supabaseUrl && supabaseKey && !supabaseUrl.includes("placeholder") && !supabaseKey.includes("placeholder")
-    ? createClient(supabaseUrl, supabaseKey)
-    : null
+import { getSupabaseAdmin } from "@/lib/supabase-server"
+import { checkRateLimit, getRateLimitKey, RATE_LIMITS } from "@/lib/rate-limit"
+import { getCorsHeaders } from "@/lib/auth-helpers"
 
 export async function POST(req: Request) {
+  const supabase = getSupabaseAdmin()
+  const headers = getCorsHeaders()
+
+  const rlKey = getRateLimitKey(req, "generate")
+  const rl = checkRateLimit(rlKey, RATE_LIMITS.generate)
+  if (!rl.allowed) {
+    return NextResponse.json({ error: "Rate limit exceeded" }, { status: 429, headers })
+  }
+
   try {
-    const headers = { "Access-Control-Allow-Origin": "*" }
 
     const authHeader = req.headers.get("Authorization")
     if (!authHeader) return NextResponse.json({ error: "Unauthorized" }, { status: 401, headers })
@@ -25,11 +28,11 @@ export async function POST(req: Request) {
     if (!user || authError) return NextResponse.json({ error: "Invalid token" }, { status: 401, headers })
 
     const apiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_GENERATIVE_AI_API_KEY
-    if (!apiKey) return NextResponse.json({ error: "API Key not configured" }, { status: 500 })
+    if (!apiKey) return NextResponse.json({ error: "API Key not configured" }, { status: 500, headers })
 
     const genAI = new GoogleGenerativeAI(apiKey)
     const model = genAI.getGenerativeModel({
-      model: "gemini-2.5-flash",
+      model: "gemini-3.5-flash",
       generationConfig: { responseMimeType: "application/json" },
     })
 
@@ -175,13 +178,13 @@ Calculate macros using TDEE (Mifflin-St Jeor) and adjust for their goal. The wor
         }).then(() => {})
       }
 
-      return NextResponse.json(data)
+      return NextResponse.json(data, { headers })
     } catch (parseError) {
       console.error("JSON parse error:", cleanedText)
-      return NextResponse.json({ error: "Invalid AI format" }, { status: 500 })
+      return NextResponse.json({ error: "Invalid AI format" }, { status: 500, headers })
     }
   } catch (error: any) {
     console.error("generate-initial-plan error:", error)
-    return NextResponse.json({ error: error.message || "Internal error" }, { status: 500 })
+    return NextResponse.json({ error: error.message || "Internal error" }, { status: 500, headers })
   }
 }

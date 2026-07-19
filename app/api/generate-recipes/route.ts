@@ -2,20 +2,9 @@ import { NextResponse } from "next/server"
 import { createGoogleGenerativeAI } from "@ai-sdk/google"
 import { generateObject } from "ai"
 import { z } from "zod"
-import { createClient } from '@supabase/supabase-js'
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY;
-const supabase = (supabaseUrl && supabaseKey && !supabaseUrl.includes('placeholder') && !supabaseKey.includes('placeholder'))
-  ? createClient(supabaseUrl, supabaseKey)
-  : null;
-
-const PLAN_LIMITS = {
-  free: { dietsPerMonth: 2 },
-  pro: { dietsPerMonth: 5 },
-  premium: { dietsPerMonth: Infinity },
-  banned: { dietsPerMonth: 0 },
-}
+import { getSupabaseAdmin } from "@/lib/supabase-server"
+import { PLAN_LIMITS, type Plan } from "@/lib/plan-limits"
+import { getCorsHeaders } from "@/lib/auth-helpers"
 
 const google = createGoogleGenerativeAI({
   apiKey: process.env.GEMINI_API_KEY || process.env.GOOGLE_GENERATIVE_AI_API_KEY,
@@ -24,6 +13,7 @@ const google = createGoogleGenerativeAI({
 export const maxDuration = 30
 
 async function checkDietLimit(userId: string, plan: string): Promise<boolean> {
+  const supabase = getSupabaseAdmin();
   if (!supabase) return true;
   
   const now = new Date()
@@ -35,7 +25,8 @@ async function checkDietLimit(userId: string, plan: string): Promise<boolean> {
     .eq('user_id', userId)
     .gte('created_at', startOfMonth.toISOString())
 
-  const limit = PLAN_LIMITS[plan as keyof typeof PLAN_LIMITS]?.dietsPerMonth ?? 0
+  const planLimits = PLAN_LIMITS[(plan as Plan) || 'free'];
+  const limit = typeof planLimits.dietsPerMonth === 'number' ? planLimits.dietsPerMonth : 999;
   return (count ?? 0) < limit
 }
 
@@ -61,10 +52,8 @@ const recipesSchema = z.object({
 })
 
 export async function POST(req: Request) {
+  const headers = getCorsHeaders();
   try {
-    const headers = {
-      'Access-Control-Allow-Origin': '*',
-    }
 
     const authHeader = req.headers.get('Authorization')
     if (!authHeader) {
@@ -72,11 +61,12 @@ export async function POST(req: Request) {
     }
 
     const token = authHeader.replace('Bearer ', '')
-    
+
+    const supabase = getSupabaseAdmin()
     if (!supabase) {
       return NextResponse.json({ error: 'Configuração do servidor incompleta.' }, { status: 500, headers })
     }
-    
+
     const { data: { user }, error: authError } = await supabase.auth.getUser(token)
 
     if (!user || authError) {
@@ -101,7 +91,7 @@ export async function POST(req: Request) {
     const { productName, dietProfile, locale = "pt-BR" } = await req.json()
 
     if (!productName) {
-      return NextResponse.json({ error: "Product name is required" }, { status: 400 })
+      return NextResponse.json({ error: "Product name is required" }, { status: 400, headers })
     }
 
     const isEnglish = locale === "en-US"
@@ -162,7 +152,7 @@ Na descrição, SEMPRE explique os benefícios nutricionais específicos e por q
 Seja criativo mas prático. Priorize receitas que realmente as pessoas fariam no dia a dia.`
 
     const { object } = await generateObject({
-      model: google("gemini-2.5-flash"),
+      model: google("gemini-3.5-flash"),
       schema: recipesSchema,
       prompt,
       temperature: 0.8,
@@ -177,12 +167,12 @@ Seja criativo mas prático. Priorize receitas que realmente as pessoas fariam no
       fat: object.recipes[0]?.macros?.fat || 0,
     })
 
-    return NextResponse.json({ recipes: object.recipes })
+    return NextResponse.json({ recipes: object.recipes }, { headers })
   } catch (error) {
     console.error("[Fitverse] Error generating recipes:", error)
     return NextResponse.json(
       { error: "Failed to generate recipes", details: error instanceof Error ? error.message : "Unknown error" },
-      { status: 500 },
+      { status: 500, headers },
     )
   }
 }

@@ -1,5 +1,16 @@
 import Stripe from "stripe"
 
-export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "sk_test_placeholder", {
-  typescript: true,
-})
+const stripeKey = process.env.STRIPE_SECRET_KEY
+
+export const stripe = stripeKey
+  ? new Stripe(stripeKey, { typescript: true })
+  : null
+
+export function getStripe(): Stripe {
+  if (!stripe) {
+    throw new Error(
+      "Stripe não configurado. Defina STRIPE_SECRET_KEY no .env"
+    )
+  }
+  return stripe
+}

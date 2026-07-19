@@ -1,7 +1,14 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { createClient } from "@supabase/supabase-js"
+import { checkRateLimit, getRateLimitKey, RATE_LIMITS } from "@/lib/rate-limit"
 
 export async function POST(request: NextRequest) {
+  const rlKey = getRateLimitKey(request, "signup")
+  const rl = checkRateLimit(rlKey, RATE_LIMITS.signup)
+  if (!rl.allowed) {
+    return NextResponse.json({ error: "Rate limit exceeded" }, { status: 429 })
+  }
+
   try {
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
     const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY

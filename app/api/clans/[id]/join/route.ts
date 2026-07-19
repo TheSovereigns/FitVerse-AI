@@ -1,11 +1,13 @@
 import { NextRequest, NextResponse } from "next/server"
-import { supabaseAdmin } from "@/lib/supabase"
+import { getSupabaseAdmin } from "@/lib/supabase-server"
 
 async function authUser(req: NextRequest) {
   const auth = req.headers.get("authorization")
   if (!auth?.startsWith("Bearer ")) return null
   const token = auth.slice(7)
-  const { data } = await supabaseAdmin.auth.getUser(token)
+  const supabase = getSupabaseAdmin()
+  if (!supabase) return null
+  const { data } = await supabase.auth.getUser(token)
   return data.user ?? null
 }
 
@@ -13,11 +15,14 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
   const user = await authUser(req)
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
+  const supabase = getSupabaseAdmin()
+  if (!supabase) return NextResponse.json({ error: "Server configuration error" }, { status: 500 })
+
   const clanId = params.id
   const body = await req.json().catch(() => ({}))
   const { inviteCode } = body
 
-  const { data: existingMember } = await supabaseAdmin
+  const { data: existingMember } = await supabase
     .from("clan_members")
     .select("id")
     .eq("clan_id", clanId)
@@ -29,7 +34,7 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
   }
 
   if (inviteCode) {
-    const { data: invitation } = await supabaseAdmin
+    const { data: invitation } = await supabase
       .from("clan_invitations")
       .select("id")
       .eq("clan_id", clanId)
@@ -42,12 +47,12 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
       return NextResponse.json({ error: "Invalid or expired invite code" }, { status: 400 })
     }
 
-    await supabaseAdmin
+    await supabase
       .from("clan_invitations")
       .update({ status: "accepted", invited_user_id: user.id })
       .eq("id", invitation.id)
   } else {
-    const { data: clan } = await supabaseAdmin
+    const { data: clan } = await supabase
       .from("clans")
       .select("is_public")
       .eq("id", clanId)
@@ -58,13 +63,13 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
     }
   }
 
-  const { data: clanInfo } = await supabaseAdmin
+  const { data: clanInfo } = await supabase
     .from("clans")
     .select("max_members")
     .eq("id", clanId)
     .single()
 
-  const { count } = await supabaseAdmin
+  const { count } = await supabase
     .from("clan_members")
     .select("*", { count: "exact", head: true })
     .eq("clan_id", clanId)
@@ -73,7 +78,7 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
     return NextResponse.json({ error: "Clan is full" }, { status: 400 })
   }
 
-  const { error } = await supabaseAdmin.from("clan_members").insert({
+  const { error } = await supabase.from("clan_members").insert({
     clan_id: clanId,
     user_id: user.id,
     role: "member",
@@ -81,7 +86,7 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
-  await supabaseAdmin.rpc("log_event", {
+  await supabase.rpc("log_event", {
     p_type: "clan_joined",
     p_user_id: user.id,
     p_metadata: { clan_id: clanId },

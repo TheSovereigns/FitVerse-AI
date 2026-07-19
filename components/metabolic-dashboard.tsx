@@ -6,11 +6,41 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { ArrowLeft, Beef, Cookie, Droplet, Utensils, Sparkles, Target, TrendingDown, TrendingUp, Minus, Zap, Lock, Crown } from "lucide-react"
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts"
-import { BioPerfil, MetabolicPlan } from "./metabolic-planner"
 import { useTranslation } from "@/lib/i18n"
 
+interface MetabolicPlanLike {
+  macros: {
+    calories: number
+    protein: number
+    proteinGrams: number
+    carbs: number
+    carbsGrams: number
+    fat: number
+    fatGrams: number
+  }
+  diet?: {
+    title: string
+    summary: string
+    meals: Array<{ name: string; items: string[] }>
+  }
+  prediction?: {
+    weeks: number
+    explanation: string
+    macroTips?: string[]
+  }
+}
+
+interface BioPerfil {
+  weight: number
+  height: number
+  age: number
+  gender: string
+  activityLevel: string
+  goal: string
+}
+
 interface MetabolicDashboardProps {
-  plan: MetabolicPlan
+  plan: MetabolicPlanLike
   perfil: BioPerfil
   onBack: () => void
   planLevel?: "summary" | "full" | "full+autoadjust"
@@ -33,7 +63,7 @@ export function MetabolicDashboard({ plan, perfil, onBack, planLevel = "full", o
     maintain: { label: t("md_maintain"), icon: Minus, color: "text-blue-400" },
   }
 
-  const goal = goalConfig[perfil.goal] || goalConfig.maintain
+  const goal = (goalConfig[perfil.goal] ?? goalConfig.maintain)!
   const GoalIcon = goal.icon
 
   return (

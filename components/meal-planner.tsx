@@ -134,7 +134,7 @@ export function MealPlanner({ isLocked = false, onUpgrade, macros }: MealPlanner
     for (const cat of CATEGORIES) groups[cat.key] = []
     for (const item of shoppingList) {
       const cat = CATEGORIES.find((c) => c.key === item.category) ? item.category : "other"
-      groups[cat].push(item)
+      groups[cat]!.push(item)
     }
     return groups
   }, [shoppingList])
@@ -271,7 +271,7 @@ export function MealPlanner({ isLocked = false, onUpgrade, macros }: MealPlanner
                       <div className="px-4 pb-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
                         {(["breakfast", "lunch", "dinner", "snacks"] as const).map((mealType) => {
                           const meal = day[mealType]
-                          const Icon = MEAL_ICONS[mealType]
+                          const Icon = MEAL_ICONS[mealType]!
                           return (
                             <div
                               key={mealType}
@@ -323,7 +323,7 @@ export function MealPlanner({ isLocked = false, onUpgrade, macros }: MealPlanner
               </div>
 
               {CATEGORIES.map(({ key, label, icon: Icon }) => {
-                const items = groupedShopping[key]
+                const items = groupedShopping[key]!
                 if (!items.length) return null
                 const isOpen = expandedCategory === key
                 return (

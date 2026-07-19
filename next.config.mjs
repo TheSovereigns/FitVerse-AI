@@ -1,25 +1,22 @@
-/** @type {import('next').NextConfig} */
+import { withSentryConfig } from "@sentry/nextjs"
+
 const nextConfig = {
+  reactStrictMode: true,
   images: {
-    unoptimized: true,
-  },
-  async headers() {
-    return [
+    remotePatterns: [
       {
-        source: '/(.*)',
-        headers: [
-          {
-            key: 'X-DNS-Prefetch-Control',
-            value: 'on'
-          },
-          {
-            key: 'X-Content-Type-Options',
-            value: 'nosniff'
-          },
-        ]
-      }
-    ]
+        protocol: "https",
+        hostname: "**",
+      },
+    ],
   },
 }
 
-export default nextConfig
+export default withSentryConfig(nextConfig, {
+  org: process.env.SENTRY_ORG,
+  project: process.env.SENTRY_PROJECT,
+  silent: !process.env.CI,
+  widenClientFileUpload: true,
+  disableLogger: true,
+  tunnelRoute: "/api/sentry-tunnel",
+})

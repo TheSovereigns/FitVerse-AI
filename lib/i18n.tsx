@@ -1,6 +1,7 @@
 "use client"
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from "react"
+import { logger } from "@/lib/logger"
 
 export type Locale = "pt-BR" | "en-US"
 
@@ -11,6 +12,13 @@ const translations = {
     nav_diet: "Dieta", nav_recipes: "Receitas", nav_store: "Loja",
     nav_aichat: "IA Chat", nav_profile: "Perfil", nav_settings: "Ajustes", nav_plate: "Prato",
     nav_pull_down_to_close: "Deslize para fechar", nav_search_placeholder: "Buscar Módulo Bio...",
+    nav_sleep: "Sono", nav_stress: "Estresse", nav_health_checkin: "Check-in",
+    nav_supplements: "Suplementos", nav_meal_plan: "Refeições", nav_micronutrients: "Micronutrientes",
+    nav_substitutions: "Troca", nav_periodization: "Periodizar", nav_workout_feedback: "Feedback",
+    nav_equipment: "Equipamento", nav_mobility: "Mobilidade", nav_longevity: "Longevidade",
+    nav_fasting: "Jejum", nav_biological_age: "Bio Idade", nav_mood: "Humor",
+    nav_habits: "Hábitos", nav_meditation: "Meditação", nav_seasons: "Temporadas",
+    nav_boss_battles: "Batalhas", nav_reward_shop: "Loja",
     // Views
     view_home: "Dashboard", view_bioscan: "BioScan", view_recipes: "IA Chef",
     view_training: "Planos", view_profile: "Perfil", view_planner: "Metabolismo",
@@ -408,6 +416,70 @@ const translations = {
     store_coming_soon: "Em breve",
     // Health Profile
     profile_default_name: "Usuário FitVerse",
+    // Home Dashboard
+    hd_today: "Hoje",
+    hd_logged_today: "registradas hoje",
+    hd_create_plan_hint: "Crie seu plano metabolico para liberar metas diarias.",
+    hd_daily_progress: "Progresso diario",
+    hd_health_snapshot: "Resumo de saude",
+    hd_last_activity: "Atividade recente",
+    hd_quick_actions: "Acoes rapidas",
+    // Desktop Sidebar
+    ds_health: "Saúde",
+    ds_training: "Treino",
+    // Settings Page
+    sp_appearance: "Aparencia",
+    sp_customize_look: "Personalize sua aparencia",
+    sp_theme: "Tema",
+    sp_dark: "Escuro",
+    sp_light: "Claro",
+    sp_accent_color: "Cor de Destaque",
+    sp_wearables_title: "Wearables",
+    sp_wearables_connected: "Conectado",
+    sp_wearables_not_connected: "Nao conectado",
+    sp_wearables_on: "Ligado",
+    sp_wearables_connect: "Conectar",
+    sp_my_data: "Meus Dados",
+    sp_age: "Idade",
+    sp_weight_kg: "Peso (kg)",
+    sp_height_cm: "Altura (cm)",
+    sp_gender: "Genero",
+    sp_select: "Selecionar",
+    sp_male: "Masculino",
+    sp_female: "Feminino",
+    sp_other: "Outro",
+    sp_goal: "Objetivo",
+    sp_lose_weight: "Perder Peso",
+    sp_gain_muscle: "Ganhar Massa",
+    sp_maintain: "Manter",
+    sp_improve_health: "Melhorar Saude",
+    sp_save: "Salvar",
+    sp_cancel: "Cancelar",
+    sp_years: "anos",
+    sp_weight: "Peso",
+    sp_height: "Altura",
+    sp_edit: "Editar",
+    sp_access: "Acessar",
+    // Health Profile
+    hp_my_data: "Meus Dados",
+    hp_personal_info: "Informacoes pessoais",
+    hp_age: "Idade",
+    hp_weight_kg: "Peso (kg)",
+    hp_height_cm: "Altura (cm)",
+    hp_gender: "Genero",
+    hp_select: "Selecionar",
+    hp_male: "Masculino",
+    hp_female: "Feminino",
+    hp_other: "Outro",
+    hp_goal: "Objetivo",
+    hp_lose_weight: "Perder Peso",
+    hp_gain_muscle: "Ganhar Massa",
+    hp_maintain: "Manter",
+    hp_improve_health: "Melhorar Saude",
+    hp_save: "Salvar",
+    hp_years: "anos",
+    hp_weight: "Peso",
+    hp_height: "Altura",
     // Login Page
     login_welcome_heading: "Bem-vindo de volta",
     login_welcome_sub: "Continue sua jornada para uma vida mais saudável com FitVerse AI",
@@ -431,6 +503,15 @@ const translations = {
     page_limit_reached: "Limite diário de scans atingido. Atualize para um plano superior!",
     page_limit_workout: "Limite mensal de treinos atingido. Atualize para um plano superior!",
     page_limit_diet: "Limite mensal de dietas atingido. Atualize para um plano superior!",
+    // Validation
+    validation_required: "Este campo é obrigatório",
+    validation_email_invalid: "Email inválido",
+    validation_password_min: "A senha deve ter pelo menos 6 caracteres",
+    validation_name_min: "O nome deve ter pelo menos 2 caracteres",
+    validation_password_confirm: "As senhas não coincidem",
+    validation_weight_range: "O peso deve estar entre 20 e 300 kg",
+    validation_height_range: "A altura deve estar entre 100 e 250 cm",
+    validation_age_range: "A idade deve estar entre 10 e 120 anos",
     // Profile Setup
     settings_profile_saved: "Perfil atualizado!",
     profile_setup_gender: "Qual seu genero?",
@@ -453,6 +534,13 @@ const translations = {
     nav_diet: "Diet", nav_recipes: "Recipes", nav_store: "Store",
     nav_aichat: "AI Chat", nav_profile: "Profile", nav_settings: "Settings", nav_plate: "Plate",
     nav_pull_down_to_close: "Pull down to close", nav_search_placeholder: "Search Bio-Module...",
+    nav_sleep: "Sleep", nav_stress: "Stress", nav_health_checkin: "Check-in",
+    nav_supplements: "Supplements", nav_meal_plan: "Meal Plan", nav_micronutrients: "Micronutrients",
+    nav_substitutions: "Substitutes", nav_periodization: "Periodization", nav_workout_feedback: "Feedback",
+    nav_equipment: "Equipment", nav_mobility: "Mobility", nav_longevity: "Longevity",
+    nav_fasting: "Fasting", nav_biological_age: "Bio Age", nav_mood: "Mood",
+    nav_habits: "Habits", nav_meditation: "Meditation", nav_seasons: "Seasons",
+    nav_boss_battles: "Boss Battles", nav_reward_shop: "Shop",
     // Views
     view_home: "Dashboard", view_bioscan: "BioScan", view_recipes: "AI Chef",
     view_training: "Plans", view_profile: "Profile", view_planner: "Metabolism",
@@ -849,6 +937,70 @@ const translations = {
     store_coming_soon: "Coming soon",
     // Health Profile
     profile_default_name: "FitVerse User",
+    // Home Dashboard
+    hd_today: "Today",
+    hd_logged_today: "logged today",
+    hd_create_plan_hint: "Create your metabolic plan to unlock daily targets.",
+    hd_daily_progress: "Daily progress",
+    hd_health_snapshot: "Health snapshot",
+    hd_last_activity: "Last activity",
+    hd_quick_actions: "Quick actions",
+    // Desktop Sidebar
+    ds_health: "Health",
+    ds_training: "Training",
+    // Settings Page
+    sp_appearance: "Appearance",
+    sp_customize_look: "Customize your look",
+    sp_theme: "Theme",
+    sp_dark: "Dark",
+    sp_light: "Light",
+    sp_accent_color: "Accent Color",
+    sp_wearables_title: "Wearables",
+    sp_wearables_connected: "Connected",
+    sp_wearables_not_connected: "Not connected",
+    sp_wearables_on: "On",
+    sp_wearables_connect: "Connect",
+    sp_my_data: "My Data",
+    sp_age: "Age",
+    sp_weight_kg: "Weight (kg)",
+    sp_height_cm: "Height (cm)",
+    sp_gender: "Gender",
+    sp_select: "Select",
+    sp_male: "Male",
+    sp_female: "Female",
+    sp_other: "Other",
+    sp_goal: "Goal",
+    sp_lose_weight: "Lose Weight",
+    sp_gain_muscle: "Gain Muscle",
+    sp_maintain: "Maintain",
+    sp_improve_health: "Improve Health",
+    sp_save: "Save",
+    sp_cancel: "Cancel",
+    sp_years: "years",
+    sp_weight: "Weight",
+    sp_height: "Height",
+    sp_edit: "Edit",
+    sp_access: "Access",
+    // Health Profile
+    hp_my_data: "My Data",
+    hp_personal_info: "Personal information",
+    hp_age: "Age",
+    hp_weight_kg: "Weight (kg)",
+    hp_height_cm: "Height (cm)",
+    hp_gender: "Gender",
+    hp_select: "Select",
+    hp_male: "Male",
+    hp_female: "Female",
+    hp_other: "Other",
+    hp_goal: "Goal",
+    hp_lose_weight: "Lose Weight",
+    hp_gain_muscle: "Gain Muscle",
+    hp_maintain: "Maintain",
+    hp_improve_health: "Improve Health",
+    hp_save: "Save",
+    hp_years: "yrs",
+    hp_weight: "Weight",
+    hp_height: "Height",
     // Login Page
     login_welcome_heading: "Welcome Back",
     login_welcome_sub: "Continue your journey to a healthier life with FitVerse AI",
@@ -872,6 +1024,15 @@ const translations = {
     page_limit_reached: "Daily scan limit reached. Upgrade to a higher plan!",
     page_limit_workout: "Monthly workout limit reached. Upgrade to a higher plan!",
     page_limit_diet: "Monthly diet limit reached. Upgrade to a higher plan!",
+    // Validation
+    validation_required: "This field is required",
+    validation_email_invalid: "Invalid email address",
+    validation_password_min: "Password must be at least 6 characters",
+    validation_name_min: "Name must be at least 2 characters",
+    validation_password_confirm: "Passwords do not match",
+    validation_weight_range: "Weight must be between 20 and 300 kg",
+    validation_height_range: "Height must be between 100 and 250 cm",
+    validation_age_range: "Age must be between 10 and 120 years",
     // Profile Setup
     settings_profile_saved: "Profile updated!",
     profile_setup_gender: "What's your gender?",
@@ -900,7 +1061,9 @@ function detectLocale(): Locale {
     const brZones = ["America/Sao_Paulo","America/Manaus","America/Fortaleza","America/Belem",
       "America/Recife","America/Cuiaba","America/Porto_Velho","America/Rio_Branco","America/Noronha"]
     if (brZones.some(z => tz.startsWith(z))) return "pt-BR"
-  } catch {}
+  } catch (e) {
+    logger.error("[i18n] Failed to detect timezone:", e)
+  }
   const lang = (navigator.language || navigator.languages?.[0] || "")
   if (lang.startsWith("pt")) return "pt-BR"
   return "en-US"
@@ -909,7 +1072,7 @@ function detectLocale(): Locale {
 interface I18nContextValue {
   locale: Locale
   setLocale: (locale: Locale) => void
-  t: (key: TranslationKey) => string
+  t: (key: string) => string
 }
 
 const I18nContext = createContext<I18nContextValue | null>(null)
@@ -932,7 +1095,7 @@ export function I18nProvider({ children }: { children: React.ReactNode }) {
   }, [])
 
   const t = useCallback(
-    (key: TranslationKey): string =>
+    (key: string): string =>
       (translations[locale] as any)[key] ?? (translations["pt-BR"] as any)[key] ?? key,
     [locale]
   )
