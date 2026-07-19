@@ -44,164 +44,98 @@ export async function POST(req: Request) {
     const lang = isEnglish ? "English" : "Portuguese"
 
     const restrictionsList = dietaryRestrictions?.length
-      ? (isEnglish ? `Dietary restrictions: ${dietaryRestrictions.join(', ')}` : `Restrições alimentares: ${dietaryRestrictions.join(', ')}`)
-      : (isEnglish ? "No dietary restrictions" : "Sem restrições alimentares")
+      ? (isEnglish ? `Diet restrictions: ${dietaryRestrictions.join(', ')}` : `Restrições: ${dietaryRestrictions.join(', ')}`)
+      : (isEnglish ? "No restrictions" : "Sem restrições")
 
     const reasonInfo = reason
-      ? (isEnglish ? `Reason for substitution: ${reason}` : `Motivo da substituição: ${reason}`)
+      ? (isEnglish ? `Reason: ${reason}` : `Motivo: ${reason}`)
       : ""
 
     const prompt = isEnglish
-      ? `Act as a world-class sports nutritionist and food scientist with deep expertise in macro/micronutrient analysis, glycemic response, and culinary applications. Your task is to provide comprehensive, evidence-based food substitutions.
+      ? `Provide 3-5 food substitutions for "${food}". Output in ${lang}. ONLY valid JSON.
 
-ORIGINAL FOOD: ${food}
 ${reasonInfo}
 ${restrictionsList}
 
-ANALYSIS REQUIREMENTS:
-For each substitution, provide a thorough comparison:
+For each substitution provide:
+- Macros per 100g: calories, protein, carbs, fat
+- matchPercent (0-100): how well macros match original
+- reason (2-3 sentences): nutritional and practical benefits
+- micronutrients: key vitamins/minerals summary
+- glycemicIndex: estimated value or "unknown"
+- tasteSimilarity: 1-10 scale
+- costComparison: "cheaper"|"similar"|"pricier"
+- availability: "common"|"moderate"|"rare"
+- bestFor: best specific use case
+- allergenNote: allergen info
 
-1. MACRONUTRIENT PROFILE:
-   - Exact values per 100g: calories, protein (g), carbs (g), fat (g)
-   - Calculate protein-to-calorie ratio (protein grams × 4 / total calories × 100)
-   - Calculate carb-to-fat ratio
-   - Note if macros are higher/lower/similar to original
+Prioritize: similar macro ratios, dietary restriction compliance, realistic availability, unique benefits.
 
-2. MICRONUTRIENTS (brief):
-   - Key vitamins and minerals present (e.g., "rich in iron, B12, zinc")
-   - Note any significant nutritional advantages over original
-
-3. GLYCEMIC INDEX:
-   - Estimated GI value (low: <55, medium: 55-69, high: >70)
-   - Impact on blood sugar compared to original
-
-4. TASTE & TEXTURE:
-   - Taste similarity score (1-10, where 10 is identical)
-   - Texture match description
-   - Flavor profile notes
-
-5. PRACTICAL FACTORS:
-   - Cost comparison: "cheaper", "similar", or "pricier"
-   - Availability: "common" (most supermarkets), "moderate" (health stores/specialty), "rare" (online/specialty only)
-   - Preparation difficulty: "easy" (ready to use), "moderate" (some prep), "complex" (specialized prep)
-
-6. USE CASES:
-   - Best specific application for this substitute (e.g., "ideal for smoothies", "great in stir-fries", "perfect for baking")
-   - When to choose this substitute over others
-
-7. ALLERGEN CONSIDERATIONS:
-   - Common allergens present (gluten, dairy, nuts, soy, eggs, shellfish)
-   - Cross-contamination risks
-   - Safe alternatives for specific allergen restrictions
-
-8. SEASONAL AVAILABILITY:
-   - Peak season months
-   - Year-round availability status
-
-Return ONLY a valid JSON with this EXACT structure (no markdown, no extra text):
+Return ONLY valid JSON:
 {
   "substitutions": [
     {
-      "name": "Substitute food name",
+      "name": string,
       "calories": number,
       "protein": number,
       "carbs": number,
       "fat": number,
-      "matchPercent": number (0-100, how well macros match original),
-      "reason": "Why this is a good substitute (2-3 sentences explaining nutritional and practical benefits)",
-      "micronutrients": "Brief summary of key micronutrients (e.g., 'High in iron, B12, zinc; good source of selenium')",
-      "glycemicIndex": number or "unknown" if not applicable,
-      "tasteSimilarity": number (1-10),
-      "costComparison": "cheaper" | "similar" | "pricier",
-      "availability": "common" | "moderate" | "rare",
-      "bestFor": "Specific best use case (e.g., 'smoothies and protein shakes')",
-      "allergenNote": "Allergen information (e.g., 'Contains soy; gluten-free, dairy-free')"
+      "matchPercent": number,
+      "reason": string,
+      "micronutrients": string,
+      "glycemicIndex": number|"unknown",
+      "tasteSimilarity": number,
+      "costComparison": "cheaper"|"similar"|"pricier",
+      "availability": "common"|"moderate"|"rare",
+      "bestFor": string,
+      "allergenNote": string
     }
   ]
 }
 
-Provide 3-5 alternatives. Prioritize substitutions that:
-- Have similar macronutrient ratios (not just individual values)
-- Fit the user's dietary restrictions
-- Are realistic and commonly available
-- Offer unique benefits (e.g., one for taste, one for nutrition, one for budget)
+All fields mandatory per substitution. No text outside JSON.`
+      : `Forneça 3-5 substituições para "${food}". Saída em ${lang}. APENAS JSON válido.
 
-The JSON must have ALL fields for EVERY substitution. No field can be missing or null.`
-      : `Atua como um nutricionista esportivo e cientista alimentar de classe mundial com profunda expertise em análise macro/micronutriente, resposta glicêmica e aplicações culinárias. Sua tarefa é fornecer substituições de alimentos abrangentes e baseadas em evidências.
-
-ALIMENTO ORIGINAL: ${food}
 ${reasonInfo}
 ${restrictionsList}
 
-REQUISITOS DE ANÁLISE:
-Para cada substituição, forneça uma comparação completa:
+Para cada substituição forneça:
+- Macros por 100g: calorias, proteína, carboidratos, gordura
+- matchPercent (0-100): similaridade com original
+- reason (2-3 frases): benefícios nutricionais e práticos
+- micronutrients: resumo de vitaminas/minerais
+- glycemicIndex: valor estimado ou "desconhecido"
+- tasteSimilarity: escala 1-10
+- costComparison: "mais barato"|"similar"|"mais caro"
+- availability: "comum"|"moderada"|"rara"
+- bestFor: melhor caso de uso
+- allergenNote: informação de alérgenos
 
-1. PERFIL DE MACRONUTRIENTES:
-   - Valores exatos por 100g: calorias, proteína (g), carboidratos (g), gordura (g)
-   - Calcular proporção proteína/caloria (gramas de proteína × 4 / calorias totais × 100)
-   - Calcular proporção carboidrato/gordura
-   - Indicar se macros são maiores/menores/similares ao original
+Priorize: proporções similares de macros, respeito a restrições, disponibilidade realista, benefícios únicos.
 
-2. MICRONUTRIENTES (breve):
-   - Vitaminas e minerais chave presentes (ex: "rico em ferro, B12, zinco")
-   - Destacar vantagens nutricionais significativas sobre o original
-
-3. ÍNDICE GLICÊMICO:
-   - Valor estimado do IG (baixo: <55, médio: 55-70, alto: >70)
-   - Impacto na glicose sanguínea comparado ao original
-
-4. SABOR E TEXTURA:
-   - Pontuação de similaridade de sabor (1-10, onde 10 é idêntico)
-   - Descrição da correspondência de textura
-   - Notas do perfil de sabor
-
-5. FATORES PRÁTICOS:
-   - Comparação de custo: "mais barato", "similar" ou "mais caro"
-   - Disponibilidade: "comum" (maioria dos supermercados), "moderada" (lojas de saúde/especializadas), "rara" (online/especializadas)
-   - Dificuldade de preparo: "fácil" (pronto para uso), "moderada" (algum preparo), "complexa" (preparo especializado)
-
-6. CASOS DE USO:
-   - Melhor aplicação específica para este substituto (ex: "ideal para smoothies", "ótimo para stir-fries", "perfeito para assar")
-   - Quando escolher este substituto sobre outros
-
-7. CONSIDERAÇÕES DE ALÉRGENOS:
-   - Alérgenos comuns presentes (glúten, laticínios, nozes, soja, ovos, frutos do mar)
-   - Riscos de contaminação cruzada
-   - Alternativas seguras para restrições específicas de alérgenos
-
-8. DISPONIBILIDADE SAZONAL:
-   - Meses de pico
-   - Status de disponibilidade durante o ano
-
-Retorne APENAS um JSON válido com esta estrutura EXATA (sem markdown, sem texto extra):
+Retorne APENAS JSON válido:
 {
   "substitutions": [
     {
-      "name": "Nome do alimento substituto",
+      "name": string,
       "calories": número,
       "protein": número,
       "carbs": número,
       "fat": número,
-      "matchPercent": número (0-100, quão bem as macros combinam com o original),
-      "reason": "Por que esta é uma boa substituição (2-3 frases explicando benefícios nutricionais e práticos)",
-      "micronutrients": "Resumo breve dos micronutrientes chave (ex: 'Alto em ferro, B12, zinco; boa fonte de selênio')",
-      "glycemicIndex": número ou "desconhecido" se não aplicável,
-      "tasteSimilarity": número (1-10),
-      "costComparison": "mais barato" | "similar" | "mais caro",
-      "availability": "comum" | "moderada" | "rara",
-      "bestFor": "Melhor caso de uso específico (ex: 'smoothies e shakes de proteína')",
-      "allergenNote": "Informação sobre alérgenos (ex: 'Contém soja; sem glúten, sem laticínios')"
+      "matchPercent": número,
+      "reason": string,
+      "micronutrients": string,
+      "glycemicIndex": número|"desconhecido",
+      "tasteSimilarity": número,
+      "costComparison": "mais barato"|"similar"|"mais caro",
+      "availability": "comum"|"moderada"|"rara",
+      "bestFor": string,
+      "allergenNote": string
     }
   ]
 }
 
-Forneça 3-5 alternativas. Priorize substituições que:
-- Tenham proporções de macronutrientes similares (não apenas valores individuais)
-- Respeitem as restrições alimentares do usuário
-- Sejam realistas e comumente disponíveis
-- Ofereçam benefícios únicos (ex: uma para sabor, outra para nutrição, outra para economia)
-
-O JSON deve ter TODOS os campos para CADA substituição. Nenhum campo pode estar faltando ou nulo.`
+Todos campos obrigatórios por substituição. Sem texto fora do JSON.`
 
     let lastError: Error | null = null;
     let data: any = null;
