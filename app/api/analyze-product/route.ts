@@ -32,7 +32,208 @@ const genAI = apiKey ? new GoogleGenerativeAI(apiKey) : null;
 
 const model = genAI ? genAI.getGenerativeModel({
   model: 'gemini-3.5-flash',
+  generationConfig: {
+    temperature: 0.3,
+    maxOutputTokens: 2048,
+  },
 }) : null;
+
+function buildPrompt(lang: string, metabolicPlan?: string) {
+  const planContext = metabolicPlan
+    ? `\nThe user has a metabolic plan: ${metabolicPlan}. Use this to give personalized fitness alignment advice.`
+    : '';
+
+  if (lang === "English") {
+    return `You are a world-class nutritionist and food scientist. Analyze this food/product image with extreme precision.
+
+Return STRICT JSON only (no markdown, no explanation, no backticks). Use this exact structure:
+
+{
+  "productName": "exact product name as shown on label",
+  "brand": "brand name or 'Generic'",
+  "category": "one of: beverage, dairy, meat, seafood, grain, vegetable, fruit, snack, condiment, supplement, processed, ready-meal, dessert, other",
+  "servingSize": "e.g. '100g', '1 can (330ml)', '1 cup (240ml)'",
+  "macros": {
+    "calories": number,
+    "protein": number,
+    "carbs": number,
+    "fat": number,
+    "fiber": number,
+    "sugar": number,
+    "sodium": number
+  },
+  "micros": {
+    "vitamins": ["Vitamin C - 45mg (50% DV)", "Vitamin D - 2mcg (10% DV)"],
+    "minerals": ["Iron - 2.5mg (14% DV)", "Calcium - 200mg (15% DV)"]
+  },
+  "ingredients": ["first ingredient", "second ingredient", "..."],
+  "allergens": ["gluten", "dairy", "soy", "nuts", "eggs", "shellfish", "peanuts", "sesame"] or [],
+  "novaClassification": {
+    "group": number 1-4,
+    "label": "Unprocessed" | "Processed culinary ingredients" | "Processed foods" | "Ultra-processed",
+    "description": "brief explanation"
+  },
+  "glycemicIndex": {
+    "value": number or null,
+    "category": "Low" | "Medium" | "High" or null,
+    "note": "brief explanation" or null
+  },
+  "healthScore": {
+    "overall": number 0-100,
+    "nutrientDensity": number 0-100,
+    "processingLevel": number 0-100 (100 = unprocessed),
+    "additiveRisk": number 0-100 (100 = no additives)
+  },
+  "positivePoints": ["specific benefit 1", "specific benefit 2", "..."],
+  "negativePoints": ["specific concern 1", "specific concern 2", "..."],
+  "alerts": [
+    {"title": "alert title", "description": "detailed explanation", "severity": "high" | "medium" | "low"}
+  ],
+  "fitnessAlignment": [
+    {
+      "goal": "Muscle Gain" | "Fat Loss" | "Endurance" | "General Health",
+      "suitability": "Excellent" | "Good" | "Neutral" | "Poor",
+      "justification": "detailed explanation"
+    }
+  ],
+  "recommendations": {
+    "bestFor": "when and how to consume this product",
+    "avoidIf": "who should avoid this and why",
+    "alternatives": "healthier alternatives if applicable"
+  },
+  "aiConfidence": number 0-100 (how confident you are in the analysis)
+}
+
+Guidelines:
+- Read the actual nutrition label if visible. If not visible, estimate based on the product type.
+- For macros, use per serving as shown on label. If no label, estimate per 100g.
+- NOVA Group 1 = unprocessed, Group 2 = processed culinary, Group 3 = processed, Group 4 = ultra-processed.
+- Glycemic Index: estimate based on ingredients and product type.
+- allergens: detect from ingredients list if visible.
+- Be specific, not generic. Name actual vitamins/minerals with amounts if visible.
+- If the image is NOT food, return {"error": "This does not appear to be a food product."}
+${planContext}`;
+  }
+
+  return `Você é um nutricionista e cientista de alimentos de classe mundial. Analise esta imagem de alimento/produto com extrema precisão.
+
+Retorne APENAS JSON estrito (sem markdown, sem explicação, sem crases). Use esta estrutura exata:
+
+{
+  "productName": "nome exato do produto como aparece no rótulo",
+  "brand": "marca ou 'Genérico'",
+  "category": "uma das: bebida, laticínio, carne, frutos do mar, grão, vegetal, fruta, snack, condimento, suplemento, processado, refeição pronta, sobremesa, outro",
+  "servingSize": "ex: '100g', '1 lata (330ml)', '1 xícara (240ml)'",
+  "macros": {
+    "calories": número,
+    "protein": número,
+    "carbs": número,
+    "fat": número,
+    "fiber": número,
+    "sugar": número,
+    "sodium": número
+  },
+  "micros": {
+    "vitamins": ["Vitamina C - 45mg (50% VD)", "Vitamina D - 2mcg (10% VD)"],
+    "minerals": ["Ferro - 2.5mg (14% VD)", "Cálcio - 200mg (15% VD)"]
+  },
+  "ingredients": ["primeiro ingrediente", "segundo ingrediente", "..."],
+  "allergens": ["glúten", "lacticínios", "soja", "nozes", "ovos", "crustáceos", "amendoim", "gergelim"] ou [],
+  "novaClassification": {
+    "group": número 1-4,
+    "label": "Não processado" | "Ingredientes culinários processados" | "Alimentos processados" | "Ultra-processados",
+    "description": "breve explicação"
+  },
+  "glycemicIndex": {
+    "value": número ou null,
+    "category": "Baixo" | "Médio" | "Alto" ou null,
+    "note": "breve explicação" ou null
+  },
+  "healthScore": {
+    "overall": número 0-100,
+    "nutrientDensity": número 0-100,
+    "processingLevel": número 0-100 (100 = não processado),
+    "additiveRisk": número 0-100 (100 = sem aditivos)
+  },
+  "positivePoints": ["benefício específico 1", "benefício específico 2", "..."],
+  "negativePoints": ["preocupação específica 1", "preocupação específica 2", "..."],
+  "alerts": [
+    {"title": "título do alerta", "description": "explicação detalhada", "severity": "high" | "medium" | "low"}
+  ],
+  "fitnessAlignment": [
+    {
+      "goal": "Ganho Muscular" | "Perda de Gordura" | "Resistência" | "Saúde Geral",
+      "suitability": "Excelente" | "Bom" | "Neutro" | "Ruim",
+      "justification": "explicação detalhada"
+    }
+  ],
+  "recommendations": {
+    "bestFor": "quando e como consumir este produto",
+    "avoidIf": "quem deve evitar e por quê",
+    "alternatives": "alternativas mais saudáveis se aplicável"
+  },
+  "aiConfidence": número 0-100 (confiança na análise)
+}
+
+Diretrizes:
+- Leia o rótulo de nutrição real se estiver visível. Se não estiver, estime com base no tipo de produto.
+- Para macros, use por porção conforme o rótulo. Se não houver rótulo, estime por 100g.
+- NOVA Grupo 1 = não processado, Grupo 2 = ingredientes culinários, Grupo 3 = processado, Grupo 4 = ultra-processado.
+- Índice Glicêmico: estime com base nos ingredientes e tipo de produto.
+- allergens: detecte da lista de ingredientes se visível.
+- Seja específico, não genérico. Nomeie vitaminas/minerais reais com quantidades se visíveis.
+- Se a imagem NÃO for alimento, retorne {"error": "Isto não parece ser um produto alimentício."}
+${planContext}`;
+}
+
+async function parseAIResponse(text: string) {
+  let cleaned = text.replace(/```json/g, '').replace(/```/g, '').trim();
+  
+  // Try to extract JSON from the response if it contains extra text
+  const jsonMatch = cleaned.match(/\{[\s\S]*\}/);
+  if (jsonMatch) {
+    cleaned = jsonMatch[0];
+  }
+
+  const parsed = JSON.parse(cleaned);
+
+  // Normalize healthScore fields
+  if (parsed.healthScore) {
+    if (typeof parsed.healthScore === 'number') {
+      parsed.healthScore = {
+        overall: parsed.healthScore,
+        nutrientDensity: parsed.healthScore,
+        processingLevel: 50,
+        additiveRisk: 50,
+      };
+    }
+    // Ensure all sub-scores exist
+    parsed.healthScore.overall = parsed.healthScore.overall ?? 50;
+    parsed.healthScore.nutrientDensity = parsed.healthScore.nutrientDensity ?? 50;
+    parsed.healthScore.processingLevel = parsed.healthScore.processingLevel ?? 50;
+    parsed.healthScore.additiveRisk = parsed.healthScore.additiveRisk ?? 50;
+  }
+
+  // Normalize alerts
+  if (parsed.alerts && Array.isArray(parsed.alerts)) {
+    parsed.alerts = parsed.alerts.map((a: Record<string, unknown>) => ({
+      title: a.title || 'Alerta',
+      description: a.description || a.title || '',
+      severity: a.severity || 'medium',
+    }));
+  }
+
+  // Normalize fitnessAlignment
+  if (parsed.fitnessAlignment && Array.isArray(parsed.fitnessAlignment)) {
+    parsed.fitnessAlignment = parsed.fitnessAlignment.map((f: Record<string, unknown>) => ({
+      goal: f.goal || 'Saúde Geral',
+      suitability: f.suitability || 'Neutro',
+      justification: f.justification || '',
+    }));
+  }
+
+  return parsed;
+}
 
 export async function POST(req: Request) {
   const headers = getCorsHeaders();
@@ -82,14 +283,14 @@ export async function POST(req: Request) {
 
   try {
     const body = await req.json();
-    const { imageData, mimeType = "image/jpeg", locale = "pt-BR" } = body;
+    const { imageData, mimeType = "image/jpeg", locale = "pt-BR", metabolicPlan } = body;
 
     if (!imageData) {
       return NextResponse.json({ error: 'Imagem não fornecida.' }, { status: 400, headers });
     }
 
     if (typeof mimeType !== "string" || !mimeType.startsWith("image/")) {
-      return NextResponse.json({ error: 'Formato de imagem invalido.' }, { status: 400, headers });
+      return NextResponse.json({ error: 'Formato de imagem inválido.' }, { status: 400, headers });
     }
 
     const base64Data = imageData.includes('base64,') 
@@ -99,105 +300,100 @@ export async function POST(req: Request) {
     const isEnglish = locale === "en-US"
     const lang = isEnglish ? "English" : "Portuguese"
 
-    const testMode = false;
-    
-    if (testMode) {
-      return NextResponse.json({
-        productName: "Food Item",
-        brand: "Generic",
-        macros: { calories: 200, protein: 10, carbs: 25, fat: 8 },
-        longevityScore: 75,
-        positivePoints: ["Good protein source", "Contains vitamins"],
-        negativePoints: ["Moderate sugar"],
-        alerts: [{ title: "Sugar", description: "Contains moderate sugar" }],
-        insights: [{ description: "Good for muscle building" }],
-        benefits: {
-          vitamins: ["Vitamina C"],
-          minerals: ["Ferro"],
-          proteins: ["Muscle building"],
-          other: ["Fiber"]
+    const prompt = buildPrompt(lang, metabolicPlan);
+
+    let analysis;
+    let lastError: unknown = null;
+
+    // Retry up to 2 times if JSON parsing fails
+    for (let attempt = 1; attempt <= 3; attempt++) {
+      try {
+        const result = await model.generateContent([
+          prompt,
+          {
+            inlineData: {
+              data: base64Data,
+              mimeType,
+            },
+          },
+        ]);
+        
+        const response = await result.response;
+        let text = response.text();
+        
+        analysis = await parseAIResponse(text);
+        break; // Success
+      } catch (parseError) {
+        lastError = parseError;
+        if (attempt === 3) {
+          console.error(`[analyze-product] Failed after 3 attempts:`, parseError);
         }
-      }, { headers });
+        // Retry with a simpler prompt
+        continue;
+      }
     }
 
-    const prompt = isEnglish
-      ? `Analyze this food or product image. Return a strict JSON (no markdown) with:
-    - productName: product name
-    - brand: brand or 'Generic'
-    - macros: object with calories, protein, carbs, fat (approximate numbers)
-    - longevityScore: score from 0 to 100 based on how healthy it is
-    - positivePoints: array of strings with HEALTH BENEFITS
-    - negativePoints: array of strings with health concerns
-    - benefits: object with vitamins, minerals, proteins, other
-    
-    If it's not food, return error. All output must be in ${lang}.`
-      : `Analise esta imagem de alimento ou produto. 
-    Retorne um JSON estrito (sem markdown) com:
-    - productName: nome do produto
-    - brand: marca ou 'Genérico'
-    - macros: objeto com calories, protein, carbs, fat (números aproximados)
-    - longevityScore: nota de 0 a 100 baseada em quão saudável é
-    - positivePoints: array de strings com BENEFÍCIOS ESPECÍFICOS PARA A SAÚDE
-    - negativePoints: array de strings com preocupações de saúde
-    - benefits: objeto com vitaminas, minerais, proteínas, outros
-    
-    Se não for alimento, retorne erro. Todo o saída deve ser em ${lang}.`
-
-    const result = await model.generateContent([
-      prompt,
-      {
-        inlineData: {
-          data: base64Data,
-          mimeType,
-        },
-      },
-    ]);
-    
-    const response = await result.response;
-    let text = response.text();
-    
-    text = text.replace(/```json/g, '').replace(/```/g, '').trim();
-    
-    let analysis;
-    try {
-      analysis = JSON.parse(text);
-    } catch {
-      console.error('Resposta invalida da IA:', text);
+    if (!analysis) {
       return NextResponse.json(
-        { error: 'A IA retornou uma resposta invalida. Tente uma foto mais nitida do alimento ou rotulo.' },
+        { error: 'A IA retornou uma resposta inválida. Tente uma foto mais nítida do alimento ou rótulo.' },
         { status: 502, headers }
       );
     }
 
     if (analysis.error) {
       return NextResponse.json(
-        { error: typeof analysis.error === 'string' ? analysis.error : 'A imagem nao parece ser um alimento.' },
+        { error: typeof analysis.error === 'string' ? analysis.error : 'A imagem não parece ser um alimento.' },
         { status: 422, headers }
       );
     }
 
-    if (!analysis.productName || typeof analysis.longevityScore !== 'number') {
+    if (!analysis.productName || typeof analysis.healthScore?.overall !== 'number') {
       return NextResponse.json(
-        { error: 'Nao foi possivel identificar o alimento. Tente uma foto mais clara.' },
+        { error: 'Não foi possível identificar o alimento. Tente uma foto mais clara.' },
         { status: 422, headers }
       );
     }
 
+    // Build transformed response with backward compatibility
     const transformed = {
-      ...analysis,
-      alerts: analysis.negativePoints?.map((desc: string) => ({
-        title: desc.split(' - ')[0] || desc,
-        description: desc.split(' - ').slice(1).join(' - ') || desc
+      productName: analysis.productName,
+      brand: analysis.brand || 'Genérico',
+      category: analysis.category || 'other',
+      servingSize: analysis.servingSize || '100g',
+      macros: analysis.macros || { calories: 0, protein: 0, carbs: 0, fat: 0, fiber: 0, sugar: 0, sodium: 0 },
+      micros: analysis.micros || { vitamins: [], minerals: [] },
+      ingredients: analysis.ingredients || [],
+      allergens: analysis.allergens || [],
+      novaClassification: analysis.novaClassification || { group: 4, label: 'Ultra-processado', description: 'Não foi possível classificar' },
+      glycemicIndex: analysis.glycemicIndex || { value: null, category: null, note: null },
+      healthScore: analysis.healthScore || { overall: 50, nutrientDensity: 50, processingLevel: 50, additiveRisk: 50 },
+      longevityScore: analysis.healthScore?.overall ?? analysis.longevityScore ?? 50,
+      positivePoints: analysis.positivePoints || [],
+      negativePoints: analysis.negativePoints || [],
+      alerts: analysis.alerts?.map((a: Record<string, unknown>) => ({
+        title: String(a.title || 'Alerta'),
+        description: String(a.description || ''),
+        severity: (a.severity as string) || 'medium',
       })) || [],
       insights: analysis.positivePoints?.map((desc: string) => ({
         description: desc
-      })) || []
+      })) || [],
+      benefits: {
+        vitamins: analysis.micros?.vitamins || analysis.benefits?.vitamins || [],
+        minerals: analysis.micros?.minerals || analysis.benefits?.minerals || [],
+        proteins: analysis.benefits?.proteins || [],
+        other: analysis.benefits?.other || [],
+      },
+      fitnessAlignment: analysis.fitnessAlignment || [],
+      recommendations: analysis.recommendations || { bestFor: '', avoidIf: '', alternatives: '' },
+      aiConfidence: analysis.aiConfidence ?? 70,
     };
 
+    // Save scan to database
     await supabaseAdmin.from('scans').insert({
       user_id: user.id,
-      product_name: analysis.productName,
-      score: analysis.longevityScore,
+      product_name: transformed.productName,
+      score: transformed.longevityScore,
       image_url: null,
     });
 
