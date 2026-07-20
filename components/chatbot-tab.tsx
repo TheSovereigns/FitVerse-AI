@@ -36,6 +36,51 @@ export function ChatbotTab() {
     scrollToBottom()
   }, [messages, scrollToBottom])
 
+  // Load conversation history on mount
+  useEffect(() => {
+    if (!user) return
+
+    const loadHistory = async () => {
+      try {
+        let token = ""
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i)
+          if (key && key.includes("sb-") && key.includes("-auth-token")) {
+            const storedSession = localStorage.getItem(key)
+            if (storedSession) {
+              const parsed = JSON.parse(storedSession)
+              if (parsed?.access_token) {
+                token = parsed.access_token
+                break
+              }
+            }
+          }
+        }
+        if (!token) return
+
+        const response = await fetch("/api/chatbot", {
+          headers: { Authorization: `Bearer ${token}` },
+        })
+        if (!response.ok) return
+
+        const data = await response.json()
+        if (data.messages?.length > 0) {
+          const loaded: Message[] = data.messages.map((m: any, i: number) => ({
+            id: `loaded-${i}`,
+            role: m.role,
+            content: m.content,
+            timestamp: m.timestamp || new Date().toISOString(),
+          }))
+          setMessages(loaded.slice(-50)) // Keep last 50 messages
+        }
+      } catch (e) {
+        logger.error("[Chatbot] Failed to load history:", e)
+      }
+    }
+
+    loadHistory()
+  }, [user])
+
   const sendMessage = async () => {
     if (!input.trim() || isLoading) return
 
@@ -70,6 +115,17 @@ export function ChatbotTab() {
         logger.error("[Chatbot] Failed to get auth token:", e)
       }
 
+      const assistantId = (Date.now() + 1).toString()
+      let accumulatedContent = ""
+
+      // Add empty assistant message for streaming
+      setMessages((prev) => [...prev, {
+        id: assistantId,
+        role: "assistant",
+        content: "",
+        timestamp: new Date().toISOString(),
+      }])
+
       const response = await fetch("/api/chatbot", {
         method: "POST",
         headers: {
@@ -77,9 +133,10 @@ export function ChatbotTab() {
           ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
         body: JSON.stringify({
-          messages: [...messages, userMessage].map((m) => ({
+          message: input.trim(),
+          history: messages.map((m) => ({
             role: m.role,
-            content: m.content,
+            parts: [{ text: m.content }],
           })),
           locale,
         }),
@@ -89,16 +146,47 @@ export function ChatbotTab() {
         throw new Error("Failed to get response")
       }
 
-      const data = await response.json()
+      const reader = response.body?.getReader()
+      const decoder = new TextDecoder()
 
-      const assistantMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        role: "assistant",
-        content: data.response || data.message || "Desculpe, não consegui processar sua pergunta.",
-        timestamp: new Date().toISOString(),
+      if (reader) {
+        while (true) {
+          const { done, value } = await reader.read()
+          if (done) break
+
+          const text = decoder.decode(value, { stream: true })
+          const lines = text.split("\n")
+
+          for (const line of lines) {
+            if (line.startsWith("data: ")) {
+              try {
+                const data = JSON.parse(line.slice(6))
+                if (data.text) {
+                  accumulatedContent += data.text
+                  setMessages((prev) =>
+                    prev.map((m) =>
+                      m.id === assistantId
+                        ? { ...m, content: accumulatedContent }
+                        : m
+                    )
+                  )
+                }
+              } catch {}
+            }
+          }
+        }
       }
 
-      setMessages((prev) => [...prev, assistantMessage])
+      // Fallback if no streaming occurred
+      if (!accumulatedContent) {
+        setMessages((prev) =>
+          prev.map((m) =>
+            m.id === assistantId
+              ? { ...m, content: "Desculpe, não consegui processar sua pergunta." }
+              : m
+          )
+        )
+      }
     } catch (error) {
       logger.error("[Chatbot] Error:", error)
       toast.error(t("chatbot_error") || "Erro ao enviar mensagem")
@@ -174,7 +262,7 @@ export function ChatbotTab() {
                   : "bg-muted text-foreground"
               }`}>
                 <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
-                {msg.role === "assistant" && (
+                {msg.role === "assistant" && msg.content && (
                   <div className="flex items-center gap-1 mt-2">
                     {[1, 2, 3, 4, 5].map((score) => (
                       <button
@@ -197,7 +285,7 @@ export function ChatbotTab() {
             </div>
           </div>
         ))}
-        {isLoading && (
+        {isLoading && messages[messages.length - 1]?.content === "" && (
           <div className="flex justify-start">
             <div className="flex gap-2">
               <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-muted text-muted-foreground">

@@ -30,6 +30,20 @@ interface Subscription {
   status: string
   created_at: string
   current_period_end: string | null
+  amount_brl?: number
+  amount_usd?: number
+}
+
+interface MonthlyRevenue {
+  month: string
+  revenue: number
+  new: number
+}
+
+interface PlanDist {
+  name: string
+  value: number
+  color: string
 }
 
 export default function AdminRevenuePage() {
@@ -92,6 +106,8 @@ export default function AdminRevenuePage() {
     newSubsThisMonth: 0,
     ltv: 0
   })
+  const [monthlyData, setMonthlyData] = useState<MonthlyRevenue[]>([])
+  const [planDistribution, setPlanDistribution] = useState<PlanDist[]>([])
 
   useEffect(() => {
     fetchRevenueData()
@@ -107,12 +123,17 @@ export default function AdminRevenuePage() {
 
       if (error) throw error
 
-      // Calculate stats
+      // Calculate stats from real data
       const active = subs?.filter(s => s.status === 'active') || []
       const canceled = subs?.filter(s => s.status === 'canceled') || []
       
-      // MRR calculation (assuming R$29.90 for premium)
-      const mrr = active.length * 29.90
+      // MRR from actual amounts (fallback to plan-based pricing)
+      const getPriceForPlan = (plan: string) => {
+        if (plan === 'premium') return 29.90
+        if (plan === 'pro') return 19.90
+        return 0
+      }
+      const mrr = active.reduce((sum, s) => sum + (s.amount_brl || getPriceForPlan(s.plan)), 0)
       const arr = mrr * 12
 
       // Churn rate
@@ -124,8 +145,15 @@ export default function AdminRevenuePage() {
       startOfMonth.setDate(1)
       const newThisMonth = active.filter(s => new Date(s.created_at) >= startOfMonth).length
 
-      // LTV (average) - assuming 6 months average lifetime
-      const ltv = mrr > 0 ? mrr * 6 : 0
+      // LTV from average subscription lifetime
+      const avgLifetimeMonths = active.length > 0
+        ? active.reduce((sum, s) => {
+            const created = new Date(s.created_at)
+            const now = new Date()
+            return sum + Math.max(1, (now.getTime() - created.getTime()) / (1000 * 60 * 60 * 24 * 30))
+          }, 0) / active.length
+        : 6
+      const ltv = mrr > 0 ? (mrr / active.length) * avgLifetimeMonths : 0
 
       setStats({
         mrr,
@@ -136,6 +164,45 @@ export default function AdminRevenuePage() {
         newSubsThisMonth: newThisMonth,
         ltv
       })
+
+      // Build monthly revenue from subscription history (last 6 months)
+      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+      const now = new Date()
+      const monthlyRev: MonthlyRevenue[] = []
+      for (let i = 5; i >= 0; i--) {
+        const d = new Date(now.getFullYear(), now.getMonth() - i, 1)
+        const monthEnd = new Date(d.getFullYear(), d.getMonth() + 1, 0)
+        const monthStart = new Date(d.getFullYear(), d.getMonth(), 1)
+        const monthSubs = (subs || []).filter(s => {
+          const created = new Date(s.created_at)
+          return created >= monthStart && created <= monthEnd
+        })
+        const activeInMonth = monthSubs.filter(s => s.status === 'active')
+        const revenue = activeInMonth.reduce((sum, s) => sum + (s.amount_brl || getPriceForPlan(s.plan)), 0)
+        monthlyRev.push({
+          month: months[d.getMonth()]!,
+          revenue,
+          new: monthSubs.length,
+        })
+      }
+      setMonthlyData(monthlyRev)
+
+      // Build plan distribution from profiles
+      const { data: profiles } = await supabase
+        .from('profiles')
+        .select('plan')
+
+      const planCounts: Record<string, number> = { free: 0, pro: 0, premium: 0 }
+      profiles?.forEach(p => {
+        const plan = p.plan || 'free'
+        planCounts[plan] = (planCounts[plan] || 0) + 1
+      })
+      const totalProfiles = profiles?.length || 1
+      setPlanDistribution([
+        { name: "Free", value: Math.round(((planCounts.free ?? 0) / totalProfiles) * 100), color: "bg-white/20" },
+        { name: "Pro", value: Math.round(((planCounts.pro ?? 0) / totalProfiles) * 100), color: "bg-blue-500" },
+        { name: "Premium", value: Math.round(((planCounts.premium ?? 0) / totalProfiles) * 100), color: "bg-primary" },
+      ])
 
       setSubscriptions(subs || [])
     } catch (error) {
@@ -153,27 +220,16 @@ export default function AdminRevenuePage() {
     }).format(locale === 'en-US' ? value / 4 : value)
   }
 
-  // Mock data for charts
-  const monthlyData = [
-    { month: "Jan", revenue: 1200, new: 45 },
-    { month: "Feb", revenue: 1800, new: 62 },
-    { month: "Mar", revenue: 2400, new: 78 },
-    { month: "Apr", revenue: 2100, new: 55 },
-    { month: "May", revenue: 3200, new: 95 },
-    { month: "Jun", revenue: 3800, new: 110 },
-  ]
-
-  const planDistribution = [
-    { name: "Free", value: 70, color: "bg-white/20" },
-    { name: "Premium", value: 30, color: "bg-primary" },
-  ]
-
+  // Revenue cards with computed variations
+  const prevMonthMRR = monthlyData.length >= 2 ? monthlyData[monthlyData.length - 2]?.revenue || 0 : 0
+  const mrrVariation = prevMonthMRR > 0 ? ((stats.mrr - prevMonthMRR) / prevMonthMRR * 100).toFixed(1) : "0"
+  
   const revenueCards = [
     {
       title: locale === "en-US" ? "Monthly Recurring Revenue" : "Receita Mensal Recorrente",
       value: formatCurrency(stats.mrr),
       icon: DollarSign,
-      variation: "+12.5%",
+      variation: `${Number(mrrVariation) >= 0 ? '+' : ''}${mrrVariation}%`,
       color: "text-yellow-400",
       bgColor: "bg-yellow-500/10"
     },
@@ -181,7 +237,7 @@ export default function AdminRevenuePage() {
       title: locale === "en-US" ? "Annual Recurring Revenue" : "Receita Anual Recorrente",
       value: formatCurrency(stats.arr),
       icon: Calendar,
-      variation: "+15.2%",
+      variation: null,
       color: "text-purple-400",
       bgColor: "bg-purple-500/10"
     },
@@ -189,7 +245,7 @@ export default function AdminRevenuePage() {
       title: locale === "en-US" ? "Churn Rate" : "Taxa de Cancelamento",
       value: `${stats.churnRate}%`,
       icon: TrendingDown,
-      variation: "-2.1%",
+      variation: null,
       color: stats.churnRate > 10 ? "text-red-400" : "text-emerald-400",
       bgColor: stats.churnRate > 10 ? "bg-red-500/10" : "bg-emerald-500/10"
     },
@@ -197,7 +253,7 @@ export default function AdminRevenuePage() {
       title: locale === "en-US" ? "Customer LTV" : "Valor do Cliente",
       value: formatCurrency(stats.ltv),
       icon: CreditCard,
-      variation: "+8.3%",
+      variation: null,
       color: "text-cyan-400",
       bgColor: "bg-cyan-500/10"
     },
@@ -291,7 +347,7 @@ export default function AdminRevenuePage() {
             {locale === "en-US" ? "Plan Distribution" : "Distribuição de Planos"}
           </h3>
           
-          <div className="space-y-6">
+          <div className="space-y-4">
             {planDistribution.map((plan) => (
               <div key={plan.name}>
                 <div className="flex items-center justify-between mb-2">

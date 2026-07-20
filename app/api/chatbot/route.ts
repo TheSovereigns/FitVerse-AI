@@ -25,6 +25,55 @@ const safetySettings = [
 
 const MAX_HISTORY_LENGTH = 20;
 
+// GET: Load conversation history from Supabase
+export async function GET(req: Request) {
+  const headers = getCorsHeaders();
+  const supabaseAdmin = getSupabaseAdmin();
+
+  const token = req.headers.get('Authorization')?.replace('Bearer ', '');
+  if (!token || !supabaseAdmin) {
+    return NextResponse.json({ messages: [] }, { headers });
+  }
+
+  try {
+    const { data: { user }, error } = await supabaseAdmin.auth.getUser(token);
+    if (error || !user) {
+      return NextResponse.json({ messages: [] }, { headers });
+    }
+
+    // Get the latest conversation and its messages
+    const { data: conv } = await supabaseAdmin
+      .from('ai_conversations')
+      .select('id')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .single();
+
+    if (!conv) {
+      return NextResponse.json({ messages: [] }, { headers });
+    }
+
+    const { data: msgs } = await supabaseAdmin
+      .from('ai_messages')
+      .select('user_message, ai_response, created_at')
+      .eq('conversation_id', conv.id)
+      .order('created_at', { ascending: true })
+      .limit(50);
+
+    const messages = (msgs || []).flatMap((m) => [
+      { role: 'user', content: m.user_message, timestamp: m.created_at },
+      { role: 'assistant', content: m.ai_response, timestamp: m.created_at },
+    ]);
+
+    return NextResponse.json({ messages }, { headers });
+  } catch (error) {
+    logger.error('[Chatbot] Failed to load history:', error);
+    return NextResponse.json({ messages: [] }, { headers });
+  }
+}
+
+// POST: Send message (streaming via SSE)
 export async function POST(req: Request) {
   const headers = getCorsHeaders();
   const supabaseAdmin = getSupabaseAdmin();
@@ -41,8 +90,6 @@ export async function POST(req: Request) {
   }
   const genAI = new GoogleGenerativeAI(apiKey);
   const model = genAI.getGenerativeModel({ model: 'gemini-3.1-flash-lite' });
-
-  logger.info('[Chatbot] Supabase admin configured:', !!supabaseAdmin);
 
   try {
     let body;
@@ -88,7 +135,7 @@ Plano de Treino: Nome do exercício, séries, repetições e um breve 'dica do p
 
 Plano Alimentar: Dividido por refeições (Café, Almoço, Lanche, Jantar) com macros aproximados (Proteínas, Carbos, Gorduras).
 
-Ajuste de Segurança: Adicione sempre um aviso de que os resultados devem ser validados por profissionais de saúde.
+Ajuste de Segurança: Adicite sempre um aviso de que os resultados devem ser validados por profissionais de saúde.
 
 Restrições:
 
@@ -127,69 +174,93 @@ Responda em português ou inglês conforme a pergunta.`;
 
 PERGUNTA: ${message}`;
     
-    const result = await chat.sendMessage(fullMessage);
-    const response = result.response;
-    const reply = response.text();
-    const responseTimeMs = Date.now() - startTime;
-
-    const usageMetadata = response.usageMetadata;
-    const tokensUsed = usageMetadata ? usageMetadata.totalTokenCount : null;
-
-    const userMessageLang = detectLanguage(message);
-    const aiResponseLang = detectLanguage(reply);
-    const { category, subcategory } = detectCategory(message);
-
-    // Save to dataset — non-blocking, never break the chat
-    if (supabaseAdmin && authenticatedUserId) {
-      (async () => {
+    // Stream the response
+    const result = await chat.sendMessageStream(fullMessage);
+    
+    const stream = new ReadableStream({
+      async start(controller) {
+        let fullReply = '';
+        
         try {
-          let conversationId: string | null = null;
-
-          const { data: existingConv } = await supabaseAdmin
-            .from('ai_conversations')
-            .select('id')
-            .eq('user_id', authenticatedUserId)
-            .order('created_at', { ascending: false })
-            .limit(1)
-            .single();
-
-          if (existingConv) {
-            conversationId = existingConv.id;
-          } else {
-            const { data: newConv } = await supabaseAdmin
-              .from('ai_conversations')
-              .insert({ user_id: authenticatedUserId, session_id: crypto.randomUUID() })
-              .select('id')
-              .single();
-            if (newConv) conversationId = newConv.id;
+          for await (const chunk of result.stream) {
+            const text = chunk.text();
+            if (text) {
+              fullReply += text;
+              controller.enqueue(new TextEncoder().encode(`data: ${JSON.stringify({ text })}\n\n`));
+            }
           }
+          
+          const responseTimeMs = Date.now() - startTime;
+          
+          // Send final event with metadata
+          controller.enqueue(new TextEncoder().encode(`data: ${JSON.stringify({ done: true, responseTimeMs })}\n\n`));
+          controller.close();
+          
+          // Save to dataset — non-blocking
+          if (supabaseAdmin && authenticatedUserId) {
+            const userMessageLang = detectLanguage(message);
+            const aiResponseLang = detectLanguage(fullReply);
+            const { category, subcategory } = detectCategory(message);
+            
+            (async () => {
+              try {
+                let conversationId: string | null = null;
+                const { data: existingConv } = await supabaseAdmin
+                  .from('ai_conversations')
+                  .select('id')
+                  .eq('user_id', authenticatedUserId)
+                  .order('created_at', { ascending: false })
+                  .limit(1)
+                  .single();
 
-          if (conversationId) {
-            await supabaseAdmin
-              .from('ai_messages')
-              .insert({
-                conversation_id: conversationId,
-                user_id: authenticatedUserId,
-                user_message: message,
-                user_message_lang: userMessageLang,
-                user_context: userContext || {},
-                ai_response: reply,
-                ai_response_lang: aiResponseLang,
-                model_used: 'gemini-3.1-flash-lite',
-                tokens_used: tokensUsed,
-                response_time_ms: responseTimeMs,
-                category,
-                subcategory,
-                training_status: 'raw',
-              })
+                if (existingConv) {
+                  conversationId = existingConv.id;
+                } else {
+                  const { data: newConv } = await supabaseAdmin
+                    .from('ai_conversations')
+                    .insert({ user_id: authenticatedUserId, session_id: crypto.randomUUID() })
+                    .select('id')
+                    .single();
+                  if (newConv) conversationId = newConv.id;
+                }
+
+                if (conversationId) {
+                  await supabaseAdmin.from('ai_messages').insert({
+                    conversation_id: conversationId,
+                    user_id: authenticatedUserId,
+                    user_message: message,
+                    user_message_lang: userMessageLang,
+                    user_context: userContext || {},
+                    ai_response: fullReply,
+                    ai_response_lang: aiResponseLang,
+                    model_used: 'gemini-3.1-flash-lite',
+                    tokens_used: null,
+                    response_time_ms: responseTimeMs,
+                    category,
+                    subcategory,
+                    training_status: 'raw',
+                  });
+                }
+              } catch (error) {
+                console.error('Failed to save AI message to dataset:', error);
+              }
+            })();
           }
         } catch (error) {
-          console.error('Failed to save AI message to dataset:', error);
+          controller.enqueue(new TextEncoder().encode(`data: ${JSON.stringify({ error: 'Stream failed' })}\n\n`));
+          controller.close();
         }
-      })();
-    }
+      },
+    });
 
-    return NextResponse.json({ reply, tokensUsed, responseTimeMs }, { headers });
+    return new Response(stream, {
+      headers: {
+        ...headers,
+        'Content-Type': 'text/event-stream',
+        'Cache-Control': 'no-cache',
+        'Connection': 'keep-alive',
+      },
+    });
 
   } catch (error) {
     console.error('Erro detalhado no chatbot:', error);

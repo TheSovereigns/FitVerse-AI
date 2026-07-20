@@ -95,44 +95,45 @@ export default function AdminAIUsagePage() {
 
   const fetchAIUsageData = async () => {
     try {
-      // Fetch AI usage data
-      const { data: usageData } = await supabase
-        .from('ai_usage')
-        .select('*')
-        .order('date', { ascending: false })
-        .limit(30)
+      // Fetch AI messages from ai_messages table
+      const { data: messages } = await supabase
+        .from('ai_messages')
+        .select('user_id, user_message, created_at, tokens_used')
+        .order('created_at', { ascending: false })
+        .limit(1000)
+
+      if (!messages || messages.length === 0) {
+        setHourlyData(Array(24).fill(0))
+        return
+      }
 
       // Calculate stats
-      const totalMessages = usageData?.reduce((acc, u) => acc + (u.messages_count || 0), 0) || 0
-      const totalTokens = usageData?.reduce((acc, u) => acc + (u.tokens_used || 0), 0) || 0
-      
-      // Get unique users
-      const { count: uniqueUsers } = await supabase
-        .from('ai_usage')
-        .select('*', { count: 'exact', head: true })
-
+      const totalMessages = messages.length
+      const totalTokens = messages.reduce((acc, m) => acc + (m.tokens_used || 0), 0)
+      const uniqueUsers = new Set(messages.map(m => m.user_id)).size
       const avgMessages = uniqueUsers ? Math.round(totalMessages / uniqueUsers) : 0
 
-      // Mock hourly data (would need real timestamps)
-      const mockHourly = Array.from({ length: 24 }, (_, i) => {
-        const base = 50
-        const morning = i >= 6 && i <= 11 ? 1.5 : 1
-        const evening = i >= 18 && i <= 22 ? 2 : 1
-        const night = i >= 0 && i <= 5 ? 0.3 : 1
-        return Math.floor(base * morning * evening * night * (0.8 + Math.random() * 0.4))
+      // Hourly distribution from real data
+      const hourlyCounts = Array(24).fill(0)
+      messages.forEach(m => {
+        const hour = new Date(m.created_at).getHours()
+        hourlyCounts[hour]++
       })
+      const peakHour = hourlyCounts.indexOf(Math.max(...hourlyCounts))
 
-      // Find peak hour
-      const peakHour = mockHourly.indexOf(Math.max(...mockHourly))
-
-      // Mock top questions
-      const topQuestions = [
-        { question: locale === "en-US" ? "What should I eat for breakfast?" : "O que devo comer no café da manhã?", count: 245 },
-        { question: locale === "en-US" ? "Create a workout plan for me" : "Crie um treino para mim", count: 189 },
-        { question: locale === "en-US" ? "How many calories should I eat?" : "Quantas calorias devo comer?", count: 156 },
-        { question: locale === "en-US" ? "Best exercises for abs" : "Melhores exercícios para abdomen", count: 134 },
-        { question: locale === "en-US" ? "Healthy snack options" : "Opções de lanche saudável", count: 98 },
-      ]
+      // Top questions from real messages (group by similar messages)
+      const messageCounts: Record<string, number> = {}
+      messages.forEach(m => {
+        if (m.user_message) {
+          // Simplify message for grouping (lowercase, first 50 chars)
+          const key = m.user_message.toLowerCase().slice(0, 50)
+          messageCounts[key] = (messageCounts[key] || 0) + 1
+        }
+      })
+      const topQuestions = Object.entries(messageCounts)
+        .sort(([, a], [, b]) => b - a)
+        .slice(0, 5)
+        .map(([question, count]) => ({ question, count }))
 
       setStats({
         totalMessages,
@@ -142,7 +143,7 @@ export default function AdminAIUsagePage() {
         topQuestions
       })
 
-      setHourlyData(mockHourly)
+      setHourlyData(hourlyCounts)
     } catch (error) {
       console.error("Error fetching AI usage data:", error)
     } finally {
