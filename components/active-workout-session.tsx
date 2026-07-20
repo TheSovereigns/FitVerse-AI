@@ -1,12 +1,10 @@
 "use client"
 
 import { useState, useEffect, useRef } from "react"
-import { X, Check, Clock, Flame, Trophy, ChevronRight, Save, Loader2, Image as ImageIcon, Search, ExternalLink } from "lucide-react"
+import { X, Check, Clock, Flame, Trophy, ChevronRight, Save, Loader2, Image as ImageIcon, Search } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
-import { Badge } from "@/components/ui/badge"
-import { Skeleton } from "@/components/ui/skeleton"
 import { toast } from "sonner"
 
 interface ActiveWorkoutSessionProps {
@@ -281,74 +279,171 @@ export function ActiveWorkoutSession({ workout, onClose, onComplete }: ActiveWor
 
   return (
     <div className="fixed inset-0 z-50 bg-background flex flex-col animate-in slide-in-from-bottom duration-300 h-[100dvh]">
-      {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-border bg-card">
-        <div className="flex flex-col">
-          <h3 className="font-bold text-foreground text-sm uppercase tracking-wider truncate max-w-[200px]">{workout.name}</h3>
-          <span className="text-xs text-primary font-mono">{formatTime(elapsedTime)}</span>
-        </div>
-        <Button variant="ghost" size="icon" onClick={onClose} className="text-muted-foreground hover:text-foreground" aria-label={t("aw_close_workout")}>
-          <X className="w-6 h-6" />
-        </Button>
-      </div>
-
-      {/* Barra de Progresso */}
-      <Progress value={progress} className="h-1 bg-muted" indicatorClassName="bg-primary" />
-
-      {/* Conteúdo Principal */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-6 pb-40 md:pb-20">
-        {/* Card do Exercício */}
-        <div className="space-y-4">
-          {/* Botão de Pesquisa */}
+      {/* Header Compacto */}
+      <div className="flex items-center justify-between px-4 py-3 border-b border-border/50 bg-card/80 backdrop-blur-xl">
+        <div className="flex items-center gap-3 min-w-0">
           <Button
-            onClick={() => window.open(`https://www.google.com/search?q=${encodeURIComponent(getSearchTerm())}`, '_blank')}
-            className="w-full aspect-video glass-strong border-white/10 rounded-xl md:rounded-2xl flex flex-col items-center justify-center gap-3 hover:bg-white/5 transition-all"
+            variant="ghost"
+            size="icon"
+            onClick={onClose}
+            className="text-muted-foreground hover:text-foreground shrink-0 h-9 w-9"
+            aria-label={t("aw_close_workout")}
           >
-            <Search className="w-10 h-10 md:w-14 md:h-14 text-primary" />
-            <div className="text-center">
-              <span className="text-base md:text-lg font-black text-foreground">{t("aw_search_google")}</span>
-              <p className="text-xs md:text-sm text-muted-foreground opacity-60 mt-1">{t("aw_search_how")}</p>
-            </div>
-            <ExternalLink className="w-4 h-4 md:w-5 md:h-5 text-primary/60" />
+            <X className="w-5 h-5" />
           </Button>
-
-          <div className="flex items-start justify-between">
-            <div>
-              <Badge variant="outline" className="mb-2 border-primary/30 text-primary">
-                {t("aw_exercise_of")} {currentExerciseIndex + 1} {t("aw_of")} {totalExercises}
-              </Badge>
-              <h2 className="text-3xl font-bold text-foreground leading-tight">{currentExercise.name}</h2>
+          <div className="min-w-0">
+            <h3 className="font-bold text-foreground text-sm truncate">{workout.name}</h3>
+            <div className="flex items-center gap-2 mt-0.5">
+              <span className="text-xs text-primary font-mono tabular-nums">{formatTime(elapsedTime)}</span>
+              <span className="text-muted-foreground text-xs">•</span>
+              <span className="text-xs text-muted-foreground">{currentExerciseIndex + 1}/{totalExercises}</span>
             </div>
           </div>
+        </div>
+        {/* Dots de progresso */}
+        <div className="flex items-center gap-1.5 shrink-0">
+          {workout.exercises.map((_: any, idx: number) => {
+            const exName = workout.exercises[idx].name
+            const exSets = parseInt(workout.exercises[idx].sets) || 3
+            const exCompleted = completedSets[exName]?.every(Boolean) ?? false
+            const isCurrent = idx === currentExerciseIndex
+            return (
+              <div
+                key={idx}
+                className={`rounded-full transition-all duration-300 ${
+                  exCompleted
+                    ? "w-2 h-2 bg-primary"
+                    : isCurrent
+                    ? "w-6 h-2 bg-primary/60"
+                    : "w-2 h-2 bg-muted-foreground/30"
+                }`}
+              />
+            )
+          })}
+        </div>
+      </div>
 
-          {/* Lista de Séries */}
-          <div className="grid gap-3">
+      {/* Barra de Progresso Finissima */}
+      <Progress value={progress} className="h-0.5 bg-muted" indicatorClassName="bg-gradient-to-r from-primary to-primary/70" />
+
+      {/* Conteúdo Principal */}
+      <div className="flex-1 overflow-y-auto px-4 pt-5 pb-40 md:pb-20 space-y-5">
+        {/* Info do Exercício + Busca */}
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center gap-2 mb-1.5">
+              <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-primary/10 border border-primary/20">
+                <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+                <span className="text-[10px] font-bold text-primary uppercase tracking-wider">
+                  {t("aw_exercise_of")} {currentExerciseIndex + 1}
+                </span>
+              </div>
+            </div>
+            <h2 className="text-2xl md:text-3xl font-black text-foreground leading-tight tracking-tight">
+              {currentExercise.name}
+            </h2>
+            <div className="flex items-center gap-3 mt-2 text-xs text-muted-foreground">
+              <span className="flex items-center gap-1">
+                <span className="font-semibold text-foreground">{parseInt(currentExercise.sets) || 3}</span> {t("aw_sets") || "séries"}
+              </span>
+              <span>•</span>
+              <span className="flex items-center gap-1">
+                <span className="font-semibold text-foreground">{currentExercise.reps}</span> {t("aw_reps")}
+              </span>
+            </div>
+          </div>
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => window.open(`https://www.google.com/search?q=${encodeURIComponent(getSearchTerm())}`, '_blank')}
+            className="shrink-0 h-10 w-10 rounded-xl border-border/50 hover:border-primary/50 hover:bg-primary/5"
+            title={t("aw_search_google")}
+          >
+            <Search className="w-4 h-4 text-muted-foreground" />
+          </Button>
+        </div>
+
+        {/* GIF do Exercício */}
+        {(exerciseGif || isLoadingGif) && (
+          <div className="relative w-full aspect-video rounded-2xl overflow-hidden bg-muted/50 border border-border/30">
+            {isLoadingGif ? (
+              <div className="absolute inset-0 flex items-center justify-center">
+                <Loader2 className="w-8 h-8 text-primary animate-spin" />
+              </div>
+            ) : exerciseGif ? (
+              <img
+                src={exerciseGif}
+                alt={currentExercise.name}
+                className="w-full h-full object-contain p-2"
+              />
+            ) : null}
+          </div>
+        )}
+
+        {/* Lista de Séries - Grid Visual */}
+        <div className="space-y-2">
+          <div className="flex items-center justify-between px-1">
+            <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">{t("aw_sets") || "Séries"}</span>
+            <span className="text-xs text-muted-foreground">
+              {currentExerciseSets.filter(Boolean).length}/{currentExerciseSets.length}
+            </span>
+          </div>
+          <div className="grid gap-2">
             {currentExerciseSets.map((isCompleted, idx) => (
               <button
                 key={idx}
                 onClick={() => handleSetComplete(idx)}
                 disabled={isCompleted}
                 className={`
-                  w-full p-4 rounded-xl border flex items-center justify-between transition-all duration-300
+                  group relative w-full p-4 rounded-2xl border transition-all duration-500 overflow-hidden
                   ${isCompleted
-                    ? "bg-primary/10 border-primary text-primary"
-                    : "bg-card border-border text-foreground hover:border-primary/50 active:scale-[0.98]"
+                    ? "border-primary/30 bg-primary/5"
+                    : "border-border/60 bg-card hover:border-primary/40 hover:bg-primary/[0.02] active:scale-[0.98]"
                   }
                 `}
               >
-                <div className="flex items-center gap-3">
+                {/* Background de progresso */}
+                {isCompleted && (
+                  <div className="absolute inset-0 bg-gradient-to-r from-primary/10 to-primary/5 animate-in fade-in duration-500" />
+                )}
+
+                <div className="relative flex items-center gap-4">
+                  {/* Número da série */}
                   <div className={`
-                    w-8 h-8 rounded-full flex items-center justify-center border-2 transition-colors
-                    ${isCompleted ? "bg-primary border-primary text-primary-foreground" : "border-muted-foreground"}
+                    w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-500 shrink-0
+                    ${isCompleted
+                      ? "bg-primary text-primary-foreground shadow-lg shadow-primary/25"
+                      : "bg-muted/80 text-muted-foreground group-hover:bg-primary/10 group-hover:text-primary"
+                    }
                   `}>
-                    {isCompleted ? <Check className="w-5 h-5" /> : <span className="text-xs font-bold">{idx + 1}</span>}
+                    {isCompleted ? (
+                      <Check className="w-5 h-5 animate-in spin-in-90 duration-300" />
+                    ) : (
+                      <span className="text-sm font-black">{idx + 1}</span>
+                    )}
                   </div>
-                  <div className="text-left">
-                    <span className="font-bold block">{t("aw_set")} {idx + 1}</span>
-                    <span className="text-xs opacity-70">{currentExercise.reps} {t("aw_reps")}</span>
+
+                  {/* Info da série */}
+                  <div className="flex-1 text-left">
+                    <span className={`font-bold block text-sm ${isCompleted ? "text-primary" : "text-foreground"}`}>
+                      {t("aw_set")} {idx + 1}
+                    </span>
+                    <span className={`text-xs ${isCompleted ? "text-primary/60" : "text-muted-foreground"}`}>
+                      {currentExercise.reps} {t("aw_reps")}
+                    </span>
                   </div>
+
+                  {/* Status */}
+                  {isCompleted ? (
+                    <span className="text-[10px] font-black uppercase tracking-wider text-primary animate-in fade-in slide-in-from-right-2 duration-300">
+                      {t("aw_done")}
+                    </span>
+                  ) : (
+                    <div className="w-8 h-8 rounded-lg border-2 border-dashed border-muted-foreground/20 group-hover:border-primary/40 flex items-center justify-center transition-colors">
+                      <span className="text-[10px] font-bold text-muted-foreground/40 group-hover:text-primary/60">+</span>
+                    </div>
+                  )}
                 </div>
-                {isCompleted && <span className="text-xs font-bold uppercase animate-in fade-in">{t("aw_done")}</span>}
               </button>
             ))}
           </div>
@@ -356,67 +451,88 @@ export function ActiveWorkoutSession({ workout, onClose, onComplete }: ActiveWor
 
         {/* Overlay de Descanso */}
         {isResting && (
-          <div className="fixed bottom-0 left-0 right-0 p-4 pb-[max(1rem,env(safe-area-inset-bottom))] bg-card/80 backdrop-blur-lg border-t border-border md:relative md:bottom-auto md:left-auto md:right-auto md:p-0 md:pb-0 md:bg-transparent md:border-none md:backdrop-blur-none">
-            <Card className="bg-card border-primary/30 animate-in zoom-in-95 duration-300 shadow-2xl shadow-black/50 dark:shadow-primary/10">
-            <CardContent className="p-6 flex flex-col items-center text-center">
-              <span className="text-sm text-muted-foreground uppercase tracking-widest mb-2">{t("aw_rest")}</span>
-              <div className="text-5xl font-black text-foreground font-mono mb-4 tabular-nums">
-                00:{restTimer.toString().padStart(2, '0')}
+          <div className="fixed bottom-0 left-0 right-0 p-4 pb-[max(1rem,env(safe-area-inset-bottom))] bg-background/80 backdrop-blur-2xl border-t border-border/50 md:relative md:bottom-auto md:left-auto md:right-auto md:p-0 md:pb-0 md:bg-transparent md:border-none md:backdrop-blur-none">
+            <div className="bg-card rounded-3xl border border-border/50 p-6 animate-in zoom-in-95 duration-300 shadow-2xl shadow-black/30">
+              <div className="flex flex-col items-center text-center">
+                {/* Timer circular */}
+                <div className="relative w-32 h-32 mb-4">
+                  <svg className="w-full h-full -rotate-90" viewBox="0 0 120 120">
+                    <circle cx="60" cy="60" r="54" fill="none" stroke="currentColor" strokeWidth="4" className="text-muted/50" />
+                    <circle
+                      cx="60" cy="60" r="54" fill="none" stroke="currentColor" strokeWidth="4"
+                      strokeDasharray={2 * Math.PI * 54}
+                      strokeDashoffset={2 * Math.PI * 54 * (1 - restTimer / 60)}
+                      className="text-primary transition-all duration-1000 ease-linear"
+                      strokeLinecap="round"
+                    />
+                  </svg>
+                  <div className="absolute inset-0 flex flex-col items-center justify-center">
+                    <span className="text-3xl font-black text-foreground font-mono tabular-nums">
+                      {restTimer.toString().padStart(2, '0')}
+                    </span>
+                    <span className="text-[10px] text-muted-foreground uppercase tracking-widest font-semibold">{t("aw_rest")}</span>
+                  </div>
+                </div>
+
+                <div className="flex gap-3 w-full">
+                  <Button
+                    variant="outline"
+                    className="flex-1 h-12 rounded-xl border-border/50 font-semibold"
+                    onClick={() => setRestTimer(prev => prev + 10)}
+                  >
+                    {t("aw_add_time")}
+                  </Button>
+                  <Button
+                    className="flex-1 h-12 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 font-bold shadow-lg shadow-primary/20"
+                    onClick={() => setIsResting(false)}
+                  >
+                    {t("aw_skip")}
+                  </Button>
+                </div>
               </div>
-              <div className="flex gap-3 w-full">
-                <Button 
-                  variant="outline" 
-                  className="flex-1"
-                  onClick={() => setRestTimer(prev => prev + 10)}
-                >
-                  {t("aw_add_time")}
-                </Button>
-                <Button 
-                  className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90"
-                  onClick={() => setIsResting(false)}
-                >
-                  {t("aw_skip")}
-                </Button>
-              </div>
-            </CardContent>
-            </Card>
+            </div>
           </div>
         )}
 
-        {/* Input de RPE (Aparece quando todas as séries acabam) */}
+        {/* RPE + Próximo (quando exercício completo) */}
         {isExerciseComplete && !isResting && (
-          <div className="fixed bottom-0 left-0 right-0 p-4 pb-[max(1rem,env(safe-area-inset-bottom))] bg-card/80 backdrop-blur-lg border-t border-border md:relative md:bottom-auto md:left-auto md:right-auto md:p-0 md:pb-0 md:bg-transparent md:border-none md:backdrop-blur-none animate-in fade-in slide-in-from-bottom-4">
-            <div className="bg-card p-4 rounded-xl border border-border">
-              <label className="text-sm font-bold text-foreground mb-4 block flex justify-between">
-                <span>{t("aw_rpe")}</span>
-                <span className="text-primary">{rpeValues[currentExercise.name] || 5} / 10</span>
-              </label>
-              
-              <input 
-                type="range" 
-                min="1" 
-                max="10" 
-                value={rpeValues[currentExercise.name] || 5}
-                onChange={(e) => setRpeValues({...rpeValues, [currentExercise.name]: parseInt(e.target.value)})}
-                className="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer accent-primary"
-              />
-              
-              <div className="flex justify-between mt-2 text-xs text-muted-foreground">
-                <span>{t("aw_easy")}</span>
-                <span>{t("aw_max")}</span>
+          <div className="fixed bottom-0 left-0 right-0 p-4 pb-[max(1rem,env(safe-area-inset-bottom))] bg-background/80 backdrop-blur-2xl border-t border-border/50 md:relative md:bottom-auto md:left-auto md:right-auto md:p-0 md:pb-0 md:bg-transparent md:border-none md:backdrop-blur-none animate-in fade-in slide-in-from-bottom-4">
+            <div className="space-y-3">
+              {/* RPE */}
+              <div className="bg-card rounded-2xl border border-border/50 p-4">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-sm font-bold text-foreground">{t("aw_rpe")}</span>
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-lg font-black text-primary tabular-nums">{rpeValues[currentExercise.name] || 5}</span>
+                    <span className="text-xs text-muted-foreground">/10</span>
+                  </div>
+                </div>
+                <input
+                  type="range"
+                  min="1"
+                  max="10"
+                  value={rpeValues[currentExercise.name] || 5}
+                  onChange={(e) => setRpeValues({...rpeValues, [currentExercise.name]: parseInt(e.target.value)})}
+                  className="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer accent-primary"
+                />
+                <div className="flex justify-between mt-2 text-[10px] text-muted-foreground uppercase tracking-wider font-semibold">
+                  <span>{t("aw_easy")}</span>
+                  <span>{t("aw_max")}</span>
+                </div>
               </div>
-            </div>
 
-            <Button 
-              className="w-full h-14 text-lg font-bold bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg mt-4"
-              onClick={handleNextExercise}
-            >
-              {currentExerciseIndex < totalExercises - 1 ? (
-                <>{t("aw_next")} <ChevronRight className="w-5 h-5 ml-2" /></>
-              ) : (
-                <>{t("aw_finish")} <Trophy className="w-5 h-5 ml-2" /></>
-              )}
-            </Button>
+              {/* Botão Próximo */}
+              <Button
+                className="w-full h-14 text-base font-bold bg-primary text-primary-foreground hover:bg-primary/90 rounded-2xl shadow-xl shadow-primary/20"
+                onClick={handleNextExercise}
+              >
+                {currentExerciseIndex < totalExercises - 1 ? (
+                  <>{t("aw_next")} <ChevronRight className="w-5 h-5 ml-1" /></>
+                ) : (
+                  <>{t("aw_finish")} <Trophy className="w-5 h-5 ml-1" /></>
+                )}
+              </Button>
+            </div>
           </div>
         )}
       </div>
