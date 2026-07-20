@@ -4,6 +4,7 @@ import { getSupabaseAdmin, getCorsHeaders } from '@/lib/supabase-server';
 import { logger } from '@/lib/logger';
 import { checkRateLimit, getRateLimitKey, RATE_LIMITS } from '@/lib/rate-limit';
 import { detectCategory, detectLanguage } from '@/lib/chat-helpers';
+import { createStreamingFallback } from '@/lib/ai-fallback';
 
 export async function OPTIONS() {
   return NextResponse.json({}, { headers: getCorsHeaders() });
@@ -173,83 +174,81 @@ Responda em português ou inglês conforme a pergunta.`;
     const fullMessage = `${systemPrompt}
 
 PERGUNTA: ${message}`;
-    
-    // Stream the response
-    const result = await chat.sendMessageStream(fullMessage);
-    
+
     const stream = new ReadableStream({
       async start(controller) {
         let fullReply = '';
-        
-        try {
-          for await (const chunk of result.stream) {
-            const text = chunk.text();
-            if (text) {
-              fullReply += text;
-              controller.enqueue(new TextEncoder().encode(`data: ${JSON.stringify({ text })}\n\n`));
-            }
-          }
-          
-          const responseTimeMs = Date.now() - startTime;
-          
-          // Send final event with metadata
-          controller.enqueue(new TextEncoder().encode(`data: ${JSON.stringify({ done: true, responseTimeMs })}\n\n`));
-          controller.close();
-          
-          // Save to dataset — non-blocking
-          if (supabaseAdmin && authenticatedUserId) {
-            const userMessageLang = detectLanguage(message);
-            const aiResponseLang = detectLanguage(fullReply);
-            const { category, subcategory } = detectCategory(message);
-            
-            (async () => {
-              try {
-                let conversationId: string | null = null;
-                const { data: existingConv } = await supabaseAdmin
-                  .from('ai_conversations')
-                  .select('id')
-                  .eq('user_id', authenticatedUserId)
-                  .order('created_at', { ascending: false })
-                  .limit(1)
-                  .single();
 
-                if (existingConv) {
-                  conversationId = existingConv.id;
-                } else {
-                  const { data: newConv } = await supabaseAdmin
+        const geminiStreamCall = () => chat.sendMessageStream(fullMessage).then((r) => r.stream);
+
+        await createStreamingFallback({
+          geminiStreamCall,
+          prompt: fullMessage,
+          systemPrompt,
+          onChunk: (text) => {
+            fullReply += text;
+            controller.enqueue(new TextEncoder().encode(`data: ${JSON.stringify({ text })}\n\n`));
+          },
+          onError: (error) => {
+            controller.enqueue(new TextEncoder().encode(`data: ${JSON.stringify({ error })}\n\n`));
+            controller.close();
+          },
+          onDone: (responseTimeMs) => {
+            controller.enqueue(new TextEncoder().encode(`data: ${JSON.stringify({ done: true, responseTimeMs })}\n\n`));
+            controller.close();
+
+            // Save to dataset — non-blocking
+            if (supabaseAdmin && authenticatedUserId) {
+              const userMessageLang = detectLanguage(message);
+              const aiResponseLang = detectLanguage(fullReply);
+              const { category, subcategory } = detectCategory(message);
+
+              (async () => {
+                try {
+                  let conversationId: string | null = null;
+                  const { data: existingConv } = await supabaseAdmin
                     .from('ai_conversations')
-                    .insert({ user_id: authenticatedUserId, session_id: crypto.randomUUID() })
                     .select('id')
+                    .eq('user_id', authenticatedUserId)
+                    .order('created_at', { ascending: false })
+                    .limit(1)
                     .single();
-                  if (newConv) conversationId = newConv.id;
-                }
 
-                if (conversationId) {
-                  await supabaseAdmin.from('ai_messages').insert({
-                    conversation_id: conversationId,
-                    user_id: authenticatedUserId,
-                    user_message: message,
-                    user_message_lang: userMessageLang,
-                    user_context: userContext || {},
-                    ai_response: fullReply,
-                    ai_response_lang: aiResponseLang,
-                    model_used: 'gemini-3.1-flash-lite',
-                    tokens_used: null,
-                    response_time_ms: responseTimeMs,
-                    category,
-                    subcategory,
-                    training_status: 'raw',
-                  });
+                  if (existingConv) {
+                    conversationId = existingConv.id;
+                  } else {
+                    const { data: newConv } = await supabaseAdmin
+                      .from('ai_conversations')
+                      .insert({ user_id: authenticatedUserId, session_id: crypto.randomUUID() })
+                      .select('id')
+                      .single();
+                    if (newConv) conversationId = newConv.id;
+                  }
+
+                  if (conversationId) {
+                    await supabaseAdmin.from('ai_messages').insert({
+                      conversation_id: conversationId,
+                      user_id: authenticatedUserId,
+                      user_message: message,
+                      user_message_lang: userMessageLang,
+                      user_context: userContext || {},
+                      ai_response: fullReply,
+                      ai_response_lang: aiResponseLang,
+                      model_used: 'gemini-3.1-flash-lite',
+                      tokens_used: null,
+                      response_time_ms: responseTimeMs,
+                      category,
+                      subcategory,
+                      training_status: 'raw',
+                    });
+                  }
+                } catch (error) {
+                  console.error('Failed to save AI message to dataset:', error);
                 }
-              } catch (error) {
-                console.error('Failed to save AI message to dataset:', error);
-              }
-            })();
-          }
-        } catch (error) {
-          controller.enqueue(new TextEncoder().encode(`data: ${JSON.stringify({ error: 'Stream failed' })}\n\n`));
-          controller.close();
-        }
+              })();
+            }
+          },
+        });
       },
     });
 

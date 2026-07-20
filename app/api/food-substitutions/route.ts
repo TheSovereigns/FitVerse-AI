@@ -3,6 +3,7 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 import { getSupabaseAdmin } from "@/lib/supabase-server";
 import { getCorsHeaders } from "@/lib/auth-helpers";
 import { checkRateLimit, getRateLimitKey, rateLimitResponse, RATE_LIMITS } from "@/lib/rate-limit";
+import { generateContentWithFallback } from "@/lib/ai-fallback";
 
 export async function POST(req: Request) {
   const supabase = getSupabaseAdmin();
@@ -142,50 +143,23 @@ Retorne APENAS JSON válido:
 
 Todos campos obrigatórios por substituição. Sem texto fora do JSON.`
 
-    let lastError: Error | null = null;
-    let data: any = null;
-
-    for (let attempt = 1; attempt <= 3; attempt++) {
-      try {
+    const responseText = await generateContentWithFallback({
+      geminiCall: async () => {
         const result = await model.generateContent(prompt);
-        const responseText = result.response.text();
-        const cleanedText = responseText.replace(/```json/g, '').replace(/```/g, '').trim();
-        data = JSON.parse(cleanedText);
+        return result.response.text();
+      },
+      prompt,
+      generationConfig: { temperature: 0.5 },
+    });
 
-        if (data.substitutions && Array.isArray(data.substitutions) && data.substitutions.length > 0) {
-          const firstSub = data.substitutions[0];
-          if (
-            typeof firstSub.name === "string" &&
-            typeof firstSub.calories === "number" &&
-            typeof firstSub.protein === "number" &&
-            typeof firstSub.carbs === "number" &&
-            typeof firstSub.fat === "number" &&
-            typeof firstSub.matchPercent === "number" &&
-            typeof firstSub.reason === "string" &&
-            typeof firstSub.micronutrients === "string" &&
-            (typeof firstSub.glycemicIndex === "number" || firstSub.glycemicIndex === "unknown") &&
-            typeof firstSub.tasteSimilarity === "number" &&
-            typeof firstSub.costComparison === "string" &&
-            typeof firstSub.availability === "string" &&
-            typeof firstSub.bestFor === "string" &&
-            typeof firstSub.allergenNote === "string"
-          ) {
-            break;
-          }
-        }
+    const cleanedText = responseText.replace(/```json/g, '').replace(/```/g, '').trim();
+    const data = JSON.parse(cleanedText);
 
-        throw new Error("JSON structure validation failed: missing or invalid fields");
-      } catch (parseError: any) {
-        lastError = parseError;
-        console.error(`Tentativa ${attempt}/3 falhou:`, parseError.message);
-        if (attempt === 3) {
-          console.error("Resposta da IA após 3 tentativas:", lastError?.message);
-          return NextResponse.json({ error: "A IA retornou um formato inválido após 3 tentativas." }, { status: 500, headers });
-        }
-      }
+    if (data.substitutions && Array.isArray(data.substitutions) && data.substitutions.length > 0) {
+      return NextResponse.json(data, { headers });
     }
 
-    return NextResponse.json(data, { headers });
+    return NextResponse.json({ error: "A IA retornou um formato inválido." }, { status: 500, headers });
 
   } catch (error: any) {
     console.error("Erro na rota food-substitutions:", error);

@@ -3,6 +3,7 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 import { getSupabaseAdmin } from "@/lib/supabase-server";
 import { getCorsHeaders } from "@/lib/auth-helpers";
 import { checkRateLimit, getRateLimitKey, rateLimitResponse, RATE_LIMITS } from "@/lib/rate-limit";
+import { generateContentWithFallback } from "@/lib/ai-fallback";
 
 export async function POST(req: Request) {
   const supabase = getSupabaseAdmin();
@@ -115,30 +116,18 @@ Retorne APENAS JSON válido:
 
 Regras: Eficiência = (sono / tempo na cama) × 100. Débito = soma dos déficits abaixo de 7h. Estime estágios de duração/qualidade. Ambiental: temp (18-20°C), ruído, luz, colchão, ar. Nutricional: cafeína, álcool, magnésio, melatonina, açúcar. Exercício: aeróbico, força, yoga, HIIT. Tela: luz azul, melatonina. Estresse: ritmo do cortisol. Protocolo: 5+ entradas. Checklist: 8+ entradas. Todos campos obrigatórios.`;
 
-    const maxRetries = 3;
-    let lastParseError: any = null;
-
-    for (let attempt = 1; attempt <= maxRetries; attempt++) {
-      try {
+    const responseText = await generateContentWithFallback({
+      geminiCall: async () => {
         const result = await model.generateContent(prompt);
-        const responseText = result.response.text();
+        return result.response.text();
+      },
+      prompt,
+      generationConfig: { temperature: 0.5 },
+    });
 
-        const cleanedText = responseText.replace(/```json/g, '').replace(/```/g, '').trim();
-
-        const data = JSON.parse(cleanedText);
-        return NextResponse.json(data, { headers });
-      } catch (parseError) {
-        lastParseError = parseError;
-        console.error(`Tentativa ${attempt}/${maxRetries} - Erro ao processar JSON da IA:`, parseError);
-
-        if (attempt < maxRetries) {
-          await new Promise(resolve => setTimeout(resolve, 1000 * attempt));
-        }
-      }
-    }
-
-    console.error("Todas as tentativas de parsing falharam:", lastParseError);
-    return NextResponse.json({ error: "A IA retornou um formato inválido após múltiplas tentativas." }, { status: 500, headers });
+    const cleanedText = responseText.replace(/```json/g, '').replace(/```/g, '').trim();
+    const data = JSON.parse(cleanedText);
+    return NextResponse.json(data, { headers });
 
   } catch (error: any) {
     console.error("Erro na rota analyze-sleep:", error);

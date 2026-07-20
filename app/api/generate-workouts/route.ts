@@ -6,6 +6,7 @@ import { getSupabaseAdmin } from "@/lib/supabase-server"
 import { PLAN_LIMITS, type Plan } from "@/lib/plan-limits"
 import { getCorsHeaders } from "@/lib/auth-helpers"
 import { checkRateLimit, getRateLimitKey, rateLimitResponse, RATE_LIMITS } from "@/lib/rate-limit"
+import { generateObjectWithFallback } from "@/lib/ai-fallback"
 
 function getGoogle() {
   return createGoogleGenerativeAI({
@@ -80,8 +81,6 @@ const workoutSchema = z.object({
   }),
   exercises: z.array(exerciseSchema),
 })
-
-const MAX_RETRIES = 3
 
 export async function POST(req: Request) {
   const headers = getCorsHeaders();
@@ -173,38 +172,27 @@ Sobrecarga progressiva (4 semanas): S1 fundação → S2 +10-15% volume → S3 +
 Saída: name, category, duration, difficulty, equipment, muscleGroups, calories, aiVerdict (2-3 frases).
 TODA saída em ${lang}. Técnico, específico, focado em resultados.`
 
-    let lastError: Error | null = null
-
-    for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
-      try {
-        const { object } = await generateObject({
+    const object = await generateObjectWithFallback({
+      geminiCall: () =>
+        generateObject({
           model: getGoogle()("gemini-3.5-flash"),
           schema: workoutSchema,
           prompt,
           temperature: 0.7,
-        })
+        }).then((r) => r.object),
+      prompt,
+      schemaName: "workout",
+    })
 
-        await supabase.from('workouts').insert({
-          user_id: user.id,
-          name: object.name || 'Generated Workout',
-          category: object.category || 'Força',
-          duration: object.duration || '30 min',
-          difficulty: object.difficulty || 'Intermediário',
-        })
+    await supabase.from('workouts').insert({
+      user_id: user.id,
+      name: object.name || 'Generated Workout',
+      category: object.category || 'Força',
+      duration: object.duration || '30 min',
+      difficulty: object.difficulty || 'Intermediário',
+    })
 
-        return NextResponse.json({ workouts: [object] }, { headers })
-      } catch (parseError) {
-        lastError = parseError instanceof Error ? parseError : new Error(String(parseError))
-        console.error(`[Fitverse] Attempt ${attempt}/${MAX_RETRIES} failed:`, lastError.message)
-        
-        if (attempt === MAX_RETRIES) break
-      }
-    }
-
-    return NextResponse.json(
-      { error: "Failed to generate valid workout after retries", details: lastError?.message || "Unknown error" },
-      { status: 500, headers },
-    )
+    return NextResponse.json({ workouts: [object] }, { headers })
   } catch (error) {
     console.error("[Fitverse] Error generating workouts:", error)
     return NextResponse.json(

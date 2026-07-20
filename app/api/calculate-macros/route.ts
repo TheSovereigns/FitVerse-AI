@@ -3,6 +3,7 @@ import { generateText } from "ai"
 import { NextResponse } from "next/server"
 import { authUser, getCorsHeaders } from "@/lib/auth-helpers"
 import { checkRateLimit, getRateLimitKey, rateLimitResponse, RATE_LIMITS } from "@/lib/rate-limit"
+import { generateTextWithFallback } from "@/lib/ai-fallback"
 
 function getGoogle() {
   return createGoogleGenerativeAI({
@@ -95,9 +96,7 @@ export async function POST(request: Request) {
     const tdee = calculateTDEE(bmr, perfil.activityLevel)
     const macros = calculateMacros(tdee, perfil.goal)
 
-    const { text } = await generateText({
-      model: getGoogle()("gemini-3.1-flash-lite"),
-      prompt: `Você é um nutricionista especialista em longevidade e performance. Analise este perfil:
+    const prompt = `Você é um nutricionista especialista em longevidade e performance. Analise este perfil:
 
 DADOS DO USUÁRIO:
 - Idade: ${perfil.age} anos
@@ -127,7 +126,15 @@ WEEKS: [número]
 EXPLANATION: [explicação detalhada]
 MACRO_TIPS: [dica 1] | [dica 2] | [dica 3]
 
-Seja científico mas acessível. Foque em resultados realistas e sustentáveis.`,
+Seja científico mas acessível. Foque em resultados realistas e sustentáveis.`
+
+    const text = await generateTextWithFallback({
+      geminiCall: () =>
+        generateText({
+          model: getGoogle()("gemini-3.1-flash-lite"),
+          prompt,
+        }).then((r) => r.text),
+      prompt,
     })
 
     const weeksMatch = text.match(/WEEKS:\s*(\d+)/)

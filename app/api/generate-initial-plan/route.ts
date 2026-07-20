@@ -3,8 +3,7 @@ import { GoogleGenerativeAI } from "@google/generative-ai"
 import { getSupabaseAdmin } from "@/lib/supabase-server"
 import { checkRateLimit, getRateLimitKey, RATE_LIMITS } from "@/lib/rate-limit"
 import { getCorsHeaders } from "@/lib/auth-helpers"
-
-const MAX_PARSE_ATTEMPTS = 3
+import { generateContentWithFallback } from "@/lib/ai-fallback"
 
 export async function POST(req: Request) {
   const supabase = getSupabaseAdmin()
@@ -124,27 +123,26 @@ OUTPUT JSON (no markdown, no text outside JSON):
 
 RULES: All text in ${lang}. Only JSON keys in English. Macros must sum to calories ±5%. Meal calories sum to daily target. All supplements have dosages and timing. Respect injuries/equipment. Actionable, specific plan. No repeated meals.`
 
-    let data: any = null
-    let lastError: any = null
+    let data: any = null;
 
-    for (let attempt = 1; attempt <= MAX_PARSE_ATTEMPTS; attempt++) {
-      try {
-        const result = await model.generateContent(prompt)
-        const responseText = result.response.text()
-        const cleanedText = responseText.replace(/```json/g, "").replace(/```/g, "").trim()
+    try {
+      const responseText = await generateContentWithFallback({
+        geminiCall: async () => {
+          const result = await model.generateContent(prompt);
+          return result.response.text();
+        },
+        prompt,
+        generationConfig: { temperature: 0.6 },
+      });
 
-        data = JSON.parse(cleanedText)
-        break
-      } catch (parseError) {
-        lastError = parseError
-        console.error(`JSON parse attempt ${attempt}/${MAX_PARSE_ATTEMPTS} failed:`, parseError)
-        if (attempt === MAX_PARSE_ATTEMPTS) {
-          return NextResponse.json(
-            { error: "AI generated invalid JSON after multiple attempts. Please try again." },
-            { status: 500, headers }
-          )
-        }
-      }
+      const cleanedText = responseText.replace(/```json/g, "").replace(/```/g, "").trim();
+      data = JSON.parse(cleanedText);
+    } catch (parseError) {
+      console.error("AI generation failed:", parseError);
+      return NextResponse.json(
+        { error: "AI generated invalid JSON after multiple attempts. Please try again." },
+        { status: 500, headers }
+      );
     }
 
     if (!data) {

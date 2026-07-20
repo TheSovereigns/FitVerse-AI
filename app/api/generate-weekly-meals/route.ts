@@ -3,8 +3,7 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 import { getSupabaseAdmin } from "@/lib/supabase-server";
 import { getCorsHeaders } from "@/lib/auth-helpers";
 import { checkRateLimit, getRateLimitKey, rateLimitResponse, RATE_LIMITS } from "@/lib/rate-limit";
-
-const MAX_RETRIES = 3;
+import { generateContentWithFallback } from "@/lib/ai-fallback";
 
 export async function POST(req: Request) {
   const supabase = getSupabaseAdmin();
@@ -177,38 +176,17 @@ Retorne APENAS JSON válido:
 
 Inclua TODOS os 7 dias. Cada campo acima é OBRIGATÓRIO. JSON válido e parseável.`;
 
-    let lastError: unknown = null;
-    let data: Record<string, unknown> | null = null;
-
-    for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
-      try {
+    const responseText = await generateContentWithFallback({
+      geminiCall: async () => {
         const result = await model.generateContent(prompt);
-        const responseText = result.response.text();
-        const cleanedText = responseText
-          .replace(/```json/g, "")
-          .replace(/```/g, "")
-          .trim();
+        return result.response.text();
+      },
+      prompt,
+      generationConfig: { temperature: 0.7 },
+    });
 
-        data = JSON.parse(cleanedText) as Record<string, unknown>;
-        break;
-      } catch (parseError) {
-        lastError = parseError;
-        console.error(
-          `Tentativa ${attempt}/${MAX_RETRIES} falhou ao parsear JSON da IA:`,
-          parseError
-        );
-        if (attempt === MAX_RETRIES) {
-          return NextResponse.json(
-            {
-              error:
-                "A IA retornou um formato inválido após múltiplas tentativas.",
-            },
-            { status: 500, headers }
-          );
-        }
-      }
-    }
-
+    const cleanedText = responseText.replace(/```json/g, "").replace(/```/g, "").trim();
+    const data = JSON.parse(cleanedText) as Record<string, unknown>;
     return NextResponse.json(data, { headers });
   } catch (error: any) {
     console.error("Erro na rota generate-weekly-meals:", error);

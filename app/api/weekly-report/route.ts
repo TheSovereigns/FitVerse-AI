@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { authUser, getCorsHeaders } from "@/lib/auth-helpers"
 import { checkRateLimit, getRateLimitKey, rateLimitResponse, RATE_LIMITS } from "@/lib/rate-limit"
+import { fetchGeminiWithFallback } from "@/lib/ai-fallback"
 
 export async function POST(req: NextRequest) {
   const user = await authUser(req)
@@ -34,20 +35,33 @@ export async function POST(req: NextRequest) {
 
 Seja positivo, motivacional, e de uma dica practica. Responda APENAS o insight, sem formatacao extra.`
 
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=${apiKey}`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: { temperature: 0.7, maxOutputTokens: 200 },
-        }),
-      }
-    )
+    const insight = await fetchGeminiWithFallback({
+      geminiCall: async () => {
+        const response = await fetch(
+          `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=${apiKey}`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              contents: [{ parts: [{ text: prompt }] }],
+              generationConfig: { temperature: 0.7, maxOutputTokens: 200 },
+            }),
+          }
+        );
 
-    const data = await response.json()
-    const insight = data.candidates?.[0]?.content?.parts?.[0]?.text
+        if (!response.ok) {
+          const errBody = await response.text();
+          throw new Error(`Gemini API returned ${response.status}: ${errBody}`);
+        }
+
+        const data = await response.json();
+        const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (!text) throw new Error("Empty response from Gemini");
+        return text;
+      },
+      prompt,
+      generationConfig: { temperature: 0.7, maxOutputTokens: 200 },
+    });
 
     return NextResponse.json({ insight: insight || generateFallbackInsight(body) })
   } catch (e) {

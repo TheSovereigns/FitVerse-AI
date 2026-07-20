@@ -3,6 +3,7 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 import { getSupabaseAdmin } from "@/lib/supabase-server";
 import { getCorsHeaders } from "@/lib/auth-helpers";
 import { checkRateLimit, getRateLimitKey, rateLimitResponse, RATE_LIMITS } from "@/lib/rate-limit";
+import { generateContentWithFallback } from "@/lib/ai-fallback";
 
 export async function POST(req: Request) {
   const supabase = getSupabaseAdmin();
@@ -139,62 +140,32 @@ Retorne APENAS JSON válido:
 
 Inclua 6+ fatores, 5+ biomarcadores, 3+ recomendações, 4+ etapas. Baseado em pesquisa revisada por pares. Todos campos obrigatórios.`;
 
-    const MAX_RETRIES = 3;
-    let parsedData: any = null;
-
-    for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
-      try {
+    const responseText = await generateContentWithFallback({
+      geminiCall: async () => {
         const result = await model.generateContent(prompt);
-        const responseText = result.response.text();
-        const cleanedText = responseText
-          .replace(/```json/g, "")
-          .replace(/```/g, "")
-          .trim();
+        return result.response.text();
+      },
+      prompt,
+      generationConfig: { temperature: 0.5 },
+    });
 
-        parsedData = JSON.parse(cleanedText);
+    const cleanedText = responseText.replace(/```json/g, "").replace(/```/g, "").trim();
+    const parsedData = JSON.parse(cleanedText);
 
-        if (
-          parsedData &&
-          typeof parsedData.biologicalAge === "number" &&
-          Array.isArray(parsedData.factors) &&
-          Array.isArray(parsedData.biomarkers) &&
-          parsedData.riskAssessment
-        ) {
-          break;
-        }
-
-        if (attempt < MAX_RETRIES) {
-          console.warn(
-            `Attempt ${attempt}: AI returned invalid structure, retrying...`
-          );
-          continue;
-        }
-
-        return NextResponse.json(
-          {
-            error:
-              "A IA retornou um formato inválido após várias tentativas.",
-          },
-          { status: 500, headers }
-        );
-      } catch (parseError) {
-        console.warn(
-          `Attempt ${attempt}: JSON parse failed -`,
-          parseError
-        );
-        if (attempt === MAX_RETRIES) {
-          return NextResponse.json(
-            {
-              error:
-                "A IA retornou um formato inválido após várias tentativas.",
-            },
-            { status: 500, headers }
-          );
-        }
-      }
+    if (
+      parsedData &&
+      typeof parsedData.biologicalAge === "number" &&
+      Array.isArray(parsedData.factors) &&
+      Array.isArray(parsedData.biomarkers) &&
+      parsedData.riskAssessment
+    ) {
+      return NextResponse.json(parsedData, { headers });
     }
 
-    return NextResponse.json(parsedData, { headers });
+    return NextResponse.json(
+      { error: "A IA retornou um formato inválido após várias tentativas." },
+      { status: 500, headers }
+    );
   } catch (error: any) {
     console.error("Erro na rota biological-age:", error);
     return NextResponse.json(

@@ -3,8 +3,7 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 import { getSupabaseAdmin } from "@/lib/supabase-server";
 import { getCorsHeaders } from "@/lib/auth-helpers";
 import { checkRateLimit, getRateLimitKey, rateLimitResponse, RATE_LIMITS } from "@/lib/rate-limit";
-
-const MAX_RETRIES = 3;
+import { generateContentWithFallback } from "@/lib/ai-fallback";
 
 function cleanJson(text: string): string {
   let cleaned = text.replace(/```json/g, "").replace(/```/g, "").trim();
@@ -162,37 +161,31 @@ Retorne APENAS JSON válido:
 
 Regras: Todos campos obrigatórios. Macros das refeições somam ao total diário. Proteína ≥1,6g/kg (ganho) ou ≥2,0g/kg (perda). Sem texto fora do JSON.`;
 
-    let lastError: string = "";
+    try {
+      const responseText = await generateContentWithFallback({
+        geminiCall: async () => {
+          const result = await model.generateContent(prompt);
+          return result.response.text();
+        },
+        prompt,
+        generationConfig: { temperature: 0.6 },
+      });
 
-    for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
-      try {
-        const result = await model.generateContent(prompt);
-        const responseText = result.response.text();
-        const cleanedText = cleanJson(responseText);
-        const data = JSON.parse(cleanedText);
+      const cleanedText = cleanJson(responseText);
+      const data = JSON.parse(cleanedText);
 
-        if (!data.macros || !data.diet || !data.prediction) {
-          throw new Error("Incomplete JSON structure from AI");
-        }
-
-        return NextResponse.json(data, { headers });
-      } catch (parseError: any) {
-        lastError = parseError.message || "JSON parse failed";
-        console.error(`Attempt ${attempt}/${MAX_RETRIES} failed:`, lastError);
-
-        if (attempt === MAX_RETRIES) {
-          return NextResponse.json(
-            { error: "A IA retornou um formato inválido após várias tentativas." },
-            { status: 500, headers }
-          );
-        }
+      if (!data.macros || !data.diet || !data.prediction) {
+        throw new Error("Incomplete JSON structure from AI");
       }
-    }
 
-    return NextResponse.json(
-      { error: "A IA retornou um formato inválido." },
-      { status: 500, headers }
-    );
+      return NextResponse.json(data, { headers });
+    } catch (parseError: any) {
+      console.error("AI generation failed:", parseError.message);
+      return NextResponse.json(
+        { error: "A IA retornou um formato inválido após várias tentativas." },
+        { status: 500, headers }
+      );
+    }
   } catch (error: any) {
     console.error("Erro na rota generate-metabolic-plan:", error);
     return NextResponse.json(

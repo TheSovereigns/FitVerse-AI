@@ -3,28 +3,7 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 import { getSupabaseAdmin } from "@/lib/supabase-server";
 import { getCorsHeaders } from "@/lib/auth-helpers";
 import { checkRateLimit, getRateLimitKey, rateLimitResponse, RATE_LIMITS } from "@/lib/rate-limit";
-
-const MAX_RETRIES = 3;
-
-async function generateWithRetry(model: any, prompt: string): Promise<string> {
-  let lastError: Error | null = null;
-  for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
-    const result = await model.generateContent(prompt);
-    const responseText = result.response.text();
-    const cleanedText = responseText.replace(/```json/g, "").replace(/```/g, "").trim();
-    try {
-      const parsed = JSON.parse(cleanedText);
-      if (parsed && Array.isArray(parsed.supplements) && parsed.supplements.length > 0) {
-        return cleanedText;
-      }
-      lastError = new Error("Parsed JSON missing 'supplements' array.");
-    } catch (e: any) {
-      lastError = e;
-      console.warn(`Retry ${attempt}/${MAX_RETRIES}: JSON parse failed — ${e.message}`);
-    }
-  }
-  throw lastError;
-}
+import { generateContentWithFallback } from "@/lib/ai-fallback";
 
 export async function POST(req: Request) {
   const supabase = getSupabaseAdmin();
@@ -178,18 +157,22 @@ Retorne APENAS JSON válido:
 
 Todos campos obrigatórios por suplemento. Sem texto fora do JSON.`;
 
-    let cleanedText: string;
-    try {
-      cleanedText = await generateWithRetry(model, prompt);
-    } catch (retryError: any) {
-      console.error("AI returned invalid JSON after retries:", retryError?.message);
-      return NextResponse.json(
-        { error: "A IA retornou um formato inválido após múltiplas tentativas." },
-        { status: 500, headers }
-      );
-    }
+    const responseText = await generateContentWithFallback({
+      geminiCall: async () => {
+        const result = await model.generateContent(prompt);
+        const text = result.response.text();
+        const cleaned = text.replace(/```json/g, "").replace(/```/g, "").trim();
+        const parsed = JSON.parse(cleaned);
+        if (parsed && Array.isArray(parsed.supplements) && parsed.supplements.length > 0) {
+          return cleaned;
+        }
+        throw new Error("Parsed JSON missing 'supplements' array.");
+      },
+      prompt,
+      generationConfig: { temperature: 0.5 },
+    });
 
-    const data = JSON.parse(cleanedText);
+    const data = JSON.parse(responseText);
     return NextResponse.json(data, { headers });
   } catch (error: any) {
     console.error("Erro na rota recommend-supplements:", error);

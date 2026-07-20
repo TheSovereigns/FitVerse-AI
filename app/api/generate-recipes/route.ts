@@ -6,6 +6,7 @@ import { getSupabaseAdmin } from "@/lib/supabase-server"
 import { PLAN_LIMITS, type Plan } from "@/lib/plan-limits"
 import { getCorsHeaders } from "@/lib/auth-helpers"
 import { checkRateLimit, getRateLimitKey, rateLimitResponse, RATE_LIMITS } from "@/lib/rate-limit"
+import { generateObjectWithFallback } from "@/lib/ai-fallback"
 
 function getGoogle() {
   return createGoogleGenerativeAI({
@@ -167,11 +168,16 @@ Para cada receita forneça:
 
 Máximo 30 min. Ingredientes de supermercado. Cada receita: abordagem única. Sem fritura — grelhar/vapor/refogar/cru.`
 
-    const { object } = await generateObject({
-      model: getGoogle()("gemini-3.5-flash"),
-      schema: recipesSchema,
+    const object = await generateObjectWithFallback({
+      geminiCall: () =>
+        generateObject({
+          model: getGoogle()("gemini-3.5-flash"),
+          schema: recipesSchema,
+          prompt,
+          temperature: 0.8,
+        }).then((r) => r.object),
       prompt,
-      temperature: 0.8,
+      schemaName: "recipes",
     })
 
     await supabase.from('diets').insert({
