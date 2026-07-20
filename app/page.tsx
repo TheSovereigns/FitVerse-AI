@@ -15,7 +15,6 @@ import { useAppStore } from "@/stores/app-store"
 import { DesktopSidebar } from "@/components/desktop-sidebar"
 import { MobileBottomNav } from "@/components/mobile-bottom-nav"
 import { FeatureErrorBoundary } from "@/components/FeatureErrorBoundary"
-import { PWAInstallPrompt } from "@/components/pwa-install-prompt"
 import type { View, MetabolicPlan, ProductAnalysis } from "@/lib/types"
 
 // Lazy-loaded views for code splitting
@@ -390,9 +389,6 @@ export default function DashboardPage() {
 
       {/* Mobile bottom nav */}
       <MobileBottomNav currentView={currentView} onNavigate={setCurrentView} />
-
-      {/* PWA Install Prompt */}
-      <PWAInstallPrompt />
     </div>
   )
 }

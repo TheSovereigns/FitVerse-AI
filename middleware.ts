@@ -123,8 +123,6 @@ export async function middleware(request: NextRequest) {
     frame-ancestors 'none';
     frame-src 'self' https://js.stripe.com https://hooks.stripe.com;
     connect-src 'self' https://api.stripe.com wss://*.supabase.co https://*.supabase.co;
-    worker-src 'self';
-    manifest-src 'self';
     ${isDev ? "" : "upgrade-insecure-requests;"}
   `
   response.headers.set(

@@ -6,7 +6,6 @@ import { ThemeProvider } from "@/components/theme-provider"
 import { I18nProvider } from "@/lib/i18n"
 import { AuthProvider } from "@/hooks/useAuth"
 import { Analytics } from "@/components/analytics"
-import { ServiceWorkerRegister } from "@/components/service-worker-register"
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" })
 
@@ -45,13 +44,7 @@ export const metadata: Metadata = {
     description: "AI-powered nutrition & fitness intelligence. Scan food, track macros, stay healthy.",
     images: ["/og.png"],
   },
-  appleWebApp: {
-    capable: true,
-    statusBarStyle: "default",
-    title: "FitVerse AI",
-  },
   formatDetection: { telephone: false },
-  manifest: "/manifest.json",
 }
 
 export default function RootLayout({
@@ -60,10 +53,6 @@ export default function RootLayout({
   return (
     <html lang="pt-BR" suppressHydrationWarning>
       <head>
-        <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-        <meta name="mobile-web-app-capable" content="yes" />
-        <link rel="manifest" href="/manifest.json" />
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
         <link rel="icon" href="/icon.svg" type="image/svg+xml" />
         <link rel="preconnect" href="https://*.supabase.co" />
@@ -87,7 +76,6 @@ export default function RootLayout({
         >
           <I18nProvider>
             <AuthProvider>
-              <ServiceWorkerRegister />
               {children}
             </AuthProvider>
           </I18nProvider>
