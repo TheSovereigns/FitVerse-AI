@@ -388,27 +388,37 @@ export async function POST(req: Request) {
 
     let analysis;
     let lastError: unknown = null;
+    const MAX_RETRIES = 5;
 
-    for (let attempt = 1; attempt <= 3; attempt++) {
+    for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
       try {
         const text = await callGemini(base64Data, mimeType, prompt, apiKey);
-        console.log(`[analyze-product] Attempt ${attempt}/3 - Gemini response length: ${text.length}, first 200 chars:`, text.slice(0, 200));
+        console.log(`[analyze-product] Attempt ${attempt}/${MAX_RETRIES} - Gemini response length: ${text.length}, first 200 chars:`, text.slice(0, 200));
         analysis = await parseAIResponse(text);
         break;
       } catch (err) {
         lastError = err;
-        console.error(`[analyze-product] Attempt ${attempt}/3 failed:`, err instanceof Error ? err.message : err);
-        if (attempt === 3) {
-          console.error('[analyze-product] All attempts exhausted. Last error:', lastError);
+        const msg = err instanceof Error ? err.message : String(err);
+        console.error(`[analyze-product] Attempt ${attempt}/${MAX_RETRIES} failed:`, msg);
+
+        const isRetryable = msg.includes('503') || msg.includes('502') || msg.includes('429') || msg.includes('aborted');
+        if (isRetryable && attempt < MAX_RETRIES) {
+          const delay = Math.min(2000 * Math.pow(2, attempt - 1), 15000);
+          console.log(`[analyze-product] Retrying in ${delay}ms...`);
+          await new Promise(r => setTimeout(r, delay));
         }
       }
     }
 
     if (!analysis) {
-      return NextResponse.json(
-        { error: 'A IA retornou uma resposta inválida. Tente uma foto mais nítida do alimento ou rótulo.' },
-        { status: 502, headers }
-      );
+      const errMsg = lastError instanceof Error ? lastError.message : '';
+      const status = errMsg.includes('503') ? 503 : errMsg.includes('429') ? 429 : 502;
+      const userMsg = status === 503
+        ? 'Serviço de IA temporariamente indisponível. Tente novamente em alguns instantes.'
+        : status === 429
+        ? 'Muitas requisições. Aguarde um momento e tente novamente.'
+        : 'A IA retornou uma resposta inválida. Tente uma foto mais nítida do alimento ou rótulo.';
+      return NextResponse.json({ error: userMsg }, { status, headers });
     }
 
     if (analysis.error) {
