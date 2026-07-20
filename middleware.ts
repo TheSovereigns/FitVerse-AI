@@ -37,8 +37,8 @@ const publicRoutes = [
   "/api/weekly-report",
 ]
 
-// Admin API routes. Admin pages use client-side Supabase session guards.
-const adminRoutes = ["/api/admin"]
+// Admin routes (API + pages). Server-side protection.
+const adminRoutes = ["/api/admin", "/admin-dashboard"]
 
 // API routes that require auth but are not admin-only.
 const protectedRoutes: string[] = []
@@ -110,9 +110,10 @@ export async function middleware(request: NextRequest) {
   response.headers.set("Referrer-Policy", "strict-origin-when-cross-origin")
 
   // 2. CSP (Content Security Policy)
+  const isDev = process.env.NODE_ENV === "development"
   const cspHeader = `
     default-src 'self';
-    script-src 'self' 'unsafe-eval' 'unsafe-inline' https://js.stripe.com;
+    script-src 'self'${isDev ? " 'unsafe-eval'" : ""} 'unsafe-inline' https://js.stripe.com;
     style-src 'self' 'unsafe-inline';
     img-src 'self' blob: data: https://*.stripe.com https://*.google.com;
     font-src 'self';
@@ -122,12 +123,22 @@ export async function middleware(request: NextRequest) {
     frame-ancestors 'none';
     frame-src 'self' https://js.stripe.com https://hooks.stripe.com;
     connect-src 'self' https://api.stripe.com wss://*.supabase.co https://*.supabase.co;
-    block-all-mixed-content;
-    ${process.env.NODE_ENV === "development" ? "" : "upgrade-insecure-requests;"}
+    worker-src 'self';
+    manifest-src 'self';
+    ${isDev ? "" : "upgrade-insecure-requests;"}
   `
   response.headers.set(
     "Content-Security-Policy",
     cspHeader.replace(/\s{2,}/g, " ").trim()
+  )
+
+  // 3. Additional security headers
+  if (!isDev) {
+    response.headers.set("Strict-Transport-Security", "max-age=63072000; includeSubDomains; preload")
+  }
+  response.headers.set(
+    "Permissions-Policy",
+    "camera=(), microphone=(), geolocation=(), interest-cohort=()"
   )
 
   // 3. Check if route is public

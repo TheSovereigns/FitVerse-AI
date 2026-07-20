@@ -2,6 +2,7 @@ import { createGoogleGenerativeAI } from "@ai-sdk/google"
 import { generateText } from "ai"
 import { NextResponse } from "next/server"
 import { authUser, getCorsHeaders } from "@/lib/auth-helpers"
+import { checkRateLimit, getRateLimitKey, rateLimitResponse, RATE_LIMITS } from "@/lib/rate-limit"
 
 function getGoogle() {
   return createGoogleGenerativeAI({
@@ -82,6 +83,10 @@ export async function POST(request: Request) {
   if (!user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401, headers })
   }
+
+  const rlKey = getRateLimitKey(request, "calculate-macros")
+  const rl = await checkRateLimit(rlKey, RATE_LIMITS.generate)
+  if (!rl.allowed) return rateLimitResponse()
 
   try {
     const perfil: BioPerfil = await request.json()

@@ -11,10 +11,11 @@ import { toast } from "sonner"
 import { useAuth } from "@/hooks/useAuth"
 import { supabase } from "@/lib/supabase"
 import { usePlanLimits } from "@/hooks/usePlanLimits"
+import { useAppStore } from "@/stores/app-store"
 import { DesktopSidebar } from "@/components/desktop-sidebar"
 import { MobileBottomNav } from "@/components/mobile-bottom-nav"
 import { FeatureErrorBoundary } from "@/components/FeatureErrorBoundary"
-import type { View, DailyActivity, MetabolicPlan, ScanHistoryItem, ProductAnalysis } from "@/lib/types"
+import type { View, MetabolicPlan, ProductAnalysis } from "@/lib/types"
 
 // Lazy-loaded views for code splitting
 const HomeDashboard = lazy(() => import("@/components/home-dashboard").then(m => ({ default: m.HomeDashboard })))
@@ -66,22 +67,26 @@ export default function DashboardPage() {
   const { t, locale } = useTranslation()
   const isEnglish = locale === "en-US"
   const { plan, limits, scansToday, canScan: checkCanScan, incrementScans, isLoading: planLoading } = usePlanLimits()
-  const [currentView, setCurrentView] = useState<View>("home")
-  const [authTimedOut, setAuthTimedOut] = useState(false)
-  const [isAnalyzing, setIsAnalyzing] = useState(false)
-  const [isAdmin, setIsAdmin] = useState(false)
-  const [scanError, setScanError] = useState<string | null>(null)
-  const [analysisResult, setAnalysisResult] = useState<ProductAnalysis | null>(null)
-  const [dailyActivity, setDailyActivity] = useState<DailyActivity>({
-    date: new Date().toISOString().split('T')[0]!,
-    scannedProducts: [],
-    generatedDiets: [],
-    generatedWorkouts: [],
-  })
-  const [scanHistory, setScanHistory] = useState<ScanHistoryItem[]>([])
-  const [userMetabolicPlanState, setUserMetabolicPlanState] = useState<MetabolicPlan | null>(null)
 
-  const [showUpgradeModal, setShowUpgradeModal] = useState(false)
+  const currentView = useAppStore(s => s.currentView)
+  const setCurrentView = useAppStore(s => s.setCurrentView)
+  const isAnalyzing = useAppStore(s => s.isAnalyzing)
+  const setIsAnalyzing = useAppStore(s => s.setIsAnalyzing)
+  const isAdmin = useAppStore(s => s.isAdmin)
+  const setIsAdmin = useAppStore(s => s.setIsAdmin)
+  const scanError = useAppStore(s => s.scanError)
+  const setScanError = useAppStore(s => s.setScanError)
+  const analysisResult = useAppStore(s => s.analysisResult)
+  const setAnalysisResult = useAppStore(s => s.setAnalysisResult)
+  const dailyActivity = useAppStore(s => s.dailyActivity)
+  const setDailyActivity = useAppStore(s => s.setDailyActivity)
+  const addScannedProduct = useAppStore(s => s.addScannedProduct)
+  const scanHistory = useAppStore(s => s.scanHistory)
+  const addScanHistory = useAppStore(s => s.addScanHistory)
+  const userMetabolicPlan = useAppStore(s => s.userMetabolicPlan)
+  const setUserMetabolicPlanStore = useAppStore(s => s.setUserMetabolicPlan)
+
+  const [authTimedOut, setAuthTimedOut] = useState(false)
   const bottomNavInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
@@ -108,35 +113,9 @@ export default function DashboardPage() {
     }
   }, [user])
 
-  useEffect(() => {
-    const savedActivity = localStorage.getItem("dailyActivity")
-    const today = new Date().toISOString().split('T')[0]
-    if (savedActivity) {
-      try {
-        const activity = JSON.parse(savedActivity)
-        if (activity.date === today) setDailyActivity(activity)
-        else {
-          const fresh = { date: today!, scannedProducts: [], generatedDiets: [], generatedWorkouts: [] }
-          setDailyActivity(fresh)
-          localStorage.setItem("dailyActivity", JSON.stringify(fresh))
-        }
-      } catch (e) { logger.error("[Page] Failed to parse dailyActivity:", e) }
-    }
-  }, [user, profile, plan])
-
-  useEffect(() => {
-    const saved = localStorage.getItem("userMetabolicPlan")
-    if (saved) {
-      try { setUserMetabolicPlanState(JSON.parse(saved)) } catch (e) { logger.error("[Page] Failed to parse userMetabolicPlan:", e) }
-    }
-  }, [])
-
   const setUserMetabolicPlan = (plan: MetabolicPlan | null, perfil?: any) => {
     const fullPlan = plan && perfil ? { ...plan, perfil } : plan
-    setUserMetabolicPlanState(fullPlan)
-    if (fullPlan) {
-      localStorage.setItem("userMetabolicPlan", JSON.stringify(fullPlan))
-    } else localStorage.removeItem("userMetabolicPlan")
+    setUserMetabolicPlanStore(fullPlan)
   }
 
   const getViewTitle = () => {
@@ -226,7 +205,7 @@ export default function DashboardPage() {
         response = await fetch('/api/analyze-product', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-          body: JSON.stringify({ imageData, mimeType: imageMimeType, metabolicPlan: userMetabolicPlanState, locale }),
+          body: JSON.stringify({ imageData, mimeType: imageMimeType, metabolicPlan: userMetabolicPlan, locale }),
           signal: controller.signal,
         })
       } catch (fetchError) {
@@ -246,13 +225,9 @@ export default function DashboardPage() {
         throw new Error(errorData?.error || t("page_error_ai_fail"))
       }
       const analysis: ProductAnalysis = await response.json()
-      setDailyActivity((prev) => {
-        const updated = { ...prev, scannedProducts: [...prev.scannedProducts, analysis] }
-        localStorage.setItem("dailyActivity", JSON.stringify(updated))
-        return updated
-      })
+      addScannedProduct(analysis)
       setAnalysisResult(analysis)
-      setScanHistory(prev => [{ id: `${prev.length + 1}`, name: analysis.productName, scannedAt: new Date().toISOString(), score: analysis.longevityScore, image: displayImage }, ...prev])
+      addScanHistory({ id: `${scanHistory.length + 1}`, name: analysis.productName, scannedAt: new Date().toISOString(), score: analysis.longevityScore, image: displayImage })
       incrementScans()
     } catch (error) {
       const message = error instanceof Error ? error.message : t("page_error_retry")
@@ -328,7 +303,7 @@ export default function DashboardPage() {
           <Suspense fallback={<ViewLoader />}>
             <FeatureErrorBoundary featureName="Dashboard">
             {/* Core views */}
-            {currentView === "home" && <HomeDashboard userMetabolicPlan={userMetabolicPlanState} dailyActivity={dailyActivity} onNavigate={setCurrentView} />}
+            {currentView === "home" && <HomeDashboard userMetabolicPlan={userMetabolicPlan} dailyActivity={dailyActivity} onNavigate={setCurrentView} />}
             {currentView === "dashboard" && <ScanDashboard onScan={handleScan} isScanning={isAnalyzing} />}
             {currentView === "result" && (
               scanError ? (
@@ -351,10 +326,10 @@ export default function DashboardPage() {
             {currentView === "recipes" && <RecipesTab />}
             {currentView === "training" && <TrainingTab />}
             {currentView === "planner" && (
-              userMetabolicPlanState?.macros
+              userMetabolicPlan?.macros
                 ? <div className="space-y-4">
-                    <MetabolicDashboard plan={userMetabolicPlanState as any} perfil={(userMetabolicPlanState.perfil || {}) as any} onBack={() => setCurrentView("home")} planLevel={limits.planDetailLevel} onUpgrade={() => router.push("/subscription")} />
-                    <Button onClick={() => { setUserMetabolicPlanState(null); localStorage.removeItem("userMetabolicPlan") }} variant="ghost" className="w-full h-11 rounded-xl text-muted-foreground text-xs font-semibold">
+                    <MetabolicDashboard plan={userMetabolicPlan as any} perfil={(userMetabolicPlan.perfil || {}) as any} onBack={() => setCurrentView("home")} planLevel={limits.planDetailLevel} onUpgrade={() => router.push("/subscription")} />
+                    <Button onClick={() => setUserMetabolicPlan(null)} variant="ghost" className="w-full h-11 rounded-xl text-muted-foreground text-xs font-semibold">
                       {t("home_new_plan")}
                     </Button>
                   </div>
@@ -372,7 +347,7 @@ export default function DashboardPage() {
             {currentView === "supplements" && <SupplementRecommender isLocked={isFeatureLocked("supplements")} />}
 
             {/* Nutrition features */}
-            {currentView === "meal-planner" && <MealPlanner isLocked={isFeatureLocked("meal-planner")} macros={userMetabolicPlanState?.macros} />}
+            {currentView === "meal-planner" && <MealPlanner isLocked={isFeatureLocked("meal-planner")} macros={userMetabolicPlan?.macros} />}
             {currentView === "dietary" && <DietaryRestrictions />}
             {currentView === "micronutrients" && <MicronutrientAnalysis isLocked={isFeatureLocked("micronutrients")} />}
             {currentView === "substitutions" && <SmartSubstitutions isLocked={isFeatureLocked("substitutions")} />}

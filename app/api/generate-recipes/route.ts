@@ -5,6 +5,7 @@ import { z } from "zod"
 import { getSupabaseAdmin } from "@/lib/supabase-server"
 import { PLAN_LIMITS, type Plan } from "@/lib/plan-limits"
 import { getCorsHeaders } from "@/lib/auth-helpers"
+import { checkRateLimit, getRateLimitKey, rateLimitResponse, RATE_LIMITS } from "@/lib/rate-limit"
 
 function getGoogle() {
   return createGoogleGenerativeAI({
@@ -79,6 +80,10 @@ export async function POST(req: Request) {
     if (!user || authError) {
       return NextResponse.json({ error: 'Token inválido.' }, { status: 401, headers })
     }
+
+    const rlKey = getRateLimitKey(req, "generate-recipes")
+    const rl = await checkRateLimit(rlKey, RATE_LIMITS.generate)
+    if (!rl.allowed) return rateLimitResponse()
 
     const { data: profile } = await supabase
       .from('profiles')

@@ -1,11 +1,16 @@
 import { NextRequest, NextResponse } from "next/server"
 import { authUser, getCorsHeaders } from "@/lib/auth-helpers"
+import { checkRateLimit, getRateLimitKey, rateLimitResponse, RATE_LIMITS } from "@/lib/rate-limit"
 
 export async function POST(req: NextRequest) {
   const user = await authUser(req)
   if (!user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401, headers: getCorsHeaders() })
   }
+
+  const rlKey = getRateLimitKey(req, "weekly-report")
+  const rl = await checkRateLimit(rlKey, RATE_LIMITS.generate)
+  if (!rl.allowed) return rateLimitResponse()
 
   const body = await req.json()
   const { totalScans, totalWorkouts, totalDiets, avgScore, daysActive, currentStreak, scanTrend, workoutTrend } = body

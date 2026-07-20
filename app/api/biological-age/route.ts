@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { getSupabaseAdmin } from "@/lib/supabase-server";
 import { getCorsHeaders } from "@/lib/auth-helpers";
+import { checkRateLimit, getRateLimitKey, rateLimitResponse, RATE_LIMITS } from "@/lib/rate-limit";
 
 export async function POST(req: Request) {
   const supabase = getSupabaseAdmin();
@@ -33,6 +34,10 @@ export async function POST(req: Request) {
         { status: 401, headers }
       );
     }
+
+    const rlKey = getRateLimitKey(req, "biological-age")
+    const rl = await checkRateLimit(rlKey, RATE_LIMITS.generate)
+    if (!rl.allowed) return rateLimitResponse()
 
     const apiKey =
       process.env.GEMINI_API_KEY || process.env.GOOGLE_GENERATIVE_AI_API_KEY;
