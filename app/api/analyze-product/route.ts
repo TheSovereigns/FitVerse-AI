@@ -1,12 +1,8 @@
 import { NextResponse } from 'next/server';
-import { GoogleGenerativeAI } from '@google/generative-ai';
 import { getSupabaseAdmin } from '@/lib/supabase-server';
 import { checkRateLimit, getRateLimitKey, RATE_LIMITS } from '@/lib/rate-limit';
 import { PLAN_LIMITS, type Plan } from '@/lib/plan-limits';
 import { getCorsHeaders } from "@/lib/auth-helpers";
-
-const MAX_IMAGE_DIMENSION = 1024;
-const JPEG_QUALITY = 0.7;
 
 async function checkScanLimit(userId: string, plan: string): Promise<boolean> {
   const supabase = getSupabaseAdmin();
@@ -30,17 +26,55 @@ export async function OPTIONS() {
   return NextResponse.json({}, { headers: getCorsHeaders() });
 }
 
-function getModel() {
-  const apiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_GENERATIVE_AI_API_KEY;
-  if (!apiKey) return null;
-  const genAI = new GoogleGenerativeAI(apiKey);
-  return genAI.getGenerativeModel({
-    model: 'gemini-3.5-flash',
-    generationConfig: {
-      temperature: 0.3,
-      maxOutputTokens: 2048,
-    },
-  });
+function getGeminiApiKey(): string | null {
+  return process.env.GEMINI_API_KEY || process.env.GOOGLE_GENERATIVE_AI_API_KEY || null;
+}
+
+async function callGemini(imageBase64: string, mimeType: string, prompt: string, apiKey: string): Promise<string> {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 30000);
+
+  try {
+    const res = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        signal: controller.signal,
+        body: JSON.stringify({
+          contents: [{
+            parts: [
+              { text: prompt },
+              { inlineData: { mimeType, data: imageBase64 } },
+            ],
+          }],
+          generationConfig: {
+            temperature: 0.3,
+            maxOutputTokens: 2048,
+          },
+        }),
+      }
+    );
+
+    clearTimeout(timeoutId);
+
+    if (!res.ok) {
+      const errBody = await res.text();
+      console.error(`[analyze-product] Gemini API error ${res.status}:`, errBody);
+      throw new Error(`Gemini API returned ${res.status}`);
+    }
+
+    const data = await res.json();
+    const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+    if (!text) {
+      console.error('[analyze-product] No text in Gemini response:', JSON.stringify(data).slice(0, 500));
+      throw new Error('Empty response from Gemini');
+    }
+    return text;
+  } catch (err) {
+    clearTimeout(timeoutId);
+    throw err;
+  }
 }
 
 function buildPrompt(lang: string, metabolicPlan?: string) {
@@ -282,8 +316,8 @@ export async function POST(req: Request) {
     }, { status: 403, headers });
   }
 
-  const model = getModel();
-  if (!model) {
+  const apiKey = getGeminiApiKey();
+  if (!apiKey) {
     return NextResponse.json({ error: 'Chave de API do Gemini não configurada.' }, { status: 500, headers });
   }
 
@@ -318,38 +352,17 @@ export async function POST(req: Request) {
     let analysis;
     let lastError: unknown = null;
 
-    // Retry up to 2 times if JSON parsing fails
     for (let attempt = 1; attempt <= 3; attempt++) {
       try {
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 25000);
-
-        const result = await model.generateContent(
-          [
-            prompt,
-            {
-              inlineData: {
-                data: base64Data,
-                mimeType,
-              },
-            },
-          ],
-          { signal: controller.signal }
-        );
-
-        clearTimeout(timeoutId);
-        
-        const response = await result.response;
-        let text = response.text();
-        
+        const text = await callGemini(base64Data, mimeType, prompt, apiKey);
         analysis = await parseAIResponse(text);
-        break; // Success
-      } catch (parseError) {
-        lastError = parseError;
+        break;
+      } catch (err) {
+        lastError = err;
+        console.error(`[analyze-product] Attempt ${attempt}/3 failed:`, err instanceof Error ? err.message : err);
         if (attempt === 3) {
-          console.error(`[analyze-product] Failed after 3 attempts:`, parseError);
+          console.error('[analyze-product] All attempts exhausted. Last error:', lastError);
         }
-        continue;
       }
     }
 
