@@ -30,6 +30,14 @@ function getGeminiApiKey(): string | null {
   return process.env.GEMINI_API_KEY || process.env.GOOGLE_GENERATIVE_AI_API_KEY || null;
 }
 
+function getGroqApiKey(): string | null {
+  return process.env.GROQ_API_KEY || null;
+}
+
+function isRetryableError(status: number): boolean {
+  return status === 503 || status === 502 || status === 429;
+}
+
 async function callGemini(imageBase64: string, mimeType: string, prompt: string, apiKey: string): Promise<string> {
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), 30000);
@@ -75,6 +83,43 @@ async function callGemini(imageBase64: string, mimeType: string, prompt: string,
     clearTimeout(timeoutId);
     throw err;
   }
+}
+
+async function callGroqVision(imageBase64: string, mimeType: string, prompt: string, apiKey: string): Promise<string> {
+  const dataUrl = `data:${mimeType};base64,${imageBase64}`;
+
+  const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      model: 'llama-3.2-90b-vision-preview',
+      messages: [
+        {
+          role: 'user',
+          content: [
+            { type: 'text', text: prompt },
+            { type: 'image_url', image_url: { url: dataUrl } },
+          ],
+        },
+      ],
+      temperature: 0.3,
+      max_tokens: 2048,
+    }),
+  });
+
+  if (!res.ok) {
+    const errBody = await res.text();
+    console.error(`[analyze-product] Groq API error ${res.status}:`, errBody);
+    throw new Error(`Groq API returned ${res.status}`);
+  }
+
+  const data = await res.json();
+  const text = data.choices?.[0]?.message?.content;
+  if (!text) throw new Error('Empty response from Groq');
+  return text;
 }
 
 function buildPrompt(lang: string, metabolicPlan?: string) {
@@ -388,25 +433,39 @@ export async function POST(req: Request) {
 
     let analysis;
     let lastError: unknown = null;
-    const MAX_RETRIES = 5;
+    const groqApiKey = getGroqApiKey();
 
-    for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+    // Try Gemini 2x, then fallback to Groq vision
+    for (let attempt = 1; attempt <= 2; attempt++) {
       try {
         const text = await callGemini(base64Data, mimeType, prompt, apiKey);
-        console.log(`[analyze-product] Attempt ${attempt}/${MAX_RETRIES} - Gemini response length: ${text.length}, first 200 chars:`, text.slice(0, 200));
+        console.log(`[analyze-product] Gemini attempt ${attempt}/2 - response length: ${text.length}`);
         analysis = await parseAIResponse(text);
         break;
       } catch (err) {
         lastError = err;
         const msg = err instanceof Error ? err.message : String(err);
-        console.error(`[analyze-product] Attempt ${attempt}/${MAX_RETRIES} failed:`, msg);
+        console.error(`[analyze-product] Gemini attempt ${attempt}/2 failed:`, msg);
 
-        const isRetryable = msg.includes('503') || msg.includes('502') || msg.includes('429') || msg.includes('aborted');
-        if (isRetryable && attempt < MAX_RETRIES) {
+        if (attempt < 2) {
           const delay = Math.min(2000 * Math.pow(2, attempt - 1), 15000);
-          console.log(`[analyze-product] Retrying in ${delay}ms...`);
+          console.log(`[analyze-product] Retrying Gemini in ${delay}ms...`);
           await new Promise(r => setTimeout(r, delay));
         }
+      }
+    }
+
+    // Fallback to Groq vision if Gemini failed
+    if (!analysis && groqApiKey) {
+      try {
+        console.log('[analyze-product] Falling back to Groq vision');
+        const text = await callGroqVision(base64Data, mimeType, prompt, groqApiKey);
+        console.log(`[analyze-product] Groq vision response length: ${text.length}`);
+        analysis = await parseAIResponse(text);
+      } catch (err) {
+        lastError = err;
+        const msg = err instanceof Error ? err.message : String(err);
+        console.error(`[analyze-product] Groq vision failed:`, msg);
       }
     }
 
