@@ -227,14 +227,51 @@ ${planContext}`;
 
 async function parseAIResponse(text: string) {
   let cleaned = text.replace(/```json/g, '').replace(/```/g, '').trim();
-  
-  // Try to extract JSON from the response if it contains extra text
-  const jsonMatch = cleaned.match(/\{[\s\S]*\}/);
-  if (jsonMatch) {
-    cleaned = jsonMatch[0];
+
+  // Extract JSON by finding matching braces (non-greedy approach)
+  const startIdx = cleaned.indexOf('{');
+  if (startIdx === -1) {
+    throw new Error('No JSON object found in response');
   }
 
-  const parsed = JSON.parse(cleaned);
+  let depth = 0;
+  let endIdx = -1;
+  for (let i = startIdx; i < cleaned.length; i++) {
+    if (cleaned[i] === '{') depth++;
+    else if (cleaned[i] === '}') {
+      depth--;
+      if (depth === 0) {
+        endIdx = i;
+        break;
+      }
+    }
+  }
+
+  if (endIdx === -1) {
+    // Fallback: try greedy regex
+    const jsonMatch = cleaned.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) throw new Error('No JSON object found in response');
+    cleaned = jsonMatch[0];
+  } else {
+    cleaned = cleaned.substring(startIdx, endIdx + 1);
+  }
+
+  // Fix common JSON issues from AI responses
+  cleaned = cleaned
+    .replace(/,\s*}/g, '}')       // trailing commas
+    .replace(/,\s*]/g, ']')       // trailing commas in arrays
+    .replace(/'/g, '"')           // single quotes to double quotes
+    .replace(/\n/g, ' ')          // remove newlines inside strings can break things, keep as-is
+    .trim();
+
+  let parsed;
+  try {
+    parsed = JSON.parse(cleaned);
+  } catch (e) {
+    console.error('[analyze-product] JSON parse failed. Raw text (first 500):', text.slice(0, 500));
+    console.error('[analyze-product] Cleaned JSON (first 500):', cleaned.slice(0, 500));
+    throw e;
+  }
 
   // Normalize healthScore fields
   if (parsed.healthScore) {
@@ -355,6 +392,7 @@ export async function POST(req: Request) {
     for (let attempt = 1; attempt <= 3; attempt++) {
       try {
         const text = await callGemini(base64Data, mimeType, prompt, apiKey);
+        console.log(`[analyze-product] Attempt ${attempt}/3 - Gemini response length: ${text.length}, first 200 chars:`, text.slice(0, 200));
         analysis = await parseAIResponse(text);
         break;
       } catch (err) {
