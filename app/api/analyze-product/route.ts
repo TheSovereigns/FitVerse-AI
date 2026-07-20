@@ -321,15 +321,23 @@ export async function POST(req: Request) {
     // Retry up to 2 times if JSON parsing fails
     for (let attempt = 1; attempt <= 3; attempt++) {
       try {
-        const result = await model.generateContent([
-          prompt,
-          {
-            inlineData: {
-              data: base64Data,
-              mimeType,
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 25000);
+
+        const result = await model.generateContent(
+          [
+            prompt,
+            {
+              inlineData: {
+                data: base64Data,
+                mimeType,
+              },
             },
-          },
-        ]);
+          ],
+          { signal: controller.signal }
+        );
+
+        clearTimeout(timeoutId);
         
         const response = await result.response;
         let text = response.text();
@@ -341,7 +349,6 @@ export async function POST(req: Request) {
         if (attempt === 3) {
           console.error(`[analyze-product] Failed after 3 attempts:`, parseError);
         }
-        // Retry with a simpler prompt
         continue;
       }
     }
