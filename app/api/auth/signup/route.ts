@@ -4,7 +4,7 @@ import { checkRateLimit, getRateLimitKey, RATE_LIMITS } from "@/lib/rate-limit"
 
 export async function POST(request: NextRequest) {
   const rlKey = getRateLimitKey(request, "signup")
-  const rl = checkRateLimit(rlKey, RATE_LIMITS.signup)
+  const rl = await checkRateLimit(rlKey, RATE_LIMITS.signup)
   if (!rl.allowed) {
     return NextResponse.json({ error: "Rate limit exceeded" }, { status: 429 })
   }

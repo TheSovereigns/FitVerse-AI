@@ -29,6 +29,12 @@ const publicRoutes = [
   "/api/generate-workouts",
   "/api/calculate-macros",
   "/api/chatbot",
+  "/api/biological-age",
+  "/api/analyze-sleep",
+  "/api/recommend-supplements",
+  "/api/food-substitutions",
+  "/api/generate-weekly-meals",
+  "/api/weekly-report",
 ]
 
 // Admin API routes. Admin pages use client-side Supabase session guards.

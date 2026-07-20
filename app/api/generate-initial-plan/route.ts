@@ -11,7 +11,7 @@ export async function POST(req: Request) {
   const headers = getCorsHeaders()
 
   const rlKey = getRateLimitKey(req, "generate")
-  const rl = checkRateLimit(rlKey, RATE_LIMITS.generate)
+  const rl = await checkRateLimit(rlKey, RATE_LIMITS.generate)
   if (!rl.allowed) {
     return NextResponse.json({ error: "Rate limit exceeded" }, { status: 429, headers })
   }

@@ -30,7 +30,7 @@ export async function POST(req: Request) {
   const supabaseAdmin = getSupabaseAdmin();
 
   const rlKey = getRateLimitKey(req, "chatbot")
-  const rl = checkRateLimit(rlKey, RATE_LIMITS.chatbot)
+  const rl = await checkRateLimit(rlKey, RATE_LIMITS.chatbot)
   if (!rl.allowed) {
     return NextResponse.json({ error: "Rate limit exceeded" }, { status: 429, headers })
   }
