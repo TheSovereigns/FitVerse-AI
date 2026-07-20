@@ -27,16 +27,18 @@ export async function OPTIONS() {
   return NextResponse.json({}, { headers: getCorsHeaders() });
 }
 
-const apiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_GENERATIVE_AI_API_KEY;
-const genAI = apiKey ? new GoogleGenerativeAI(apiKey) : null;
-
-const model = genAI ? genAI.getGenerativeModel({
-  model: 'gemini-3.5-flash',
-  generationConfig: {
-    temperature: 0.3,
-    maxOutputTokens: 2048,
-  },
-}) : null;
+function getModel() {
+  const apiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_GENERATIVE_AI_API_KEY;
+  if (!apiKey) return null;
+  const genAI = new GoogleGenerativeAI(apiKey);
+  return genAI.getGenerativeModel({
+    model: 'gemini-3.5-flash',
+    generationConfig: {
+      temperature: 0.3,
+      maxOutputTokens: 2048,
+    },
+  });
+}
 
 function buildPrompt(lang: string, metabolicPlan?: string) {
   const planContext = metabolicPlan
@@ -277,7 +279,8 @@ export async function POST(req: Request) {
     }, { status: 403, headers });
   }
 
-  if (!apiKey || !model) {
+  const model = getModel();
+  if (!model) {
     return NextResponse.json({ error: 'Chave de API do Gemini não configurada.' }, { status: 500, headers });
   }
 

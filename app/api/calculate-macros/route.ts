@@ -3,9 +3,11 @@ import { generateText } from "ai"
 import { NextResponse } from "next/server"
 import { authUser, getCorsHeaders } from "@/lib/auth-helpers"
 
-const google = createGoogleGenerativeAI({
-  apiKey: process.env.GEMINI_API_KEY || process.env.GOOGLE_GENERATIVE_AI_API_KEY,
-})
+function getGoogle() {
+  return createGoogleGenerativeAI({
+    apiKey: process.env.GEMINI_API_KEY || process.env.GOOGLE_GENERATIVE_AI_API_KEY,
+  })
+}
 
 interface BioPerfil {
   age: number
@@ -89,7 +91,7 @@ export async function POST(request: Request) {
     const macros = calculateMacros(tdee, perfil.goal)
 
     const { text } = await generateText({
-      model: google("gemini-3.1-flash-lite"),
+      model: getGoogle()("gemini-3.1-flash-lite"),
       prompt: `Você é um nutricionista especialista em longevidade e performance. Analise este perfil:
 
 DADOS DO USUÁRIO:

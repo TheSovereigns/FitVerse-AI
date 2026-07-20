@@ -6,9 +6,11 @@ import { getSupabaseAdmin } from "@/lib/supabase-server"
 import { PLAN_LIMITS, type Plan } from "@/lib/plan-limits"
 import { getCorsHeaders } from "@/lib/auth-helpers"
 
-const google = createGoogleGenerativeAI({
-  apiKey: process.env.GEMINI_API_KEY || process.env.GOOGLE_GENERATIVE_AI_API_KEY,
-})
+function getGoogle() {
+  return createGoogleGenerativeAI({
+    apiKey: process.env.GEMINI_API_KEY || process.env.GOOGLE_GENERATIVE_AI_API_KEY,
+  })
+}
 
 export const maxDuration = 30
 
@@ -161,7 +163,7 @@ Para cada receita forneça:
 Máximo 30 min. Ingredientes de supermercado. Cada receita: abordagem única. Sem fritura — grelhar/vapor/refogar/cru.`
 
     const { object } = await generateObject({
-      model: google("gemini-3.5-flash"),
+      model: getGoogle()("gemini-3.5-flash"),
       schema: recipesSchema,
       prompt,
       temperature: 0.8,

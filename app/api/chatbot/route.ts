@@ -9,13 +9,6 @@ export async function OPTIONS() {
   return NextResponse.json({}, { headers: getCorsHeaders() });
 }
 
-const apiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_GENERATIVE_AI_API_KEY;
-const genAI = apiKey ? new GoogleGenerativeAI(apiKey) : null;
-
-const model = genAI ? genAI.getGenerativeModel({
-  model: 'gemini-3.1-flash-lite',
-}) : null;
-
 const generationConfig = {
   temperature: 0.7,
   topK: 1,
@@ -42,12 +35,12 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Rate limit exceeded" }, { status: 429, headers })
   }
 
-  logger.info('[Chatbot] API called, apiKey exists:', !!apiKey, 'model exists:', !!model);
-
-  if (!apiKey || !model) {
-    console.error('[Chatbot] Gemini API not configured');
+  const apiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_GENERATIVE_AI_API_KEY;
+  if (!apiKey) {
     return NextResponse.json({ reply: "Erro: Chave de API do Gemini não configurada." }, { status: 500, headers });
   }
+  const genAI = new GoogleGenerativeAI(apiKey);
+  const model = genAI.getGenerativeModel({ model: 'gemini-3.1-flash-lite' });
 
   logger.info('[Chatbot] Supabase admin configured:', !!supabaseAdmin);
 
