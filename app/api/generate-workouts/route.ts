@@ -175,7 +175,7 @@ TODA saída em ${lang}. Técnico, específico, focado em resultados.`
     const object = await generateObjectWithFallback({
       geminiCall: () =>
         generateObject({
-          model: getGoogle()("gemini-3.5-flash"),
+          model: getGoogle()("gemini-3.1-flash-lite"),
           schema: workoutSchema,
           prompt,
           temperature: 0.7,

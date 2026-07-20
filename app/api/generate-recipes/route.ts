@@ -171,7 +171,7 @@ Máximo 30 min. Ingredientes de supermercado. Cada receita: abordagem única. Se
     const object = await generateObjectWithFallback({
       geminiCall: () =>
         generateObject({
-          model: getGoogle()("gemini-3.5-flash"),
+          model: getGoogle()("gemini-3.1-flash-lite"),
           schema: recipesSchema,
           prompt,
           temperature: 0.8,
