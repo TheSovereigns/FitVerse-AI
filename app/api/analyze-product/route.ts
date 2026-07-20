@@ -5,6 +5,9 @@ import { checkRateLimit, getRateLimitKey, RATE_LIMITS } from '@/lib/rate-limit';
 import { PLAN_LIMITS, type Plan } from '@/lib/plan-limits';
 import { getCorsHeaders } from "@/lib/auth-helpers";
 
+const MAX_IMAGE_DIMENSION = 1024;
+const JPEG_QUALITY = 0.7;
+
 async function checkScanLimit(userId: string, plan: string): Promise<boolean> {
   const supabase = getSupabaseAdmin();
   if (!supabase) return true;
@@ -299,6 +302,13 @@ export async function POST(req: Request) {
     const base64Data = imageData.includes('base64,') 
       ? imageData.split('base64,')[1] 
       : imageData;
+
+    // Reject images larger than 1MB base64 (~750KB raw)
+    if (base64Data.length > 1_400_000) {
+      return NextResponse.json({ 
+        error: 'Imagem muito grande. Tira uma foto mais nítida ou menor.' 
+      }, { status: 400, headers });
+    }
 
     const isEnglish = locale === "en-US"
     const lang = isEnglish ? "English" : "Portuguese"

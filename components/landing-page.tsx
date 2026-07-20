@@ -3,8 +3,7 @@
 import { motion } from "framer-motion"
 import { 
   ScanLine, Dumbbell, UtensilsCrossed, MessageCircle, 
-  Shield, Zap, Heart, Brain, ArrowRight, Check,
-  Star, Crown, Sparkles, Menu, X
+  Heart, Brain, ArrowRight, Check, Sparkles, Menu, X
 } from "lucide-react"
 import Link from "next/link"
 import { useState } from "react"
@@ -51,12 +50,11 @@ const plans = [
   },
 ]
 
-export default function LandingPage() {
+export function LandingPage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Nav */}
       <nav className="fixed top-0 w-full z-50 bg-background/80 backdrop-blur-xl border-b border-border">
         <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
@@ -90,29 +88,19 @@ export default function LandingPage() {
         )}
       </nav>
 
-      {/* Hero */}
       <section className="pt-32 pb-20 px-4">
         <div className="max-w-4xl mx-auto text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-          >
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
             <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full text-sm font-bold mb-8">
               <Sparkles className="w-4 h-4" />
               AI-Powered Fitness & Nutrition
             </div>
-            
             <h1 className="text-5xl md:text-7xl font-black tracking-tight leading-none mb-6">
-              Your Body.<br />
-              <span className="text-primary">Optimized.</span>
+              Your Body.<br /><span className="text-primary">Optimized.</span>
             </h1>
-            
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-10">
-              Scan food, generate workouts, plan meals, and track your health — all powered by advanced AI. 
-              Your personal biohacking coach in your pocket.
+              Scan food, generate workouts, plan meals, and track your health — all powered by advanced AI. Your personal biohacking coach in your pocket.
             </p>
-
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <Link href="/auth/signup" className="flex items-center gap-2 bg-primary text-primary-foreground px-8 py-4 rounded-2xl text-lg font-bold hover:opacity-90 transition-opacity">
                 Get Started Free
@@ -126,24 +114,16 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Features */}
       <section id="features" className="py-20 px-4">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-black tracking-tight mb-4">Everything You Need</h2>
             <p className="text-xl text-muted-foreground">One app to replace your gym notebook, diet plan, and health tracker.</p>
           </div>
-
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {features.map((f, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
-                className="bg-card border border-border rounded-2xl p-6 hover:border-primary/30 transition-colors"
-              >
+              <motion.div key={i} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }}
+                className="bg-card border border-border rounded-2xl p-6 hover:border-primary/30 transition-colors">
                 <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center mb-4">
                   <f.icon className="w-6 h-6 text-primary" />
                 </div>
@@ -155,39 +135,27 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Pricing */}
       <section id="pricing" className="py-20 px-4">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-black tracking-tight mb-4">Simple Pricing</h2>
             <p className="text-xl text-muted-foreground">Start free, upgrade when you&apos;re ready.</p>
           </div>
-
           <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
             {plans.map((plan, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
-                className={`bg-card border rounded-2xl p-8 relative ${
-                  plan.popular ? 'border-primary shadow-lg shadow-primary/10' : 'border-border'
-                }`}
-              >
+              <motion.div key={i} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }}
+                className={`bg-card border rounded-2xl p-8 relative ${plan.popular ? 'border-primary shadow-lg shadow-primary/10' : 'border-border'}`}>
                 {plan.popular && (
                   <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground px-4 py-1 rounded-full text-xs font-black uppercase tracking-wider">
                     Most Popular
                   </div>
                 )}
-                
                 <div className="flex items-baseline gap-1 mb-2">
                   <span className="text-4xl font-black">{plan.price}</span>
                   {plan.period !== "forever" && <span className="text-muted-foreground">{plan.period}</span>}
                 </div>
                 <h3 className="text-xl font-black mb-1">{plan.name}</h3>
                 <p className="text-sm text-muted-foreground mb-6">{plan.description}</p>
-                
                 <ul className="space-y-3 mb-8">
                   {plan.features.map((f, j) => (
                     <li key={j} className="flex items-center gap-2 text-sm">
@@ -196,15 +164,7 @@ export default function LandingPage() {
                     </li>
                   ))}
                 </ul>
-
-                <Link 
-                  href={plan.href} 
-                  className={`block text-center py-3 rounded-xl font-bold transition-opacity ${
-                    plan.popular 
-                      ? 'bg-primary text-primary-foreground hover:opacity-90' 
-                      : 'border border-border hover:bg-muted/50'
-                  }`}
-                >
+                <Link href={plan.href} className={`block text-center py-3 rounded-xl font-bold transition-opacity ${plan.popular ? 'bg-primary text-primary-foreground hover:opacity-90' : 'border border-border hover:bg-muted/50'}`}>
                   {plan.cta}
                 </Link>
               </motion.div>
@@ -213,19 +173,11 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* CTA */}
       <section className="py-20 px-4">
         <div className="max-w-4xl mx-auto text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="bg-card border border-border rounded-3xl p-12"
-          >
+          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="bg-card border border-border rounded-3xl p-12">
             <h2 className="text-4xl font-black tracking-tight mb-4">Ready to Transform?</h2>
-            <p className="text-xl text-muted-foreground mb-8">
-              Join thousands optimizing their health with AI.
-            </p>
+            <p className="text-xl text-muted-foreground mb-8">Join thousands optimizing their health with AI.</p>
             <Link href="/auth/signup" className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-8 py-4 rounded-2xl text-lg font-bold hover:opacity-90 transition-opacity">
               Start Your Journey
               <ArrowRight className="w-5 h-5" />
@@ -234,7 +186,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Footer */}
       <footer className="border-t border-border py-12 px-4">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">

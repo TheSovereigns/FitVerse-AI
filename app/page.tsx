@@ -15,6 +15,7 @@ import { useAppStore } from "@/stores/app-store"
 import { DesktopSidebar } from "@/components/desktop-sidebar"
 import { MobileBottomNav } from "@/components/mobile-bottom-nav"
 import { FeatureErrorBoundary } from "@/components/FeatureErrorBoundary"
+import { LandingPage } from "@/components/landing-page"
 import type { View, MetabolicPlan, ProductAnalysis } from "@/lib/types"
 
 // Lazy-loaded views for code splitting
@@ -78,6 +79,8 @@ export default function DashboardPage() {
   const setScanError = useAppStore(s => s.setScanError)
   const analysisResult = useAppStore(s => s.analysisResult)
   const setAnalysisResult = useAppStore(s => s.setAnalysisResult)
+  const scannedImage = useAppStore(s => s.scannedImage)
+  const setScannedImage = useAppStore(s => s.setScannedImage)
   const dailyActivity = useAppStore(s => s.dailyActivity)
   const setDailyActivity = useAppStore(s => s.setDailyActivity)
   const addScannedProduct = useAppStore(s => s.addScannedProduct)
@@ -152,9 +155,37 @@ export default function DashboardPage() {
     setCurrentView("result")
     setAnalysisResult(null)
     setScanError(null)
+    setScannedImage(null)
 
     let displayImage = "/placeholder.svg?height=80&width=80"
     let imageMimeType = "image/jpeg"
+
+    const compressImage = (file: File): Promise<string> =>
+      new Promise((resolve, reject) => {
+        const canvas = document.createElement("canvas")
+        const ctx = canvas.getContext("2d")
+        const img = new Image()
+        img.onload = () => {
+          let { width, height } = img
+          const maxDim = 1024
+          if (width > maxDim || height > maxDim) {
+            if (width > height) {
+              height = Math.round((height / width) * maxDim)
+              width = maxDim
+            } else {
+              width = Math.round((width / height) * maxDim)
+              height = maxDim
+            }
+          }
+          canvas.width = width
+          canvas.height = height
+          ctx?.drawImage(img, 0, 0, width, height)
+          resolve(canvas.toDataURL("image/jpeg", 0.7))
+        }
+        img.onerror = reject
+        img.src = URL.createObjectURL(file)
+      })
+
     const toBase64 = (file: File): Promise<string> =>
       new Promise((resolve, reject) => {
         const reader = new FileReader()
@@ -167,13 +198,14 @@ export default function DashboardPage() {
       let imageData: string | undefined
       if (fileOrUrl instanceof File) {
         displayImage = URL.createObjectURL(fileOrUrl)
-        imageMimeType = fileOrUrl.type || "image/jpeg"
-        imageData = await toBase64(fileOrUrl)
+        imageMimeType = "image/jpeg"
+        imageData = await compressImage(fileOrUrl)
       } else if (typeof fileOrUrl === "string") {
         displayImage = fileOrUrl
         imageData = fileOrUrl
       }
       if (!imageData) throw new Error(t("page_error_no_image"))
+      setScannedImage(displayImage)
 
       let token = ''
       try {
@@ -321,7 +353,7 @@ export default function DashboardPage() {
                     </Button>
                   </div>
                 </div>
-              ) : isAnalyzing || !analysisResult ? <ProductSkeleton /> : <ProductResult result={analysisResult} onBack={() => setCurrentView("dashboard")} />
+              ) : isAnalyzing || !analysisResult ? <ProductSkeleton /> : <ProductResult result={analysisResult} onBack={() => setCurrentView("dashboard")} imageData={scannedImage || undefined} />
             )}
             {currentView === "recipes" && <RecipesTab />}
             {currentView === "training" && <TrainingTab />}

@@ -26,6 +26,9 @@ interface AppState {
   analysisResult: ProductAnalysis | null
   setAnalysisResult: (r: ProductAnalysis | null) => void
 
+  scannedImage: string | null
+  setScannedImage: (img: string | null) => void
+
   isAdmin: boolean
   setIsAdmin: (v: boolean) => void
 
@@ -73,6 +76,9 @@ export const useAppStore = create<AppState>()(
 
       analysisResult: null,
       setAnalysisResult: (r) => set({ analysisResult: r }),
+
+      scannedImage: null,
+      setScannedImage: (img) => set({ scannedImage: img }),
 
       isAdmin: false,
       setIsAdmin: (v) => set({ isAdmin: v }),

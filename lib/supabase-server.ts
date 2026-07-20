@@ -48,7 +48,7 @@ export function getCorsHeaders(): Record<string, string> {
     || "http://localhost:3000"
 
   return {
-    "Access-Control-Allow-Origin": process.env.NODE_ENV === "production" ? origin : "*",
+    "Access-Control-Allow-Origin": origin,
     "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
     "Access-Control-Allow-Headers": "Content-Type, Authorization",
   }
