@@ -91,8 +91,10 @@ export function usePlanLimits() {
 
     fetchPlan()
 
+    const pollInterval = setInterval(fetchPlan, 30000)
+
     return () => {
-      // Realtime desabilitado - não causando mais erros
+      clearInterval(pollInterval)
     }
   }, [user])
 

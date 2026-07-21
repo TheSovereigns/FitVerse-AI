@@ -202,20 +202,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   const signOut = async () => {
-    try {
-      await supabase.auth.signOut()
-    } catch (e) {
-      logger.error("[Auth] signOut failed:", e)
-    }
     setUser(null)
     setProfile(null)
     setIsAdmin(false)
     hasRedirectedRef.current = false
     clearFitVerseStorage()
-    // Delay to ensure logout completes
-    setTimeout(() => {
-      window.location.href = "/auth/login"
-    }, 100)
+    supabase.auth.signOut({ scope: 'local' }).catch(() => {})
+    window.location.href = "/auth/login"
   }
 
   const signInWithGoogle = async () => {

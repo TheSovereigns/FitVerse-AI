@@ -145,17 +145,38 @@ export default function SubscriptionPage() {
   useEffect(() => {
     if (!user?.id) return
 
-    supabase
-      .from("profiles")
-      .select("plan, ads_enabled")
-      .eq("id", user.id)
-      .single()
-      .then(({ data }) => {
-        if (data) {
-          setCurrentPlan(data.plan as Plan)
-          setAdsEnabled(data.ads_enabled !== false)
-        }
-      })
+    const params = new URLSearchParams(window.location.search)
+    const fromCheckout = params.get("success") === "true"
+
+    const fetchPlan = () =>
+      supabase
+        .from("profiles")
+        .select("plan, ads_enabled")
+        .eq("id", user.id)
+        .single()
+        .then(({ data }) => {
+          if (data) {
+            setCurrentPlan(data.plan as Plan)
+            setAdsEnabled(data.ads_enabled !== false)
+          }
+        })
+
+    fetchPlan()
+
+    if (fromCheckout) {
+      let attempts = 0
+      const maxAttempts = 10
+      let poll: ReturnType<typeof setInterval> | null = null
+      poll = setInterval(async () => {
+        attempts++
+        await fetchPlan()
+        await refreshPlan()
+        if (attempts >= maxAttempts && poll) clearInterval(poll)
+      }, 2000)
+      return () => { if (poll) clearInterval(poll) }
+    }
+
+    return () => {}
   }, [user])
 
   useEffect(() => {
