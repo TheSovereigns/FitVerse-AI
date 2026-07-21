@@ -202,13 +202,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   const signOut = async () => {
-    setUser(null)
-    setProfile(null)
-    setIsAdmin(false)
-    hasRedirectedRef.current = false
     clearFitVerseStorage()
-    supabase.auth.signOut({ scope: 'local' }).catch(() => {})
-    window.location.href = "/auth/login"
+    try { supabase.auth.signOut({ scope: 'local' }).catch(() => {}) } catch {}
+    window.location.replace("/auth/login")
   }
 
   const signInWithGoogle = async () => {
