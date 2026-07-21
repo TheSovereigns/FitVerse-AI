@@ -75,6 +75,7 @@ interface MetabolicPlannerProps {
 
 export function MetabolicPlanner({ onPlanCreated }: MetabolicPlannerProps) {
   const { t, locale } = useTranslation();
+  const isEnglish = locale === "en-US";
   const [weight, setWeight] = useState(70);
   const [height, setHeight] = useState(170);
   const [age, setAge] = useState(25);
@@ -125,6 +126,9 @@ export function MetabolicPlanner({ onPlanCreated }: MetabolicPlannerProps) {
         }
       }
 
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => controller.abort(), 60000)
+
       const response = await fetch('/api/generate-metabolic-plan', {
         method: 'POST',
         headers: {
@@ -132,7 +136,10 @@ export function MetabolicPlanner({ onPlanCreated }: MetabolicPlannerProps) {
           'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({ ...profileData, locale }),
+        signal: controller.signal,
       });
+
+      clearTimeout(timeoutId)
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -143,7 +150,9 @@ export function MetabolicPlanner({ onPlanCreated }: MetabolicPlannerProps) {
       onPlanCreated(plan, profileData);
 
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : t("mp_error_unknown");
+      const errorMessage = err instanceof Error && err.name === "AbortError"
+        ? (isEnglish ? "Request timed out. Try again." : "A requisicao expirou. Tente novamente.")
+        : err instanceof Error ? err.message : t("mp_error_unknown");
       console.error(t("mp_error_calc"), errorMessage);
       setError(errorMessage);
     } finally {
