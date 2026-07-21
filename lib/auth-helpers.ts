@@ -35,7 +35,7 @@ const FITVERSE_KEYS = [
   "bioProfile",
   "userProfile",
   "initialPlan",
-  "onboarding_completed",
+
   "streakData",
   "userStats",
   "boss_history",
