@@ -62,6 +62,11 @@ export default function AdminUsersPage() {
     }
   }, [user, authLoading, profile, router])
 
+  const [filter, setFilter] = useState<FilterType>("all")
+  const [currentPage, setCurrentPage] = useState(1)
+  const [totalCount, setTotalCount] = useState(0)
+  const [selectedUser, setSelectedUser] = useState<string | null>(null)
+
   if (authLoading || !user) {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center">
@@ -93,10 +98,6 @@ export default function AdminUsersPage() {
       </div>
     )
   }
-  const [filter, setFilter] = useState<FilterType>("all")
-  const [currentPage, setCurrentPage] = useState(1)
-  const [totalCount, setTotalCount] = useState(0)
-  const [selectedUser, setSelectedUser] = useState<string | null>(null)
 
   const pageSize = 20
 
