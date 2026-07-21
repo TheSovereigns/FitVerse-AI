@@ -18,19 +18,18 @@ export async function PATCH(req: Request) {
   }
 
   const { plan } = await req.json()
-  if (!['free', 'pro', 'premium'].includes(plan)) {
+  if (plan !== 'free') {
     return NextResponse.json(
-      { error: 'Plano invalido.' },
+      { error: 'Use o checkout do Stripe para planos pagos.' },
       { status: 400 }
     )
   }
 
-  const isPaid = plan !== 'free'
   const { error } = await supabaseAdmin
     .from('profiles')
     .update({
-      plan,
-      ads_enabled: isPaid ? false : true,
+      plan: 'free',
+      ads_enabled: true,
     })
     .eq('id', user.id)
 
@@ -38,5 +37,5 @@ export async function PATCH(req: Request) {
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 
-  return NextResponse.json({ ok: true, plan })
+  return NextResponse.json({ ok: true, plan: 'free' })
 }

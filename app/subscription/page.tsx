@@ -232,32 +232,6 @@ export default function SubscriptionPage() {
     await refreshPlan()
   }
 
-  const activatePlanDirectly = async (newPlan: PaidPlan) => {
-    const token = await getSessionToken()
-    if (!token) {
-      throw new Error(isEnglish ? "Your session expired. Sign in again." : "Sua sessao expirou. Entre novamente.")
-    }
-
-    const response = await fetch("/api/subscription/plan", {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`,
-      },
-      body: JSON.stringify({ plan: newPlan }),
-    })
-
-    const data = await response.json().catch(() => null)
-    if (!response.ok || data?.error) {
-      throw new Error(data?.error || (isEnglish ? "Could not activate plan." : "Nao foi possivel ativar o plano."))
-    }
-
-    setCurrentPlan(newPlan)
-    setAdsEnabled(false)
-    localStorage.setItem("userPlan", newPlan)
-    await refreshPlan()
-  }
-
   const startStripeCheckout = async (newPlan: PaidPlan) => {
     const token = await getSessionToken()
     if (!token) {
@@ -318,22 +292,7 @@ export default function SubscriptionPage() {
         throw new Error(isEnglish ? "Invalid checkout plan." : "Plano de checkout invalido.")
       }
 
-      try {
-        await startStripeCheckout(newPlan)
-      } catch (stripeError) {
-        const msg = stripeError instanceof Error ? stripeError.message : ""
-        if (msg.includes("nao configurado") || msg.includes("not configured")) {
-          await activatePlanDirectly(newPlan)
-          setLoading(null)
-          toast.success(
-            isEnglish
-              ? `${newPlan.toUpperCase()} plan activated`
-              : `Plano ${newPlan.toUpperCase()} ativado com sucesso`
-          )
-          return
-        }
-        throw stripeError
-      }
+      await startStripeCheckout(newPlan)
     } catch (error) {
       const message = error instanceof Error && error.name === "AbortError"
         ? (isEnglish ? "Checkout took too long. Please try again." : "O checkout demorou demais. Tente novamente.")
