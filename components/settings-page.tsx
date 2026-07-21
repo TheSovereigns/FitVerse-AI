@@ -423,9 +423,7 @@ export function SettingsPage({ onBack }: { onBack?: () => void }) {
   }
 
   const handleLogout = async () => {
-    localStorage.clear()
     await signOut()
-    window.location.href = "/auth/login"
   }
 
   const handleLanguageToggle = () => {
