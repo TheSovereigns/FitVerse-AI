@@ -1,8 +1,7 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { useAuth } from "@/hooks/useAuth"
-import { supabase } from "@/lib/supabase"
 import { X } from "lucide-react"
 import { Button } from "./ui/button"
 
@@ -13,42 +12,18 @@ interface AdBannerProps {
 
 export function AdBanner({ position = "bottom", className = "" }: AdBannerProps) {
   const { user, profile } = useAuth()
-  const [showAd, setShowAd] = useState(false)
   const [dismissed, setDismissed] = useState(false)
-  const [isLoading, setIsLoading] = useState(true)
 
-  useEffect(() => {
-    const checkAdStatus = async () => {
-      if (!user) {
-        setIsLoading(false)
-        return
-      }
-
-      if (profile?.plan === "pro" || profile?.plan === "premium") {
-        const { data } = await supabase
-          .from('profiles')
-          .select('ads_enabled')
-          .eq('id', user.id)
-          .single()
-        
-        const adsEnabled = data?.ads_enabled !== false
-        setShowAd(adsEnabled && !dismissed)
-      } else {
-        setShowAd(!dismissed)
-      }
-      setIsLoading(false)
-    }
-
-    checkAdStatus()
-  }, [user, profile?.plan, dismissed])
+  const isPaidPlan = profile?.plan === "pro" || profile?.plan === "premium"
+  const adsEnabledForPlan = isPaidPlan ? (profile as any)?.ads_enabled !== false : true
+  const showAd = user && adsEnabledForPlan && !dismissed
 
   const handleDismiss = () => {
     setDismissed(true)
-    setShowAd(false)
     localStorage.setItem("adDismissed", "true")
   }
 
-  if (isLoading || !showAd) return null
+  if (!showAd) return null
 
   return (
     <div className={`w-full ${position === "top" ? "pt-2" : "pb-2"} ${className}`}>
@@ -88,33 +63,7 @@ export function AdBanner({ position = "bottom", className = "" }: AdBannerProps)
 
 export function useAdsEnabled() {
   const { user, profile } = useAuth()
-  const [adsEnabled, setAdsEnabled] = useState(false)
-  const [isLoading, setIsLoading] = useState(true)
-
-  useEffect(() => {
-    const checkAds = async () => {
-      if (!user) {
-        setAdsEnabled(false)
-        setIsLoading(false)
-        return
-      }
-
-      if (profile?.plan === "pro" || profile?.plan === "premium") {
-        const { data } = await supabase
-          .from('profiles')
-          .select('ads_enabled')
-          .eq('id', user.id)
-          .single()
-        
-        setAdsEnabled(data?.ads_enabled === true)
-      } else {
-        setAdsEnabled(true)
-      }
-      setIsLoading(false)
-    }
-
-    checkAds()
-  }, [user, profile?.plan])
-
-  return { adsEnabled, isLoading }
+  const isPaidPlan = profile?.plan === "pro" || profile?.plan === "premium"
+  const adsEnabled = isPaidPlan ? (profile as any)?.ads_enabled === true : !!user
+  return { adsEnabled, isLoading: false }
 }

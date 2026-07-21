@@ -2,7 +2,6 @@
 
 import { useMemo, useState } from "react"
 import { motion } from "framer-motion"
-import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
 import { useTranslation } from "@/lib/i18n"
@@ -14,7 +13,6 @@ import {
   Dumbbell,
   Flame,
   ScanLine,
-  ShieldCheck,
   Target,
   Trophy,
   Zap,
@@ -65,158 +63,166 @@ export function HomeDashboard({
   const dateString = new Date().toLocaleDateString(locale, { weekday: "long", day: "numeric", month: "long" })
 
   const quickActions = [
-    { label: t("dopamine_quick_scan"), desc: t("dopamine_quick_scan_desc"), icon: ScanLine, view: "dashboard" as View },
-    { label: t("dopamine_quick_workout"), desc: t("dopamine_quick_workout_desc"), icon: Dumbbell, view: "training" as View },
-    { label: t("dopamine_quick_recipe"), desc: t("dopamine_quick_recipe_desc"), icon: ChefHat, view: "recipes" as View },
-    { label: t("dopamine_quick_plan"), desc: t("dopamine_quick_plan_desc"), icon: Calculator, view: "planner" as View },
+    { label: t("dopamine_quick_scan"), icon: ScanLine, view: "dashboard" as View, color: "text-brand" },
+    { label: t("view_training"), icon: Dumbbell, view: "training" as View, color: "text-foreground" },
+    { label: t("view_recipes"), icon: ChefHat, view: "recipes" as View, color: "text-foreground" },
+    { label: t("view_planner"), icon: Calculator, view: "planner" as View, color: "text-foreground" },
   ]
 
+  const calorieRingRadius = 54
+  const calorieRingCircumference = 2 * Math.PI * calorieRingRadius
+  const calorieRingOffset = calorieRingCircumference - (progressPercent / 100) * calorieRingCircumference
+
   return (
-    <div className="mx-auto w-full max-w-3xl space-y-5 pb-safe-nav md:space-y-6">
-      {/* Header card */}
+    <div className="mx-auto w-full max-w-2xl space-y-6 pb-safe-nav">
+      {/* Header */}
       <motion.section
-        initial={{ opacity: 0, y: 8 }}
+        initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
-        className="rounded-2xl border border-border bg-card p-5 md:p-6"
+        className="pt-2"
       >
-        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <div>
-            <Badge className="mb-2 rounded-lg border border-brand/20 bg-brand-muted px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-brand">
-              FitVerse AI
-            </Badge>
-            <h1 className="text-2xl font-bold tracking-tight text-foreground md:text-3xl">
-              {t("hd_today")}
-            </h1>
-            <p className="mt-0.5 text-sm text-muted-foreground capitalize">{dateString}</p>
-          </div>
-          <div className="flex gap-2">
-            <Button onClick={() => onNavigate("dashboard")} className="h-10 rounded-xl px-4 text-xs bg-brand text-brand-foreground hover:bg-brand/90">
-              <ScanLine className="h-4 w-4" />
-              {t("dopamine_quick_scan")}
-            </Button>
-            <Button variant="outline" onClick={() => onNavigate("planner")} className="h-10 rounded-xl px-4 text-xs">
-              <Target className="h-4 w-4" />
-              {t("view_planner")}
-            </Button>
-          </div>
-        </div>
+        <p className="text-sm text-muted-foreground capitalize">{dateString}</p>
+        <h1 className="mt-1 text-3xl font-bold tracking-tight text-foreground md:text-4xl">
+          {t("hd_today")}
+        </h1>
       </motion.section>
 
       <StreakDisplay compact onNavigate={onNavigate} />
       <BeginnerChecklist />
 
-      {/* Calorie + Health */}
-      <section className="grid gap-4 lg:grid-cols-[1.25fr_0.75fr]">
-        <Panel>
-          <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
-            <div className="min-w-0">
-              <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-muted text-muted-foreground">
-                <Flame className="h-5 w-5" />
-              </div>
-              <p className="text-xs font-medium text-muted-foreground">
-                {goals ? t("home_calorie_label") : t("view_planner")}
-              </p>
-              <div className="mt-1.5 flex items-end gap-1.5">
-                <span className="text-3xl font-bold tracking-tight text-foreground md:text-4xl">
-                  {goals ? remainingCalories : "--"}
-                </span>
-                <span className="mb-0.5 text-sm text-muted-foreground">{t("home_kcal")}</span>
-              </div>
-              <p className="mt-2 text-sm text-muted-foreground">
-                {goals
-                  ? `${consumedCalories} ${t("home_kcal")} ${t("hd_logged_today")}.`
-                  : t("hd_create_plan_hint")}
-              </p>
+      {/* Calorie Ring Widget */}
+      <motion.section
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.05 }}
+        className="rounded-2xl glass-strong p-6"
+      >
+        <div className="flex items-center gap-6">
+          <div className="relative shrink-0">
+            <svg width="128" height="128" className="-rotate-90">
+              <circle
+                cx="64"
+                cy="64"
+                r={calorieRingRadius}
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="8"
+                className="text-border"
+              />
+              <motion.circle
+                cx="64"
+                cy="64"
+                r={calorieRingRadius}
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="8"
+                strokeLinecap="round"
+                strokeDasharray={calorieRingCircumference}
+                initial={{ strokeDashoffset: calorieRingCircumference }}
+                animate={{ strokeDashoffset: calorieRingOffset }}
+                transition={{ duration: 1.2, ease: "easeOut" }}
+                className="text-brand"
+              />
+            </svg>
+            <div className="absolute inset-0 flex flex-col items-center justify-center">
+              <Flame className="h-4 w-4 text-brand mb-0.5" />
+              <span className="text-2xl font-bold text-foreground">{goals ? remainingCalories : "--"}</span>
+              <span className="text-[10px] text-muted-foreground">kcal left</span>
             </div>
+          </div>
 
-            <div className="w-full rounded-xl border border-border bg-muted/50 p-4 md:w-64">
-              <div className="mb-2.5 flex items-center justify-between">
-                <span className="text-xs font-medium text-muted-foreground">
-                  {t("hd_daily_progress")}
-                </span>
-                <span className="text-sm font-bold text-foreground">{goals ? `${progressPercent}%` : "--"}</span>
+          <div className="flex-1 min-w-0">
+            <div className="space-y-3">
+              <div>
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-xs text-muted-foreground">{t("hd_daily_progress")}</span>
+                  <span className="text-xs font-semibold text-foreground">{goals ? `${progressPercent}%` : "--"}</span>
+                </div>
+                <Progress value={goals ? progressPercent : 0} className="h-1.5 bg-border" indicatorClassName="bg-brand" />
               </div>
-              <Progress value={goals ? progressPercent : 0} className="h-1.5 bg-border" indicatorClassName="bg-primary" />
+
+              <div className="grid grid-cols-3 gap-2">
+                <MacroPill label="P" value={`${Math.round(dailyTotals.protein)}g`} color="text-brand" />
+                <MacroPill label="C" value={`${Math.round(dailyTotals.carbs)}g`} color="text-warning" />
+                <MacroPill label="G" value={`${Math.round(dailyTotals.fat)}g`} color="text-destructive" />
+              </div>
+
               <Button
                 onClick={() => onNavigate(goals ? "dashboard" : "planner")}
                 variant="ghost"
-                className="mt-3 h-9 w-full rounded-lg text-xs"
+                className="h-9 w-full rounded-xl text-xs font-medium"
               >
                 {goals ? t("home_start_btn") : t("home_new_plan")}
-                <ArrowRight className="h-3.5 w-3.5" />
+                <ArrowRight className="ml-1 h-3 w-3" />
               </Button>
             </div>
           </div>
-        </Panel>
+        </div>
+      </motion.section>
 
-        <Panel>
-          <div className="mb-3 flex items-center justify-between">
-            <div>
-              <h2 className="text-base font-bold text-foreground">
-                {t("hd_health_snapshot")}
-              </h2>
-              <p className="text-xs text-muted-foreground">
-                {t("hd_last_activity")}
-              </p>
-            </div>
-            <ShieldCheck className="h-4 w-4 text-muted-foreground" />
-          </div>
-          <div className="grid grid-cols-3 gap-2">
-            <Metric label={t("home_longevity")} value={averageLongevityScore || "-"} icon={Trophy} />
-            <Metric label={t("home_water")} value={`${waterCups * 250}ml`} icon={Droplet} />
-            <Metric label={t("home_protein")} value={`${Math.round(dailyTotals.protein)}g`} icon={Zap} />
-          </div>
-        </Panel>
-      </section>
+      {/* Quick Stats */}
+      <motion.section
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1 }}
+        className="grid grid-cols-3 gap-3"
+      >
+        <StatWidget icon={Trophy} label={t("home_longevity")} value={averageLongevityScore || "-"} />
+        <StatWidget icon={Droplet} label={t("home_water")} value={`${waterCups * 250}ml`} />
+        <StatWidget icon={Zap} label={t("home_protein")} value={`${Math.round(dailyTotals.protein)}g`} />
+      </motion.section>
 
       <HydrationTracker />
 
-      {/* Quick actions */}
-      <section>
-        <div className="mb-3 flex items-center justify-between">
-          <h2 className="text-base font-bold text-foreground md:text-lg">
-            {t("hd_quick_actions")}
-          </h2>
-        </div>
-        <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+      {/* Quick Actions */}
+      <motion.section
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.15 }}
+      >
+        <h2 className="mb-3 text-sm font-semibold text-muted-foreground">
+          {t("hd_quick_actions")}
+        </h2>
+        <div className="grid grid-cols-4 gap-3">
           {quickActions.map((action) => (
             <button
               key={action.view}
               type="button"
               onClick={() => onNavigate(action.view)}
-              className="min-h-[100px] rounded-2xl border border-border bg-card p-4 text-left transition-all duration-200 hover:bg-muted/50 active:scale-[0.98]"
+              className="flex flex-col items-center gap-2 rounded-2xl glass-card p-4 transition-all duration-200 hover:bg-brand/5 active:scale-[0.97]"
             >
-              <div className="mb-2.5 flex h-9 w-9 items-center justify-center rounded-xl bg-muted">
-                <action.icon className="h-4 w-4 text-muted-foreground" />
+              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-brand-muted">
+                <action.icon className="h-5 w-5 text-brand" />
               </div>
-              <p className="text-sm font-semibold text-foreground">{action.label}</p>
-              <p className="mt-0.5 line-clamp-2 text-xs text-muted-foreground">{action.desc}</p>
+              <span className="text-[11px] font-medium text-foreground text-center leading-tight">{action.label}</span>
             </button>
           ))}
         </div>
-      </section>
+      </motion.section>
 
       {/* Bio logs */}
-      <Panel>
-        <div className="mb-3 flex items-center justify-between">
-          <div>
-            <h2 className="text-base font-bold text-foreground md:text-lg">{t("home_bio_logs")}</h2>
-            <p className="text-xs text-muted-foreground">{t("home_last_24h")}</p>
-          </div>
-          <Button variant="ghost" onClick={() => onNavigate("profile")} className="h-9 rounded-lg px-3 text-xs">
+      <motion.section
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.2 }}
+        className="rounded-2xl glass-strong p-5"
+      >
+        <div className="mb-4 flex items-center justify-between">
+          <h2 className="text-base font-semibold text-foreground">{t("home_bio_logs")}</h2>
+          <Button variant="ghost" onClick={() => onNavigate("profile")} className="h-8 rounded-lg px-3 text-xs">
             {t("home_see_history")}
           </Button>
         </div>
 
         {dailyActivity.scannedProducts.length > 0 ? (
           <div className="space-y-2">
-            {dailyActivity.scannedProducts.slice(0, 4).map((product: any, index: number) => (
+            {dailyActivity.scannedProducts.slice(0, 3).map((product: any, index: number) => (
               <motion.div
                 key={`${product.productName}-${index}`}
                 initial={{ opacity: 0, y: 4 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.03 }}
-                className="flex items-center gap-3 rounded-xl border border-border bg-muted/30 p-3"
+                className="flex items-center gap-3 rounded-xl bg-muted/50 p-3"
               >
                 <img
                   src={product.image || "/placeholder.svg?width=100&height=100"}
@@ -224,48 +230,45 @@ export function HomeDashboard({
                   className="h-10 w-10 rounded-lg object-cover"
                 />
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-semibold text-foreground">{product.productName}</p>
-                  <p className="mt-0.5 text-xs text-muted-foreground">
+                  <p className="truncate text-sm font-medium text-foreground">{product.productName}</p>
+                  <p className="text-xs text-muted-foreground">
                     {product.longevityScore} {t("scan_score_label")}
                   </p>
                 </div>
-                <ArrowRight className="h-4 w-4 text-muted-foreground/50" />
+                <ArrowRight className="h-4 w-4 text-muted-foreground/40" />
               </motion.div>
             ))}
           </div>
         ) : (
-          <div className="rounded-2xl border border-dashed border-border p-6 text-center">
-            <ScanLine className="mx-auto mb-2 h-8 w-8 text-muted-foreground/50" />
-            <h3 className="text-sm font-semibold text-foreground">{t("dopamine_empty_title")}</h3>
+          <div className="rounded-xl border border-dashed border-border p-6 text-center">
+            <ScanLine className="mx-auto mb-2 h-8 w-8 text-muted-foreground/30" />
+            <h3 className="text-sm font-medium text-foreground">{t("dopamine_empty_title")}</h3>
             <p className="mt-1 text-xs text-muted-foreground">{t("dopamine_empty_subtitle")}</p>
-            <Button onClick={() => onNavigate("dashboard")} className="mt-4 h-10 rounded-xl px-5 text-xs">
+            <Button onClick={() => onNavigate("dashboard")} className="mt-4 h-9 rounded-xl px-5 text-xs">
               {t("dopamine_empty_cta")}
             </Button>
           </div>
         )}
-      </Panel>
+      </motion.section>
     </div>
   )
 }
 
-function Panel({ children }: { children: React.ReactNode }) {
+function MacroPill({ label, value, color }: { label: string; value: string; color: string }) {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 8 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="rounded-2xl border border-border bg-card p-4 md:p-5"
-    >
-      {children}
-    </motion.div>
+    <div className="rounded-xl bg-muted/50 px-3 py-2">
+      <span className={`text-[10px] font-bold uppercase tracking-wider ${color}`}>{label}</span>
+      <p className="text-sm font-semibold text-foreground">{value}</p>
+    </div>
   )
 }
 
-function Metric({ icon: Icon, label, value }: { icon: React.ElementType; label: string; value: string | number }) {
+function StatWidget({ icon: Icon, label, value }: { icon: React.ElementType; label: string; value: string | number }) {
   return (
-    <div className="min-w-0 rounded-xl bg-muted/50 p-3">
-      <Icon className="h-4 w-4 text-muted-foreground" />
-      <p className="mt-2 truncate text-lg font-bold text-foreground">{value}</p>
-      <p className="mt-0.5 truncate text-[10px] font-medium uppercase tracking-wider text-muted-foreground">{label}</p>
+    <div className="rounded-2xl glass-strong p-4 text-center">
+      <Icon className="mx-auto h-4 w-4 text-brand mb-2" />
+      <p className="text-lg font-bold text-foreground">{value}</p>
+      <p className="text-[10px] text-muted-foreground mt-0.5">{label}</p>
     </div>
   )
 }

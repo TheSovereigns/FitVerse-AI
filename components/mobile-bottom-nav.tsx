@@ -21,18 +21,40 @@ export function MobileBottomNav({ currentView, onNavigate }: MobileBottomNavProp
   ]
 
   return (
-    <nav className="mobile-bottom-safe md:hidden fixed left-3 right-3 z-40 mx-auto flex h-16 max-w-md items-center justify-around rounded-2xl border border-border bg-card/90 backdrop-blur-xl px-2 shadow-lg">
-      {items.map((item) => (
-        <button key={item.view} onClick={() => onNavigate(item.view)}
-          className="relative flex h-12 w-12 flex-col items-center justify-center rounded-xl p-2 transition-colors"
-        >
-          <item.icon className={cn("w-5 h-5 transition-colors", currentView === item.view ? "text-brand" : "text-muted-foreground")} />
-          {currentView === item.view && <span className="absolute bottom-1 h-1 w-1 rounded-full bg-brand" />}
-        </button>
-      ))}
-      <button onClick={() => onNavigate("settings")} className="relative flex h-12 w-12 flex-col items-center justify-center rounded-xl p-2">
-        <Settings className={cn("w-5 h-5 transition-colors", currentView === "settings" ? "text-brand" : "text-muted-foreground")} />
-        {currentView === "settings" && <span className="absolute bottom-1 h-1 w-1 rounded-full bg-brand" />}
+    <nav className="mobile-bottom-safe md:hidden fixed left-3 right-3 z-40 mx-auto flex h-[68px] max-w-md items-center justify-between rounded-[1.25rem] glass-strong px-3 shadow-lg shadow-black/5 dark:shadow-black/30">
+      {items.map((item) => {
+        const isActive = currentView === item.view
+        return (
+          <button
+            key={item.view}
+            onClick={() => onNavigate(item.view)}
+            className={cn(
+              "relative flex h-12 w-12 items-center justify-center rounded-xl transition-all duration-200",
+              isActive
+                ? "bg-brand/10 text-brand"
+                : "text-muted-foreground hover:text-foreground"
+            )}
+          >
+            <item.icon className={cn("h-[22px] w-[22px]", isActive && "stroke-[2.5]")} />
+            {isActive && (
+              <span className="absolute -bottom-0.5 h-[3px] w-4 rounded-full bg-brand" />
+            )}
+          </button>
+        )
+      })}
+      <button
+        onClick={() => onNavigate("settings")}
+        className={cn(
+          "relative flex h-12 w-12 items-center justify-center rounded-xl transition-all duration-200",
+          currentView === "settings"
+            ? "bg-brand/10 text-brand"
+            : "text-muted-foreground hover:text-foreground"
+        )}
+      >
+        <Settings className={cn("h-[22px] w-[22px]", currentView === "settings" && "stroke-[2.5]")} />
+        {currentView === "settings" && (
+          <span className="absolute -bottom-0.5 h-[3px] w-4 rounded-full bg-brand" />
+        )}
       </button>
     </nav>
   )

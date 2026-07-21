@@ -110,7 +110,7 @@ export function MoodTracker({ isLocked = false }: MoodTrackerProps) {
 
   if (isLocked) {
     return (
-      <div className="bg-card border border-border rounded-2xl p-6 relative overflow-hidden">
+      <div className="glass-strong border border-border rounded-2xl p-6 relative overflow-hidden">
         <div className="absolute inset-0 bg-muted/50 backdrop-blur-sm flex items-center justify-center z-10">
           <div className="text-center">
             <Lock className="w-10 h-10 mx-auto mb-2 text-muted-foreground" />
@@ -133,7 +133,7 @@ export function MoodTracker({ isLocked = false }: MoodTrackerProps) {
   }
 
   return (
-    <div className="bg-card border border-border rounded-2xl p-6">
+    <div className="glass-strong border border-border rounded-2xl p-6">
       <h2 className="text-lg font-semibold text-foreground mb-4">Mood Tracker</h2>
 
       <div className="mb-6">
@@ -173,7 +173,7 @@ export function MoodTracker({ isLocked = false }: MoodTrackerProps) {
             />
             <button
               onClick={addEntry}
-              className="mt-2 px-4 py-2 rounded-xl bg-foreground text-background text-sm font-medium hover:opacity-90 transition-opacity"
+              className="mt-2 px-4 py-2 rounded-xl bg-brand text-white text-sm font-medium hover:bg-brand/90 transition-opacity"
             >
               Save Mood
             </button>

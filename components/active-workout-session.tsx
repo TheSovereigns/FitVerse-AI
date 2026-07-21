@@ -2,9 +2,6 @@
 
 import { useState, useEffect, useRef } from "react"
 import { X, Check, Clock, Flame, Trophy, ChevronRight, Save, Search, Minus, Plus, Zap, Target, Timer } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
-import { Progress } from "@/components/ui/progress"
 import { toast } from "sonner"
 
 interface ActiveWorkoutSessionProps {
@@ -102,7 +99,6 @@ export function ActiveWorkoutSession({ workout, onClose, onComplete }: ActiveWor
 
   const currentExercise = workout.exercises[currentExerciseIndex]
   const totalExercises = workout.exercises.length
-  const progress = ((currentExerciseIndex) / totalExercises) * 100
   const exerciseSets = parseInt(currentExercise.sets) || 3
   const currentExerciseSets = completedSets[currentExercise.name] || new Array(exerciseSets).fill(false)
   const isExerciseComplete = currentExerciseSets.every(Boolean)
@@ -154,230 +150,232 @@ export function ActiveWorkoutSession({ workout, onClose, onComplete }: ActiveWor
 
   if (isFinished) {
     return (
-      <div className="fixed inset-0 z-50 bg-background flex flex-col items-center justify-center p-6 animate-in fade-in duration-300">
-        <div className="max-w-md w-full space-y-8 text-center">
-          <div className="w-24 h-24 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-6 animate-bounce">
-            <Trophy className="w-12 h-12 text-primary" />
+      <div style={{ position: "fixed", inset: 0, zIndex: 50, background: "#09090B", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 24 }}>
+        <div style={{ maxWidth: 380, width: "100%", display: "flex", flexDirection: "column", gap: 32, textAlign: "center" }}>
+          <div style={{ width: 96, height: 96, borderRadius: "50%", background: "rgba(16,185,129,0.15)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto" }}>
+            <Trophy style={{ width: 48, height: 48, color: "#10B981" }} />
           </div>
           <div>
-            <h2 className="text-3xl font-bold text-foreground mb-2">{t("aw_finished_title")}</h2>
-            <p className="text-muted-foreground">{t("aw_finished_sub")} {workout.name}</p>
+            <h2 style={{ fontSize: 30, fontWeight: 900, color: "#FAFAFA", marginBottom: 8 }}>{t("aw_finished_title")}</h2>
+            <p style={{ fontSize: 14, color: "#71717A" }}>{t("aw_finished_sub")} {workout.name}</p>
           </div>
-          <div className="grid grid-cols-2 gap-4">
-            <Card className="bg-card border-border p-4">
-              <div className="flex flex-col items-center">
-                <Clock className="w-6 h-6 text-blue-500 mb-2" />
-                <span className="text-2xl font-bold text-foreground">{formatTime(elapsedTime)}</span>
-                <span className="text-xs text-muted-foreground uppercase">{t("aw_total_time")}</span>
-              </div>
-            </Card>
-            <Card className="bg-card border-border p-4">
-              <div className="flex flex-col items-center">
-                <Flame className="w-6 h-6 text-red-500 mb-2" />
-                <span className="text-2xl font-bold text-foreground">{t("aw_kcal_estimate")}</span>
-                <span className="text-xs text-muted-foreground uppercase">{t("aw_kcal_est")}</span>
-              </div>
-            </Card>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+            <div style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 16, padding: 20, textAlign: "center" }}>
+              <Clock style={{ width: 24, height: 24, color: "#3B82F6", margin: "0 auto 8px" }} />
+              <div style={{ fontSize: 28, fontWeight: 900, color: "#FAFAFA" }}>{formatTime(elapsedTime)}</div>
+              <div style={{ fontSize: 11, color: "#71717A", textTransform: "uppercase", marginTop: 4, letterSpacing: "0.1em" }}>{t("aw_total_time")}</div>
+            </div>
+            <div style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 16, padding: 20, textAlign: "center" }}>
+              <Flame style={{ width: 24, height: 24, color: "#EF4444", margin: "0 auto 8px" }} />
+              <div style={{ fontSize: 28, fontWeight: 900, color: "#FAFAFA" }}>{t("aw_kcal_estimate")}</div>
+              <div style={{ fontSize: 11, color: "#71717A", textTransform: "uppercase", marginTop: 4, letterSpacing: "0.1em" }}>{t("aw_kcal_est")}</div>
+            </div>
           </div>
-          <Button
-            className="w-full h-14 text-lg font-bold bg-primary hover:bg-primary/90 text-primary-foreground"
+          <button
             onClick={() => onComplete({ elapsedTime, rpeValues })}
+            style={{ width: "100%", height: 56, borderRadius: 16, border: "none", background: "#10B981", color: "#FFFFFF", fontSize: 16, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}
           >
-            <Save className="w-5 h-5 mr-2" />
+            <Save style={{ width: 20, height: 20 }} />
             {t("aw_save_log")}
-          </Button>
+          </button>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="fixed inset-0 z-50 bg-background flex flex-col h-[100dvh]">
+    <div style={{ position: "fixed", inset: 0, zIndex: 50, display: "flex", flexDirection: "column", background: "#09090B" }}>
       {/* Header */}
-      <div className="relative px-5 pt-4 pb-3 bg-gradient-to-b from-primary/8 to-transparent">
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-3 min-w-0">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={onClose}
-              className="text-muted-foreground hover:text-foreground shrink-0 h-9 w-9 -ml-2"
-            >
-              <X className="w-5 h-5" />
-            </Button>
-            <div className="min-w-0">
-              <h3 className="font-bold text-foreground text-sm truncate">{workout.name}</h3>
-              <div className="flex items-center gap-2 mt-0.5">
-                <Clock className="w-3 h-3 text-primary" />
-                <span className="text-xs text-primary font-mono font-semibold tabular-nums">{formatTime(elapsedTime)}</span>
+      <div style={{ padding: "16px 16px 12px", background: "#18181B", borderBottom: "1px solid rgba(255,255,255,0.08)", flexShrink: 0 }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 12, minWidth: 0 }}>
+            <button onClick={onClose} style={{ width: 36, height: 36, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: "50%", background: "rgba(255,255,255,0.06)", border: "none", cursor: "pointer", flexShrink: 0, color: "rgba(255,255,255,0.6)" }}>
+              <X style={{ width: 18, height: 18 }} />
+            </button>
+            <div style={{ minWidth: 0 }}>
+              <h3 style={{ fontSize: 14, fontWeight: 800, color: "#FAFAFA", margin: 0, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{workout.name}</h3>
+              <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 2 }}>
+                <Clock style={{ width: 12, height: 12, color: "#10B981" }} />
+                <span style={{ fontSize: 12, color: "#10B981", fontFamily: "monospace", fontWeight: 700 }}>{formatTime(elapsedTime)}</span>
+                <span style={{ color: "rgba(255,255,255,0.2)" }}>|</span>
+                <span style={{ fontSize: 12, color: "rgba(255,255,255,0.4)" }}>{currentExerciseIndex + 1}/{totalExercises}</span>
               </div>
             </div>
           </div>
-          <div className="flex items-center gap-2">
-            <div className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-primary/10 border border-primary/20">
-              <Target className="w-3 h-3 text-primary" />
-              <span className="text-xs font-bold text-primary">{currentExerciseIndex + 1}/{totalExercises}</span>
-            </div>
+          <div style={{ display: "flex", alignItems: "center", gap: 6, padding: "4px 10px", borderRadius: 20, background: "rgba(16,185,129,0.12)", border: "1px solid rgba(16,185,129,0.25)" }}>
+            <Target style={{ width: 12, height: 12, color: "#10B981" }} />
+            <span style={{ fontSize: 11, fontWeight: 800, color: "#10B981" }}>{currentExerciseIndex + 1}/{totalExercises}</span>
           </div>
         </div>
-
-        {/* Exercise Progress Bar */}
-        <div className="flex gap-1">
+        {/* Progress bars */}
+        <div style={{ display: "flex", gap: 4 }}>
           {workout.exercises.map((_: any, idx: number) => {
             const exName = workout.exercises[idx].name
-            const exSets = parseInt(workout.exercises[idx].sets) || 3
             const exCompleted = completedSets[exName]?.every(Boolean) ?? false
             const isCurrent = idx === currentExerciseIndex
             return (
               <div
                 key={idx}
-                className={`h-1 rounded-full transition-all duration-500 ${
-                  exCompleted
-                    ? "flex-1 bg-primary"
-                    : isCurrent
-                    ? "flex-[2] bg-primary/50"
-                    : "flex-1 bg-muted-foreground/15"
-                }`}
+                style={{
+                  height: 3,
+                  borderRadius: 2,
+                  flex: exCompleted ? 1 : isCurrent ? 2 : 1,
+                  background: exCompleted ? "#10B981" : isCurrent ? "rgba(16,185,129,0.3)" : "rgba(255,255,255,0.08)",
+                  transition: "all 0.5s ease",
+                }}
               />
             )
           })}
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className="flex-1 overflow-y-auto px-5 pt-4 pb-44 md:pb-28">
+      {/* Scrollable Content */}
+      <div style={{ flex: 1, overflowY: "auto", padding: "20px 16px 180px" }}>
         {/* Exercise Title */}
-        <div className="mb-5">
-          <h2 className="text-2xl md:text-3xl font-black text-foreground leading-tight tracking-tight">
-            {currentExercise.name}
-          </h2>
-          <div className="flex items-center gap-4 mt-2">
-            <span className="text-xs font-semibold text-muted-foreground">
-              {parseInt(currentExercise.sets) || 3} {t("aw_sets") || "séries"}
-            </span>
-            <span className="text-xs font-semibold text-muted-foreground">
-              {currentExercise.reps} {t("aw_reps")}
-            </span>
+        <div style={{ marginBottom: 20 }}>
+          <h2 style={{ fontSize: 26, fontWeight: 900, color: "#FAFAFA", margin: 0, lineHeight: 1.2 }}>{currentExercise.name}</h2>
+          <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 8 }}>
+            <span style={{ fontSize: 12, color: "rgba(255,255,255,0.45)", fontWeight: 700 }}>{parseInt(currentExercise.sets) || 3} Séries</span>
+            <span style={{ fontSize: 12, color: "rgba(255,255,255,0.45)", fontWeight: 700 }}>{currentExercise.reps} Reps</span>
           </div>
         </div>
 
         {/* Stats Widget */}
-        <div className="grid grid-cols-3 gap-2 mb-6">
-          <div className="bg-gradient-to-br from-primary/10 to-primary/5 rounded-2xl p-3 border border-primary/10">
-            <div className="flex items-center gap-1.5 mb-1">
-              <Zap className="w-3.5 h-3.5 text-primary" />
-              <span className="text-[10px] font-bold text-primary uppercase tracking-wider">{t("aw_sets") || "Séries"}</span>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8, marginBottom: 24 }}>
+          {/* Sets */}
+          <div style={{ borderRadius: 16, padding: 14, background: "rgba(16,185,129,0.10)", border: "1px solid rgba(16,185,129,0.18)" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 6 }}>
+              <Zap style={{ width: 14, height: 14, color: "#10B981" }} />
+              <span style={{ fontSize: 10, fontWeight: 800, color: "#10B981", textTransform: "uppercase", letterSpacing: "0.08em" }}>Séries</span>
             </div>
-            <span className="text-xl font-black text-foreground">{completedCount}<span className="text-sm font-bold text-muted-foreground">/{exerciseSets}</span></span>
+            <span style={{ fontSize: 22, fontWeight: 900, color: "#FAFAFA" }}>{completedCount}<span style={{ fontSize: 14, color: "rgba(255,255,255,0.35)" }}>/{exerciseSets}</span></span>
           </div>
-          <div className="bg-gradient-to-br from-orange-500/10 to-orange-500/5 rounded-2xl p-3 border border-orange-500/10">
-            <div className="flex items-center gap-1.5 mb-1">
-              <Flame className="w-3.5 h-3.5 text-orange-500" />
-              <span className="text-[10px] font-bold text-orange-500 uppercase tracking-wider">RPE</span>
+          {/* RPE */}
+          <div style={{ borderRadius: 16, padding: 14, background: "rgba(249,115,22,0.10)", border: "1px solid rgba(249,115,22,0.18)" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 6 }}>
+              <Flame style={{ width: 14, height: 14, color: "#F97316" }} />
+              <span style={{ fontSize: 10, fontWeight: 800, color: "#F97316", textTransform: "uppercase", letterSpacing: "0.08em" }}>RPE</span>
             </div>
-            <span className="text-xl font-black text-foreground">{rpeValues[currentExercise.name] || "—"}<span className="text-sm font-bold text-muted-foreground">/10</span></span>
+            <span style={{ fontSize: 22, fontWeight: 900, color: "#FAFAFA" }}>{rpeValues[currentExercise.name] || "—"}<span style={{ fontSize: 14, color: "rgba(255,255,255,0.35)" }}>/10</span></span>
           </div>
-          <div className="bg-gradient-to-br from-blue-500/10 to-blue-500/5 rounded-2xl p-3 border border-blue-500/10">
-            <div className="flex items-center gap-1.5 mb-1">
-              <Timer className="w-3.5 h-3.5 text-blue-500" />
-              <span className="text-[10px] font-bold text-blue-500 uppercase tracking-wider">{t("aw_rest")}</span>
+          {/* Rest */}
+          <div style={{ borderRadius: 16, padding: 14, background: "rgba(59,130,246,0.10)", border: "1px solid rgba(59,130,246,0.18)" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 6 }}>
+              <Timer style={{ width: 14, height: 14, color: "#3B82F6" }} />
+              <span style={{ fontSize: 10, fontWeight: 800, color: "#3B82F6", textTransform: "uppercase", letterSpacing: "0.08em" }}>Descanso</span>
             </div>
-            <span className="text-xl font-black text-foreground">60<span className="text-sm font-bold text-muted-foreground">s</span></span>
+            <span style={{ fontSize: 22, fontWeight: 900, color: "#FAFAFA" }}>60<span style={{ fontSize: 14, color: "rgba(255,255,255,0.35)" }}>s</span></span>
           </div>
         </div>
 
         {/* Sets List */}
-        <div className="space-y-3">
-          {currentExerciseSets.map((isCompleted, idx) => (
+        <div style={{ marginBottom: 16 }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10, padding: "0 4px" }}>
+            <span style={{ fontSize: 11, fontWeight: 800, color: "rgba(255,255,255,0.35)", textTransform: "uppercase", letterSpacing: "0.1em" }}>Séries</span>
+            <span style={{ fontSize: 11, color: "rgba(255,255,255,0.35)" }}>{completedCount}/{exerciseSets}</span>
+          </div>
+          {currentExerciseSets.map((isCompleted: boolean, idx: number) => (
             <div
               key={idx}
-              className={`relative rounded-2xl border transition-all duration-500 overflow-hidden ${
-                isCompleted
-                  ? "border-primary/20 bg-gradient-to-r from-primary/8 to-primary/3"
-                  : "border-border/50 bg-card"
-              }`}
+              style={{
+                padding: 14,
+                borderRadius: 16,
+                marginBottom: 8,
+                border: isCompleted ? "1px solid rgba(16,185,129,0.25)" : "1px solid rgba(255,255,255,0.07)",
+                background: isCompleted ? "rgba(16,185,129,0.08)" : "#18181B",
+                transition: "all 0.3s ease",
+              }}
             >
-              {/* Completed glow */}
-              {isCompleted && (
-                <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-primary/10 to-primary/5 animate-in fade-in duration-700" />
-              )}
+              <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+                {/* Set Number / Check Button */}
+                <button
+                  onClick={() => handleSetComplete(idx)}
+                  disabled={isCompleted}
+                  style={{
+                    width: 44,
+                    height: 44,
+                    borderRadius: 12,
+                    border: "none",
+                    cursor: isCompleted ? "default" : "pointer",
+                    background: isCompleted ? "#10B981" : "rgba(255,255,255,0.06)",
+                    color: isCompleted ? "#FFFFFF" : "rgba(255,255,255,0.4)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    flexShrink: 0,
+                    transition: "all 0.3s ease",
+                    boxShadow: isCompleted ? "0 4px 16px rgba(16,185,129,0.3)" : "none",
+                  }}
+                >
+                  {isCompleted ? (
+                    <Check style={{ width: 22, height: 22, strokeWidth: 3 }} />
+                  ) : (
+                    <span style={{ fontSize: 16, fontWeight: 900 }}>{idx + 1}</span>
+                  )}
+                </button>
 
-              <div className="relative p-4">
-                <div className="flex items-center gap-4">
-                  {/* Set Number Circle */}
-                  <button
-                    onClick={() => handleSetComplete(idx)}
-                    disabled={isCompleted}
-                    className={`
-                      w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-500 shrink-0
-                      ${isCompleted
-                        ? "bg-primary text-primary-foreground shadow-lg shadow-primary/30 scale-100"
-                        : "bg-muted/60 text-muted-foreground hover:bg-primary/15 hover:text-primary hover:scale-105 active:scale-95"
-                      }
-                    `}
-                  >
-                    {isCompleted ? (
-                      <Check className="w-6 h-6" strokeWidth={3} />
-                    ) : (
-                      <span className="text-base font-black">{idx + 1}</span>
-                    )}
-                  </button>
-
-                  {/* Rep Counter Widget */}
-                  <div className="flex-1 flex items-center justify-between">
-                    <div>
-                      <span className={`text-sm font-bold block ${isCompleted ? "text-primary" : "text-foreground"}`}>
-                        {t("aw_set")} {idx + 1}
-                      </span>
-                      <span className={`text-xs ${isCompleted ? "text-primary/60" : "text-muted-foreground"}`}>
-                        {isCompleted ? t("aw_done") : currentExercise.reps + " " + t("aw_reps")}
-                      </span>
+                {/* Set Info + Rep Counter */}
+                <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                  <div>
+                    <div style={{ fontSize: 14, fontWeight: 700, color: isCompleted ? "#10B981" : "#FAFAFA" }}>Série {idx + 1}</div>
+                    <div style={{ fontSize: 11, color: isCompleted ? "rgba(16,185,129,0.6)" : "rgba(255,255,255,0.35)", marginTop: 2 }}>
+                      {isCompleted ? "Concluída" : `${currentExercise.reps} reps`}
                     </div>
+                  </div>
 
-                    {!isCompleted && (
-                      <div className="flex items-center gap-1">
-                        <button
-                          onClick={(e) => { e.stopPropagation(); updateRepCount(idx, -1) }}
-                          className="w-8 h-8 rounded-lg bg-muted/80 hover:bg-muted flex items-center justify-center transition-colors active:scale-90"
-                        >
-                          <Minus className="w-3.5 h-3.5 text-muted-foreground" />
-                        </button>
-                        <span className="w-10 text-center text-lg font-black text-foreground tabular-nums">
-                          {getRepCount(idx)}
-                        </span>
-                        <button
-                          onClick={(e) => { e.stopPropagation(); updateRepCount(idx, 1) }}
-                          className="w-8 h-8 rounded-lg bg-muted/80 hover:bg-muted flex items-center justify-center transition-colors active:scale-90"
-                        >
-                          <Plus className="w-3.5 h-3.5 text-muted-foreground" />
-                        </button>
-                      </div>
-                    )}
-
-                    {isCompleted && (
+                  {!isCompleted ? (
+                    <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
                       <button
-                        onClick={() => {
-                          const newSets = [...currentExerciseSets]
-                          newSets[idx] = false
-                          setCompletedSets({ ...completedSets, [currentExercise.name]: newSets })
+                        onClick={(e) => { e.stopPropagation(); updateRepCount(idx, -1) }}
+                        style={{
+                          width: 32,
+                          height: 32,
+                          borderRadius: 8,
+                          background: "rgba(255,255,255,0.06)",
+                          border: "1px solid rgba(255,255,255,0.08)",
+                          color: "rgba(255,255,255,0.5)",
+                          cursor: "pointer",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
                         }}
-                        className="px-3 py-1.5 rounded-lg bg-primary/10 text-primary text-xs font-bold hover:bg-primary/20 transition-colors"
                       >
-                        {t("aw_undo") || "Desfazer"}
+                        <Minus style={{ width: 14, height: 14 }} />
                       </button>
-                    )}
-                  </div>
+                      <span style={{ width: 36, textAlign: "center", fontWeight: 900, color: "#FAFAFA", fontSize: 17, fontVariantNumeric: "tabular-nums" }}>
+                        {getRepCount(idx)}
+                      </span>
+                      <button
+                        onClick={(e) => { e.stopPropagation(); updateRepCount(idx, 1) }}
+                        style={{
+                          width: 32,
+                          height: 32,
+                          borderRadius: 8,
+                          background: "rgba(255,255,255,0.06)",
+                          border: "1px solid rgba(255,255,255,0.08)",
+                          color: "rgba(255,255,255,0.5)",
+                          cursor: "pointer",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                        }}
+                      >
+                        <Plus style={{ width: 14, height: 14 }} />
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => {
+                        const newSets = [...currentExerciseSets]
+                        newSets[idx] = false
+                        setCompletedSets({ ...completedSets, [currentExercise.name]: newSets })
+                      }}
+                      style={{ padding: "6px 12px", borderRadius: 8, background: "rgba(16,185,129,0.12)", color: "#10B981", fontSize: 11, fontWeight: 700, border: "none", cursor: "pointer" }}
+                    >
+                      {t("aw_undo") || "Desfazer"}
+                    </button>
+                  )}
                 </div>
-
-                {/* Progress indicator bar */}
-                {!isCompleted && (
-                  <div className="mt-3 h-1 bg-muted/50 rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-gradient-to-r from-primary/40 to-primary/20 rounded-full transition-all duration-300"
-                      style={{ width: `${((idx + 1) / exerciseSets) * 100}%` }}
-                    />
-                  </div>
-                )}
               </div>
             </div>
           ))}
@@ -386,78 +384,93 @@ export function ActiveWorkoutSession({ workout, onClose, onComplete }: ActiveWor
         {/* Search Button */}
         <button
           onClick={() => window.open(`https://www.google.com/search?q=${encodeURIComponent(getSearchTerm())}`, '_blank')}
-          className="w-full mt-5 flex items-center justify-center gap-2 py-3 rounded-xl border border-border/40 text-muted-foreground hover:text-primary hover:border-primary/30 hover:bg-primary/5 transition-all text-sm font-semibold"
+          style={{
+            width: "100%",
+            padding: "12px 16px",
+            borderRadius: 14,
+            border: "1px solid rgba(255,255,255,0.07)",
+            background: "transparent",
+            color: "rgba(255,255,255,0.35)",
+            fontSize: 13,
+            fontWeight: 600,
+            cursor: "pointer",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 8,
+          }}
         >
-          <Search className="w-4 h-4" />
+          <Search style={{ width: 16, height: 16 }} />
           {t("aw_search_google")}
         </button>
       </div>
 
       {/* Rest Timer Overlay */}
       {isResting && (
-        <div className="fixed inset-0 z-40 bg-background/90 backdrop-blur-xl flex flex-col items-center justify-center p-6 animate-in fade-in duration-300">
-          <div className="text-center space-y-8">
-            <span className="text-sm font-bold text-muted-foreground uppercase tracking-[0.2em]">{t("aw_rest")}</span>
+        <div style={{ position: "fixed", inset: 0, zIndex: 60, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", background: "rgba(0,0,0,0.94)", backdropFilter: "blur(24px)" }}>
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 32 }}>
+            <span style={{ fontSize: 12, fontWeight: 800, color: "rgba(255,255,255,0.35)", textTransform: "uppercase", letterSpacing: "0.15em" }}>Descanso</span>
 
-            {/* Circular Timer */}
-            <div className="relative w-48 h-48 mx-auto">
-              <svg className="w-full h-full -rotate-90" viewBox="0 0 200 200">
-                <circle cx="100" cy="100" r="90" fill="none" stroke="currentColor" strokeWidth="6" className="text-muted/30" />
+            {/* Big Timer Ring */}
+            <div style={{ position: "relative", width: 200, height: 200 }}>
+              <svg style={{ width: "100%", height: "100%", transform: "rotate(-90deg)" }} viewBox="0 0 200 200">
+                <circle cx="100" cy="100" r="90" fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="6" />
                 <circle
-                  cx="100" cy="100" r="90" fill="none" stroke="currentColor" strokeWidth="6"
+                  cx="100" cy="100" r="90" fill="none" strokeWidth="6"
+                  stroke="#10B981"
                   strokeDasharray={2 * Math.PI * 90}
                   strokeDashoffset={2 * Math.PI * 90 * (1 - restTimer / 60)}
-                  className="text-primary transition-all duration-1000 ease-linear"
-                  strokeLinecap="round"
+                  style={{ transition: "stroke-dashoffset 1s linear", strokeLinecap: "round" }}
                 />
               </svg>
-              <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <span className="text-6xl font-black text-foreground font-mono tabular-nums">
+              <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
+                <span style={{ fontSize: 72, fontWeight: 900, color: "#FAFAFA", fontFamily: "monospace", fontVariantNumeric: "tabular-nums", lineHeight: 1 }}>
                   {restTimer}
                 </span>
-                <span className="text-xs text-muted-foreground uppercase tracking-widest font-semibold mt-1">segundos</span>
+                <span style={{ fontSize: 11, color: "rgba(255,255,255,0.3)", textTransform: "uppercase", marginTop: 4, letterSpacing: "0.1em", fontWeight: 600 }}>segundos</span>
               </div>
             </div>
 
             {/* Next Exercise Preview */}
             {currentExerciseIndex < totalExercises - 1 && (
-              <div className="bg-card/50 rounded-2xl border border-border/30 p-4 max-w-xs mx-auto">
-                <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">{t("aw_next")}</span>
-                <p className="text-sm font-bold text-foreground mt-1 truncate">
+              <div style={{ padding: "12px 20px", borderRadius: 16, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.06)", textAlign: "center", maxWidth: 280 }}>
+                <span style={{ fontSize: 10, fontWeight: 800, color: "rgba(255,255,255,0.3)", textTransform: "uppercase", letterSpacing: "0.1em" }}>Próximo</span>
+                <p style={{ fontSize: 13, fontWeight: 700, color: "#FAFAFA", marginTop: 4, margin: "4px 0 0", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                   {workout.exercises[currentExerciseIndex + 1].name}
                 </p>
               </div>
             )}
 
-            {/* Action Buttons */}
-            <div className="flex gap-3 max-w-xs mx-auto">
-              <Button
-                variant="outline"
-                className="flex-1 h-12 rounded-xl border-border/50 font-semibold"
+            {/* Buttons */}
+            <div style={{ display: "flex", gap: 12, width: "100%", maxWidth: 280 }}>
+              <button
                 onClick={() => setRestTimer(prev => prev + 10)}
+                style={{ flex: 1, height: 48, borderRadius: 14, border: "1px solid rgba(255,255,255,0.1)", background: "transparent", color: "#FAFAFA", fontSize: 14, fontWeight: 600, cursor: "pointer" }}
               >
                 +10s
-              </Button>
-              <Button
-                className="flex-1 h-12 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 font-bold shadow-lg shadow-primary/25"
+              </button>
+              <button
                 onClick={() => setIsResting(false)}
+                style={{ flex: 1, height: 48, borderRadius: 14, border: "none", background: "#10B981", color: "#FFFFFF", fontSize: 14, fontWeight: 700, cursor: "pointer", boxShadow: "0 4px 20px rgba(16,185,129,0.3)" }}
               >
-                {t("aw_skip")}
-              </Button>
+                Pular
+              </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* Bottom Bar - RPE + Next */}
+      {/* Bottom Bar — RPE + Next */}
       {isExerciseComplete && !isResting && (
-        <div className="fixed bottom-0 left-0 right-0 z-30 p-4 pb-[max(1rem,env(safe-area-inset-bottom))] bg-background/80 backdrop-blur-2xl border-t border-border/30 animate-in slide-in-from-bottom duration-300">
-          <div className="max-w-lg mx-auto space-y-3">
+        <div style={{ position: "fixed", bottom: 0, left: 0, right: 0, zIndex: 40, padding: "16px 16px calc(16px + env(safe-area-inset-bottom, 0px))", background: "#18181B", borderTop: "1px solid rgba(255,255,255,0.08)", backdropFilter: "blur(16px)" }}>
+          <div style={{ maxWidth: 480, margin: "0 auto", display: "flex", flexDirection: "column", gap: 12 }}>
             {/* RPE Slider */}
-            <div className="bg-card rounded-2xl border border-border/40 p-4">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-bold text-foreground">{t("aw_rpe")}</span>
-                <span className="text-lg font-black text-primary tabular-nums">{rpeValues[currentExercise.name] || 5}<span className="text-xs font-bold text-muted-foreground">/10</span></span>
+            <div style={{ padding: 16, borderRadius: 16, border: "1px solid rgba(255,255,255,0.07)", background: "#0F0F12" }}>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
+                <span style={{ fontSize: 14, fontWeight: 700, color: "#FAFAFA" }}>RPE</span>
+                <span style={{ fontWeight: 900, fontVariantNumeric: "tabular-nums", color: "#10B981", fontSize: 18 }}>
+                  {rpeValues[currentExercise.name] || 5}<span style={{ fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,0.35)" }}>/10</span>
+                </span>
               </div>
               <input
                 type="range"
@@ -465,25 +478,25 @@ export function ActiveWorkoutSession({ workout, onClose, onComplete }: ActiveWor
                 max="10"
                 value={rpeValues[currentExercise.name] || 5}
                 onChange={(e) => setRpeValues({...rpeValues, [currentExercise.name]: parseInt(e.target.value)})}
-                className="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer accent-primary"
+                style={{ width: "100%", height: 8, borderRadius: 4, accentColor: "#10B981" }}
               />
-              <div className="flex justify-between mt-1.5 text-[10px] text-muted-foreground uppercase tracking-wider font-semibold">
-                <span>{t("aw_easy")}</span>
-                <span>{t("aw_max")}</span>
+              <div style={{ display: "flex", justifyContent: "space-between", marginTop: 6 }}>
+                <span style={{ fontSize: 10, color: "rgba(255,255,255,0.3)", textTransform: "uppercase", letterSpacing: "0.1em", fontWeight: 600 }}>Fácil</span>
+                <span style={{ fontSize: 10, color: "rgba(255,255,255,0.3)", textTransform: "uppercase", letterSpacing: "0.1em", fontWeight: 600 }}>Máximo</span>
               </div>
             </div>
 
             {/* Next Button */}
-            <Button
-              className="w-full h-14 text-base font-bold bg-primary text-primary-foreground hover:bg-primary/90 rounded-2xl shadow-xl shadow-primary/25"
+            <button
               onClick={handleNextExercise}
+              style={{ width: "100%", height: 56, borderRadius: 16, border: "none", background: "#10B981", color: "#FFFFFF", fontSize: 16, fontWeight: 700, cursor: "pointer", boxShadow: "0 4px 24px rgba(16,185,129,0.3)", display: "flex", alignItems: "center", justifyContent: "center", gap: 4 }}
             >
               {currentExerciseIndex < totalExercises - 1 ? (
-                <>{t("aw_next")} <ChevronRight className="w-5 h-5 ml-1" /></>
+                <>Próximo exercício <ChevronRight style={{ width: 20, height: 20 }} /></>
               ) : (
-                <>{t("aw_finish")} <Trophy className="w-5 h-5 ml-1" /></>
+                <>Finalizar <Trophy style={{ width: 20, height: 20 }} /></>
               )}
-            </Button>
+            </button>
           </div>
         </div>
       )}

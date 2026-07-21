@@ -291,11 +291,11 @@ export function MobilityRoutines({
       <motion.div
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
-        className="rounded-2xl border border-border bg-card p-6"
+        className="rounded-2xl border border-border glass-strong p-6"
       >
         <div className="flex flex-col items-center text-center py-8 space-y-4">
-          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-muted">
-            <Lock className="h-6 w-6 text-muted-foreground" />
+          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-brand/10">
+            <Lock className="h-6 w-6 text-brand" />
           </div>
           <div>
             <h3 className="text-lg font-semibold text-foreground">
@@ -307,7 +307,7 @@ export function MobilityRoutines({
           </div>
           <Button
             onClick={onUnlock}
-            className="bg-primary text-primary-foreground hover:bg-primary/90"
+            className="bg-brand text-white hover:bg-brand/90"
           >
             {(isEnglish ? "Unlock Pro" : "Desbloquear Pro")}
           </Button>
@@ -320,13 +320,13 @@ export function MobilityRoutines({
     <motion.div
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
-      className="rounded-2xl border border-border bg-card p-5"
+      className="rounded-2xl border border-border glass-strong p-5"
     >
       {/* Header */}
       <div className="flex items-center justify-between mb-5">
         <div className="flex items-center gap-2.5">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/10">
-            <Activity className="h-4 w-4 text-primary" />
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand/10">
+            <Activity className="h-4 w-4 text-brand" />
           </div>
           <div>
             <h3 className="text-sm font-semibold text-foreground">
@@ -354,13 +354,13 @@ export function MobilityRoutines({
                 <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">
                   {currentRoutine?.name || ""}
                 </span>
-                <span className="text-[10px] text-primary">
+                <span className="text-[10px] text-brand">
                   {activeExercise + 1}/{filteredExercises.length}
                 </span>
               </div>
               <div className="h-1.5 bg-muted rounded-full overflow-hidden">
                 <motion.div
-                  className="h-full bg-primary rounded-full"
+                  className="h-full bg-brand rounded-full"
                   animate={{ width: `${getProgress()}%` }}
                   transition={{ duration: 0.3 }}
                 />
@@ -395,7 +395,7 @@ export function MobilityRoutines({
               <p className="text-xs text-muted-foreground">
                 {currentExercise.instructions}
               </p>
-              <p className="text-[10px] text-primary mt-1.5">
+              <p className="text-[10px] text-brand mt-1.5">
                 Target: {currentExercise.targetArea}
               </p>
             </div>
@@ -448,12 +448,12 @@ export function MobilityRoutines({
               </button>
               <button
                 onClick={toggleTimer}
-                className="h-12 w-12 rounded-xl bg-primary flex items-center justify-center hover:bg-primary/90 transition-colors"
+                  className="h-12 w-12 rounded-xl bg-brand flex items-center justify-center hover:bg-brand/90 transition-colors"
               >
                 {isRunning ? (
-                  <Pause className="h-5 w-5 text-primary-foreground" />
+                  <Pause className="h-5 w-5 text-white" />
                 ) : (
-                  <Play className="h-5 w-5 text-primary-foreground" />
+                  <Play className="h-5 w-5 text-white" />
                 )}
               </button>
               <button
@@ -482,8 +482,8 @@ export function MobilityRoutines({
                   onClick={() => setSelectedArea(null)}
                   className={`px-2.5 py-1.5 rounded-lg text-[11px] font-medium transition-all border ${
                     selectedArea === null
-                      ? "bg-primary text-primary-foreground border-primary"
-                      : "bg-card text-muted-foreground border-border hover:border-primary/30"
+                      ? "bg-brand text-white border-brand"
+                      : "bg-card text-muted-foreground border-border hover:border-brand/30"
                   }`}
                 >
                   All
@@ -496,8 +496,8 @@ export function MobilityRoutines({
                     }
                     className={`px-2.5 py-1.5 rounded-lg text-[11px] font-medium transition-all border ${
                       selectedArea === area.id
-                        ? "bg-primary text-primary-foreground border-primary"
-                        : "bg-card text-muted-foreground border-border hover:border-primary/30"
+                        ? "bg-brand text-white border-brand"
+                        : "bg-card text-muted-foreground border-border hover:border-brand/30"
                     }`}
                   >
                     {area.label}
@@ -555,7 +555,7 @@ export function MobilityRoutines({
                           </span>
                         ))}
                         {routine.exercises.length > 3 && (
-                          <span className="px-1.5 py-0.5 rounded bg-muted text-[9px] text-primary">
+                           <span className="px-1.5 py-0.5 rounded bg-brand-muted text-[9px] text-brand">
                             +{routine.exercises.length - 3}
                           </span>
                         )}
@@ -565,7 +565,7 @@ export function MobilityRoutines({
                       onClick={() => startRoutine(routine.id)}
                       disabled={exerciseCount === 0}
                       size="sm"
-                      className="h-8 text-[11px] bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-40"
+                      className="h-8 text-[11px] bg-brand text-white hover:bg-brand/90 disabled:opacity-40"
                     >
                       Start
                     </Button>

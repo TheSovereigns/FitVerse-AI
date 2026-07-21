@@ -231,13 +231,13 @@ export function EquipmentSelector({
     <motion.div
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
-      className="rounded-2xl border border-border bg-card p-5"
+      className="rounded-2xl border border-border glass-strong p-5"
     >
       {/* Header */}
       <div className="flex items-center justify-between mb-5">
         <div className="flex items-center gap-2.5">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/10">
-            <Dumbbell className="h-4 w-4 text-primary" />
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand/10">
+            <Dumbbell className="h-4 w-4 text-brand" />
           </div>
           <div>
             <h3 className="text-sm font-semibold text-foreground">
@@ -265,21 +265,21 @@ export function EquipmentSelector({
               whileTap={{ scale: 0.95 }}
               className={`relative p-3 rounded-xl border text-left transition-all ${
                 isSelected
-                  ? "border-primary bg-primary/5"
-                  : "border-border bg-card hover:border-primary/30"
+                  ? "border-brand bg-brand/5"
+                  : "border-border glass-strong hover:border-brand/30"
               }`}
             >
               {isSelected && (
                 <div className="absolute top-1.5 right-1.5">
-                  <div className="h-4 w-4 rounded-full bg-primary flex items-center justify-center">
-                    <Check className="h-2.5 w-2.5 text-primary-foreground" />
+                  <div className="h-4 w-4 rounded-full bg-brand flex items-center justify-center">
+                    <Check className="h-2.5 w-2.5 text-white" />
                   </div>
                 </div>
               )}
               <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-muted mb-2">
                 <Icon
                   className={`h-4 w-4 ${
-                    isSelected ? "text-primary" : "text-muted-foreground"
+                    isSelected ? "text-brand" : "text-muted-foreground"
                   }`}
                 />
               </div>
@@ -313,7 +313,7 @@ export function EquipmentSelector({
             </span>
           ))}
           {availableExercises.length > 12 && (
-            <span className="px-2 py-1 rounded-lg bg-muted text-[11px] text-primary">
+            <span className="px-2 py-1 rounded-lg bg-brand-muted text-[11px] text-brand">
               +{availableExercises.length - 12} more
             </span>
           )}

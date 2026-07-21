@@ -129,11 +129,11 @@ export function HealthCheckin({ isLocked = false }: { isLocked?: boolean }) {
       <motion.div
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
-        className="rounded-2xl border border-border bg-card p-5"
+        className="rounded-2xl border border-border glass-strong p-5"
       >
         <div className="flex items-center gap-2.5 mb-3">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-500/10">
-            <ClipboardCheck className="h-4 w-4 text-emerald-500" />
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-muted">
+            <ClipboardCheck className="h-4 w-4 text-brand" />
           </div>
           <div>
             <h3 className="text-sm font-semibold text-foreground">{isEnglish ? "Health Check-in" : "Check-in de Saude"}</h3>
@@ -153,11 +153,11 @@ export function HealthCheckin({ isLocked = false }: { isLocked?: boolean }) {
     <motion.div
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
-      className="rounded-2xl border border-border bg-card p-5"
+      className="rounded-2xl border border-border glass-strong p-5"
     >
       <div className="flex items-center gap-2.5 mb-4">
-        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-500/10">
-          <ClipboardCheck className="h-4 w-4 text-emerald-500" />
+        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-muted">
+          <ClipboardCheck className="h-4 w-4 text-brand" />
         </div>
         <div>
           <h3 className="text-sm font-semibold text-foreground">{isEnglish ? "Health Check-in" : "Check-in de Saude"}</h3>
@@ -165,7 +165,7 @@ export function HealthCheckin({ isLocked = false }: { isLocked?: boolean }) {
         </div>
       </div>
 
-      <div className="flex items-center gap-2 mb-4 p-3 rounded-xl bg-muted/50">
+      <div className="flex items-center gap-2 mb-4 p-3 rounded-xl bg-brand-muted">
         <div className="text-center flex-1">
           <p className="text-2xl font-bold text-foreground">{totalScore}</p>
           <p className="text-[10px] text-muted-foreground">{isEnglish ? "Weekly Score" : "Score Semanal"}</p>
@@ -238,7 +238,7 @@ export function HealthCheckin({ isLocked = false }: { isLocked?: boolean }) {
         </div>
       )}
 
-      <div className="mt-4 flex items-start gap-2 p-3 rounded-xl bg-muted/50">
+      <div className="mt-4 flex items-start gap-2 p-3 rounded-xl bg-brand-muted">
         <Lightbulb className="h-4 w-4 text-yellow-500 mt-0.5 shrink-0" />
         <div>
           <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider mb-0.5">

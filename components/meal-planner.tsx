@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import { useState, useMemo, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import {
   Calendar,
@@ -84,6 +84,21 @@ export function MealPlanner({ isLocked = false, onUpgrade, macros }: MealPlanner
   const [budgetLevel, setBudgetLevel] = useState<"low" | "medium" | "high">("medium")
   const [dietaryRestrictions, setDietaryRestrictions] = useState<string[]>([])
 
+  useEffect(() => {
+    try {
+      const savedMeals = localStorage.getItem("fitverse-weekly-meals")
+      if (savedMeals) {
+        const parsed = JSON.parse(savedMeals)
+        if (Array.isArray(parsed) && parsed.length > 0) setMealPlan(parsed)
+      }
+      const savedShopping = localStorage.getItem("fitverse-shopping-list")
+      if (savedShopping) {
+        const parsed = JSON.parse(savedShopping)
+        if (Array.isArray(parsed)) setShoppingList(parsed)
+      }
+    } catch {}
+  }, [])
+
   const generatePlan = async () => {
     setIsGenerating(true)
     try {
@@ -97,8 +112,44 @@ export function MealPlanner({ isLocked = false, onUpgrade, macros }: MealPlanner
         }),
       })
       const data = await res.json()
-      if (data.mealPlan) setMealPlan(data.mealPlan)
-      if (data.shoppingList) setShoppingList(data.shoppingList)
+
+      const mapMeal = (meals: any[], name: string): MealItem => {
+        const m = meals?.find((meal: any) => {
+          const lower = (meal.name || "").toLowerCase()
+          return lower.includes(name)
+        })
+        return m ? { name: m.name, calories: m.calories || 0, protein: m.protein || 0, carbs: m.carbs || 0, fat: m.fat || 0 } : { name, calories: 0, protein: 0, carbs: 0, fat: 0 }
+      }
+
+      if (data.week && Array.isArray(data.week)) {
+        const mapped: DayPlan[] = data.week.map((dayData: any) => ({
+          day: dayData.day,
+          breakfast: mapMeal(dayData.meals, "breakfast") || mapMeal(dayData.meals, "café") || mapMeal(dayData.meals, "manhã"),
+          lunch: mapMeal(dayData.meals, "lunch") || mapMeal(dayData.meals, "almoço"),
+          dinner: mapMeal(dayData.meals, "dinner") || mapMeal(dayData.meals, "jantar"),
+          snacks: mapMeal(dayData.meals, "snack") || mapMeal(dayData.meals, "lanche"),
+        }))
+        setMealPlan(mapped)
+        localStorage.setItem("fitverse-weekly-meals", JSON.stringify(mapped))
+      } else if (data.mealPlan && Array.isArray(data.mealPlan)) {
+        setMealPlan(data.mealPlan)
+        localStorage.setItem("fitverse-weekly-meals", JSON.stringify(data.mealPlan))
+      }
+
+      if (data.shoppingList) {
+        const mappedShopping: ShoppingItem[] = []
+        if (Array.isArray(data.shoppingList)) {
+          for (const cat of data.shoppingList) {
+            if (cat.items && Array.isArray(cat.items)) {
+              for (const item of cat.items) {
+                mappedShopping.push({ name: item.name || item.item || "", amount: item.quantity || item.amount || "", category: "other" })
+              }
+            }
+          }
+        }
+        setShoppingList(mappedShopping)
+        localStorage.setItem("fitverse-shopping-list", JSON.stringify(mappedShopping))
+      }
     } catch (err) {
       console.error("Failed to generate meal plan:", err)
     } finally {
@@ -150,9 +201,9 @@ export function MealPlanner({ isLocked = false, onUpgrade, macros }: MealPlanner
 
   if (isLocked) {
     return (
-      <div className="bg-card border border-border rounded-2xl p-8 flex flex-col items-center justify-center text-center gap-4">
-        <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center">
-          <Lock className="w-7 h-7 text-primary" />
+      <div className="glass-strong border border-border rounded-2xl p-8 flex flex-col items-center justify-center text-center gap-4">
+        <div className="w-14 h-14 rounded-2xl bg-brand/10 flex items-center justify-center">
+          <Lock className="w-7 h-7 text-brand" />
         </div>
         <h3 className="text-lg font-semibold text-foreground">Weekly Meal Planner</h3>
         <p className="text-sm text-muted-foreground max-w-xs">
@@ -166,10 +217,10 @@ export function MealPlanner({ isLocked = false, onUpgrade, macros }: MealPlanner
   }
 
   return (
-    <div className="bg-card border border-border rounded-2xl p-4 md:p-6 space-y-5">
+    <div className="glass-strong border border-border rounded-2xl p-4 md:p-6 space-y-5">
       <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
-          <Calendar className="w-5 h-5 text-primary" />
+        <div className="w-10 h-10 rounded-xl bg-brand/10 flex items-center justify-center">
+          <Calendar className="w-5 h-5 text-brand" />
         </div>
         <div>
           <h2 className="text-lg font-semibold text-foreground">Weekly Meal Planner</h2>
@@ -188,7 +239,7 @@ export function MealPlanner({ isLocked = false, onUpgrade, macros }: MealPlanner
                 className={cn(
                   "px-3 py-1.5 text-xs font-medium rounded-lg border transition-colors capitalize",
                   budgetLevel === level
-                    ? "bg-primary text-primary-foreground border-primary"
+                    ? "bg-brand text-white border-brand"
                     : "bg-transparent text-muted-foreground border-border hover:bg-muted"
                 )}
               >
@@ -286,7 +337,7 @@ export function MealPlanner({ isLocked = false, onUpgrade, macros }: MealPlanner
                                 </div>
                                 <button
                                   onClick={() => swapMeal(dayIdx, mealType)}
-                                  className="text-[10px] text-primary hover:underline"
+                                  className="text-[10px] text-brand hover:underline"
                                 >
                                   Swap
                                 </button>

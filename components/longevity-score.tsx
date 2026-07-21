@@ -224,12 +224,12 @@ export function LongevityScore() {
     <motion.div
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
-      className="rounded-2xl border border-border bg-card p-5"
+      className="rounded-2xl border border-border glass-strong p-5"
     >
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2.5">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-red-500/10">
-            <Heart className="h-4 w-4 text-red-500" />
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-muted">
+            <Heart className="h-4 w-4 text-brand" />
           </div>
           <div>
             <h3 className="text-sm font-semibold text-foreground">

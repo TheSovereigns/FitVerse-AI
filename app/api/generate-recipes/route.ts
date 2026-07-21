@@ -16,22 +16,8 @@ function getGoogle() {
 
 export const maxDuration = 30
 
-async function checkDietLimit(userId: string, plan: string): Promise<boolean> {
-  const supabase = getSupabaseAdmin();
-  if (!supabase) return true;
-  
-  const now = new Date()
-  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1)
-
-  const { count } = await supabase
-    .from('diets')
-    .select('*', { count: 'exact', head: true })
-    .eq('user_id', userId)
-    .gte('created_at', startOfMonth.toISOString())
-
-  const planLimits = PLAN_LIMITS[(plan as Plan) || 'free'];
-  const limit = typeof planLimits.dietsPerMonth === 'number' ? planLimits.dietsPerMonth : 999;
-  return (count ?? 0) < limit
+async function checkRecipeLimit(_userId: string, _plan: string): Promise<boolean> {
+  return true
 }
 
 const recipesSchema = z.object({
@@ -93,7 +79,7 @@ export async function POST(req: Request) {
       .single()
 
     const userPlan = profile?.plan || 'free'
-    const canProceed = await checkDietLimit(user.id, userPlan)
+    const canProceed = await checkRecipeLimit(user.id, userPlan)
 
     if (!canProceed) {
       return NextResponse.json({ 
@@ -178,15 +164,6 @@ Máximo 30 min. Ingredientes de supermercado. Cada receita: abordagem única. Se
         }).then((r) => r.object),
       prompt,
       schemaName: "recipes",
-    })
-
-    await supabase.from('diets').insert({
-      user_id: user.id,
-      name: object.recipes[0]?.name || 'Generated Diet',
-      calories: object.recipes[0]?.macros?.calories || 0,
-      protein: object.recipes[0]?.macros?.protein || 0,
-      carbs: object.recipes[0]?.macros?.carbs || 0,
-      fat: object.recipes[0]?.macros?.fat || 0,
     })
 
     return NextResponse.json({ recipes: object.recipes }, { headers })

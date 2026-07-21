@@ -148,7 +148,7 @@ export function GuidedMeditation({ isLocked = false }: GuidedMeditationProps) {
 
   if (isLocked) {
     return (
-      <div className="bg-card border border-border rounded-2xl p-6 relative overflow-hidden">
+      <div className="glass-strong border border-border rounded-2xl p-6 relative overflow-hidden">
         <div className="absolute inset-0 bg-muted/50 backdrop-blur-sm flex items-center justify-center z-10">
           <div className="text-center">
             <Lock className="w-10 h-10 mx-auto mb-2 text-muted-foreground" />
@@ -171,7 +171,7 @@ export function GuidedMeditation({ isLocked = false }: GuidedMeditationProps) {
   }
 
   return (
-    <div className="bg-card border border-border rounded-2xl p-6">
+    <div className="glass-strong border border-border rounded-2xl p-6">
       <h2 className="text-lg font-semibold text-foreground mb-4">Guided Meditation</h2>
 
       {!isActive && !selectedExercise && (
@@ -223,7 +223,7 @@ export function GuidedMeditation({ isLocked = false }: GuidedMeditationProps) {
           <div className="flex gap-2 justify-center">
             <button
               onClick={startExercise}
-              className="px-6 py-2 rounded-xl bg-foreground text-background text-sm font-medium"
+              className="px-6 py-2 rounded-xl bg-brand text-white text-sm font-medium"
             >
               <Play className="w-4 h-4 inline mr-1" />
               Start

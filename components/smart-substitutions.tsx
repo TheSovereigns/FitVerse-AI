@@ -73,9 +73,9 @@ export function SmartSubstitutions({ isLocked = false, onUpgrade }: SmartSubstit
 
   if (isLocked) {
     return (
-      <div className="bg-card border border-border rounded-2xl p-8 flex flex-col items-center justify-center text-center gap-4">
-        <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center">
-          <Lock className="w-7 h-7 text-primary" />
+      <div className="glass-strong border border-border rounded-2xl p-8 flex flex-col items-center justify-center text-center gap-4">
+        <div className="w-14 h-14 rounded-2xl bg-brand/10 flex items-center justify-center">
+          <Lock className="w-7 h-7 text-brand" />
         </div>
         <h3 className="text-lg font-semibold text-foreground">Smart Substitutions</h3>
         <p className="text-sm text-muted-foreground max-w-xs">
@@ -89,10 +89,10 @@ export function SmartSubstitutions({ isLocked = false, onUpgrade }: SmartSubstit
   }
 
   return (
-    <div className="bg-card border border-border rounded-2xl p-4 md:p-6 space-y-5">
+    <div className="glass-strong border border-border rounded-2xl p-4 md:p-6 space-y-5">
       <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
-          <ArrowLeftRight className="w-5 h-5 text-primary" />
+        <div className="w-10 h-10 rounded-xl bg-brand/10 flex items-center justify-center">
+          <ArrowLeftRight className="w-5 h-5 text-brand" />
         </div>
         <div>
           <h2 className="text-lg font-semibold text-foreground">Smart Substitutions</h2>
@@ -185,7 +185,7 @@ export function SmartSubstitutions({ isLocked = false, onUpgrade }: SmartSubstit
                     className={cn(
                       "border rounded-xl p-3 transition-colors cursor-pointer",
                       isSelected
-                        ? "bg-primary/10 border-primary/30"
+                        ? "bg-brand/10 border-brand/30"
                         : "bg-muted/30 border-border hover:bg-muted/50"
                     )}
                     onClick={() => selectSubstitution(sub)}
@@ -195,8 +195,8 @@ export function SmartSubstitutions({ isLocked = false, onUpgrade }: SmartSubstit
                         <div className="flex items-center gap-2">
                           <span className="text-sm font-medium text-foreground">{sub.name}</span>
                           {isSelected && (
-                            <div className="w-5 h-5 rounded-full bg-primary flex items-center justify-center shrink-0">
-                              <Check className="w-3 h-3 text-primary-foreground" />
+                            <div className="w-5 h-5 rounded-full bg-brand flex items-center justify-center shrink-0">
+                              <Check className="w-3 h-3 text-white" />
                             </div>
                           )}
                         </div>

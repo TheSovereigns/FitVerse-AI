@@ -191,11 +191,11 @@ export function DietaryRestrictions({ onRestrictionsChange }: DietaryRestriction
   }
 
   return (
-    <div className="bg-card border border-border rounded-2xl p-4 md:p-6 space-y-5">
+    <div className="glass-strong border border-border rounded-2xl p-4 md:p-6 space-y-5">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
-            <ShieldCheck className="w-5 h-5 text-primary" />
+          <div className="w-10 h-10 rounded-xl bg-brand/10 flex items-center justify-center">
+            <ShieldCheck className="w-5 h-5 text-brand" />
           </div>
           <div>
             <h2 className="text-lg font-semibold text-foreground">Dietary Restrictions</h2>
@@ -219,16 +219,16 @@ export function DietaryRestrictions({ onRestrictionsChange }: DietaryRestriction
               className={cn(
                 "relative flex flex-col items-start p-3 rounded-xl border text-left transition-colors",
                 isSelected
-                  ? "bg-primary/10 border-primary/30"
+                  ? "bg-brand/10 border-brand/30"
                   : "bg-muted/30 border-border hover:bg-muted/50"
               )}
             >
               {isSelected && (
-                <div className="absolute top-2 right-2 w-5 h-5 rounded-full bg-primary flex items-center justify-center">
-                  <Check className="w-3 h-3 text-primary-foreground" />
+                <div className="absolute top-2 right-2 w-5 h-5 rounded-full bg-brand flex items-center justify-center">
+                  <Check className="w-3 h-3 text-white" />
                 </div>
               )}
-              <Icon className={cn("w-4 h-4 mb-1.5", isSelected ? "text-primary" : "text-muted-foreground")} />
+              <Icon className={cn("w-4 h-4 mb-1.5", isSelected ? "text-brand" : "text-muted-foreground")} />
               <span className="text-xs font-medium text-foreground">{r.label}</span>
               <span className="text-[10px] text-muted-foreground mt-0.5">{r.description}</span>
               <button

@@ -187,11 +187,11 @@ export function PeriodizationEngine({
       <motion.div
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
-        className="rounded-2xl border border-border bg-card p-6"
+        className="rounded-2xl border border-border glass-strong p-6"
       >
         <div className="flex flex-col items-center text-center py-8 space-y-4">
-          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-muted">
-            <Lock className="h-6 w-6 text-muted-foreground" />
+          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-brand/10">
+            <Lock className="h-6 w-6 text-brand" />
           </div>
           <div>
             <h3 className="text-lg font-semibold text-foreground">
@@ -203,7 +203,7 @@ export function PeriodizationEngine({
           </div>
           <Button
             onClick={onUnlock}
-            className="bg-primary text-primary-foreground hover:bg-primary/90"
+            className="bg-brand text-white hover:bg-brand/90"
           >
             {isEnglish ? "Unlock Pro Feature" : "Desbloquear Recurso Pro"}
           </Button>
@@ -216,13 +216,13 @@ export function PeriodizationEngine({
     <motion.div
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
-      className="rounded-2xl border border-border bg-card p-5"
+      className="rounded-2xl border border-border glass-strong p-5"
     >
       {/* Header */}
       <div className="flex items-center justify-between mb-5">
         <div className="flex items-center gap-2.5">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/10">
-            <BarChart3 className="h-4 w-4 text-primary" />
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand/10">
+            <BarChart3 className="h-4 w-4 text-brand" />
           </div>
           <div>
             <h3 className="text-sm font-semibold text-foreground">
@@ -233,7 +233,7 @@ export function PeriodizationEngine({
             </p>
           </div>
         </div>
-        <span className="text-xs font-medium text-primary">
+        <span className="text-xs font-medium text-brand">
           {activePhase + 1}/{PHASES.length}
         </span>
       </div>
@@ -242,7 +242,7 @@ export function PeriodizationEngine({
       <div className="mb-5">
         <div className="h-1.5 bg-muted rounded-full overflow-hidden">
           <motion.div
-            className="h-full bg-primary rounded-full"
+            className="h-full bg-brand rounded-full"
             animate={{ width: `${getPhaseProgress()}%` }}
             transition={{ duration: 0.5 }}
           />
@@ -297,7 +297,7 @@ export function PeriodizationEngine({
                       </span>
                     )}
                     {isActive && (
-                      <span className="text-[10px] text-primary font-medium">
+                      <span className="text-[10px] text-brand font-medium">
                         Active
                       </span>
                     )}
@@ -337,7 +337,7 @@ export function PeriodizationEngine({
                     </motion.div>
                   )}
                 </div>
-                {isActive && <ChevronRight className="h-4 w-4 text-primary shrink-0 mt-2" />}
+                {isActive && <ChevronRight className="h-4 w-4 text-brand shrink-0 mt-2" />}
               </div>
             </motion.div>
           )
@@ -354,7 +354,7 @@ export function PeriodizationEngine({
             className="mb-5 overflow-hidden"
           >
             <div className="p-3 rounded-xl border border-border bg-muted/50">
-              <p className="text-[10px] font-medium text-primary uppercase tracking-wider mb-2">
+              <p className="text-[10px] font-medium text-brand uppercase tracking-wider mb-2">
                 AI Generated Workout — {PHASES[activePhase]!.name}
               </p>
               <ul className="space-y-1.5">
@@ -363,7 +363,7 @@ export function PeriodizationEngine({
                     key={i}
                     className="text-xs text-muted-foreground flex items-center gap-2"
                   >
-                    <span className="h-1 w-1 rounded-full bg-primary shrink-0" />
+                    <span className="h-1 w-1 rounded-full bg-brand shrink-0" />
                     {exercise}
                   </li>
                 ))}
@@ -385,7 +385,7 @@ export function PeriodizationEngine({
         <Button
           onClick={advancePhase}
           disabled={activePhase >= PHASES.length - 1}
-          className="flex-1 h-10 text-xs bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-40"
+          className="flex-1 h-10 text-xs bg-brand text-white hover:bg-brand/90 disabled:opacity-40"
         >
           {activePhase >= PHASES.length - 1
             ? isEnglish ? "Complete" : "Completar"

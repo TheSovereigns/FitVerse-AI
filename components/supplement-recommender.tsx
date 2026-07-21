@@ -81,11 +81,11 @@ export function SupplementRecommender({
       <motion.div
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
-        className="rounded-2xl border border-border bg-card p-5"
+        className="rounded-2xl border border-border glass-strong p-5"
       >
         <div className="flex items-center gap-2.5 mb-3">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-amber-500/10">
-            <Pill className="h-4 w-4 text-amber-500" />
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-muted">
+            <Pill className="h-4 w-4 text-brand" />
           </div>
           <div>
             <h3 className="text-sm font-semibold text-foreground">{isEnglish ? "Supplement Advisor" : "Assessor de Suplementos"}</h3>
@@ -105,11 +105,11 @@ export function SupplementRecommender({
     <motion.div
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
-      className="rounded-2xl border border-border bg-card p-5"
+      className="rounded-2xl border border-border glass-strong p-5"
     >
       <div className="flex items-center gap-2.5 mb-4">
-        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-amber-500/10">
-          <Pill className="h-4 w-4 text-amber-500" />
+        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-muted">
+          <Pill className="h-4 w-4 text-brand" />
         </div>
         <div>
           <h3 className="text-sm font-semibold text-foreground">{isEnglish ? "Supplement Advisor" : "Assessor de Suplementos"}</h3>
@@ -118,19 +118,19 @@ export function SupplementRecommender({
       </div>
 
       <div className="grid grid-cols-2 gap-2 mb-4 text-[10px]">
-        <div className="p-2 rounded-xl bg-muted/50">
+        <div className="p-2 rounded-xl bg-brand-muted">
           <p className="text-muted-foreground">{isEnglish ? "Goals" : "Objetivos"}</p>
           <p className="text-foreground font-medium truncate">{userGoals || (isEnglish ? "Not set" : "Nao definido")}</p>
         </div>
-        <div className="p-2 rounded-xl bg-muted/50">
+        <div className="p-2 rounded-xl bg-brand-muted">
           <p className="text-muted-foreground">{isEnglish ? "Diet" : "Dieta"}</p>
           <p className="text-foreground font-medium truncate">{dietaryRestrictions || (isEnglish ? "None" : "Nenhuma")}</p>
         </div>
-        <div className="p-2 rounded-xl bg-muted/50">
+        <div className="p-2 rounded-xl bg-brand-muted">
           <p className="text-muted-foreground">{isEnglish ? "Age" : "Idade"}</p>
           <p className="text-foreground font-medium">{age} {isEnglish ? "yrs" : "anos"}</p>
         </div>
-        <div className="p-2 rounded-xl bg-muted/50">
+        <div className="p-2 rounded-xl bg-brand-muted">
           <p className="text-muted-foreground">{isEnglish ? "Gender" : "Genero"}</p>
           <p className="text-foreground font-medium capitalize">{gender}</p>
         </div>

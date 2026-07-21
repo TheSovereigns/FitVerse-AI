@@ -65,7 +65,7 @@ export function HealthProfile({ scanHistory, onNavigateToSettings, onNavigateToS
   const [editName, setEditName] = useState("")
   const [isEditing, setIsEditing] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
-  
+
   const [profileData, setProfileData] = useState({
     age: null as number | null,
     weight: null as number | null,
@@ -262,7 +262,7 @@ export function HealthProfile({ scanHistory, onNavigateToSettings, onNavigateToS
   const distribution = getQualityDistribution()
   const streak = getStreak()
   const userSubscription = currentPlan || "free"
-  const scoreStroke = averageScore >= 70 ? "#34d399" : averageScore >= 40 ? "#f59e0b" : "#fb7185"
+  const scoreStroke = averageScore >= 70 ? "#34D399" : averageScore >= 40 ? "#FFD60A" : "#FF453A"
 
   const handleSubscriptionClick = () => {
     if (onNavigateToSubscription) {
@@ -273,34 +273,25 @@ export function HealthProfile({ scanHistory, onNavigateToSettings, onNavigateToS
   }
 
   return (
-    <div className="relative mx-auto w-full max-w-6xl space-y-5 pb-safe-nav animate-in fade-in duration-500 md:space-y-7">
-      <div className="pointer-events-none absolute inset-x-[-1rem] top-[-5rem] h-72 bg-[radial-gradient(circle_at_25%_10%,rgba(255,255,255,0.08),transparent_42%),radial-gradient(circle_at_88%_4%,rgba(255,255,255,0.04),transparent_36%)]" />
-
+    <div className="relative mx-auto w-full max-w-2xl space-y-5 pb-safe-nav md:space-y-6">
+      {/* Profile Header */}
       <motion.section
-        initial={{ opacity: 0, y: 18 }}
+        initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
-        className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-black/50 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_28px_90px_rgba(0,0,0,0.32)] backdrop-blur-2xl md:rounded-[2.5rem] md:p-6"
+        className="rounded-2xl glass-strong p-5 md:p-6"
       >
-        <div className="absolute inset-y-0 left-0 w-1.5 bg-gradient-to-b from-white/10 via-white/5 to-transparent" />
-        <div className="absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
-        <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(255,255,255,0.05),transparent_34%,rgba(255,255,255,0.03))]" />
-
-        <div className="relative grid gap-5 lg:grid-cols-[1fr_auto] lg:items-end">
-          <div className="flex items-start gap-4 md:gap-5">
+        <div className="flex items-start justify-between">
+          <div className="flex items-start gap-4">
             <motion.div
-              whileHover={{ rotate: 6, scale: 1.03 }}
-              className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-[1.4rem] border border-white/10 bg-white/10 text-foreground/60 shadow-xl md:h-20 md:w-20 md:rounded-[1.8rem]"
+              whileHover={{ scale: 1.03 }}
+              className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-brand/10 text-brand shadow-xl md:h-20 md:w-20"
             >
-              <User className="h-7 w-7 md:h-9 md:w-9" />
+              <User className="h-7 w-7 md:h-8 md:w-8" />
             </motion.div>
 
             <div className="min-w-0 flex-1">
-              <Badge className="mb-3 rounded-full border border-white/10 bg-white/10 px-3 py-1.5 text-[9px] font-black uppercase tracking-[0.24em] text-foreground/50">
-                FitVerse Profile
-              </Badge>
-
               {isEditing ? (
-                <div className="flex max-w-xl flex-col gap-2 sm:flex-row sm:items-center">
+                <div className="flex max-w-sm flex-col gap-2 sm:flex-row sm:items-center">
                   <Input
                     value={editName}
                     onChange={(e) => setEditName(e.target.value)}
@@ -308,22 +299,22 @@ export function HealthProfile({ scanHistory, onNavigateToSettings, onNavigateToS
                       if (e.key === "Enter") handleSaveName()
                       if (e.key === "Escape") handleCancelEdit()
                     }}
-                    className="h-12 rounded-2xl border-white/10 bg-black/35 text-xl font-black text-foreground focus-visible:ring-white/20"
+                    className="h-11 rounded-xl border-border bg-muted/50 text-lg font-bold text-foreground focus-visible:ring-brand"
                     autoFocus
                     disabled={isSaving}
                   />
                   <div className="flex gap-2">
-                    <Button size="icon" onClick={handleSaveName} disabled={isSaving} className="h-12 w-12 rounded-2xl bg-white/10 text-foreground hover:bg-white/20">
-                      <Check className="h-5 w-5" />
+                    <Button size="icon" onClick={handleSaveName} disabled={isSaving} className="h-11 w-11 rounded-xl bg-brand text-white hover:bg-brand/90">
+                      <Check className="h-4 w-4" />
                     </Button>
-                    <Button size="icon" variant="ghost" onClick={handleCancelEdit} className="h-12 w-12 rounded-2xl border border-white/10 bg-white/8 text-foreground/60 hover:bg-white/16">
-                      <X className="h-5 w-5" />
+                    <Button size="icon" variant="ghost" onClick={handleCancelEdit} className="h-11 w-11 rounded-xl border border-border text-muted-foreground hover:bg-muted">
+                      <X className="h-4 w-4" />
                     </Button>
                   </div>
                 </div>
               ) : (
                 <div className="flex min-w-0 items-center gap-2">
-                  <h1 className="truncate text-3xl font-black leading-none tracking-tight text-foreground md:text-5xl">
+                  <h1 className="truncate text-2xl font-bold text-foreground md:text-3xl">
                     {displayName}
                   </h1>
                   <Button
@@ -333,318 +324,295 @@ export function HealthProfile({ scanHistory, onNavigateToSettings, onNavigateToS
                       setEditName(displayName)
                       setIsEditing(true)
                     }}
-                    className="h-9 w-9 shrink-0 rounded-xl border border-white/10 bg-white/8 text-foreground/50 hover:bg-white/16 hover:text-foreground"
+                    className="h-8 w-8 shrink-0 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted"
                   >
-                    <Pencil className="h-4 w-4" />
+                    <Pencil className="h-3.5 w-3.5" />
                   </Button>
                 </div>
               )}
 
-              <div className="mt-3 flex min-w-0 items-center gap-2">
-                <Activity className="h-4 w-4 shrink-0 text-foreground/50" />
-                <p className="truncate text-xs font-black uppercase tracking-[0.18em] text-foreground/50 md:text-sm">
-                  {user?.email || ""}
-                </p>
+              <div className="mt-2 flex items-center gap-2">
+                <Activity className="h-3.5 w-3.5 text-muted-foreground" />
+                <p className="text-xs text-muted-foreground">{user?.email || ""}</p>
               </div>
             </div>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2 md:justify-end">
-            <div className="flex rounded-2xl border border-white/10 bg-black/30 p-1 backdrop-blur-xl">
-              {(["week", "month"] as const).map((period) => (
-                <button
-                  key={period}
-                  type="button"
-                  onClick={() => setSelectedPeriod(period)}
-                  className={cn(
-                    "min-h-11 rounded-xl px-4 text-[10px] font-black uppercase tracking-widest transition",
-                    selectedPeriod === period ? "bg-white/10 text-foreground shadow-lg" : "text-foreground/50 hover:text-foreground"
-                  )}
-                >
-                  {period === "week" ? t("profile_7cycles") : t("profile_30cycles")}
-                </button>
-              ))}
-            </div>
+          <div className="flex items-center gap-2">
             <Button
               variant="ghost"
               size="icon"
               onClick={onNavigateToSettings}
-              className="h-12 w-12 rounded-2xl border border-white/10 bg-white/8 text-foreground/60 hover:bg-white/16"
+              className="h-10 w-10 rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted"
             >
-              <Settings className="h-5 w-5" />
+              <Settings className="h-4 w-4" />
             </Button>
             <Button
               variant="ghost"
               size="icon"
               onClick={signOut}
-              className="h-12 w-12 rounded-2xl border border-red-300/18 bg-red-500/10 text-red-200 hover:bg-red-500/16"
+              className="h-10 w-10 rounded-xl text-destructive/70 hover:text-destructive hover:bg-destructive/10"
             >
-              <LogOut className="h-5 w-5" />
+              <LogOut className="h-4 w-4" />
             </Button>
           </div>
         </div>
       </motion.section>
 
-      {/* Profile Data Section */}
+      {/* Profile Data */}
       <motion.section
-        initial={{ opacity: 0, y: 18 }}
+        initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.1 }}
-        className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-black/48 p-5 shadow-xl backdrop-blur-2xl md:rounded-[2.5rem] md:p-6"
+        transition={{ delay: 0.05 }}
+        className="rounded-2xl glass-strong p-5 md:p-6"
       >
-        <div className="absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r from-white/10 via-white/5 to-transparent" />
-        <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-transparent" />
-        
-        <div className="relative">
-          <div className="mb-5 flex items-center justify-between gap-3">
-            <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-2xl border border-white/10 bg-white/10 text-foreground/60">
-                <User className="h-5 w-5" />
-              </div>
-              <div>
-                <h3 className="text-lg font-black uppercase tracking-tight text-foreground">
-                  {t("hp_my_data")}
-                </h3>
-                <p className="text-[10px] font-black uppercase tracking-[0.24em] text-foreground/50">
-                  {t("hp_personal_info")}
-                </p>
-              </div>
+        <div className="mb-4 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand/10 text-brand">
+              <User className="h-4 w-4" />
             </div>
-            {!isEditingProfile && (
-              <Button
-                size="icon"
-                variant="ghost"
-                onClick={handleStartEditProfile}
-                className="h-10 w-10 rounded-xl border border-white/10 bg-white/8 text-foreground/50 hover:bg-white/16 hover:text-foreground"
-              >
-                <Pencil className="h-4 w-4" />
-              </Button>
-            )}
+            <div>
+              <h3 className="text-sm font-semibold text-foreground">{t("hp_my_data")}</h3>
+              <p className="text-[10px] text-muted-foreground">{t("hp_personal_info")}</p>
+            </div>
           </div>
-
-          {isEditingProfile ? (
-            <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
-              <div className="space-y-2">
-                <label className="text-[10px] font-black uppercase tracking-[0.2em] text-foreground/50">
-                  {t("hp_age")}
-                </label>
-                <Input
-                  type="number"
-                  value={editProfileData.age}
-                  onChange={(e) => setEditProfileData({ ...editProfileData, age: e.target.value })}
-                  className="h-12 rounded-xl border-white/10 bg-white/5 text-foreground"
-                  min={10}
-                  max={120}
-                />
-              </div>
-              <div className="space-y-2">
-                <label className="text-[10px] font-black uppercase tracking-[0.2em] text-foreground/50">
-                  {t("hp_weight_kg")}
-                </label>
-                <Input
-                  type="number"
-                  value={editProfileData.weight}
-                  onChange={(e) => setEditProfileData({ ...editProfileData, weight: e.target.value })}
-                  className="h-12 rounded-xl border-white/10 bg-white/5 text-foreground"
-                  min={20}
-                  max={300}
-                  step={0.1}
-                />
-              </div>
-              <div className="space-y-2">
-                <label className="text-[10px] font-black uppercase tracking-[0.2em] text-foreground/50">
-                  {t("hp_height_cm")}
-                </label>
-                <Input
-                  type="number"
-                  value={editProfileData.height}
-                  onChange={(e) => setEditProfileData({ ...editProfileData, height: e.target.value })}
-                  className="h-12 rounded-xl border-white/10 bg-white/5 text-foreground"
-                  min={100}
-                  max={250}
-                  step={0.1}
-                />
-              </div>
-              <div className="space-y-2">
-                <label className="text-[10px] font-black uppercase tracking-[0.2em] text-foreground/50">
-                  {t("hp_gender")}
-                </label>
-                <select
-                  value={editProfileData.gender}
-                  onChange={(e) => setEditProfileData({ ...editProfileData, gender: e.target.value })}
-                  className="flex h-12 w-full rounded-xl border border-white/10 bg-white/5 px-3 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/50"
-                >
-                  <option value="">{t("hp_select")}</option>
-                  <option value="male">{t("hp_male")}</option>
-                  <option value="female">{t("hp_female")}</option>
-                  <option value="other">{t("hp_other")}</option>
-                </select>
-              </div>
-              <div className="space-y-2">
-                <label className="text-[10px] font-black uppercase tracking-[0.2em] text-foreground/50">
-                  {t("hp_goal")}
-                </label>
-                <select
-                  value={editProfileData.fitness_goal}
-                  onChange={(e) => setEditProfileData({ ...editProfileData, fitness_goal: e.target.value })}
-                  className="flex h-12 w-full rounded-xl border border-white/10 bg-white/5 px-3 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/50"
-                >
-                  <option value="">{t("hp_select")}</option>
-                  <option value="lose_weight">{t("hp_lose_weight")}</option>
-                  <option value="gain_muscle">{t("hp_gain_muscle")}</option>
-                  <option value="maintain">{t("hp_maintain")}</option>
-                  <option value="improve_health">{t("hp_improve_health")}</option>
-                </select>
-              </div>
-              <div className="flex items-end gap-2">
-                <Button
-                  onClick={handleSaveProfile}
-                  disabled={isSavingProfile}
-                  className="h-12 flex-1 rounded-xl bg-primary text-sm font-black text-white hover:bg-primary/80"
-                >
-                  <Check className="h-4 w-4 mr-2" />
-                  {isSavingProfile ? "..." : t("hp_save")}
-                </Button>
-                <Button
-                  onClick={() => setIsEditingProfile(false)}
-                  variant="ghost"
-                  className="h-12 rounded-xl border border-white/10 bg-white/8 text-foreground/60 hover:bg-white/16"
-                >
-                  <X className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
-          ) : (
-            <div className="grid grid-cols-2 gap-3 md:grid-cols-5">
-              {[
-                { icon: Calendar, label: t("hp_age"), value: profileData.age ? `${profileData.age} ${t("hp_years")}` : "—" },
-                { icon: Scale, label: t("hp_weight"), value: profileData.weight ? `${profileData.weight} kg` : "—" },
-                { icon: Ruler, label: t("hp_height"), value: profileData.height ? `${profileData.height} cm` : "—" },
-                { icon: User, label: t("hp_gender"), value: getGenderLabel(profileData.gender) || "—" },
-                { icon: Target, label: t("hp_goal"), value: getGoalLabel(profileData.fitness_goal) || "—" },
-              ].map((item) => (
-                <div key={item.label} className="rounded-2xl border border-white/10 bg-white/5 p-3">
-                  <item.icon className="h-4 w-4 text-foreground/40" />
-                  <p className="mt-2 text-lg font-black text-foreground">{item.value}</p>
-                  <p className="text-[9px] font-black uppercase tracking-[0.2em] text-foreground/40">{item.label}</p>
-                </div>
-              ))}
-            </div>
+          {!isEditingProfile && (
+            <Button
+              size="icon"
+              variant="ghost"
+              onClick={handleStartEditProfile}
+              className="h-9 w-9 rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted"
+            >
+              <Pencil className="h-3.5 w-3.5" />
+            </Button>
           )}
         </div>
+
+        {isEditingProfile ? (
+          <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
+            <div className="space-y-1.5">
+              <label className="text-[10px] text-muted-foreground">{t("hp_age")}</label>
+              <Input
+                type="number"
+                value={editProfileData.age}
+                onChange={(e) => setEditProfileData({ ...editProfileData, age: e.target.value })}
+                className="h-10 rounded-xl border-border bg-muted/50 text-sm"
+                min={10}
+                max={120}
+              />
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-[10px] text-muted-foreground">{t("hp_weight_kg")}</label>
+              <Input
+                type="number"
+                value={editProfileData.weight}
+                onChange={(e) => setEditProfileData({ ...editProfileData, weight: e.target.value })}
+                className="h-10 rounded-xl border-border bg-muted/50 text-sm"
+                min={20}
+                max={300}
+                step={0.1}
+              />
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-[10px] text-muted-foreground">{t("hp_height_cm")}</label>
+              <Input
+                type="number"
+                value={editProfileData.height}
+                onChange={(e) => setEditProfileData({ ...editProfileData, height: e.target.value })}
+                className="h-10 rounded-xl border-border bg-muted/50 text-sm"
+                min={100}
+                max={250}
+                step={0.1}
+              />
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-[10px] text-muted-foreground">{t("hp_gender")}</label>
+              <select
+                value={editProfileData.gender}
+                onChange={(e) => setEditProfileData({ ...editProfileData, gender: e.target.value })}
+                className="flex h-10 w-full rounded-xl border border-border bg-muted/50 px-3 text-sm text-foreground outline-none focus:ring-2 focus:ring-brand/50"
+              >
+                <option value="">{t("hp_select")}</option>
+                <option value="male">{t("hp_male")}</option>
+                <option value="female">{t("hp_female")}</option>
+                <option value="other">{t("hp_other")}</option>
+              </select>
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-[10px] text-muted-foreground">{t("hp_goal")}</label>
+              <select
+                value={editProfileData.fitness_goal}
+                onChange={(e) => setEditProfileData({ ...editProfileData, fitness_goal: e.target.value })}
+                className="flex h-10 w-full rounded-xl border border-border bg-muted/50 px-3 text-sm text-foreground outline-none focus:ring-2 focus:ring-brand/50"
+              >
+                <option value="">{t("hp_select")}</option>
+                <option value="lose_weight">{t("hp_lose_weight")}</option>
+                <option value="gain_muscle">{t("hp_gain_muscle")}</option>
+                <option value="maintain">{t("hp_maintain")}</option>
+                <option value="improve_health">{t("hp_improve_health")}</option>
+              </select>
+            </div>
+            <div className="flex items-end gap-2">
+              <Button
+                onClick={handleSaveProfile}
+                disabled={isSavingProfile}
+                className="h-10 flex-1 rounded-xl bg-brand text-sm font-semibold text-white hover:bg-brand/90"
+              >
+                <Check className="h-4 w-4 mr-2" />
+                {isSavingProfile ? "..." : t("hp_save")}
+              </Button>
+              <Button
+                onClick={() => setIsEditingProfile(false)}
+                variant="ghost"
+                className="h-10 rounded-xl border border-border text-muted-foreground hover:bg-muted"
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 gap-3 md:grid-cols-5">
+            {[
+              { icon: Calendar, label: t("hp_age"), value: profileData.age ? `${profileData.age} ${t("hp_years")}` : "—" },
+              { icon: Scale, label: t("hp_weight"), value: profileData.weight ? `${profileData.weight} kg` : "—" },
+              { icon: Ruler, label: t("hp_height"), value: profileData.height ? `${profileData.height} cm` : "—" },
+              { icon: User, label: t("hp_gender"), value: getGenderLabel(profileData.gender) || "—" },
+              { icon: Target, label: t("hp_goal"), value: getGoalLabel(profileData.fitness_goal) || "—" },
+            ].map((item) => (
+              <div key={item.label} className="rounded-xl bg-muted/30 p-3">
+                <item.icon className="h-3.5 w-3.5 text-muted-foreground" />
+                <p className="mt-2 text-sm font-bold text-foreground">{item.value}</p>
+                <p className="text-[9px] text-muted-foreground">{item.label}</p>
+              </div>
+            ))}
+          </div>
+        )}
       </motion.section>
 
-      <section className="grid gap-4 lg:grid-cols-[0.95fr_1.05fr]">
-        <motion.div
-          whileHover={{ y: -3 }}
-          className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-black/48 p-5 shadow-xl backdrop-blur-2xl md:p-6"
-        >
-          <div className="absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r from-white/10 via-white/5 to-transparent" />
-          <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-transparent" />
-          <div className="relative flex h-full flex-col justify-between gap-7">
-            <div className="flex items-start justify-between gap-4">
-              <div className="flex items-center gap-4">
-                <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-white/10 bg-white/10 text-foreground/60">
-                  <Crown className="h-7 w-7" />
-                </div>
-                <div>
-                  <p className="text-[10px] font-black uppercase tracking-[0.26em] text-foreground/50">
-                    {userSubscription === "free" ? t("subscription_free_label") : t("subscription_premium_label")}
-                  </p>
-                  <h2 className="mt-1 text-3xl font-black tracking-tight text-foreground">{userSubscription.toUpperCase()}</h2>
-                </div>
+      {/* Stats Row */}
+      <motion.section
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1 }}
+        className="grid gap-4 lg:grid-cols-[0.95fr_1.05fr]"
+      >
+        {/* Subscription Card */}
+        <div className="rounded-2xl glass-strong p-5">
+          <div className="flex items-start justify-between">
+            <div className="flex items-center gap-3">
+              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-brand/10 text-brand">
+                <Crown className="h-5 w-5" />
               </div>
-              <ShieldCheck className="h-6 w-6 text-foreground/50" />
+              <div>
+                <p className="text-[10px] text-muted-foreground">
+                  {userSubscription === "free" ? t("subscription_free_label") : t("subscription_premium_label")}
+                </p>
+                <h2 className="text-xl font-bold text-foreground">{userSubscription.toUpperCase()}</h2>
+              </div>
             </div>
-
-            <Button
-              onClick={handleSubscriptionClick}
-              className="h-12 rounded-2xl bg-white/10 text-sm font-black uppercase tracking-[0.16em] text-foreground shadow-[0_14px_34px_rgba(255,255,255,0.08)] hover:bg-white/20"
-            >
-              {userSubscription === "free" ? t("subscription_upgrade") : t("subscription_manage")}
-              <Zap className="ml-2 h-4 w-4" />
-            </Button>
           </div>
-        </motion.div>
+          <Button
+            onClick={handleSubscriptionClick}
+            className="mt-4 h-11 w-full rounded-xl bg-brand text-sm font-semibold text-white hover:bg-brand/90"
+          >
+            {userSubscription === "free" ? t("subscription_upgrade") : t("subscription_manage")}
+            <Zap className="ml-2 h-4 w-4" />
+          </Button>
+        </div>
 
+        {/* Stats Cards */}
         <div className="grid grid-cols-3 gap-3">
-          <StatCard icon={Target} label={t("profile_avg_score")} value={averageScore} accent="score">
-            <div className="relative mx-auto mt-2 h-16 w-16 md:h-20 md:w-20">
+          <StatCard icon={Target} label={t("profile_avg_score")} value={averageScore}>
+            <div className="relative mx-auto mt-2 h-14 w-14 md:h-16 md:w-16">
               <svg className="h-full w-full -rotate-90">
-                <circle cx="50%" cy="50%" r="42%" fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="8" />
+                <circle cx="50%" cy="50%" r="42%" fill="none" stroke="currentColor" strokeWidth="6" className="text-border" />
                 <motion.circle
                   cx="50%"
                   cy="50%"
                   r="42%"
                   fill="none"
-                  stroke={scoreStroke}
-                  strokeWidth="8"
+                  stroke="currentColor"
+                  strokeWidth="6"
                   strokeLinecap="round"
                   strokeDasharray={220}
                   initial={{ strokeDashoffset: 220 }}
                   animate={{ strokeDashoffset: 220 - (220 * averageScore) / 100 }}
-                  transition={{ duration: 1.4, ease: "easeOut" }}
+                  transition={{ duration: 1.2, ease: "easeOut" }}
+                  className={averageScore >= 70 ? "text-brand" : averageScore >= 40 ? "text-warning" : "text-destructive"}
                 />
               </svg>
-              <div className="absolute inset-0 flex items-center justify-center text-xl font-black text-foreground md:text-2xl">{averageScore}</div>
+              <div className="absolute inset-0 flex items-center justify-center text-lg font-bold text-foreground">{averageScore}</div>
             </div>
           </StatCard>
-          <StatCard icon={TrendingUp} label={t("profile_streak")} value={streak} accent="streak" />
-          <StatCard icon={Sparkles} label={t("profile_total_scans")} value={distribution.total} accent="total" />
+          <StatCard icon={TrendingUp} label={t("profile_streak")} value={streak} />
+          <StatCard icon={Sparkles} label={t("profile_total_scans")} value={distribution.total} />
         </div>
-      </section>
+      </motion.section>
 
-      <section className="grid gap-4 md:grid-cols-3">
+      {/* Quality Distribution */}
+      <motion.section
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.15 }}
+        className="grid grid-cols-3 gap-3"
+      >
         {[
-          { label: "Healthy", value: distribution.healthy, icon: ShieldCheck },
-          { label: "Moderate", value: distribution.moderate, icon: Flame },
-          { label: "Risk", value: distribution.poor, icon: Activity },
+          { label: "Healthy", value: distribution.healthy, color: "bg-brand" },
+          { label: "Moderate", value: distribution.moderate, color: "bg-warning" },
+          { label: "Risk", value: distribution.poor, color: "bg-destructive" },
         ].map((item) => (
-          <div key={item.label} className="rounded-[1.5rem] border border-white/10 bg-black/38 p-4 shadow-xl backdrop-blur-2xl">
-            <div className="mb-3 flex items-center justify-between">
-              <item.icon className="h-5 w-5 text-foreground/60" />
-              <span className="text-2xl font-black text-foreground">{item.value}%</span>
+          <div key={item.label} className="rounded-xl glass-strong p-4">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-lg font-bold text-foreground">{item.value}%</span>
             </div>
-            <p className="text-[10px] font-black uppercase tracking-[0.24em] text-foreground/50">{item.label}</p>
-            <div className="mt-3 h-2 overflow-hidden rounded-full bg-white/5">
-              <div className="h-full rounded-full bg-white/30" style={{ width: `${item.value}%` }} />
+            <p className="text-[10px] text-muted-foreground mb-2">{item.label}</p>
+            <div className="h-1.5 overflow-hidden rounded-full bg-border">
+              <div className={`h-full rounded-full ${item.color}`} style={{ width: `${item.value}%` }} />
             </div>
           </div>
         ))}
-      </section>
+      </motion.section>
 
-      <section className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-black/42 p-4 shadow-xl backdrop-blur-2xl md:p-6">
-        <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-transparent" />
-        <div className="relative">
-          <div className="mb-5 flex items-center justify-between gap-3">
-            <div>
-              <h2 className="text-2xl font-black uppercase tracking-tight text-foreground md:text-3xl">{t("profile_history_title")}</h2>
-              <p className="mt-1 text-[10px] font-black uppercase tracking-[0.24em] text-foreground/50">{t("profile_history_sub")}</p>
-            </div>
-            <Button variant="ghost" className="h-10 rounded-2xl border border-white/10 bg-white/8 px-4 text-[10px] font-black uppercase tracking-widest text-foreground/60 hover:bg-white/16">
-              {t("profile_export")}
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </Button>
+      {/* Scan History */}
+      <motion.section
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.2 }}
+        className="rounded-2xl glass-strong p-5 md:p-6"
+      >
+        <div className="mb-4 flex items-center justify-between">
+          <div>
+            <h2 className="text-base font-semibold text-foreground">{t("profile_history_title")}</h2>
+            <p className="text-[10px] text-muted-foreground">{t("profile_history_sub")}</p>
           </div>
-          <ScanHistory items={localScanHistory} showAll />
+          <Button variant="ghost" className="h-9 rounded-lg px-3 text-xs text-muted-foreground hover:text-foreground">
+            {t("profile_export")}
+            <ArrowRight className="ml-1 h-3 w-3" />
+          </Button>
         </div>
-      </section>
+        <ScanHistory items={localScanHistory} showAll />
+      </motion.section>
 
-      <section className="rounded-[2rem] border border-white/10 bg-black/42 p-4 shadow-xl backdrop-blur-2xl md:p-6">
+      {/* Daily Summary */}
+      <motion.section
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.25 }}
+        className="rounded-2xl glass-strong p-5 md:p-6"
+      >
         <div className="mb-4 flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-2xl border border-white/10 bg-white/10 text-foreground/60">
-            <Activity className="h-5 w-5" />
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand/10 text-brand">
+            <Activity className="h-4 w-4" />
           </div>
           <div>
-            <h3 className="text-lg font-black uppercase tracking-tight text-foreground">{t("summary_title") || "Resumo do Dia"}</h3>
-            <p className="text-[10px] font-black uppercase tracking-[0.24em] text-foreground/50">FitVerse activity</p>
+            <h3 className="text-sm font-semibold text-foreground">{t("summary_title") || "Resumo do Dia"}</h3>
+            <p className="text-[10px] text-muted-foreground">FitVerse activity</p>
           </div>
         </div>
         <DailySummary />
-      </section>
+      </motion.section>
 
       <BodyEvolution />
-
       <WeeklyReport />
     </div>
   )
@@ -659,20 +627,15 @@ function StatCard({
   icon: React.ElementType
   label: string
   value: number
-  accent: string
   children?: React.ReactNode
 }) {
   return (
-    <motion.div
-      whileHover={{ y: -3 }}
-      className="relative min-h-[170px] overflow-hidden rounded-[1.5rem] border border-white/10 bg-black/42 p-3 text-center shadow-xl backdrop-blur-2xl md:p-4"
-    >
-      <div className="absolute inset-x-0 top-0 h-1 bg-white/20" />
-      <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-2xl border border-white/10 bg-white/10 text-foreground/60">
-        <Icon className="h-5 w-5" />
+    <div className="flex min-h-[150px] flex-col items-center justify-center rounded-xl glass-strong p-3 text-center">
+      <div className="mb-2 flex h-9 w-9 items-center justify-center rounded-xl bg-brand/10 text-brand">
+        <Icon className="h-4 w-4" />
       </div>
-      {children || <p className="mt-5 text-4xl font-black leading-none tracking-tight text-foreground md:text-5xl">{value}</p>}
-      <p className="mt-3 text-[8px] font-black uppercase tracking-[0.22em] text-foreground/50 md:text-[9px]">{label}</p>
-    </motion.div>
+      {children || <p className="mt-2 text-3xl font-bold text-foreground">{value}</p>}
+      <p className="mt-2 text-[9px] text-muted-foreground">{label}</p>
+    </div>
   )
 }

@@ -529,15 +529,18 @@ export async function POST(req: Request) {
       aiConfidence: analysis.aiConfidence ?? 70,
     };
 
-    // Save scan to database
-    await supabaseAdmin.from('scans').insert({
+    // Save scan to database (minimal - for limit tracking only)
+    const { data: scanRecord } = await supabaseAdmin.from('scans').insert({
       user_id: user.id,
       product_name: transformed.productName,
       score: transformed.longevityScore,
-      image_url: null,
-    });
+    }).select('id, created_at').single();
 
-    return NextResponse.json(transformed, { headers });
+    return NextResponse.json({
+      ...transformed,
+      scanId: scanRecord?.id || null,
+      scannedAt: scanRecord?.created_at || new Date().toISOString(),
+    }, { headers });
 
   } catch (error) {
     console.error('Erro na análise de produto:', error);

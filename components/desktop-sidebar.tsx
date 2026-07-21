@@ -42,10 +42,10 @@ export function DesktopSidebar({ currentView, onNavigate, isFeatureLocked }: Sid
   ]
 
   return (
-    <aside className="hidden md:flex flex-col w-16 fixed top-0 left-0 h-full bg-card z-50 border-r border-border overflow-hidden">
+    <aside className="hidden md:flex flex-col w-16 fixed top-0 left-0 h-full glass-strong z-50 border-r border-border overflow-hidden">
       <div className="p-3 flex items-center justify-center mb-4">
         <div className="w-9 h-9 rounded-xl bg-brand flex items-center justify-center">
-          <ScanLine className="w-4 h-4 text-brand-foreground" />
+          <ScanLine className="w-4 h-4 text-white" />
         </div>
       </div>
 

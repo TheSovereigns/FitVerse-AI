@@ -187,9 +187,6 @@ TODA saída em ${lang}. Técnico, específico, focado em resultados.`
     await supabase.from('workouts').insert({
       user_id: user.id,
       name: object.name || 'Generated Workout',
-      category: object.category || 'Força',
-      duration: object.duration || '30 min',
-      difficulty: object.difficulty || 'Intermediário',
     })
 
     return NextResponse.json({ workouts: [object] }, { headers })

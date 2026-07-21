@@ -2,11 +2,10 @@
 
 import { useRef, useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { useTranslation } from "@/lib/i18n"
-import { Box, Camera, ChevronRight, Scan, ShieldCheck, Sparkles, Upload, Barcode } from "lucide-react"
+import { Camera, ChevronRight, Scan, Upload, Barcode, Sparkles } from "lucide-react"
 import { BarcodeScanner } from "@/components/barcode-scanner"
 
 interface ScanDashboardProps {
@@ -28,41 +27,36 @@ export function ScanDashboard({ onScan, isScanning = false }: ScanDashboardProps
   }
 
   return (
-    <div className="relative mx-auto w-full max-w-3xl space-y-5 pb-safe-nav md:space-y-7">
-      <div className="pointer-events-none absolute inset-x-[-1rem] top-[-5rem] h-72 bg-[radial-gradient(circle_at_24%_10%,var(--muted-foreground),transparent_42%),radial-gradient(circle_at_86%_2%,var(--muted-foreground),transparent_36%)]" />
-
+    <div className="relative mx-auto w-full max-w-2xl space-y-6 pb-safe-nav">
+      {/* Header */}
       <motion.section
-        initial={{ opacity: 0, y: 18 }}
+        initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
-        className="relative overflow-hidden rounded-2xl border border-border bg-muted/50 p-5 shadow-sm md:rounded-2xl md:p-7"
+        className="pt-2"
       >
-        <div className="absolute inset-y-0 left-0 w-1.5 bg-gradient-to-b from-border via-border/50 to-border" />
-        <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(255,255,255,0.06),transparent_34%,rgba(255,255,255,0.04))]" />
-        <div className="relative flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-          <div>
-            <Badge className="mb-4 rounded-full border border-border bg-muted/50 px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.24em] text-foreground">
-              {t("scan_dashboard_neural")}
-            </Badge>
-            <h1 className="text-4xl font-black leading-none tracking-tight text-foreground md:text-6xl">
-              {t("scan_title")} <span className="text-primary">2.0</span>
-            </h1>
-            <p className="mt-4 max-w-2xl text-sm font-bold leading-relaxed text-muted-foreground md:text-base">
-              {t("scan_subtitle")}
-            </p>
-          </div>
-          <div className="grid grid-cols-2 gap-2 sm:w-[320px]">
-            <InfoPill icon={ShieldCheck} label="AI" value="Vision" />
-            <InfoPill icon={Sparkles} label="Mode" value="BioScan" />
-          </div>
+        <div className="flex items-center gap-2 mb-1">
+          <Sparkles className="h-4 w-4 text-brand" />
+          <span className="text-xs font-medium text-brand">AI Vision</span>
         </div>
+        <h1 className="text-3xl font-bold tracking-tight text-foreground md:text-4xl">
+          {t("scan_title")}
+        </h1>
+        <p className="mt-1 text-sm text-muted-foreground">
+          {t("scan_subtitle")}
+        </p>
       </motion.section>
 
+      {/* Scan Area */}
       <motion.div
-        whileHover={{ y: -3 }}
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.05 }}
         className={cn(
-          "relative min-h-[460px] overflow-hidden rounded-2xl border-2 bg-muted/50 p-5 shadow-sm transition md:min-h-[520px] md:rounded-2xl",
-          isDragging ? "border-border bg-muted/50" : "border-border hover:border-border",
-          isScanning && "ring-4 ring-border"
+          "relative min-h-[400px] overflow-hidden rounded-3xl border-2 transition-all duration-300 md:min-h-[460px]",
+          isDragging
+            ? "border-brand/40 bg-brand/5"
+            : "border-border glass-strong hover:border-brand/20",
+          isScanning && "ring-4 ring-brand/20 border-brand/30"
         )}
         onDragOver={(e) => {
           e.preventDefault()
@@ -75,41 +69,41 @@ export function ScanDashboard({ onScan, isScanning = false }: ScanDashboardProps
           if (e.dataTransfer.files?.[0]) onScan(e.dataTransfer.files[0])
         }}
       >
-        <div className="absolute inset-0 opacity-[0.14] [background-image:linear-gradient(var(--muted-foreground)_1px,transparent_1px),linear-gradient(90deg,var(--muted-foreground)_1px,transparent_1px)] [background-size:56px_56px]" />
-        <div className="absolute inset-0 bg-gradient-to-br from-border/5 via-transparent to-border/5" />
-
+        {/* Scan line animation */}
         {isScanning && (
           <div className="pointer-events-none absolute inset-0 z-20 overflow-hidden">
             <motion.div
               initial={{ y: "-20%" }}
               animate={{ y: "120%" }}
-              transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-              className="absolute inset-x-8 h-px bg-border shadow-sm"
+              transition={{ duration: 1.8, repeat: Infinity, ease: "linear" }}
+              className="absolute inset-x-8 h-px bg-brand shadow-[0_0_12px_rgba(52,211,153,0.4)]"
             />
           </div>
         )}
 
-        <div className="relative z-30 flex h-full min-h-[420px] flex-col items-center justify-center gap-7 text-center md:min-h-[480px]">
+        <div className="relative z-30 flex h-full min-h-[360px] flex-col items-center justify-center gap-6 text-center md:min-h-[420px]">
           <AnimatePresence mode="wait">
             {isScanning ? (
               <motion.div
                 key="scanning"
-                initial={{ opacity: 0, scale: 0.94 }}
+                initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 1.04 }}
-                className="flex flex-col items-center gap-6"
+                exit={{ opacity: 0, scale: 1.05 }}
+                className="flex flex-col items-center gap-5"
               >
                 <div className="relative">
-                  <Box className="h-24 w-24 text-primary md:h-32 md:w-32" />
+                  <div className="flex h-24 w-24 items-center justify-center rounded-3xl bg-brand/10">
+                    <Scan className="h-12 w-12 text-brand" />
+                  </div>
                   <motion.div
                     animate={{ rotate: 360 }}
-                    transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
-                    className="absolute inset-[-16%] rounded-full border-2 border-dashed border-border"
+                    transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+                    className="absolute inset-[-12%] rounded-full border-2 border-dashed border-brand/30"
                   />
                 </div>
                 <div>
-                  <h3 className="text-3xl font-black tracking-tight text-foreground md:text-4xl">{t("scan_bio_mapping")}</h3>
-                  <p className="mt-2 text-xs font-black uppercase tracking-[0.34em] text-muted-foreground">{t("scan_neural_mesh")}</p>
+                  <h3 className="text-xl font-bold text-foreground">{t("scan_bio_mapping")}</h3>
+                  <p className="mt-1 text-xs text-muted-foreground">{t("scan_neural_mesh")}</p>
                 </div>
               </motion.div>
             ) : (
@@ -117,44 +111,44 @@ export function ScanDashboard({ onScan, isScanning = false }: ScanDashboardProps
                 key="idle"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                className="flex w-full max-w-xl flex-col items-center gap-7"
+                className="flex w-full max-w-sm flex-col items-center gap-6"
               >
                 <button type="button" onClick={() => fileInputRef.current?.click()} className="group relative">
-                  <div className="flex h-32 w-32 items-center justify-center rounded-2xl border border-border bg-muted/50 shadow-sm transition group-hover:border-border group-hover:bg-muted/50 md:h-40 md:w-40">
-                    <Scan className="h-16 w-16 text-primary md:h-20 md:w-20" />
+                  <div className="flex h-28 w-28 items-center justify-center rounded-3xl bg-muted/50 transition group-hover:bg-brand/5 md:h-32 md:w-32">
+                    <Scan className="h-14 w-14 text-brand md:h-16 md:w-16" />
                   </div>
-                  <div className="absolute -bottom-3 -right-3 flex h-12 w-12 items-center justify-center rounded-2xl border border-border bg-foreground text-black shadow-sm">
-                    <Upload className="h-5 w-5" />
+                  <div className="absolute -bottom-1 -right-1 flex h-10 w-10 items-center justify-center rounded-xl bg-brand text-white shadow-lg shadow-brand/25">
+                    <Upload className="h-4 w-4" />
                   </div>
                 </button>
 
                 <div>
-                  <h3 className="text-3xl font-black tracking-tight text-foreground md:text-5xl">{t("scan_ready")}</h3>
-                  <p className="mx-auto mt-3 max-w-md text-base font-bold leading-relaxed text-muted-foreground">{t("scan_instruction")}</p>
+                  <h3 className="text-2xl font-bold tracking-tight text-foreground">{t("scan_ready")}</h3>
+                  <p className="mt-2 max-w-xs text-sm text-muted-foreground">{t("scan_instruction")}</p>
                 </div>
 
-                <div className="grid w-full gap-3 sm:grid-cols-3">
+                <div className="grid w-full grid-cols-3 gap-3">
                   <Button
-                    className="h-14 rounded-2xl bg-foreground text-sm font-black uppercase tracking-[0.16em] text-black shadow-sm hover:bg-muted/50"
+                    className="h-14 rounded-2xl bg-brand text-sm font-semibold text-white shadow-lg shadow-brand/25 hover:bg-brand/90"
                     onClick={() => cameraInputRef.current?.click()}
                   >
-                    <Camera className="mr-2 h-5 w-5" />
+                    <Camera className="mr-2 h-4 w-4" />
                     {t("scan_open_camera")}
                   </Button>
                   <Button
-                    variant="ghost"
-                    className="h-14 rounded-2xl border border-border bg-muted/50 text-sm font-black uppercase tracking-[0.16em] text-muted-foreground hover:bg-muted/50"
+                    variant="outline"
+                    className="h-14 rounded-2xl border-border bg-transparent text-sm font-medium text-foreground hover:bg-muted/50"
                     onClick={() => fileInputRef.current?.click()}
                   >
-                    <Upload className="mr-2 h-5 w-5" />
+                    <Upload className="mr-2 h-4 w-4" />
                     Upload
                   </Button>
                   <Button
-                    variant="ghost"
-                    className="h-14 rounded-2xl border border-border bg-muted/50 text-sm font-black uppercase tracking-[0.16em] text-muted-foreground hover:bg-muted/50"
+                    variant="outline"
+                    className="h-14 rounded-2xl border-border bg-transparent text-sm font-medium text-foreground hover:bg-muted/50"
                     onClick={() => setShowBarcodeScanner(true)}
                   >
-                    <Barcode className="mr-2 h-5 w-5" />
+                    <Barcode className="mr-2 h-4 w-4" />
                     Barcode
                   </Button>
                 </div>
@@ -167,26 +161,32 @@ export function ScanDashboard({ onScan, isScanning = false }: ScanDashboardProps
         <input type="file" ref={cameraInputRef} className="hidden" accept="image/*" capture="environment" onChange={handleFileSelect} />
       </motion.div>
 
-      <section className="rounded-2xl border border-border bg-muted/50 p-4 shadow-sm md:p-6">
+      {/* Recent Scans Placeholder */}
+      <motion.section
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1 }}
+        className="rounded-2xl glass-strong p-5"
+      >
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-2xl font-black tracking-tight text-foreground">{t("scan_history_title")}</h2>
-          <ChevronRight className="h-5 w-5 text-muted-foreground" />
+          <h2 className="text-base font-semibold text-foreground">{t("scan_history_title")}</h2>
+          <ChevronRight className="h-4 w-4 text-muted-foreground" />
         </div>
         <div className="space-y-3">
           {[1, 2].map((_, index) => (
-            <div key={index} className="flex items-center gap-4 rounded-xl border border-border bg-muted/50 p-3">
-              <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-muted/50 text-muted-foreground">
-                <Box className="h-7 w-7" />
+            <div key={index} className="flex items-center gap-3 rounded-xl bg-muted/50 p-3">
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-muted text-muted-foreground">
+                <Scan className="h-5 w-5" />
               </div>
               <div className="min-w-0 flex-1">
-                <p className="truncate text-base font-black text-foreground">BioScore #{2409 + index}</p>
-                <p className="mt-1 text-xs font-black uppercase tracking-widest text-muted-foreground">{t("scan_yesterday")} 14:05</p>
+                <p className="truncate text-sm font-medium text-foreground">BioScore #{2409 + index}</p>
+                <p className="text-xs text-muted-foreground">{t("scan_yesterday")} 14:05</p>
               </div>
-              <Badge className="rounded-full border border-border bg-muted/50 text-muted-foreground">{t("scan_good")}</Badge>
+              <span className="rounded-full bg-brand/10 px-2.5 py-1 text-xs font-medium text-brand">{t("scan_good")}</span>
             </div>
           ))}
         </div>
-      </section>
+      </motion.section>
 
       {showBarcodeScanner && (
         <BarcodeScanner
@@ -199,16 +199,6 @@ export function ScanDashboard({ onScan, isScanning = false }: ScanDashboardProps
           onClose={() => setShowBarcodeScanner(false)}
         />
       )}
-    </div>
-  )
-}
-
-function InfoPill({ icon: Icon, label, value }: { icon: React.ElementType; label: string; value: string }) {
-  return (
-    <div className="rounded-2xl border border-border bg-muted/50 p-3">
-      <Icon className="h-4 w-4 text-muted-foreground" />
-      <p className="mt-2 text-lg font-black text-foreground">{value}</p>
-      <p className="text-[11px] font-black uppercase tracking-widest text-muted-foreground">{label}</p>
     </div>
   )
 }

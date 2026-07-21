@@ -227,7 +227,7 @@ export function ChatbotTab() {
             <p className="mx-auto mt-4 max-w-md text-sm font-bold leading-relaxed text-foreground/50 md:text-base">
               {t("chatbot_pro_required") || "Faça upgrade para Pro ou Premium para acessar o coach IA."}
             </p>
-            <Button onClick={() => window.location.href = "/subscription"} className="mt-7 h-12 rounded-2xl bg-primary text-primary-foreground">
+            <Button onClick={() => window.location.href = "/subscription"} className="mt-7 h-12 rounded-2xl bg-brand text-white">
               {t("subscription_upgrade") || "Fazer Upgrade"}
             </Button>
           </div>
@@ -252,13 +252,13 @@ export function ChatbotTab() {
           <div key={msg.id} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
             <div className={`flex max-w-[80%] gap-2 ${msg.role === "user" ? "flex-row-reverse" : ""}`}>
               <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-xl ${
-                msg.role === "user" ? "bg-primary/20 text-primary" : "bg-muted text-muted-foreground"
+                msg.role === "user" ? "bg-brand/20 text-brand" : "bg-muted text-muted-foreground"
               }`}>
                 {msg.role === "user" ? <User className="h-4 w-4" /> : <Bot className="h-4 w-4" />}
               </div>
               <div className={`rounded-2xl px-4 py-3 ${
                 msg.role === "user"
-                  ? "bg-primary text-primary-foreground"
+                  ? "bg-brand text-white"
                   : "bg-muted text-foreground"
               }`}>
                 <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
@@ -313,7 +313,7 @@ export function ChatbotTab() {
           <Button
             onClick={sendMessage}
             disabled={!input.trim() || isLoading}
-            className="h-12 w-12 rounded-xl bg-primary text-primary-foreground"
+            className="h-12 w-12 rounded-xl bg-brand text-white"
           >
             <Send className="h-5 w-5" />
           </Button>

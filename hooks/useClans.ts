@@ -17,6 +17,8 @@ interface Clan {
   userRole?: string
   isMember?: boolean
   ownerName?: string
+  total_xp?: number
+  achievements?: string[]
 }
 
 interface ClanMember {

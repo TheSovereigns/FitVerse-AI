@@ -169,11 +169,11 @@ export function BiologicalAge({ isLocked = false }: { isLocked?: boolean }) {
       <motion.div
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
-        className="rounded-2xl border border-border bg-card p-5 relative overflow-hidden"
+        className="rounded-2xl border border-border glass-strong p-5 relative overflow-hidden"
       >
         <div className="flex items-center gap-2.5 mb-3">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-purple-500/10">
-            <Brain className="h-4 w-4 text-purple-500" />
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-muted">
+            <Brain className="h-4 w-4 text-brand" />
           </div>
           <div>
             <h3 className="text-sm font-semibold text-foreground">
@@ -185,7 +185,7 @@ export function BiologicalAge({ isLocked = false }: { isLocked?: boolean }) {
           </div>
         </div>
         <div className="rounded-xl border border-border p-8 text-center">
-          <Lock className="mx-auto mb-3 h-10 w-10 text-purple-500/30" />
+          <Lock className="mx-auto mb-3 h-10 w-10 text-brand/30" />
           <p className="text-sm font-medium text-foreground mb-1">
             {isEnglish ? "Upgrade to Premium" : "Faca upgrade para Premium"}
           </p>
@@ -203,12 +203,12 @@ export function BiologicalAge({ isLocked = false }: { isLocked?: boolean }) {
     <motion.div
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
-      className="rounded-2xl border border-border bg-card p-5"
+      className="rounded-2xl border border-border glass-strong p-5"
     >
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2.5">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-purple-500/10">
-            <Brain className="h-4 w-4 text-purple-500" />
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-muted">
+            <Brain className="h-4 w-4 text-brand" />
           </div>
           <div>
             <h3 className="text-sm font-semibold text-foreground">
@@ -315,7 +315,7 @@ export function BiologicalAge({ isLocked = false }: { isLocked?: boolean }) {
         </button>
       </div>
 
-      <Button onClick={handleCalculate} className="w-full h-10 rounded-xl bg-purple-500 hover:bg-purple-600 text-white font-semibold text-sm mb-4">
+      <Button onClick={handleCalculate} className="w-full h-10 rounded-xl bg-brand hover:bg-brand/90 text-white font-semibold text-sm mb-4">
         <Brain className="h-4 w-4 mr-1.5" />
         {isEnglish ? "Calculate" : "Calcular"}
       </Button>
@@ -389,7 +389,7 @@ export function BiologicalAge({ isLocked = false }: { isLocked?: boolean }) {
             variant="ghost"
             className="w-full h-8 rounded-xl text-xs font-medium text-muted-foreground mb-2"
           >
-            <Heart className="h-3 w-3 mr-1.5 text-purple-500" />
+            <Heart className="h-3 w-3 mr-1.5 text-brand" />
             {isEnglish ? "Recommendations" : "Recomendacoes"}
             {showRecommendations ? <ChevronUp className="h-3 w-3 ml-1" /> : <ChevronDown className="h-3 w-3 ml-1" />}
           </Button>
@@ -402,14 +402,14 @@ export function BiologicalAge({ isLocked = false }: { isLocked?: boolean }) {
                 exit={{ height: 0, opacity: 0 }}
                 className="overflow-hidden mb-4"
               >
-                <div className="rounded-xl border border-purple-500/15 bg-purple-500/5 p-3 space-y-2">
+                <div className="rounded-xl border border-brand/20 bg-brand-muted p-3 space-y-2">
                   {factors.filter((f) => f.impact > 0).map((factor) => (
                     <div key={factor.name}>
                       <p className="text-xs font-semibold text-foreground mb-1">{factor.name} (+{factor.impact} years)</p>
                       <ul className="space-y-0.5">
                         {(RECOMMENDATIONS[factor.name] || []).map((rec, i) => (
                           <li key={i} className="text-[10px] text-muted-foreground flex items-start gap-1.5">
-                            <span className="text-purple-500 mt-0.5">•</span>
+                            <span className="text-brand mt-0.5">•</span>
                             {rec}
                           </li>
                         ))}

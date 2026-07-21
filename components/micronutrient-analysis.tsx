@@ -78,9 +78,9 @@ export function MicronutrientAnalysis({ isLocked = false, onUpgrade, intakeData 
 
   if (isLocked) {
     return (
-      <div className="bg-card border border-border rounded-2xl p-8 flex flex-col items-center justify-center text-center gap-4">
-        <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center">
-          <Lock className="w-7 h-7 text-primary" />
+      <div className="glass-strong border border-border rounded-2xl p-8 flex flex-col items-center justify-center text-center gap-4">
+        <div className="w-14 h-14 rounded-2xl bg-brand/10 flex items-center justify-center">
+          <Lock className="w-7 h-7 text-brand" />
         </div>
         <h3 className="text-lg font-semibold text-foreground">Micronutrient Analysis</h3>
         <p className="text-sm text-muted-foreground max-w-xs">
@@ -94,10 +94,10 @@ export function MicronutrientAnalysis({ isLocked = false, onUpgrade, intakeData 
   }
 
   return (
-    <div className="bg-card border border-border rounded-2xl p-4 md:p-6 space-y-5">
+    <div className="glass-strong border border-border rounded-2xl p-4 md:p-6 space-y-5">
       <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
-          <Pill className="w-5 h-5 text-primary" />
+        <div className="w-10 h-10 rounded-xl bg-brand/10 flex items-center justify-center">
+          <Pill className="w-5 h-5 text-brand" />
         </div>
         <div>
           <h2 className="text-lg font-semibold text-foreground">Micronutrient Analysis</h2>

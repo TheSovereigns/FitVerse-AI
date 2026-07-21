@@ -115,7 +115,7 @@ export function SeasonSystem({}: SeasonSystemProps) {
   ];
 
   return (
-    <div className="bg-card border border-border rounded-2xl p-6">
+    <div className="glass-strong border border-border rounded-2xl p-6">
       <h2 className="text-lg font-semibold text-foreground mb-1">{currentSeason.name}</h2>
       <p className="text-sm text-muted-foreground mb-4">{currentSeason.description}</p>
 

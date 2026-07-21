@@ -129,7 +129,7 @@ export function RewardShop({ isLocked = false }: RewardShopProps) {
 
   if (isLocked) {
     return (
-      <div className="bg-card border border-border rounded-2xl p-6 relative overflow-hidden">
+      <div className="glass-strong border border-border rounded-2xl p-6 relative overflow-hidden">
         <div className="absolute inset-0 bg-muted/50 backdrop-blur-sm flex items-center justify-center z-10">
           <div className="text-center">
             <Lock className="w-10 h-10 mx-auto mb-2 text-muted-foreground" />
@@ -152,14 +152,14 @@ export function RewardShop({ isLocked = false }: RewardShopProps) {
   }
 
   return (
-    <div className="bg-card border border-border rounded-2xl p-6">
+    <div className="glass-strong border border-border rounded-2xl p-6">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
-          <ShoppingBag className="w-5 h-5 text-foreground" />
+          <ShoppingBag className="w-5 h-5 text-brand" />
           <h2 className="text-lg font-semibold text-foreground">Reward Shop</h2>
         </div>
-        <div className="flex items-center gap-1 px-3 py-1 rounded-xl bg-muted">
-          <Zap className="w-4 h-4 text-foreground" />
+        <div className="flex items-center gap-1 px-3 py-1 rounded-xl border-brand/20 bg-brand-muted">
+          <Zap className="w-4 h-4 text-brand" />
           <span className="text-sm font-medium text-foreground">{userXp} XP</span>
         </div>
       </div>
@@ -203,7 +203,7 @@ export function RewardShop({ isLocked = false }: RewardShopProps) {
                             disabled={!canAfford}
                             className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                               canAfford
-                                ? "bg-foreground text-background hover:opacity-90"
+                                ? "bg-brand text-white hover:bg-brand/90"
                                 : "bg-muted text-muted-foreground cursor-not-allowed"
                             }`}
                           >
@@ -232,7 +232,7 @@ export function RewardShop({ isLocked = false }: RewardShopProps) {
               initial={{ scale: 0.9 }}
               animate={{ scale: 1 }}
               exit={{ scale: 0.9 }}
-              className="bg-card border border-border rounded-2xl p-6 max-w-sm w-full"
+              className="glass-strong border border-border rounded-2xl p-6 max-w-sm w-full"
               onClick={(e) => e.stopPropagation()}
             >
               <h3 className="text-lg font-semibold text-foreground mb-2">Confirm Purchase</h3>
@@ -242,7 +242,7 @@ export function RewardShop({ isLocked = false }: RewardShopProps) {
               <div className="flex gap-2">
                 <button
                   onClick={() => buyItem(confirmItem)}
-                  className="flex-1 px-4 py-2 rounded-xl bg-foreground text-background text-sm font-medium"
+                  className="flex-1 px-4 py-2 rounded-xl bg-brand text-white text-sm font-medium"
                 >
                   Buy
                 </button>

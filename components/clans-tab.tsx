@@ -1,11 +1,13 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect, useMemo } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import {
   Users, Plus, Search, ArrowRight, Crown, Shield, X, Loader2,
   Globe, Lock, UserPlus, Hash, MessageCircle, Activity, Trophy,
-  ChevronRight, LogOut, Settings, Flame, Target,
+  ChevronRight, LogOut, Settings, Flame, Target, Swords, Star,
+  Zap, Medal, Award, TrendingUp, Sparkles, Heart,
+  Dumbbell, ScanLine, UtensilsCrossed,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -22,7 +24,44 @@ import { ClanInviteModal } from "./clan-invite-modal"
 import { ChallengesTab } from "./challenges-tab"
 import { AccountabilityPartnerCard } from "./accountability-partner-card"
 
-type ClanView = "list" | "detail" | "chat" | "feed" | "members" | "ranking"
+type ClanView = "list" | "detail"
+
+const GUILD_LEVELS = [
+  { level: 1, xpRequired: 0, title: "Initiate" },
+  { level: 2, xpRequired: 100, title: "Recruit" },
+  { level: 3, xpRequired: 300, title: "Member" },
+  { level: 4, xpRequired: 600, title: "Veteran" },
+  { level: 5, xpRequired: 1000, title: "Elite" },
+  { level: 6, xpRequired: 1500, title: "Champion" },
+  { level: 7, xpRequired: 2500, title: "Hero" },
+  { level: 8, xpRequired: 4000, title: "Legend" },
+  { level: 9, xpRequired: 6000, title: "Mythic" },
+  { level: 10, xpRequired: 10000, title: "Immortal" },
+]
+
+const GUILD_ACHIEVEMENTS = [
+  { id: "first_workout", icon: Dumbbell, title: "First Workout", desc: "Complete your first workout", xp: 50 },
+  { id: "streak_7", icon: Flame, title: "7-Day Streak", desc: "Train 7 days in a row", xp: 200 },
+  { id: "scan_10", icon: ScanLine, title: "Scan Master", desc: "Scan 10 food products", xp: 100 },
+  { id: "meal_plan", icon: UtensilsCrossed, title: "Meal Planner", desc: "Generate 5 meal plans", xp: 150 },
+  { id: "challenge_win", icon: Trophy, title: "Challenge Champion", desc: "Win a guild challenge", xp: 300 },
+  { id: "invite_3", icon: UserPlus, title: "Recruiter", desc: "Invite 3 friends", xp: 250 },
+  { id: "rank_1", icon: Crown, title: "Guild Leader", desc: "Reach #1 in ranking", xp: 500 },
+  { id: "partner_30", icon: Heart, title: "Dedicated Partner", desc: "30 days with accountability partner", xp: 400 },
+]
+
+function getGuildLevel(xp: number) {
+  let current = GUILD_LEVELS[0]!
+  for (const level of GUILD_LEVELS) {
+    if (xp >= level.xpRequired) current = level
+  }
+  const nextIdx = GUILD_LEVELS.findIndex(l => l.level === current.level + 1)
+  const next = nextIdx >= 0 ? GUILD_LEVELS[nextIdx] ?? null : null
+  const progress = next
+    ? ((xp - current.xpRequired) / (next.xpRequired - current.xpRequired)) * 100
+    : 100
+  return { current, next, progress: Math.min(100, Math.max(0, progress)) }
+}
 
 export function ClansTab() {
   const { t, locale } = useTranslation()
@@ -45,6 +84,12 @@ export function ClansTab() {
   useEffect(() => {
     fetchDiscoverClans()
   }, [fetchDiscoverClans])
+
+  const guildXp = useMemo(() => {
+    return (userClan?.total_xp || 0) + (selectedClan?.total_xp || 0)
+  }, [userClan?.total_xp, selectedClan?.total_xp])
+
+  const guildLevel = useMemo(() => getGuildLevel(guildXp), [guildXp])
 
   const handleSelectClan = async (clan: any) => {
     setSelectedClan(clan)
@@ -91,59 +136,64 @@ export function ClansTab() {
 
   if (view === "detail" && selectedClan) {
     return (
-      <div className="mx-auto w-full max-w-3xl space-y-4 pb-20">
+      <div className="mx-auto w-full max-w-2xl space-y-4 pb-20">
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          className="relative overflow-hidden rounded-2xl border border-border bg-card p-5"
+          className="rounded-2xl glass-strong p-5"
         >
-          <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-white/5" />
-          <div className="relative">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-3">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => { setView("list"); setSelectedClan(null) }}
-                  className="h-10 w-10 rounded-xl border border-border bg-muted/50 text-muted-foreground hover:bg-muted/50"
-                >
-                  <ArrowRight className="h-4 w-4 rotate-180" />
-                </Button>
-                <div>
-                  <h2 className="text-xl font-black tracking-tight text-foreground">{selectedClan.name}</h2>
-                  <p className="text-xs font-black uppercase tracking-[0.2em] text-muted-foreground">
-                    {selectedClan.memberCount || 0} {isEnglish ? "members" : "membros"}
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-3">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => { setView("list"); setSelectedClan(null) }}
+                className="h-10 w-10 rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted"
+              >
+                <ArrowRight className="h-4 w-4 rotate-180" />
+              </Button>
+              <div>
+                <div className="flex items-center gap-2">
+                  <h2 className="text-lg font-bold text-foreground">{selectedClan.name}</h2>
+                  {selectedClan.is_public ? (
+                    <Globe className="h-4 w-4 text-brand" />
+                  ) : (
+                    <Lock className="h-4 w-4 text-muted-foreground" />
+                  )}
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  {selectedClan.memberCount || 0} {isEnglish ? "members" : "membros"}
                   </p>
                 </div>
               </div>
               <div className="flex items-center gap-2">
                 {selectedClan.isMember && (
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => setShowInviteModal(true)}
-                  className="h-10 w-10 rounded-xl border border-border bg-muted/50 text-muted-foreground hover:bg-muted/50"
-                  >
-                    <UserPlus className="h-4 w-4" />
-                  </Button>
-                )}
-                {selectedClan.userRole === "owner" && (
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => deleteClan(selectedClan.id)}
-                    className="h-10 w-10 rounded-xl border border-red-300/14 bg-red-500/8 text-red-300 hover:bg-red-500/16"
-                  >
-                    <Settings className="h-4 w-4" />
-                  </Button>
-                )}
-                {selectedClan.isMember && selectedClan.userRole !== "owner" && (
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={handleLeave}
-                    className="h-10 w-10 rounded-xl border border-red-300/14 bg-red-500/8 text-red-300 hover:bg-red-500/16"
-                  >
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setShowInviteModal(true)}
+                  className="h-10 w-10 rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted"
+                >
+                  <UserPlus className="h-4 w-4" />
+                </Button>
+              )}
+              {selectedClan.userRole === "owner" && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => deleteClan(selectedClan.id)}
+                  className="h-10 w-10 rounded-xl text-destructive/70 hover:text-destructive hover:bg-destructive/10"
+                >
+                  <Settings className="h-4 w-4" />
+                </Button>
+              )}
+              {selectedClan.isMember && selectedClan.userRole !== "owner" && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={handleLeave}
+                  className="h-10 w-10 rounded-xl text-destructive/70 hover:text-destructive hover:bg-destructive/10"
+                >
                     <LogOut className="h-4 w-4" />
                   </Button>
                 )}
@@ -161,7 +211,7 @@ export function ClansTab() {
                 <Button
                   onClick={handleJoinWithCode}
                   disabled={isJoining || !joinCode.trim()}
-                  className="h-10 rounded-xl bg-foreground px-4 text-xs font-black uppercase tracking-widest text-black hover:bg-muted/50"
+                  className="h-10 rounded-xl bg-brand px-4 text-xs font-semibold text-white hover:bg-brand/90"
                 >
                   {isJoining ? <Loader2 className="h-4 w-4 animate-spin" /> : isEnglish ? "Join" : "Entrar"}
                 </Button>
@@ -170,27 +220,26 @@ export function ClansTab() {
                     onClick={async () => { await joinClan(selectedClan.id); await fetchUserClan() }}
                     disabled={isJoining}
                     variant="ghost"
-                    className="h-10 rounded-xl border border-border bg-muted/50 text-muted-foreground hover:bg-muted/50"
+                    className="h-10 rounded-xl bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground"
                   >
-                    {isEnglish ? "Join Free" : "Entrar Grátis"}
+                    {isEnglish ? "Join Free" : "Entrar Gratis"}
                   </Button>
                 )}
               </div>
             )}
-          </div>
         </motion.div>
 
         {selectedClan.isMember && (
-          <div className="flex gap-2 px-1 overflow-x-auto scrollbar-none">
+          <div className="flex gap-1.5 px-1 overflow-x-auto scrollbar-none">
             {(["chat", "feed", "members", "ranking", "challenges", "partner"] as const).map((v) => (
               <button
                 key={v}
                 onClick={() => setTab(v)}
                 className={cn(
-                  "flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-black uppercase tracking-widest transition-all whitespace-nowrap",
+                  "flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-bold transition-all whitespace-nowrap",
                   tab === v
-                    ? "bg-muted/50 text-foreground border border-border"
-                    : "text-muted-foreground hover:text-foreground/70 border border-transparent"
+                    ? "bg-brand/10 text-brand border border-brand/20"
+                    : "text-muted-foreground hover:text-foreground hover:bg-muted/50 border border-transparent"
                 )}
               >
                 {v === "chat" && <MessageCircle className="h-3.5 w-3.5" />}
@@ -236,43 +285,111 @@ export function ClansTab() {
   }
 
   return (
-    <div className="mx-auto w-full max-w-3xl space-y-5 pb-20">
+    <div className="mx-auto w-full max-w-2xl space-y-5 pb-20">
       {userClan && (
         <motion.section
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          className="relative overflow-hidden rounded-2xl border border-border bg-card p-5 cursor-pointer"
+          className="relative overflow-hidden rounded-2xl glass-strong p-5 cursor-pointer hover:bg-brand/5 transition-colors"
           onClick={() => handleSelectClan(userClan)}
         >
-          <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-white/5" />
-          <div className="relative flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-foreground to-foreground/80">
-                <Crown className="h-6 w-6 text-white" />
+          <div className="absolute inset-0 bg-gradient-to-br from-brand/5 via-transparent to-transparent pointer-events-none" />
+          <div className="relative">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-3">
+                <div className="flex h-14 w-14 items-center justify-center rounded-2xl gradient-brand shadow-lg shadow-brand/20">
+                  <Crown className="h-7 w-7 text-white" />
+                </div>
+                <div>
+                  <p className="text-[10px] font-medium text-brand">
+                    {isEnglish ? "Your Guild" : "Sua Guild"}
+                  </p>
+                  <h3 className="text-lg font-bold text-foreground">{userClan.name}</h3>
+                  <p className="text-xs text-muted-foreground">
+                    {userClan.memberCount || 0} {isEnglish ? "members" : "membros"} · {userClan.role === "owner" ? "Owner" : userClan.role === "admin" ? "Admin" : "Member"}
+                  </p>
+                </div>
               </div>
-              <div>
-                <p className="text-xs font-black uppercase tracking-[0.2em] text-muted-foreground">
-                  {isEnglish ? "Your Clan" : "Seu Clã"}
-                </p>
-                <h3 className="text-lg font-black text-foreground">{userClan.name}</h3>
-                <p className="text-xs font-bold text-muted-foreground">
-                  {userClan.memberCount || 0} {isEnglish ? "members" : "membros"} · {userClan.role === "owner" ? "Owner" : userClan.role === "admin" ? "Admin" : "Member"}
-                </p>
-              </div>
+              <ChevronRight className="h-5 w-5 text-muted-foreground" />
             </div>
-            <ChevronRight className="h-5 w-5 text-muted-foreground" />
+
+            <div className="space-y-2">
+              <div className="flex items-center justify-between text-xs">
+                <div className="flex items-center gap-1.5">
+                  <Star className="h-3.5 w-3.5 text-brand" />
+                  <span className="font-bold text-foreground">{guildLevel.current.title}</span>
+                  <span className="text-muted-foreground">Level {guildLevel.current.level}</span>
+                </div>
+                <span className="font-bold text-brand">{guildXp.toLocaleString()} XP</span>
+              </div>
+              <div className="h-2 rounded-full bg-muted/50 overflow-hidden">
+                <motion.div
+                  initial={{ width: 0 }}
+                  animate={{ width: `${guildLevel.progress}%` }}
+                  transition={{ duration: 1, ease: "easeOut" }}
+                  className="h-full rounded-full gradient-brand"
+                />
+              </div>
+              {guildLevel.next && (
+                <p className="text-[10px] text-muted-foreground text-right">
+                  {(guildLevel.next.xpRequired - guildXp).toLocaleString()} XP to {guildLevel.next.title}
+                </p>
+              )}
+            </div>
           </div>
         </motion.section>
       )}
 
+      {userClan && (
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+        >
+          <div className="flex items-center gap-2 mb-3">
+            <Award className="h-4 w-4 text-brand" />
+            <h3 className="text-xs font-medium text-muted-foreground">
+              {isEnglish ? "Guild Achievements" : "Conquistas da Guild"}
+            </h3>
+          </div>
+          <div className="grid grid-cols-4 gap-2">
+            {GUILD_ACHIEVEMENTS.slice(0, 8).map((ach, i) => {
+              const unlocked = (userClan?.achievements || []).includes(ach.id)
+              return (
+                <motion.div
+                  key={ach.id}
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: i * 0.03 }}
+                  className={cn(
+                    "relative flex flex-col items-center gap-1 rounded-xl p-2.5 border transition-all",
+                    unlocked
+                      ? "border-brand/20 bg-brand/5"
+                      : "border-border bg-muted/30 opacity-50"
+                  )}
+                >
+                  <ach.icon className={cn("h-5 w-5", unlocked ? "text-brand" : "text-muted-foreground")} />
+                  <p className="text-[9px] font-bold text-center leading-tight text-foreground">{ach.title}</p>
+                  {unlocked && (
+                    <div className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-brand flex items-center justify-center">
+                      <Zap className="h-2.5 w-2.5 text-white" />
+                    </div>
+                  )}
+                </motion.div>
+              )
+            })}
+          </div>
+        </motion.div>
+      )}
+
       <div>
         <div className="flex items-center justify-between mb-3">
-          <h2 className="text-lg font-black tracking-tight text-foreground">
-            {isEnglish ? "Discover Clans" : "Descobrir Clãs"}
+          <h2 className="text-lg font-bold text-foreground">
+            {isEnglish ? "Discover Guilds" : "Descobrir Guilds"}
           </h2>
           <Button
             onClick={() => setShowCreateModal(true)}
-            className="h-10 rounded-xl bg-foreground px-4 text-xs font-black uppercase tracking-widest text-black hover:bg-muted/50"
+            className="h-10 rounded-xl bg-brand px-4 text-xs font-semibold text-white hover:bg-brand/90"
           >
             <Plus className="h-4 w-4 mr-1" />
             {isEnglish ? "Create" : "Criar"}
@@ -284,50 +401,65 @@ export function ClansTab() {
           <Input
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder={isEnglish ? "Search clans..." : "Buscar clãs..."}
+            placeholder={isEnglish ? "Search guilds..." : "Buscar guilds..."}
             className="h-11 rounded-xl border-border bg-muted/50 pl-10 text-sm"
           />
         </div>
 
         {filteredDiscover.length === 0 ? (
-          <div className="rounded-2xl border border-border bg-muted/50 p-8 text-center">
-            <Users className="mx-auto mb-3 h-10 w-10 text-muted-foreground" />
+          <div className="rounded-2xl glass-strong p-8 text-center">
+            <Swords className="mx-auto mb-3 h-10 w-10 text-muted-foreground" />
             <p className="text-sm font-bold text-muted-foreground">
-              {isEnglish ? "No clans found. Create one!" : "Nenhum clã encontrado. Crie um!"}
+              {isEnglish ? "No guilds found. Create one!" : "Nenhuma guild encontrada. Crie uma!"}
             </p>
           </div>
         ) : (
           <div className="space-y-2">
-            {filteredDiscover.map((clan, i) => (
-              <motion.div
-                key={clan.id}
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.03 }}
-                className="flex items-center gap-3 rounded-xl border border-border bg-card p-4 transition-all hover:border-border hover:bg-muted/50 cursor-pointer"
-                onClick={() => handleSelectClan(clan)}
-              >
-                <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-white/10 to-white/5 border border-border">
-                  {clan.is_public ? (
-                    <Globe className="h-5 w-5 text-muted-foreground" />
-                  ) : (
-                    <Lock className="h-5 w-5 text-muted-foreground" />
-                  )}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="font-black text-sm text-foreground truncate">{clan.name}</p>
-                  <p className="text-xs font-bold text-muted-foreground truncate">
-                    {clan.description || (isEnglish ? "No description" : "Sem descrição")}
-                  </p>
-                </div>
-                <div className="text-right flex-shrink-0">
-                  <p className="text-sm font-black text-foreground">{clan.memberCount || 0}</p>
-                  <p className="text-[11px] font-black uppercase tracking-widest text-muted-foreground">
-                    {isEnglish ? "members" : "membros"}
-                  </p>
-                </div>
-              </motion.div>
-            ))}
+            {filteredDiscover.map((clan, i) => {
+              const clanLevel = getGuildLevel(clan.total_xp || 0)
+              return (
+                <motion.div
+                  key={clan.id}
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.03 }}
+                  className="flex items-center gap-3 rounded-xl glass-card p-4 cursor-pointer group hover:bg-brand/5 transition-colors"
+                  onClick={() => handleSelectClan(clan)}
+                >
+                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-brand/10 group-hover:bg-brand/15 transition-colors">
+                    <Swords className="h-5 w-5 text-brand" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <p className="font-medium text-sm text-foreground truncate">{clan.name}</p>
+                      {clan.is_public ? (
+                        <Globe className="h-3 w-3 text-brand shrink-0" />
+                      ) : (
+                        <Lock className="h-3 w-3 text-muted-foreground shrink-0" />
+                      )}
+                    </div>
+                    <p className="text-xs text-muted-foreground truncate">
+                      {clan.description || (isEnglish ? "No description" : "Sem descricao")}
+                    </p>
+                    <div className="flex items-center gap-2 mt-1">
+                      <span className="text-[10px] font-bold text-brand">
+                        Lvl {clanLevel.current.level}
+                      </span>
+                      <span className="text-[10px] text-muted-foreground">·</span>
+                      <span className="text-[10px] font-bold text-muted-foreground">
+                        {(clan.total_xp || 0).toLocaleString()} XP
+                      </span>
+                    </div>
+                  </div>
+                  <div className="text-right flex-shrink-0">
+                    <p className="text-sm font-bold text-foreground">{clan.memberCount || 0}</p>
+                    <p className="text-[10px] text-muted-foreground">
+                      {isEnglish ? "members" : "membros"}
+                    </p>
+                  </div>
+                </motion.div>
+              )
+            })}
           </div>
         )}
       </div>

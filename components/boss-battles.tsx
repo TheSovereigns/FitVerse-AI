@@ -114,7 +114,7 @@ export function BossBattles({ isLocked = false }: BossBattlesProps) {
 
   if (isLocked) {
     return (
-      <div className="bg-card border border-border rounded-2xl p-6 relative overflow-hidden">
+      <div className="glass-strong border border-border rounded-2xl p-6 relative overflow-hidden">
         <div className="absolute inset-0 bg-muted/50 backdrop-blur-sm flex items-center justify-center z-10">
           <div className="text-center">
             <Lock className="w-10 h-10 mx-auto mb-2 text-muted-foreground" />
@@ -133,13 +133,13 @@ export function BossBattles({ isLocked = false }: BossBattlesProps) {
   }
 
   return (
-    <div className="bg-card border border-border rounded-2xl p-6">
+    <div className="glass-strong border border-border rounded-2xl p-6">
       <div className="flex items-center gap-2 mb-4">
-        <Swords className="w-5 h-5 text-foreground" />
+        <Swords className="w-5 h-5 text-brand" />
         <h2 className="text-lg font-semibold text-foreground">Boss Battles</h2>
       </div>
 
-      <div className="mb-6 p-4 rounded-xl border border-border bg-card">
+      <div className="mb-6 p-4 rounded-xl border border-border glass-strong">
         <div className="flex items-center justify-between mb-3">
           <div>
             <h3 className="font-medium text-foreground">{boss.name}</h3>
@@ -169,7 +169,7 @@ export function BossBattles({ isLocked = false }: BossBattlesProps) {
         <motion.button
           whileTap={{ scale: 0.98 }}
           onClick={startBattle}
-          className="w-full px-4 py-3 rounded-xl bg-foreground text-background text-sm font-medium mb-4"
+          className="w-full px-4 py-3 rounded-xl bg-brand text-white text-sm font-medium mb-4"
         >
           <Swords className="w-4 h-4 inline mr-2" />
           Start Battle
@@ -206,14 +206,14 @@ export function BossBattles({ isLocked = false }: BossBattlesProps) {
             exit={{ opacity: 0, scale: 0.9 }}
             className="text-center p-6 rounded-xl border border-border bg-card mb-4"
           >
-            <Trophy className="w-12 h-12 mx-auto mb-2 text-green-500" />
+            <Trophy className="w-12 h-12 mx-auto mb-2 text-brand" />
             <h3 className="text-lg font-semibold text-foreground mb-1">Victory!</h3>
             <p className="text-sm text-muted-foreground mb-3">
               You defeated {boss.name}! Earned {boss.xpReward} XP
             </p>
             <button
               onClick={nextBoss}
-              className="px-4 py-2 rounded-xl bg-foreground text-background text-sm font-medium"
+              className="px-4 py-2 rounded-xl bg-brand text-white text-sm font-medium"
             >
               Next Boss
             </button>

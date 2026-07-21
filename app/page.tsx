@@ -16,6 +16,7 @@ import { DesktopSidebar } from "@/components/desktop-sidebar"
 import { MobileBottomNav } from "@/components/mobile-bottom-nav"
 import { FeatureErrorBoundary } from "@/components/FeatureErrorBoundary"
 import { LandingPage } from "@/components/landing-page"
+import { AdBanner } from "@/components/ad-banner"
 import type { View, MetabolicPlan, ProductAnalysis } from "@/lib/types"
 
 // Lazy-loaded views for code splitting
@@ -57,7 +58,7 @@ const RewardShop = lazy(() => import("@/components/reward-shop").then(m => ({ de
 function ViewLoader() {
   return (
     <div className="flex items-center justify-center py-20">
-      <Loader2 className="w-6 h-6 text-muted-foreground animate-spin" />
+      <Loader2 className="w-6 h-6 text-brand animate-spin" />
     </div>
   )
 }
@@ -259,7 +260,9 @@ export default function DashboardPage() {
       const analysis: ProductAnalysis = await response.json()
       addScannedProduct(analysis)
       setAnalysisResult(analysis)
-      addScanHistory({ id: `${scanHistory.length + 1}`, name: analysis.productName, scannedAt: new Date().toISOString(), score: analysis.longevityScore, image: displayImage })
+      const scanId = (analysis as any).scanId || `local-${Date.now()}`
+      const scannedAt = (analysis as any).scannedAt || new Date().toISOString()
+      addScanHistory({ id: scanId, name: analysis.productName, scannedAt, score: analysis.longevityScore, image: displayImage })
       incrementScans()
     } catch (error) {
       const message = error instanceof Error ? error.message : t("page_error_retry")
@@ -291,7 +294,7 @@ export default function DashboardPage() {
   if (authLoading && !authTimedOut) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
-        <Loader2 className="w-6 h-6 text-muted-foreground animate-spin" />
+        <Loader2 className="w-6 h-6 text-brand animate-spin" />
       </div>
     )
   }
@@ -310,21 +313,21 @@ export default function DashboardPage() {
       <div className="md:ml-16 flex flex-col min-h-screen transition-all duration-300 max-w-[1200px] mx-auto w-full">
         <header className="sticky top-0 z-40 flex h-14 items-center justify-between px-4 bg-background/80 backdrop-blur-xl border-b border-border md:border-none md:bg-transparent md:backdrop-blur-none">
           <div className="md:hidden flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-brand flex items-center justify-center">
-              <ScanLine className="w-4 h-4 text-brand-foreground" />
+            <div className="w-8 h-8 rounded-xl bg-brand flex items-center justify-center">
+              <ScanLine className="w-4 h-4 text-white" />
             </div>
             <div>
               <span className="block text-sm font-bold tracking-tight">{t("home_brand")}</span>
-              <span className="block text-[10px] font-medium text-muted-foreground">{getViewTitle()}</span>
+              <span className="block text-[10px] text-muted-foreground">{getViewTitle()}</span>
             </div>
           </div>
           <div className="hidden md:block" />
           <div className="flex items-center gap-1.5">
             {(isAdmin || user?.user_metadata?.is_admin) && (
-              <button onClick={() => router.push("/admin-dashboard")} className="w-9 h-9 rounded-xl flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-all">
-                <Shield className="w-[18px] h-[18px]" />
-              </button>
-            )}
+            <button onClick={() => router.push("/admin-dashboard")} className="w-9 h-9 rounded-xl flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-all">
+              <Shield className="w-[18px] h-[18px]" />
+            </button>
+          )}
             <button onClick={() => setCurrentView("profile")} className="w-9 h-9 rounded-xl flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-all">
               <User className="w-[18px] h-[18px]" />
             </button>
@@ -340,15 +343,15 @@ export default function DashboardPage() {
             {currentView === "result" && (
               scanError ? (
                 <div className="min-h-[50vh] flex items-center justify-center">
-                  <div className="w-full max-w-sm rounded-2xl border border-border bg-card p-6 text-center space-y-4">
+                  <div className="w-full max-w-sm rounded-2xl glass-strong p-6 text-center space-y-4">
                     <div className="w-12 h-12 mx-auto rounded-xl bg-destructive/10 flex items-center justify-center">
                       <ScanLine className="w-6 h-6 text-destructive" />
                     </div>
                     <div>
-                      <h2 className="text-lg font-bold text-foreground">{isEnglish ? "Scan failed" : "Não foi possível analisar"}</h2>
+                      <h2 className="text-lg font-bold text-foreground">{isEnglish ? "Scan failed" : "Nao foi possivel analisar"}</h2>
                       <p className="mt-1.5 text-sm text-muted-foreground">{scanError}</p>
                     </div>
-                    <Button onClick={() => { setScanError(null); setCurrentView("dashboard") }} className="w-full h-11 rounded-xl">
+                    <Button onClick={() => { setScanError(null); setCurrentView("dashboard") }} className="w-full h-11 rounded-xl bg-brand text-white hover:bg-brand/90">
                       {isEnglish ? "Try again" : "Tentar novamente"}
                     </Button>
                   </div>
@@ -413,13 +416,14 @@ export default function DashboardPage() {
 
       {/* FAB - Scan */}
       <button onClick={handleNavScan}
-        className="mobile-fab-safe fixed right-4 z-50 w-14 h-14 rounded-2xl bg-brand text-brand-foreground shadow-lg shadow-brand/25 flex items-center justify-center transition-all duration-200 hover:scale-105 hover:shadow-xl hover:shadow-brand/30 active:scale-95 md:bottom-8 md:right-8"
+        className="mobile-fab-safe fixed right-4 z-50 h-14 w-14 rounded-2xl bg-brand text-white shadow-xl shadow-brand/30 flex items-center justify-center transition-all duration-200 hover:scale-105 active:scale-95 md:bottom-8 md:right-8"
         aria-label={t("home_scan_product")}
       >
         <ScanLine className="w-6 h-6" />
       </button>
 
       {/* Mobile bottom nav */}
+      <AdBanner position="bottom" />
       <MobileBottomNav currentView={currentView} onNavigate={setCurrentView} />
     </div>
   )

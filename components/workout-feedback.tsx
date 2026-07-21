@@ -167,13 +167,13 @@ export function WorkoutFeedback({
     <motion.div
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
-      className="rounded-2xl border border-border bg-card p-5"
+      className="rounded-2xl border border-border glass-strong p-5"
     >
       {/* Header */}
       <div className="flex items-center justify-between mb-5">
         <div className="flex items-center gap-2.5">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/10">
-            <ThumbsUp className="h-4 w-4 text-primary" />
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand/10">
+            <ThumbsUp className="h-4 w-4 text-brand" />
           </div>
           <div>
             <h3 className="text-sm font-semibold text-foreground">
@@ -217,7 +217,7 @@ export function WorkoutFeedback({
                 onClick={() => setShowAdjustments(!showAdjustments)}
                 className="flex items-center justify-between w-full text-left"
               >
-                <span className="text-[10px] font-medium text-primary uppercase tracking-wider">
+                <span className="text-[10px] font-medium text-brand uppercase tracking-wider">
                   {isPro ? "AI Adjustments" : "Basic Adjustments"}
                 </span>
                 {showAdjustments ? (
@@ -238,7 +238,7 @@ export function WorkoutFeedback({
                     <div className="p-3 rounded-xl border border-border bg-muted/50 space-y-2">
                       {getAdjustmentSuggestions().map((suggestion, i) => (
                         <div key={i} className="flex items-start gap-2">
-                          <span className="h-1 w-1 rounded-full bg-primary shrink-0 mt-1.5" />
+                          <span className="h-1 w-1 rounded-full bg-brand shrink-0 mt-1.5" />
                           <span className="text-xs text-muted-foreground">
                             {suggestion}
                           </span>
@@ -340,8 +340,8 @@ export function WorkoutFeedback({
                     onClick={() => setDifficulty(level)}
                     className={`flex-1 py-2.5 rounded-xl text-xs font-medium transition-all border ${
                       difficulty === level
-                        ? "bg-primary text-primary-foreground border-primary"
-                        : "bg-card text-muted-foreground border-border hover:border-primary/50"
+                        ? "bg-brand text-white border-brand"
+                        : "bg-card text-muted-foreground border-border hover:border-brand/50"
                     }`}
                   >
                     {level}
@@ -365,8 +365,8 @@ export function WorkoutFeedback({
                     onClick={() => setEnergy(level)}
                     className={`flex-1 py-2.5 rounded-xl text-xs font-medium transition-all border ${
                       energy === level
-                        ? "bg-primary text-primary-foreground border-primary"
-                        : "bg-card text-muted-foreground border-border hover:border-primary/50"
+                        ? "bg-brand text-white border-brand"
+                        : "bg-card text-muted-foreground border-border hover:border-brand/50"
                     }`}
                   >
                     {level}
@@ -426,7 +426,7 @@ export function WorkoutFeedback({
             {/* Submit */}
             <Button
               onClick={handleSubmit}
-              className="w-full h-10 text-xs font-medium bg-primary text-primary-foreground hover:bg-primary/90"
+              className="w-full h-10 text-xs font-medium bg-brand text-white hover:bg-brand/90"
             >
               {isEnglish ? "Submit Feedback" : "Enviar Feedback"}
             </Button>

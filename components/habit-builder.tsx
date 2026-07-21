@@ -130,11 +130,11 @@ export function HabitBuilder({}: HabitBuilderProps) {
   const totalXp = completedToday.length * 10;
 
   return (
-    <div className="bg-card border border-border rounded-2xl p-6">
+    <div className="glass-strong border border-border rounded-2xl p-6">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-lg font-semibold text-foreground">Habit Builder</h2>
-        <div className="flex items-center gap-1 text-sm text-muted-foreground">
-          <Zap className="w-4 h-4" />
+        <div className="flex items-center gap-1 text-sm border-brand/20 bg-brand-muted px-2 py-0.5 rounded-lg">
+          <Zap className="w-4 h-4 text-brand" />
           <span>{totalXp} XP</span>
         </div>
       </div>
@@ -230,7 +230,7 @@ export function HabitBuilder({}: HabitBuilderProps) {
               />
               <button
                 onClick={addCustomHabit}
-                className="px-3 py-2 rounded-xl bg-foreground text-background text-sm"
+                className="px-3 py-2 rounded-xl bg-brand text-white text-sm"
               >
                 Add
               </button>
