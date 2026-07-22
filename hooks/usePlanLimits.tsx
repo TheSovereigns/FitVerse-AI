@@ -50,11 +50,22 @@ export function usePlanLimits() {
       try {
         let data = null
 
+        // Ensure we have a fresh session before querying (RLS requires valid JWT)
+        const { data: { session } } = await supabase.auth.getSession()
+        if (!session?.access_token) {
+          logger.warn("[usePlanLimits] No valid session, attempting refresh")
+          await supabase.auth.refreshSession()
+        }
+
         const { data: byId, error: errById } = await supabase
           .from('profiles')
           .select('plan')
           .eq('id', user.id)
           .maybeSingle()
+
+        if (errById) {
+          logger.error("[usePlanLimits] Query error:", errById.message, errById.code)
+        }
 
         if (byId) {
           data = byId

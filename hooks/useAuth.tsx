@@ -7,6 +7,15 @@ import { useRouter } from "next/navigation"
 import { clearFitVerseStorage } from "@/lib/auth-helpers"
 import { logger } from "@/lib/logger"
 
+function syncSessionToCookie(accessToken: string | undefined) {
+  if (typeof document === 'undefined') return
+  if (accessToken) {
+    document.cookie = `sb-access-token=${accessToken}; path=/; SameSite=Lax; max-age=3600`
+  } else {
+    document.cookie = 'sb-access-token=; path=/; max-age=0'
+  }
+}
+
 interface AuthContextType {
   user: User | null
   profile: Profile | null
@@ -68,6 +77,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
         if (session?.user && mounted) {
           setUser(session.user)
+          syncSessionToCookie(session.access_token)
           await loadProfile(session.user.id)
 
           try {
@@ -95,6 +105,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (!mounted) return
 
         setUser(session?.user || null)
+        syncSessionToCookie(session?.access_token)
 
         if (session?.user) {
           await loadProfile(session.user.id)
@@ -202,6 +213,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   const signOut = async () => {
+    syncSessionToCookie(undefined)
     clearFitVerseStorage()
     try { supabase.auth.signOut({ scope: 'local' }).catch(() => {}) } catch {}
     window.location.replace("/auth/login")

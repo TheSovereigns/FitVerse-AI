@@ -7,18 +7,10 @@ export function getSupabase() {
   return getSupabaseClient()
 }
 
-// Lazy proxy that delegates to getSupabaseClient()
-export const supabase = new Proxy({} as ReturnType<typeof getSupabaseClient>, {
-  get(_, prop) {
-    const client = getSupabaseClient()
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const val = (client as any)[prop]
-    if (typeof val === 'function') {
-      return val.bind(client)
-    }
-    return val
-  },
-})
+// Direct export - avoids Proxy val.bind() pattern that breaks JWT header attachment
+// The Proxy creates a new function reference on every access, which prevents
+// Supabase JS from properly attaching the Authorization header to requests
+export const supabase: SupabaseClient = getSupabaseClient()
 
 // Re-export server utilities from supabase-server.ts
 export { getSupabaseAdmin, authUser, getTokenFromRequest, getCorsHeaders } from './supabase-server'

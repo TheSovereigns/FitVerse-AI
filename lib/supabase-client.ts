@@ -54,15 +54,5 @@ export function getSupabase(): SupabaseClient {
   return getSupabaseClient()
 }
 
-// Legacy export - lazy getter
-export const supabase: SupabaseClient = new Proxy({} as SupabaseClient, {
-  get(_, prop) {
-    const client = getSupabaseClient()
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const val = (client as any)[prop]
-    if (typeof val === 'function') {
-      return val.bind(client)
-    }
-    return val
-  },
-})
+// Legacy export - direct client (avoid Proxy pattern that breaks JWT header attachment)
+export const supabase: SupabaseClient = getSupabaseClient()
