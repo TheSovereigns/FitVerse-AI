@@ -44,7 +44,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           .from('profiles')
           .select('is_admin')
           .eq('id', userId)
-          .single()
+          .maybeSingle()
         if (data?.is_admin) {
           setIsAdmin(true)
           logger.info("[Auth] Admin from direct query")

@@ -111,54 +111,54 @@ export async function getUserProfile(userId: string): Promise<Profile | null> {
       .from('profiles')
       .select('*')
       .eq('id', userId)
-      .single()
+      .maybeSingle()
 
-    if (data) return data
-
-    if (error?.code === 'PGRST116') {
-      const { data: { user: authUser } } = await supabase.auth.getUser()
-      const email = authUser?.email || ''
-
-      if (email) {
-        const { data: existingByEmail } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('email', email)
-          .single()
-
-        if (existingByEmail) {
-          logger.info("[Supabase] Found profile by email, linking:", email)
-          return existingByEmail
-        }
-      }
-
-      logger.info("[Supabase] Creating profile for user:", userId)
-      const { data: newProfile, error: insertError } = await supabase
-        .from('profiles')
-        .insert({
-          id: userId,
-          email,
-          plan: 'free',
-          is_admin: false,
-          country: 'BR',
-          ads_enabled: true,
-        })
-        .select('*')
-        .single()
-
-      if (!insertError && newProfile) {
-        return newProfile
-      }
+    if (data) {
+      logger.info("[getUserProfile] Found by id:", data.id, "plan:", data.plan)
+      return data
     }
-    
+
     if (error) {
-      console.warn("[Supabase] Profile fetch error:", error.message)
-      return null
+      logger.warn("[getUserProfile] Error by id:", error.message, error.code)
     }
-    
-    return data
+
+    const { data: { user: authUser } } = await supabase.auth.getUser()
+    const email = authUser?.email || ''
+
+    if (email) {
+      const { data: existingByEmail } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('email', email)
+        .maybeSingle()
+
+      if (existingByEmail) {
+        logger.info("[getUserProfile] Found by email:", email, "plan:", existingByEmail.plan)
+        return existingByEmail
+      }
+    }
+
+    logger.info("[getUserProfile] Creating profile for user:", userId)
+    const { data: newProfile, error: insertError } = await supabase
+      .from('profiles')
+      .insert({
+        id: userId,
+        email,
+        plan: 'free',
+        is_admin: false,
+        country: 'BR',
+        ads_enabled: true,
+      })
+      .select('*')
+      .maybeSingle()
+
+    if (!insertError && newProfile) {
+      return newProfile
+    }
+
+    return null
   } catch (e) {
-    console.warn("[Supabase] Profile fetch exception:", e)
+    logger.error("[getUserProfile] Exception:", e)
     return null
   }
 }
@@ -171,22 +171,43 @@ export async function isUserAdmin(userId: string): Promise<boolean> {
 
 // Shared helper: find profile by user.id, fallback to email
 export async function findProfile(userId: string, email?: string | null): Promise<Profile | null> {
-  const { data } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('id', userId)
-    .single()
-
-  if (data) return data
-
-  if (email) {
-    const { data: byEmail } = await supabase
+  try {
+    const { data, error } = await supabase
       .from('profiles')
       .select('*')
-      .eq('email', email)
-      .single()
-    if (byEmail) return byEmail
-  }
+      .eq('id', userId)
+      .maybeSingle()
 
-  return null
+    if (error) {
+      logger.warn("[findProfile] Error fetching by id:", error.message, error.code)
+    }
+
+    if (data) {
+      logger.info("[findProfile] Found by id:", data.id, "plan:", data.plan, "is_admin:", data.is_admin)
+      return data
+    }
+
+    if (email) {
+      const { data: byEmail, error: emailErr } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('email', email)
+        .maybeSingle()
+
+      if (emailErr) {
+        logger.warn("[findProfile] Error fetching by email:", emailErr.message, emailErr.code)
+      }
+
+      if (byEmail) {
+        logger.info("[findProfile] Found by email:", byEmail.id, "plan:", byEmail.plan, "is_admin:", byEmail.is_admin)
+        return byEmail
+      }
+    }
+
+    logger.warn("[findProfile] No profile found for userId:", userId, "email:", email)
+    return null
+  } catch (e) {
+    logger.error("[findProfile] Exception:", e)
+    return null
+  }
 }

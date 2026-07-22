@@ -24,7 +24,7 @@ export function usePlanLimits() {
         .from('profiles')
         .select('plan')
         .eq('id', user.id)
-        .single()
+        .maybeSingle()
 
       logger.info("[usePlanLimits] Refresh result:", { data, error })
 
@@ -54,16 +54,16 @@ export function usePlanLimits() {
           .from('profiles')
           .select('plan')
           .eq('id', user.id)
-          .single()
+          .maybeSingle()
 
         if (byId) {
           data = byId
-        } else if (errById?.code === 'PGRST116' && user.email) {
+        } else if (user.email) {
           const { data: byEmail } = await supabase
             .from('profiles')
             .select('plan')
             .eq('email', user.email)
-            .single()
+            .maybeSingle()
           if (byEmail) data = byEmail
         }
 
@@ -86,7 +86,7 @@ export function usePlanLimits() {
               ads_enabled: true,
             })
             .select('plan')
-            .single()
+            .maybeSingle()
 
           if (!insertError && newProfile) {
             setPlan('free')
