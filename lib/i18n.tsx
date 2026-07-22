@@ -171,7 +171,7 @@ const translations = {
     plate_save: "Salvar Prato", plate_select: "Selecionar Item", plate_no_history: "Nenhum item no histórico. Escaneie algo primeiro!",
     plate_saved: "Pratos Salvos", plate_no_saved: "Nenhum prato salvo ainda",
     gam_points: "pontos", gam_days: "dias", gam_view_badges: "Ver badges", gam_badges: "Badges", gam_total_scans: "Scans", gam_best_streak: "Melhor série",
-    gam_unlock_more: "Desbloqueie mais badges escaneando alimentos!", gam_badge_unlocked: "Badge解锁!",
+    gam_unlock_more: "Desbloqueie mais badges escaneando alimentos!", gam_badge_unlocked: "Badge Desbloqueado!",
     // Streak
     streak_title: "Sequencia", streak_subtitle: "Mantenha o ritmo", streak_best: "recorde",
     streak_active_today: "Atividade registrada hoje", streak_no_today: "Nenhuma atividade ainda hoje",
@@ -181,8 +181,8 @@ const translations = {
     clans_chat: "Chat", clans_feed: "Atividades", clans_members: "Membros", clans_ranking: "Ranking",
     clans_challenges: "Desafios", clans_partner: "Parceiro",
     // Live Workout
-    live_workout: "Treino Ao Vivo", live_rest: "Descanso", live_complete_set: "Concluir Serie",
-    live_complete_exercise: "Concluir Exercicio", live_finished: "Treino Concluido!",
+    live_workout: "Treino Ao Vivo", live_rest: "Descanso", live_complete_set: "Concluir Série",
+    live_complete_exercise: "Concluir Exercício", live_finished: "Treino Concluído!",
     // Focus Mode
     focus_mode: "Modo Foco", focus_exit: "Sair do Modo Foco",
     // Weekly Report
@@ -308,9 +308,9 @@ const translations = {
     wg_default_duration: "45 min",
     // Training Tab
     training_new_workout: "+ Novo Treino",
-    training_error_ai: "Error connecting to AI.",
+    training_error_ai: "Erro ao conectar com a IA.",
     training_kcal_unit: " KCAL",
-    training_ai_insight: "Great exercise.",
+    training_ai_insight: "Excelente exercício.",
     // Exercise Modal
     em_exercise: "Exercício",
     em_ai_insight: "Insight IA",
@@ -320,7 +320,7 @@ const translations = {
     em_next_set: "Próxima Série",
     em_finish: "Finalizar",
     em_search_suffix: " exercício como fazer",
-    em_error_gif: "Erro ao carificar GIF:",
+    em_error_gif: "Erro ao carregar GIF:",
     // Active Workout
     aw_error_progress: "Erro ao carregar progresso",
     aw_error_gif: "Erro ao carregar GIF:",
@@ -419,16 +419,16 @@ const translations = {
     // Home Dashboard
     hd_today: "Hoje",
     hd_logged_today: "registradas hoje",
-    hd_create_plan_hint: "Crie seu plano metabolico para liberar metas diarias.",
-    hd_daily_progress: "Progresso diario",
-    hd_health_snapshot: "Resumo de saude",
-    hd_last_activity: "Atividade recente",
-    hd_quick_actions: "Acoes rapidas",
+    hd_create_plan_hint: "Crie seu plano metabólico para liberar metas diárias.",
+    hd_daily_progress: "Progresso diário",
+    hd_health_snapshot: "Resumo de saúde",
+    // hd_heart_rate: "Heart Rate", (en only)
+    hd_quick_actions: "Ações rápidas",
     // Desktop Sidebar
     ds_health: "Saúde",
     ds_training: "Treino",
     // Settings Page
-    sp_appearance: "Aparencia",
+    sp_appearance: "Aparência",
     sp_customize_look: "Personalize sua aparencia",
     sp_theme: "Tema",
     sp_dark: "Escuro",
@@ -436,14 +436,14 @@ const translations = {
     sp_accent_color: "Cor de Destaque",
     sp_wearables_title: "Wearables",
     sp_wearables_connected: "Conectado",
-    sp_wearables_not_connected: "Nao conectado",
+    sp_wearables_not_connected: "Não conectado",
     sp_wearables_on: "Ligado",
     sp_wearables_connect: "Conectar",
     sp_my_data: "Meus Dados",
     sp_age: "Idade",
     sp_weight_kg: "Peso (kg)",
     sp_height_cm: "Altura (cm)",
-    sp_gender: "Genero",
+    sp_gender: "Gênero",
     sp_select: "Selecionar",
     sp_male: "Masculino",
     sp_female: "Feminino",
@@ -462,11 +462,11 @@ const translations = {
     sp_access: "Acessar",
     // Health Profile
     hp_my_data: "Meus Dados",
-    hp_personal_info: "Informacoes pessoais",
+    hp_personal_info: "Informações pessoais",
     hp_age: "Idade",
     hp_weight_kg: "Peso (kg)",
     hp_height_cm: "Altura (cm)",
-    hp_gender: "Genero",
+    hp_gender: "Gênero",
     hp_select: "Selecionar",
     hp_male: "Masculino",
     hp_female: "Feminino",
@@ -514,7 +514,7 @@ const translations = {
     validation_age_range: "A idade deve estar entre 10 e 120 anos",
     // Profile Setup
     settings_profile_saved: "Perfil atualizado!",
-    profile_setup_gender: "Qual seu genero?",
+    profile_setup_gender: "Qual seu gênero?",
     profile_setup_gender_desc: "Isso ajuda a personalizar seu plano",
     profile_setup_age: "Quantos anos voce tem?",
     profile_setup_age_desc: "Para calculos precisos",
@@ -525,7 +525,7 @@ const translations = {
     profile_setup_goal: "Qual seu objetivo?",
     profile_setup_goal_desc: "Escolha o que mais importa",
     profile_data_title: "Meus Dados",
-    profile_data_subtitle: "Informacoes pessoais",
+    profile_data_subtitle: "Informações pessoais",
   },
 
   "en-US": {
@@ -744,6 +744,7 @@ const translations = {
     em_pre_workout: "Pre-Workout Bio-Fuel", em_top_nutrients: "Top Nutrients from History",
     em_neural_link: "Neural Link Initiated...", em_no_signal: "Signal Unavailable",
     em_bodyweight: "Bodyweight", em_home_env: "Home Environment", em_bio_gym: "Bio-Gym",
+    em_search_google: "Search on Google", em_search_how: "See how to do this exercise",
     em_btn_search_google: "See how to do on Google",
     // Metabolic Planner
     mp_title: "Metabolism AI", mp_subtitle: "Our intelligence will analyze your profile to create the perfect strategy.",
