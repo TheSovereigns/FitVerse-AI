@@ -65,6 +65,7 @@ export type Profile = {
   gender: 'male' | 'female' | 'other' | null
   fitness_goal: 'lose_weight' | 'gain_muscle' | 'maintain' | 'improve_health' | null
   profile_setup_completed: boolean
+  ads_enabled: boolean
 }
 
 export type Subscription = {
@@ -112,13 +113,31 @@ export async function getUserProfile(userId: string): Promise<Profile | null> {
       .eq('id', userId)
       .single()
 
-    if (error?.code === 'PGRST116' || (!data && error?.code === 'PGRST116')) {
+    if (data) return data
+
+    if (error?.code === 'PGRST116') {
+      const { data: { user: authUser } } = await supabase.auth.getUser()
+      const email = authUser?.email || ''
+
+      if (email) {
+        const { data: existingByEmail } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('email', email)
+          .single()
+
+        if (existingByEmail) {
+          logger.info("[Supabase] Found profile by email, linking:", email)
+          return existingByEmail
+        }
+      }
+
       logger.info("[Supabase] Creating profile for user:", userId)
       const { data: newProfile, error: insertError } = await supabase
         .from('profiles')
         .insert({
           id: userId,
-          email: '',
+          email,
           plan: 'free',
           is_admin: false,
           country: 'BR',
@@ -148,4 +167,26 @@ export async function getUserProfile(userId: string): Promise<Profile | null> {
 export async function isUserAdmin(userId: string): Promise<boolean> {
   const profile = await getUserProfile(userId)
   return profile?.is_admin || false
+}
+
+// Shared helper: find profile by user.id, fallback to email
+export async function findProfile(userId: string, email?: string | null): Promise<Profile | null> {
+  const { data } = await supabase
+    .from('profiles')
+    .select('*')
+    .eq('id', userId)
+    .single()
+
+  if (data) return data
+
+  if (email) {
+    const { data: byEmail } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('email', email)
+      .single()
+    if (byEmail) return byEmail
+  }
+
+  return null
 }

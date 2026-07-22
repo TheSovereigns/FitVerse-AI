@@ -9,7 +9,7 @@ import { useTranslation } from "@/lib/i18n"
 import { logger } from "@/lib/logger"
 import { toast } from "sonner"
 import { useAuth } from "@/hooks/useAuth"
-import { supabase } from "@/lib/supabase"
+import { supabase, findProfile } from "@/lib/supabase"
 import { usePlanLimits } from "@/hooks/usePlanLimits"
 import { useAppStore } from "@/stores/app-store"
 import { DesktopSidebar } from "@/components/desktop-sidebar"
@@ -112,8 +112,7 @@ export default function DashboardPage() {
     if (user) {
       const userMetaAdmin = user.user_metadata?.is_admin === true
       if (userMetaAdmin) setIsAdmin(true)
-      supabase.from('profiles').select('is_admin').eq('id', user.id).single()
-        .then(({ data }) => { if (data?.is_admin) setIsAdmin(true) })
+      findProfile(user.id, user.email).then((p) => { if (p?.is_admin) setIsAdmin(true) })
     }
   }, [user])
 

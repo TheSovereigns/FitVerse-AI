@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Switch } from "./switch"
-import { supabase } from "@/lib/supabase"
+import { supabase, findProfile } from "@/lib/supabase"
 import {
   ArrowLeft,
   Bell,
@@ -283,11 +283,7 @@ export function SettingsPage({ onBack }: { onBack?: () => void }) {
     if (!user?.id) return
     const fetchProfile = async () => {
       try {
-        const { data } = await supabase
-          .from("profiles")
-          .select("ads_enabled, plan, is_admin")
-          .eq("id", user.id)
-          .single()
+        const data = await findProfile(user.id, user.email)
         if (data) {
           setUserSubscription(data.plan || "free")
           setAdsEnabled(data.ads_enabled !== false)
@@ -308,11 +304,7 @@ export function SettingsPage({ onBack }: { onBack?: () => void }) {
     if (!user?.id) return
     const loadProfile = async () => {
       try {
-        const { data } = await supabase
-          .from("profiles")
-          .select("age, weight, height, gender, fitness_goal")
-          .eq("id", user.id)
-          .single()
+        const data = await findProfile(user.id, user.email)
         if (data) {
           setProfileData({ age: data.age, weight: data.weight, height: data.height, gender: data.gender, fitness_goal: data.fitness_goal })
         }

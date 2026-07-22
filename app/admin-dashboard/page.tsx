@@ -19,7 +19,7 @@ import {
   ArrowLeft
 } from "lucide-react"
 import { useTranslation } from "@/lib/i18n"
-import { supabase } from "@/lib/supabase"
+import { supabase, findProfile } from "@/lib/supabase"
 import { cn } from "@/lib/utils"
 import { MetricCard } from "@/components/admin/metric-card"
 import { ActivityFeed } from "@/components/admin/activity-feed"
@@ -88,17 +88,11 @@ export default function AdminDashboardPage() {
       if (profile && !profile.is_admin) {
         setAccessDenied(true)
       } else if (!profile) {
-        // Profile not loaded yet, check directly
-        supabase
-          .from('profiles')
-          .select('is_admin')
-          .eq('id', user.id)
-          .single()
-          .then(({ data }) => {
-            if (!data?.is_admin) {
-              setAccessDenied(true)
-            }
-          })
+        findProfile(user.id, user.email).then((p) => {
+          if (!p?.is_admin) {
+            setAccessDenied(true)
+          }
+        })
       }
     }
   }, [user, authLoading, profile, router])

@@ -30,7 +30,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
-import { supabase } from "@/lib/supabase"
+import { supabase, findProfile } from "@/lib/supabase"
 import { useAuth } from "@/hooks/useAuth"
 import {
   LineChart,
@@ -136,14 +136,9 @@ export default function DatasetPage() {
       if (profile && !profile.is_admin) {
         setAccessDenied(true)
       } else if (!profile) {
-        supabase
-          .from('profiles')
-          .select('is_admin')
-          .eq('id', user.id)
-          .single()
-          .then(({ data }) => {
-            if (!data?.is_admin) setAccessDenied(true)
-          })
+        findProfile(user.id, user.email).then((p) => {
+          if (!p?.is_admin) setAccessDenied(true)
+        })
       }
     }
   }, [user, authLoading, profile, router])

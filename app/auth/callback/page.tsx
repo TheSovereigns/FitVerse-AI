@@ -12,16 +12,26 @@ async function ensureProfileExists(userId: string, email: string) {
     .eq('id', userId)
     .single()
 
-  if (!existing) {
-    await supabase.from('profiles').insert({
-      id: userId,
-      email: email,
-      name: null,
-      plan: 'free',
-      is_admin: false,
-      country: 'BR',
-    })
+  if (existing) return
+
+  if (email) {
+    const { data: existingByEmail } = await supabase
+      .from('profiles')
+      .select('id')
+      .eq('email', email)
+      .single()
+
+    if (existingByEmail) return
   }
+
+  await supabase.from('profiles').insert({
+    id: userId,
+    email: email,
+    name: null,
+    plan: 'free',
+    is_admin: false,
+    country: 'BR',
+  })
 }
 
 export default function AuthCallbackPage() {

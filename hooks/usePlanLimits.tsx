@@ -48,17 +48,33 @@ export function usePlanLimits() {
 
     const fetchPlan = async () => {
       try {
-        const { data, error } = await supabase
+        let data = null
+
+        const { data: byId, error: errById } = await supabase
           .from('profiles')
           .select('plan')
           .eq('id', user.id)
           .single()
 
-        logger.info("[usePlanLimits] Fetch result:", { data, error })
+        if (byId) {
+          data = byId
+        } else if (errById?.code === 'PGRST116' && user.email) {
+          const { data: byEmail } = await supabase
+            .from('profiles')
+            .select('plan')
+            .eq('email', user.email)
+            .single()
+          if (byEmail) data = byEmail
+        }
 
-        // If profile doesn't exist, create it
-        if (error?.code === 'PGRST116' || !data) {
-          logger.info("[usePlanLimits] Creating profile for user:", user.id)
+        logger.info("[usePlanLimits] Fetch result:", { data })
+
+        if (data?.plan) {
+          const userPlan = data.plan as Plan
+          setPlan(userPlan)
+          setLimits(getPlanLimits(userPlan))
+          logger.info("[usePlanLimits] Plan set to:", userPlan)
+        } else if (!data) {
           const { data: newProfile, error: insertError } = await supabase
             .from('profiles')
             .insert({
@@ -76,11 +92,6 @@ export function usePlanLimits() {
             setPlan('free')
             setLimits(getPlanLimits('free'))
           }
-        } else if (data?.plan) {
-          const userPlan = data.plan as Plan
-          setPlan(userPlan)
-          setLimits(getPlanLimits(userPlan))
-          logger.info("[usePlanLimits] Plan set to:", userPlan)
         }
       } catch (e) {
         logger.error("[usePlanLimits] Error:", e)

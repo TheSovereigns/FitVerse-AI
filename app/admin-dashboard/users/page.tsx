@@ -20,7 +20,7 @@ import {
   ArrowLeft
 } from "lucide-react"
 import { useTranslation } from "@/lib/i18n"
-import { supabase, Profile } from "@/lib/supabase"
+import { supabase, findProfile, Profile } from "@/lib/supabase"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
@@ -48,16 +48,11 @@ export default function AdminUsersPage() {
       if (profile && !profile.is_admin) {
         setAccessDenied(true)
       } else if (!profile) {
-        supabase
-          .from('profiles')
-          .select('is_admin')
-          .eq('id', user.id)
-          .single()
-          .then(({ data }) => {
-            if (!data?.is_admin) {
-              setAccessDenied(true)
-            }
-          })
+        findProfile(user.id, user.email).then((p) => {
+          if (!p?.is_admin) {
+            setAccessDenied(true)
+          }
+        })
       }
     }
   }, [user, authLoading, profile, router])
