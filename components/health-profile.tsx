@@ -108,7 +108,7 @@ export function HealthProfile({ scanHistory, onNavigateToSettings, onNavigateToS
         .from("profiles")
         .select("age, weight, height, gender, fitness_goal")
         .eq("id", user.id)
-        .single()
+        .maybeSingle()
       if (data) {
         setProfileData({
           age: data.age,

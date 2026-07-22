@@ -10,7 +10,7 @@ async function ensureProfileExists(userId: string, email: string) {
     .from('profiles')
     .select('id')
     .eq('id', userId)
-    .single()
+    .maybeSingle()
 
   if (existing) return
 
@@ -19,7 +19,7 @@ async function ensureProfileExists(userId: string, email: string) {
       .from('profiles')
       .select('id')
       .eq('email', email)
-      .single()
+      .maybeSingle()
 
     if (existingByEmail) return
   }

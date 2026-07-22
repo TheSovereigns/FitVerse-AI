@@ -153,7 +153,7 @@ export default function SubscriptionPage() {
         .from("profiles")
         .select("plan, ads_enabled")
         .eq("id", user.id)
-        .single()
+        .maybeSingle()
         .then(({ data }) => {
           if (data) {
             setCurrentPlan(data.plan as Plan)

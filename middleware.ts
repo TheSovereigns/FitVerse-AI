@@ -90,9 +90,9 @@ async function isAdmin(userId: string): Promise<boolean> {
       .from("profiles")
       .select("is_admin")
       .eq("id", userId)
-      .single()
+      .maybeSingle()
 
-    if (error) return false
+    if (error || !data) return false
     return data?.is_admin || false
   } catch (error) {
     console.error("Admin check error:", error)

@@ -138,24 +138,7 @@ export async function getUserProfile(userId: string): Promise<Profile | null> {
       }
     }
 
-    logger.info("[getUserProfile] Creating profile for user:", userId)
-    const { data: newProfile, error: insertError } = await supabase
-      .from('profiles')
-      .insert({
-        id: userId,
-        email,
-        plan: 'free',
-        is_admin: false,
-        country: 'BR',
-        ads_enabled: true,
-      })
-      .select('*')
-      .maybeSingle()
-
-    if (!insertError && newProfile) {
-      return newProfile
-    }
-
+    logger.info("[getUserProfile] No profile found for:", userId, email)
     return null
   } catch (e) {
     logger.error("[getUserProfile] Exception:", e)

@@ -74,24 +74,8 @@ export function usePlanLimits() {
           setPlan(userPlan)
           setLimits(getPlanLimits(userPlan))
           logger.info("[usePlanLimits] Plan set to:", userPlan)
-        } else if (!data) {
-          const { data: newProfile, error: insertError } = await supabase
-            .from('profiles')
-            .insert({
-              id: user.id,
-              email: user.email || '',
-              plan: 'free',
-              is_admin: false,
-              country: 'BR',
-              ads_enabled: true,
-            })
-            .select('plan')
-            .maybeSingle()
-
-          if (!insertError && newProfile) {
-            setPlan('free')
-            setLimits(getPlanLimits('free'))
-          }
+        } else {
+          logger.warn("[usePlanLimits] No profile found, keeping default plan:", plan)
         }
       } catch (e) {
         logger.error("[usePlanLimits] Error:", e)
