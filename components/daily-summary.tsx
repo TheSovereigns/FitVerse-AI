@@ -76,11 +76,11 @@ export function DailySummary() {
   }, [dailyData.scans])
 
   const weekData = useMemo(() => {
-    const days = []
+    const days: Array<{ date: string; dayName: string; scans: number; calories: number; protein: number; carbs: number; fat: number }> = []
     for (let i = 6; i >= 0; i--) {
       const date = new Date()
       date.setDate(date.getDate() - i)
-      const dateStr = date.toISOString().split("T")[0]
+      const dateStr = date.toISOString().split("T")[0] ?? ''
       
       const activity = localStorage.getItem("dailyActivity")
       const scans = activity ? JSON.parse(activity).scannedProducts || [] : []
@@ -101,6 +101,9 @@ export function DailySummary() {
         dayName: date.toLocaleDateString("pt-BR", { weekday: "short" }),
         scans: dayScans.length,
         calories: dayMacros.calories,
+        protein: dayMacros.protein,
+        carbs: dayMacros.carbs,
+        fat: dayMacros.fat,
       })
     }
     return days

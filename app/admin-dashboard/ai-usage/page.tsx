@@ -22,6 +22,13 @@ import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { useAuth } from "@/hooks/useAuth"
 
+interface AIMessage {
+  user_id: string
+  user_message: string
+  created_at: string
+  tokens_used: number | null
+}
+
 interface AIUsageStats {
   totalMessages: number
   avgMessagesPerUser: number
@@ -95,7 +102,7 @@ export default function AdminAIUsagePage() {
         .from('ai_messages')
         .select('user_id, user_message, created_at, tokens_used')
         .order('created_at', { ascending: false })
-        .limit(1000)
+        .limit(1000) as { data: AIMessage[] | null }
 
       if (!messages || messages.length === 0) {
         setHourlyData(Array(24).fill(0))

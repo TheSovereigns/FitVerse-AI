@@ -210,7 +210,7 @@ export default function DatasetPage() {
 
       const from = (page - 1) * pageSize
       const to = from + pageSize - 1
-      const { data, error } = await query.range(from, to)
+      const { data, error } = await query.range(from, to) as { data: MessageRecord[] | null; error: null }
 
       if (!error && data) setMessages(data as MessageRecord[])
 
@@ -220,7 +220,7 @@ export default function DatasetPage() {
       const { data: growthRows } = await supabase
         .from("ai_messages")
         .select("created_at")
-        .order("created_at", { ascending: true })
+        .order("created_at", { ascending: true }) as { data: { created_at: string }[] | null }
 
       if (growthRows) {
         const dateMap: Record<string, number> = {}

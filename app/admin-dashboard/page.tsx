@@ -160,8 +160,8 @@ export default function AdminDashboardPage() {
         supabase.from('top_users_view').select('*').limit(5)
       ])
 
-      const mrrBRL = subscriptions?.reduce((sum, s) => sum + (s.amount_brl || 0), 0) || 0
-      const mrrUSD = subscriptions?.reduce((sum, s) => sum + (s.amount_usd || 0), 0) || 0
+      const mrrBRL = subscriptions?.reduce((sum, s) => sum + ((s as any).amount_brl || 0), 0) || 0
+      const mrrUSD = subscriptions?.reduce((sum, s) => sum + ((s as any).amount_usd || 0), 0) || 0
       const conversionRate = totalUsers ? ((premiumUsers || 0) / totalUsers) * 100 : 0
 
       setStats({
@@ -182,7 +182,7 @@ export default function AdminDashboardPage() {
       )
       
       sortedProfiles.forEach(p => {
-        const date = p.created_at.split('T')[0]
+        const date = p.created_at.split('T')[0] ?? 'unknown'
         if (!groupedData[date]) {
           groupedData[date] = { newUsers: 0, total: 0 }
         }

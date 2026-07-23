@@ -114,7 +114,7 @@ export default function AdminRevenuePage() {
       const { data: subs, error } = await supabase
         .from('subscriptions')
         .select('*')
-        .order('created_at', { ascending: false })
+        .order('created_at', { ascending: false }) as { data: Subscription[] | null; error: null }
 
       if (error) throw error
 
@@ -185,7 +185,7 @@ export default function AdminRevenuePage() {
       // Build plan distribution from profiles
       const { data: profiles } = await supabase
         .from('profiles')
-        .select('plan')
+        .select('plan') as { data: { plan: string }[] | null }
 
       const planCounts: Record<string, number> = { free: 0, pro: 0, premium: 0 }
       profiles?.forEach(p => {

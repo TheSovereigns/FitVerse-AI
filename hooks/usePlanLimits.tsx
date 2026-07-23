@@ -48,7 +48,7 @@ export function usePlanLimits() {
 
     const fetchPlan = async () => {
       try {
-        let data = null
+        let data: { plan: string } | null = null
 
         // Ensure we have a fresh session before querying (RLS requires valid JWT)
         const { data: { session } } = await supabase.auth.getSession()

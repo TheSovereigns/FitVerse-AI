@@ -52,7 +52,7 @@ export default function AuthCallbackPage() {
 
     handleCallback()
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event: string, session: { user: { id: string; email?: string } } | null) => {
       if (event === "SIGNED_IN" || event === "INITIAL_SESSION") {
         if (session) {
           ensureProfileExists(session.user.id, session.user.email || '').then(() => {
@@ -63,7 +63,7 @@ export default function AuthCallbackPage() {
     })
 
     const timer = setTimeout(() => {
-      supabase.auth.getSession().then(({ data: { session } }) => {
+      supabase.auth.getSession().then(({ data: { session } }: { data: { session: { user: { id: string; email?: string } } | null } }) => {
         if (session) {
           ensureProfileExists(session.user.id, session.user.email || '').then(() => {
             router.replace("/")

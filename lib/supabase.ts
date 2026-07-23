@@ -1,5 +1,5 @@
 import { getSupabaseClient } from './supabase-client'
-import { createClient } from '@supabase/supabase-js'
+import { createClient, SupabaseClient } from '@supabase/supabase-js'
 import { logger } from './logger'
 
 // Lazy getter - only creates client on first access

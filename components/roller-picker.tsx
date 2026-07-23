@@ -17,7 +17,7 @@ export function RollerPicker({ min, max, value, onChange, unit, label }: RollerP
   const [items, setItems] = useState<number[]>([])
 
   useEffect(() => {
-    const newItems = []
+    const newItems: number[] = []
     for (let i = min; i <= max; i++) {
         newItems.push(i)
     }
