@@ -3,21 +3,22 @@
 import { cn } from "@/lib/utils"
 import { useTranslation } from "@/lib/i18n"
 import type { View } from "@/lib/types"
-import { Home, Dumbbell, ChefHat, Users, Settings } from "lucide-react"
+import { Home, ScanLine, Dumbbell, ChefHat, LayoutGrid } from "lucide-react"
 
 interface MobileBottomNavProps {
   currentView: View
   onNavigate: (view: View) => void
+  onOpenMore: () => void
 }
 
-export function MobileBottomNav({ currentView, onNavigate }: MobileBottomNavProps) {
+export function MobileBottomNav({ currentView, onNavigate, onOpenMore }: MobileBottomNavProps) {
   const { t } = useTranslation()
 
-  const items = [
-    { view: "home" as View, icon: Home, label: t("nav_home") },
-    { view: "training" as View, icon: Dumbbell, label: t("nav_workouts") },
-    { view: "recipes" as View, icon: ChefHat, label: t("nav_recipes") },
-    { view: "clans" as View, icon: Users, label: t("nav_clans") },
+  const items: { view: View; icon: typeof Home; label: string }[] = [
+    { view: "home", icon: Home, label: t("nav_home") },
+    { view: "dashboard", icon: ScanLine, label: t("nav_bioscan") },
+    { view: "training", icon: Dumbbell, label: t("nav_workouts") },
+    { view: "recipes", icon: ChefHat, label: t("nav_recipes") },
   ]
 
   return (
@@ -43,18 +44,13 @@ export function MobileBottomNav({ currentView, onNavigate }: MobileBottomNavProp
         )
       })}
       <button
-        onClick={() => onNavigate("settings")}
+        onClick={onOpenMore}
         className={cn(
           "relative flex h-12 w-12 items-center justify-center rounded-xl transition-all duration-200",
-          currentView === "settings"
-            ? "bg-brand/10 text-brand"
-            : "text-muted-foreground hover:text-foreground"
+          "text-muted-foreground hover:text-foreground"
         )}
       >
-        <Settings className={cn("h-[22px] w-[22px]", currentView === "settings" && "stroke-[2.5]")} />
-        {currentView === "settings" && (
-          <span className="absolute -bottom-0.5 h-[3px] w-4 rounded-full bg-brand" />
-        )}
+        <LayoutGrid className="h-[22px] w-[22px]" />
       </button>
     </nav>
   )

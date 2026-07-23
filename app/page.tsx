@@ -14,6 +14,7 @@ import { usePlanLimits } from "@/hooks/usePlanLimits"
 import { useAppStore } from "@/stores/app-store"
 import { DesktopSidebar } from "@/components/desktop-sidebar"
 import { MobileBottomNav } from "@/components/mobile-bottom-nav"
+import { MobileMoreSheet } from "@/components/mobile-more-sheet"
 import { FeatureErrorBoundary } from "@/components/FeatureErrorBoundary"
 import { LandingPage } from "@/components/landing-page"
 import { AdBanner } from "@/components/ad-banner"
@@ -91,6 +92,7 @@ export default function DashboardPage() {
   const setUserMetabolicPlanStore = useAppStore(s => s.setUserMetabolicPlan)
 
   const [authTimedOut, setAuthTimedOut] = useState(false)
+  const [moreSheetOpen, setMoreSheetOpen] = useState(false)
   const bottomNavInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
@@ -423,7 +425,8 @@ export default function DashboardPage() {
 
       {/* Mobile bottom nav */}
       <AdBanner position="bottom" />
-      <MobileBottomNav currentView={currentView} onNavigate={setCurrentView} />
+      <MobileBottomNav currentView={currentView} onNavigate={setCurrentView} onOpenMore={() => setMoreSheetOpen(true)} />
+      <MobileMoreSheet open={moreSheetOpen} onClose={() => setMoreSheetOpen(false)} onNavigate={setCurrentView} isFeatureLocked={isFeatureLocked} />
     </div>
   )
 }
