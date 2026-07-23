@@ -103,6 +103,11 @@ export default function AdminUsersPage() {
   const fetchUsers = async () => {
     setLoading(true)
     try {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session?.access_token) {
+        await supabase.auth.refreshSession()
+      }
+
       let query = supabase
         .from('profiles')
         .select('*', { count: 'exact' })

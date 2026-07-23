@@ -195,6 +195,11 @@ export default function DatasetPage() {
   const fetchData = useCallback(async () => {
     setLoading(true)
     try {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session?.access_token) {
+        await supabase.auth.refreshSession()
+      }
+
       let query = supabase
         .from("ai_messages")
         .select("*, profiles(name, email)")

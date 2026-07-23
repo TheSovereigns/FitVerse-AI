@@ -136,6 +136,11 @@ export default function AdminDashboardPage() {
 
   const fetchDashboardData = useCallback(async () => {
     try {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session?.access_token) {
+        await supabase.auth.refreshSession()
+      }
+
       const today = new Date().toISOString().split('T')[0]
       const thirtyDaysAgo = new Date()
       thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
