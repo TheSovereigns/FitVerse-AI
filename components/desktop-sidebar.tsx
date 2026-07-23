@@ -114,20 +114,20 @@ export function DesktopSidebar({ currentView, onNavigate, isFeatureLocked }: Sid
                 <ChevronDown className={cn("w-2 h-2 absolute right-1.5 top-1.5 transition-transform", isOpen && "rotate-180")} />
               </button>
               {isOpen && (
-                <div className="ml-1 mt-0.5 mb-1 space-y-0.5 pl-1 border-l border-border/50">
+                <div className="grid grid-cols-3 gap-1 px-1 py-1">
                   {g.items.map((sub) => (
                     <button
                       key={sub.view}
                       onClick={() => { onNavigate(sub.view); setExpanded(null) }}
+                      title={sub.label}
                       className={cn(
-                        "flex items-center gap-1.5 w-full px-2 py-1 rounded-lg text-left transition-all",
+                        "flex items-center justify-center w-full aspect-square rounded-lg transition-all",
                         currentView === sub.view
                           ? "bg-brand-muted text-brand"
                           : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
                       )}
                     >
-                      <sub.icon className="w-3 h-3 shrink-0" />
-                      <span className="text-[8px] font-medium leading-none truncate">{sub.label}</span>
+                      <sub.icon className="w-4 h-4" />
                     </button>
                   ))}
                 </div>
