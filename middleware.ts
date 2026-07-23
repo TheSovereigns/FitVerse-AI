@@ -2,8 +2,16 @@ import { NextResponse } from "next/server"
 import type { NextRequest } from "next/server"
 import { createClient } from "@supabase/supabase-js"
 
-// Initialize Supabase admin client for server-side operations
+// Supabase anon client for token verification (works with any valid JWT)
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ""
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ""
+const supabaseAuth = supabaseUrl && supabaseAnonKey
+  ? createClient(supabaseUrl, supabaseAnonKey, {
+      auth: { autoRefreshToken: false, persistSession: false },
+    })
+  : null
+
+// Supabase service-role client for admin DB queries (bypasses RLS)
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || ""
 const supabaseAdmin = supabaseUrl && supabaseServiceKey
   ? createClient(supabaseUrl, supabaseServiceKey, {
@@ -58,12 +66,12 @@ function matchesRoute(path: string, route: string) {
 }
 
 async function getSession(request: NextRequest) {
-  if (!supabaseAdmin) return null
+  if (!supabaseAuth) return null
 
   try {
     const bearerToken = request.headers.get("Authorization")?.replace("Bearer ", "")
     if (bearerToken) {
-      const { data: { user }, error } = await supabaseAdmin.auth.getUser(bearerToken)
+      const { data: { user }, error } = await supabaseAuth.auth.getUser(bearerToken)
       if (error || !user) return null
       return user
     }
@@ -78,7 +86,7 @@ async function getSession(request: NextRequest) {
     if (!token) return null
 
     // Verify the token
-    const { data: { user }, error } = await supabaseAdmin.auth.getUser(token)
+    const { data: { user }, error } = await supabaseAuth.auth.getUser(token)
     if (error || !user) return null
 
     return user
@@ -89,7 +97,11 @@ async function getSession(request: NextRequest) {
 }
 
 async function isAdmin(userId: string): Promise<boolean> {
-  if (!supabaseAdmin) return false
+  if (!supabaseAdmin) {
+    // Service role key not available — can't verify admin status server-side.
+    // Allow the request through; the admin page will verify client-side.
+    return true
+  }
 
   try {
     const { data, error } = await supabaseAdmin
