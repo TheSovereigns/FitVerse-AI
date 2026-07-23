@@ -23,6 +23,13 @@ const publicRoutes = [
   "/api/auth/signup",
   "/api/auth/reset-password",
   "/api/stripe/webhook",
+]
+
+// Admin routes (API + pages). Server-side protection.
+const adminRoutes = ["/api/admin", "/admin-dashboard"]
+
+// API routes that require auth but are not admin-only.
+const protectedRoutes = [
   "/api/analyze-product",
   "/api/generate-metabolic-plan",
   "/api/generate-recipes",
@@ -35,13 +42,12 @@ const publicRoutes = [
   "/api/food-substitutions",
   "/api/generate-weekly-meals",
   "/api/weekly-report",
+  "/api/generate-initial-plan",
+  "/api/metabolic-plan",
+  "/api/stripe/checkout",
+  "/api/stripe/stats",
+  "/api/subscription",
 ]
-
-// Admin routes (API + pages). Server-side protection.
-const adminRoutes = ["/api/admin", "/admin-dashboard"]
-
-// API routes that require auth but are not admin-only.
-const protectedRoutes: string[] = []
 
 function matchesRoute(path: string, route: string) {
   if (route === "/") {

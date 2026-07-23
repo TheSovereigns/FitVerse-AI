@@ -127,10 +127,36 @@ function collectWeeklyData(): WeeklyReportData {
     logger.error("[useWeeklyReport] Failed to parse streakData:", e)
   }
 
-  const prevWeekScans = Math.round(totalScans * 0.8)
-  const prevWeekWorkouts = Math.round(totalWorkouts * 0.8)
-  const scanTrend = prevWeekScans > 0 ? Math.round(((totalScans - prevWeekScans) / prevWeekScans) * 100) : 0
-  const workoutTrend = prevWeekWorkouts > 0 ? Math.round(((totalWorkouts - prevWeekWorkouts) / prevWeekWorkouts) * 100) : 0
+  // Store current week snapshot for future comparisons
+  const snapshotKey = `weekly-snapshot-${format(weekStart, "yyyy-MM-dd")}`
+  let scanTrend = 0
+  let workoutTrend = 0
+  try {
+    const prevSnapshotKey = `weekly-snapshot-${format(subDays(weekStart, 7), "yyyy-MM-dd")}`
+    const prevSnapshot = localStorage.getItem(prevSnapshotKey)
+    const prevData = prevSnapshot ? JSON.parse(prevSnapshot) : null
+
+    scanTrend = prevData?.totalScans
+      ? Math.round(((totalScans - prevData.totalScans) / Math.max(prevData.totalScans, 1)) * 100)
+      : 0
+    workoutTrend = prevData?.totalWorkouts
+      ? Math.round(((totalWorkouts - prevData.totalWorkouts) / Math.max(prevData.totalWorkouts, 1)) * 100)
+      : 0
+
+    // Save current week snapshot
+    localStorage.setItem(snapshotKey, JSON.stringify({
+      totalScans, totalWorkouts, totalDiets, avgScore: scoreCount > 0 ? Math.round(totalScore / scoreCount) : 0,
+      totalCalories: Math.round(totalCalories), daysActive, bestScore, bestDay,
+    }))
+
+    // Clean old snapshots (keep last 12 weeks)
+    for (let i = 13; i <= 52; i++) {
+      const oldKey = `weekly-snapshot-${format(subDays(weekStart, i * 7), "yyyy-MM-dd")}`
+      localStorage.removeItem(oldKey)
+    }
+  } catch (e) {
+    logger.error("[useWeeklyReport] Failed to compute trends:", e)
+  }
 
   return {
     weekLabel,

@@ -56,6 +56,8 @@ const SeasonSystem = lazy(() => import("@/components/season-system").then(m => (
 const BossBattles = lazy(() => import("@/components/boss-battles").then(m => ({ default: m.BossBattles })))
 const RewardShop = lazy(() => import("@/components/reward-shop").then(m => ({ default: m.RewardShop })))
 
+import { HomeSkeleton, TrainingSkeleton, RecipesSkeleton, ChatSkeleton, SettingsSkeleton, ProfileSkeleton, PlannerSkeleton } from "@/components/skeleton-loaders-views"
+
 function ViewLoader() {
   return (
     <div className="flex items-center justify-center py-20">

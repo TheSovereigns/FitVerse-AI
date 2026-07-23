@@ -1,6 +1,37 @@
 import { logger } from "@/lib/logger"
+import { NextResponse } from "next/server"
 
 export { getSupabaseAdmin, authUser, getTokenFromRequest, getCorsHeaders } from "@/lib/supabase-server"
+
+export async function requireAuth(request: Request): Promise<{ userId: string; email?: string } | NextResponse> {
+  const { authUser } = await import("@/lib/supabase-server")
+  const user = await authUser(request)
+  if (!user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  }
+  return user
+}
+
+export async function requireAdmin(request: Request): Promise<{ userId: string; email?: string } | NextResponse> {
+  const { authUser, getSupabaseAdmin } = await import("@/lib/supabase-server")
+  const user = await authUser(request)
+  if (!user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  }
+  const supabaseAdmin = getSupabaseAdmin()
+  if (!supabaseAdmin) {
+    return NextResponse.json({ error: "Server configuration error" }, { status: 500 })
+  }
+  const { data: profile } = await supabaseAdmin
+    .from("profiles")
+    .select("is_admin")
+    .eq("id", user.userId)
+    .single()
+  if (!profile?.is_admin) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 })
+  }
+  return user
+}
 
 const FITVERSE_KEYS = [
   "fitverse-app-store",

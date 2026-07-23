@@ -4,6 +4,7 @@ import { useEffect } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Home, AlertTriangle } from "lucide-react"
+import { useTranslation } from "@/lib/i18n"
 
 export default function GlobalError({
   error,
@@ -12,6 +13,9 @@ export default function GlobalError({
   error: Error & { digest?: string }
   reset: () => void
 }) {
+  const { t, locale } = useTranslation()
+  const isEnglish = locale === "en-US"
+
   useEffect(() => {
     console.error(error)
   }, [error])
@@ -24,11 +28,13 @@ export default function GlobalError({
         </div>
         
         <h1 className="text-3xl md:text-4xl font-black text-white">
-          Ops! Algo deu errado
+          {isEnglish ? "Oops! Something went wrong" : "Ops! Algo deu errado"}
         </h1>
         
         <p className="text-white/60 max-w-md mx-auto">
-          Encontramos um erro inesperado. Tente novamente ou volte para a página inicial.
+          {isEnglish
+            ? "We encountered an unexpected error. Try again or go back to the home page."
+            : "Encontramos um erro inesperado. Tente novamente ou volte para a pagina inicial."}
         </p>
 
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -36,7 +42,7 @@ export default function GlobalError({
             onClick={() => reset()}
             className="h-12 px-8 rounded-2xl font-bold"
           >
-            Tentar novamente
+            {isEnglish ? "Try again" : "Tentar novamente"}
           </Button>
           
           <Link href="/">
@@ -45,7 +51,7 @@ export default function GlobalError({
               className="h-12 px-8 rounded-2xl font-bold border-white/20 text-white hover:bg-white/10"
             >
               <Home className="w-5 h-5 mr-2" />
-              Início
+              {isEnglish ? "Home" : "Inicio"}
             </Button>
           </Link>
         </div>
