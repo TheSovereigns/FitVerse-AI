@@ -97,10 +97,8 @@ export default function AdminAIUsagePage() {
 
   const fetchAIUsageData = async () => {
     try {
-      const { data: { session } } = await supabase.auth.getSession()
-      if (!session?.access_token) {
-        await supabase.auth.refreshSession()
-      }
+      const { data: { user: authUser } } = await supabase.auth.getUser()
+      if (!authUser) return
 
       // Fetch AI messages from ai_messages table
       const { data: messages } = await supabase

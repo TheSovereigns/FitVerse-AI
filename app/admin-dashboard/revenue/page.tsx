@@ -110,10 +110,8 @@ export default function AdminRevenuePage() {
 
   const fetchRevenueData = async () => {
     try {
-      const { data: { session } } = await supabase.auth.getSession()
-      if (!session?.access_token) {
-        await supabase.auth.refreshSession()
-      }
+      const { data: { user: authUser } } = await supabase.auth.getUser()
+      if (!authUser) return
 
       // Fetch all subscriptions
       const { data: subs, error } = await supabase

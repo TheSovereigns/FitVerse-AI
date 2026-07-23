@@ -103,9 +103,10 @@ export default function AdminUsersPage() {
   const fetchUsers = async () => {
     setLoading(true)
     try {
-      const { data: { session } } = await supabase.auth.getSession()
-      if (!session?.access_token) {
-        await supabase.auth.refreshSession()
+      const { data: { user: authUser } } = await supabase.auth.getUser()
+      if (!authUser) {
+        setLoading(false)
+        return
       }
 
       let query = supabase
@@ -143,6 +144,12 @@ export default function AdminUsersPage() {
 
     setLoading(true)
     try {
+      const { data: { user: authUser } } = await supabase.auth.getUser()
+      if (!authUser) {
+        setLoading(false)
+        return
+      }
+
       const { data, error } = await supabase
         .from('profiles')
         .select('*')

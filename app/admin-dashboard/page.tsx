@@ -136,9 +136,10 @@ export default function AdminDashboardPage() {
 
   const fetchDashboardData = useCallback(async () => {
     try {
-      const { data: { session } } = await supabase.auth.getSession()
-      if (!session?.access_token) {
-        await supabase.auth.refreshSession()
+      const { data: { user: authUser } } = await supabase.auth.getUser()
+      if (!authUser) {
+        setLoading(false)
+        return
       }
 
       const today = new Date().toISOString().split('T')[0]
