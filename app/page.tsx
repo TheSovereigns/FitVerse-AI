@@ -12,6 +12,7 @@ import { useAuth } from "@/hooks/useAuth"
 import { supabase, findProfile } from "@/lib/supabase"
 import { usePlanLimits } from "@/hooks/usePlanLimits"
 import { useAppStore } from "@/stores/app-store"
+import { recordAction } from "@/lib/gamification"
 import { DesktopSidebar } from "@/components/desktop-sidebar"
 import { MobileBottomNav } from "@/components/mobile-bottom-nav"
 import { MobileMoreSheet } from "@/components/mobile-more-sheet"
@@ -285,6 +286,14 @@ export default function DashboardPage() {
     addScanHistory({ id: scanId, name: analysis.productName, scannedAt, score: analysis.longevityScore, image: displayImage })
     incrementScans()
     setPendingScan(null)
+
+    const result = recordAction("scan")
+    if (result.bossVictory) {
+      toast.success(isEnglish ? `Boss defeated! +${result.bossXpEarned} XP` : `Boss derrotado! +${result.bossXpEarned} XP`)
+    }
+    if (result.newAchievements.length > 0) {
+      toast.success(isEnglish ? `Achievement unlocked! +${result.newAchievements.length} achievements` : `Conquista desbloqueada! +${result.newAchievements.length} conquistas`)
+    }
     toast.success(isEnglish ? "Scan saved!" : "Escaneamento salvo!")
   }
 

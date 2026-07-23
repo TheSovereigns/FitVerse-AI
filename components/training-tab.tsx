@@ -16,6 +16,7 @@ import { cn } from "@/lib/utils"
 import { supabase } from "@/lib/supabase"
 import { toast } from "sonner"
 import { useTranslation } from "@/lib/i18n"
+import { recordAction } from "@/lib/gamification"
 
 interface Exercise {
   name: string
@@ -323,7 +324,16 @@ export function TrainingTab({ userGoal }: TrainingTabProps) {
         <ActiveWorkoutSession
           workout={activeSessionWorkout}
           onClose={() => setActiveSessionWorkout(null)}
-          onComplete={() => setActiveSessionWorkout(null)}
+          onComplete={() => {
+            const result = recordAction("workout")
+            if (result.bossVictory) {
+              toast.success(locale === "en-US" ? `Boss defeated! +${result.bossXpEarned} XP` : `Boss derrotado! +${result.bossXpEarned} XP`)
+            }
+            if (result.newAchievements.length > 0) {
+              toast.success(locale === "en-US" ? `Achievement unlocked!` : `Conquista desbloqueada!`)
+            }
+            setActiveSessionWorkout(null)
+          }}
         />
       )}
 

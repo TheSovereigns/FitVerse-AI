@@ -10,6 +10,7 @@ import { notifications } from "@/lib/notifications"
 import { Droplets, Plus, Minus, Target, TrendingUp } from "lucide-react"
 import { format } from "date-fns"
 import { cn } from "@/lib/utils"
+import { recordAction } from "@/lib/gamification"
 
 interface HydrationEntry {
   date: string
@@ -47,6 +48,12 @@ export function HydrationTracker() {
     setTodayEntry({ date: today, amount: newAmount, goal })
     if (newAmount >= goal && !isGoalMet) {
       notifications.success("Meta de hidratação atingida!")
+    }
+    if (amount > 0) {
+      const result = recordAction("water")
+      if (result.bossVictory) {
+        notifications.success("Boss defeated!")
+      }
     }
   }
 

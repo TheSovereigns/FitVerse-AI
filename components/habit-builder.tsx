@@ -4,7 +4,8 @@ import React, { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTranslation } from "@/lib/i18n";
 import { logger } from "@/lib/logger";
-import { Check, Plus, X, Flame, Zap } from "lucide-react";
+import { Check, Plus, X, Flame, Zap } from "lucide-react"
+import { recordAction } from "@/lib/gamification"
 
 interface Habit {
   id: string;
@@ -58,9 +59,10 @@ export function HabitBuilder({}: HabitBuilderProps) {
   const completedToday = todayLog?.completed || [];
 
   const toggleHabit = (id: string) => {
+    const wasCompleted = completedToday.includes(id)
     let updated: HabitLog[];
     if (todayLog) {
-      const completed = completedToday.includes(id)
+      const completed = wasCompleted
         ? completedToday.filter((c) => c !== id)
         : [...completedToday, id];
       updated = logs.map((l) => (l.date === today ? { ...l, completed } : l));
@@ -68,6 +70,9 @@ export function HabitBuilder({}: HabitBuilderProps) {
       updated = [...logs, { date: today, completed: [id] }];
     }
     saveLogs(updated);
+    if (!wasCompleted) {
+      recordAction("habit")
+    }
   };
 
   const addCustomHabit = () => {

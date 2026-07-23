@@ -4,108 +4,74 @@ import React, { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTranslation } from "@/lib/i18n";
 import { logger } from "@/lib/logger";
-import { Swords, Heart, Shield, Zap, Trophy, RotateCcw, Lock, Dumbbell, ScanLine, Droplets, CheckCircle } from "lucide-react";
-
-interface BattleRecord {
-  bossName: string;
-  date: string;
-  won: boolean;
-  damageDealt: number;
-}
+import {
+  Swords, Heart, Shield, Zap, Trophy, RotateCcw, Lock,
+  Dumbbell, ScanLine, Droplets, CheckCircle
+} from "lucide-react";
+import {
+  getGamificationData, startBossBattle, advanceBoss, recordAction, BossState
+} from "@/lib/gamification";
 
 interface BossBattlesProps {
   isLocked?: boolean;
 }
 
 const bosses = [
-  {
-    name: "Sedentary Slime",
-    maxHp: 500,
-    difficulty: "Easy",
-    xpReward: 200,
-    weakness: "Workouts",
-  },
-  {
-    name: "Junk Food Dragon",
-    maxHp: 800,
-    difficulty: "Medium",
-    xpReward: 350,
-    weakness: "Food Scans",
-  },
-  {
-    name: "Stress Phantom",
-    maxHp: 1200,
-    difficulty: "Hard",
-    xpReward: 500,
-    weakness: "Meditation",
-  },
+  { name: "Sedentary Slime", maxHp: 500, difficulty: "Easy", xpReward: 200, weakness: "Workouts" },
+  { name: "Junk Food Dragon", maxHp: 800, difficulty: "Medium", xpReward: 350, weakness: "Food Scans" },
+  { name: "Stress Phantom", maxHp: 1200, difficulty: "Hard", xpReward: 500, weakness: "Meditation" },
 ];
-
-const taskDamage: Record<string, number> = {
-  workout: 50,
-  scan: 25,
-  water: 15,
-  habit: 20,
-};
 
 export function BossBattles({ isLocked = false }: BossBattlesProps) {
   const { t } = useTranslation();
-  const [currentBossIndex, setCurrentBossIndex] = useState(0);
-  const [bossHp, setBossHp] = useState(0);
-  const [battleHistory, setBattleHistory] = useState<BattleRecord[]>([]);
+  const [bossState, setBossState] = useState<BossState | null>(null);
   const [showVictory, setShowVictory] = useState(false);
-  const [showDefeat, setShowDefeat] = useState(false);
-  const [battleStarted, setBattleStarted] = useState(false);
-
-  const boss = bosses[currentBossIndex]!;
+  const [xpEarned, setXpEarned] = useState(0);
 
   useEffect(() => {
-    try {
-      const stored = localStorage.getItem("boss_history");
-      if (stored) setBattleHistory(JSON.parse(stored));
-    } catch (e) {
-      logger.error("[BossBattles] Failed to parse boss_history:", e)
-    }
-    setBossHp(boss.maxHp);
-  }, [currentBossIndex, boss.maxHp]);
+    const data = getGamificationData();
+    setBossState(data.bossState);
+  }, []);
 
-  const startBattle = () => {
-    setBossHp(boss.maxHp);
-    setBattleStarted(true);
-    setShowVictory(false);
-    setShowDefeat(false);
-  };
+  const refreshState = useCallback(() => {
+    const data = getGamificationData();
+    setBossState(data.bossState);
+  }, []);
 
-  const dealDamage = (type: string) => {
-    if (!battleStarted || bossHp <= 0) return;
-    const damage = taskDamage[type] || 0;
-    const newHp = Math.max(0, bossHp - damage);
-    setBossHp(newHp);
+  useEffect(() => {
+    const interval = setInterval(refreshState, 2000);
+    return () => clearInterval(interval);
+  }, [refreshState]);
 
-    if (newHp <= 0) {
-      setShowVictory(true);
-      setBattleStarted(false);
-      const record: BattleRecord = {
-        bossName: boss.name,
-        date: new Date().toISOString(),
-        won: true,
-        damageDealt: boss.maxHp,
-      };
-      const updated = [...battleHistory, record];
-      setBattleHistory(updated);
-      localStorage.setItem("boss_history", JSON.stringify(updated));
-    }
-  };
-
-  const nextBoss = () => {
-    const next = (currentBossIndex + 1) % bosses.length;
-    setCurrentBossIndex(next);
-    setBattleStarted(false);
-    setShowVictory(false);
-    setShowDefeat(false);
-  };
-
+  const boss = bossState ? bosses[bossState.currentBossIndex]! : bosses[0]!;
+  const bossHp = bossState?.bossHp ?? boss.maxHp;
+  const battleStarted = bossState?.battleStarted ?? false;
+  const battleHistory = bossState?.battleHistory ?? [];
   const hpPercent = (bossHp / boss.maxHp) * 100;
+
+  const handleStartBattle = () => {
+    startBossBattle();
+    setShowVictory(false);
+    setXpEarned(0);
+    refreshState();
+  };
+
+  const handleDealDamage = (type: string) => {
+    if (!battleStarted || bossHp <= 0) return;
+    const result = recordAction(type as any);
+    if (result.bossVictory) {
+      setShowVictory(true);
+      setXpEarned(result.bossXpEarned);
+    }
+    refreshState();
+  };
+
+  const handleNextBoss = () => {
+    advanceBoss();
+    setShowVictory(false);
+    setXpEarned(0);
+    refreshState();
+  };
 
   const formatTime = (s: number) => {
     const m = Math.floor(s / 60);
@@ -168,7 +134,7 @@ export function BossBattles({ isLocked = false }: BossBattlesProps) {
       {!battleStarted && !showVictory && (
         <motion.button
           whileTap={{ scale: 0.98 }}
-          onClick={startBattle}
+          onClick={handleStartBattle}
           className="w-full px-4 py-3 rounded-xl bg-brand text-white text-sm font-medium mb-4"
         >
           <Swords className="w-4 h-4 inline mr-2" />
@@ -179,15 +145,15 @@ export function BossBattles({ isLocked = false }: BossBattlesProps) {
       {battleStarted && (
         <div className="grid grid-cols-2 gap-2 mb-4">
           {[
-            { type: "workout", label: "Workout", icon: Dumbbell, damage: taskDamage.workout },
-            { type: "scan", label: "Food Scan", icon: ScanLine, damage: taskDamage.scan },
-            { type: "water", label: "Drink Water", icon: Droplets, damage: taskDamage.water },
-            { type: "habit", label: "Complete Habit", icon: CheckCircle, damage: taskDamage.habit },
+            { type: "workout", label: "Workout", icon: Dumbbell, damage: 50 },
+            { type: "scan", label: "Food Scan", icon: ScanLine, damage: 25 },
+            { type: "water", label: "Drink Water", icon: Droplets, damage: 15 },
+            { type: "habit", label: "Complete Habit", icon: CheckCircle, damage: 20 },
           ].map((task) => (
             <motion.button
               key={task.type}
               whileTap={{ scale: 0.95 }}
-              onClick={() => dealDamage(task.type)}
+              onClick={() => handleDealDamage(task.type)}
               className="p-3 rounded-xl border border-border bg-card text-left hover:bg-muted transition-colors"
             >
               <task.icon className="w-4 h-4 text-muted-foreground mb-1" />
@@ -209,10 +175,10 @@ export function BossBattles({ isLocked = false }: BossBattlesProps) {
             <Trophy className="w-12 h-12 mx-auto mb-2 text-brand" />
             <h3 className="text-lg font-semibold text-foreground mb-1">Victory!</h3>
             <p className="text-sm text-muted-foreground mb-3">
-              You defeated {boss.name}! Earned {boss.xpReward} XP
+              You defeated {boss.name}! Earned {xpEarned} XP
             </p>
             <button
-              onClick={nextBoss}
+              onClick={handleNextBoss}
               className="px-4 py-2 rounded-xl bg-brand text-white text-sm font-medium"
             >
               Next Boss
