@@ -55,6 +55,8 @@ const GuidedMeditation = lazy(() => import("@/components/guided-meditation").the
 const SeasonSystem = lazy(() => import("@/components/season-system").then(m => ({ default: m.SeasonSystem })))
 const BossBattles = lazy(() => import("@/components/boss-battles").then(m => ({ default: m.BossBattles })))
 const RewardShop = lazy(() => import("@/components/reward-shop").then(m => ({ default: m.RewardShop })))
+const FoodDiary = lazy(() => import("@/components/food-diary").then(m => ({ default: m.FoodDiary })))
+const BodyTracker = lazy(() => import("@/components/body-tracker").then(m => ({ default: m.BodyTracker })))
 
 import { HomeSkeleton, TrainingSkeleton, RecipesSkeleton, ChatSkeleton, SettingsSkeleton, ProfileSkeleton, PlannerSkeleton } from "@/components/skeleton-loaders-views"
 
@@ -425,6 +427,8 @@ export default function DashboardPage() {
             {currentView === "seasons" && <SeasonSystem />}
             {currentView === "boss-battles" && <BossBattles isLocked={isFeatureLocked("boss-battles")} />}
             {currentView === "reward-shop" && <RewardShop isLocked={isFeatureLocked("reward-shop")} />}
+            {currentView === "food-diary" && <FoodDiary onBack={() => setCurrentView("home")} />}
+            {currentView === "body" && <BodyTracker />}
             </FeatureErrorBoundary>
           </Suspense>
         </main>

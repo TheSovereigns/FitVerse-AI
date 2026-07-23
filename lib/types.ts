@@ -144,3 +144,4 @@ export type View =
   | 'longevity' | 'fasting' | 'biological-age'
   | 'mood' | 'habits' | 'meditation'
   | 'seasons' | 'boss-battles' | 'reward-shop'
+  | 'food-diary' | 'body'

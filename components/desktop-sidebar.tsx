@@ -11,7 +11,7 @@ import {
   Trophy, Swords, Gift,
   User, Settings, Users, MessageCircle,
   Salad, Pill, ArrowLeftRight, Zap,
-  ChevronDown
+  ChevronDown, Utensils, Ruler
 } from "lucide-react"
 
 interface SidebarProps {
@@ -21,7 +21,8 @@ interface SidebarProps {
 }
 
 export function DesktopSidebar({ currentView, onNavigate, isFeatureLocked }: SidebarProps) {
-  const { t } = useTranslation()
+  const { t, locale } = useTranslation()
+  const isEnglish = locale === "en-US"
   const [expanded, setExpanded] = useState<string | null>(null)
 
   const toggle = (key: string) => setExpanded(prev => prev === key ? null : key)
@@ -160,6 +161,22 @@ export function DesktopSidebar({ currentView, onNavigate, isFeatureLocked }: Sid
           <ChefHat className="w-[18px] h-[18px] shrink-0" />
           {isWide && <span className="text-xs font-medium truncate">{t("nav_recipes")}</span>}
           {!isWide && <span className="text-[7px] font-medium leading-none">{t("nav_recipes")}</span>}
+        </button>
+        <button
+          onClick={() => onNavigate("food-diary")}
+          className={cn("flex items-center gap-2 w-full py-1.5 rounded-xl transition-all", currentView === "food-diary" ? "bg-brand-muted text-brand" : "text-muted-foreground hover:text-foreground hover:bg-muted/50", isWide ? "px-2" : "flex-col px-0")}
+        >
+          <Utensils className="w-[18px] h-[18px] shrink-0" />
+          {isWide && <span className="text-xs font-medium truncate">{isEnglish ? "Diary" : "Diario"}</span>}
+          {!isWide && <span className="text-[7px] font-medium leading-none">{isEnglish ? "Diary" : "Diario"}</span>}
+        </button>
+        <button
+          onClick={() => onNavigate("body")}
+          className={cn("flex items-center gap-2 w-full py-1.5 rounded-xl transition-all", currentView === "body" ? "bg-brand-muted text-brand" : "text-muted-foreground hover:text-foreground hover:bg-muted/50", isWide ? "px-2" : "flex-col px-0")}
+        >
+          <Ruler className="w-[18px] h-[18px] shrink-0" />
+          {isWide && <span className="text-xs font-medium truncate">{isEnglish ? "Body" : "Corpo"}</span>}
+          {!isWide && <span className="text-[7px] font-medium leading-none">{isEnglish ? "Body" : "Corpo"}</span>}
         </button>
       </nav>
 

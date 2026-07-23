@@ -11,7 +11,7 @@ import {
   Timer, Zap, Dumbbell, Wind,
   Heart, Smile, ListChecks,
   Trophy, Swords, Gift,
-  X
+  X, Utensils, Ruler
 } from "lucide-react"
 
 interface MobileMoreSheetProps {
@@ -29,7 +29,8 @@ interface FeatureItem {
 }
 
 export function MobileMoreSheet({ open, onClose, onNavigate, isFeatureLocked }: MobileMoreSheetProps) {
-  const { t } = useTranslation()
+  const { t, locale } = useTranslation()
+  const isEnglish = locale === "en-US"
 
   const handleNavigate = (view: View, feature?: string) => {
     if (feature && isFeatureLocked(feature)) return
@@ -97,6 +98,13 @@ export function MobileMoreSheet({ open, onClose, onNavigate, isFeatureLocked }: 
         { view: "seasons", icon: Trophy, label: t("nav_seasons"), feature: "seasons" },
         { view: "boss-battles", icon: Swords, label: t("nav_boss_battles"), feature: "boss-battles" },
         { view: "reward-shop", icon: Gift, label: t("nav_reward_shop"), feature: "reward-shop" },
+      ]
+    },
+    {
+      title: isEnglish ? "Tracking" : "Acompanhamento",
+      items: [
+        { view: "food-diary", icon: Utensils, label: isEnglish ? "Food Diary" : "Diario Alimentar" },
+        { view: "body", icon: Ruler, label: isEnglish ? "Body Measurements" : "Medidas Corporais" },
       ]
     },
   ]

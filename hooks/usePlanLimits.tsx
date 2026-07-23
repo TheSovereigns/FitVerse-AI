@@ -9,8 +9,11 @@ import { PLAN_LIMITS, getPlanLimits, canScanToday, canGenerateWorkout, canGenera
 
 export function usePlanLimits() {
   const { user } = useAuth()
-  const [plan, setPlan] = useState<Plan>('free')
-  const [limits, setLimits] = useState(PLAN_LIMITS.free)
+  const [plan, setPlan] = useState<Plan>(() => {
+    if (typeof window === 'undefined') return 'free'
+    return (localStorage.getItem('fitverse-plan') as Plan) || 'free'
+  })
+  const [limits, setLimits] = useState(() => getPlanLimits((typeof window !== 'undefined' ? (localStorage.getItem('fitverse-plan') as Plan) : null) || 'free'))
   const [scansToday, setScansToday] = useState(0)
   const [isLoading, setIsLoading] = useState(true)
 
@@ -37,6 +40,7 @@ export function usePlanLimits() {
             const p = retry.plan as Plan
             setPlan(p)
             setLimits(getPlanLimits(p))
+            localStorage.setItem('fitverse-plan', p)
             logger.info("[usePlanLimits] Plan set after refresh:", p)
           }
         }
@@ -47,6 +51,7 @@ export function usePlanLimits() {
         const p = data.plan as Plan
         setPlan(p)
         setLimits(getPlanLimits(p))
+        localStorage.setItem('fitverse-plan', p)
         logger.info("[usePlanLimits] Plan set to:", p)
       } else {
         logger.warn("[usePlanLimits] No profile found for user:", user.id)
