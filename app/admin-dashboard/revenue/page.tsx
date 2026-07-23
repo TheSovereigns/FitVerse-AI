@@ -110,20 +110,18 @@ export default function AdminRevenuePage() {
 
   const fetchRevenueData = async () => {
     try {
-      const { data: { user: authUser } } = await supabase.auth.getUser()
-      if (!authUser) return
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session?.access_token) return
 
-      // Fetch all subscriptions
-      const { data: subs, error } = await supabase
-        .from('subscriptions')
-        .select('*')
-        .order('created_at', { ascending: false }) as { data: Subscription[] | null; error: null }
-
-      if (error) throw error
+      const res = await fetch('/api/admin/revenue', {
+        headers: { Authorization: `Bearer ${session.access_token}` }
+      })
+      if (!res.ok) throw new Error(`API error: ${res.status}`)
+      const { subscriptions: subs, profiles } = await res.json()
 
       // Calculate stats from real data
-      const active = subs?.filter(s => s.status === 'active') || []
-      const canceled = subs?.filter(s => s.status === 'canceled') || []
+      const active = subs?.filter((s: Subscription) => s.status === 'active') || []
+      const canceled = subs?.filter((s: Subscription) => s.status === 'canceled') || []
       
       // MRR from actual amounts (fallback to plan-based pricing)
       const getPriceForPlan = (plan: string) => {
@@ -186,12 +184,8 @@ export default function AdminRevenuePage() {
       setMonthlyData(monthlyRev)
 
       // Build plan distribution from profiles
-      const { data: profiles } = await supabase
-        .from('profiles')
-        .select('plan') as { data: { plan: string }[] | null }
-
       const planCounts: Record<string, number> = { free: 0, pro: 0, premium: 0 }
-      profiles?.forEach(p => {
+      profiles?.forEach((p: { plan: string }) => {
         const plan = p.plan || 'free'
         planCounts[plan] = (planCounts[plan] || 0) + 1
       })

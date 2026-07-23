@@ -136,58 +136,43 @@ export default function AdminDashboardPage() {
 
   const fetchDashboardData = useCallback(async () => {
     try {
-      const { data: { user: authUser } } = await supabase.auth.getUser()
-      if (!authUser) {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session?.access_token) {
         setLoading(false)
         return
       }
 
-      const today = new Date().toISOString().split('T')[0]
-      const thirtyDaysAgo = new Date()
-      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
+      const res = await fetch('/api/admin/dashboard', {
+        headers: { Authorization: `Bearer ${session.access_token}` }
+      })
 
-      const [
-        { count: totalUsers },
-        { count: usersToday },
-        { count: activeSubscriptions },
-        { count: freeUsers },
-        { count: premiumUsers },
-        { data: profiles },
-        { data: subscriptions },
-        { data: topUsersData }
-      ] = await Promise.all([
-        supabase.from('profiles').select('*', { count: 'exact', head: true }),
-        supabase.from('profiles').select('*', { count: 'exact', head: true }).gte('created_at', today),
-        supabase.from('subscriptions').select('*', { count: 'exact', head: true }).eq('status', 'active'),
-        supabase.from('profiles').select('*', { count: 'exact', head: true }).eq('plan', 'free'),
-        supabase.from('profiles').select('*', { count: 'exact', head: true }).eq('plan', 'premium'),
-        supabase.from('profiles').select('created_at').gte('created_at', thirtyDaysAgo.toISOString()),
-        supabase.from('subscriptions').select('amount_brl, amount_usd').eq('status', 'active'),
-        supabase.from('top_users_view').select('*').limit(5)
-      ])
+      if (!res.ok) {
+        console.error('Admin dashboard API error:', res.status)
+        setLoading(false)
+        return
+      }
 
-      const mrrBRL = subscriptions?.reduce((sum, s) => sum + ((s as any).amount_brl || 0), 0) || 0
-      const mrrUSD = subscriptions?.reduce((sum, s) => sum + ((s as any).amount_usd || 0), 0) || 0
-      const conversionRate = totalUsers ? ((premiumUsers || 0) / totalUsers) * 100 : 0
+      const data = await res.json()
+      const conversionRate = data.totalUsers ? ((data.premiumUsers || 0) / data.totalUsers) * 100 : 0
 
       setStats({
-        totalUsers: totalUsers || 0,
-        usersToday: usersToday || 0,
-        activeSubscriptions: activeSubscriptions || 0,
-        mrr: mrrBRL,
-        mrrUSD: mrrUSD,
+        totalUsers: data.totalUsers || 0,
+        usersToday: data.usersToday || 0,
+        activeSubscriptions: data.activeSubscriptions || 0,
+        mrr: data.mrrBRL || 0,
+        mrrUSD: data.mrrUSD || 0,
         conversionRate: Math.round(conversionRate * 10) / 10,
         onlineUsers: onlineCount,
-        freeUsers: freeUsers || 0,
-        premiumUsers: premiumUsers || 0
+        freeUsers: data.freeUsers || 0,
+        premiumUsers: data.premiumUsers || 0
       })
 
       const groupedData: Record<string, { newUsers: number; total: number }> = {}
-      const sortedProfiles = [...(profiles || [])].sort((a, b) => 
+      const sortedProfiles = [...(data.profiles || [])].sort((a: { created_at: string }, b: { created_at: string }) => 
         new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
       )
       
-      sortedProfiles.forEach(p => {
+      sortedProfiles.forEach((p: { created_at: string }) => {
         const date = p.created_at.split('T')[0] ?? 'unknown'
         if (!groupedData[date]) {
           groupedData[date] = { newUsers: 0, total: 0 }
@@ -205,7 +190,7 @@ export default function AdminDashboardPage() {
         }))
 
       setDailyData(dailyDataArray)
-      setTopUsers(topUsersData || [])
+      setTopUsers(data.topUsers || [])
     } catch (error) {
       console.error("Error fetching dashboard data:", error)
     } finally {

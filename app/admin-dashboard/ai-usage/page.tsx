@@ -97,15 +97,14 @@ export default function AdminAIUsagePage() {
 
   const fetchAIUsageData = async () => {
     try {
-      const { data: { user: authUser } } = await supabase.auth.getUser()
-      if (!authUser) return
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session?.access_token) return
 
-      // Fetch AI messages from ai_messages table
-      const { data: messages } = await supabase
-        .from('ai_messages')
-        .select('user_id, user_message, created_at, tokens_used')
-        .order('created_at', { ascending: false })
-        .limit(1000) as { data: AIMessage[] | null }
+      const res = await fetch('/api/admin/ai-usage', {
+        headers: { Authorization: `Bearer ${session.access_token}` }
+      })
+      if (!res.ok) throw new Error(`API error: ${res.status}`)
+      const { messages } = await res.json()
 
       if (!messages || messages.length === 0) {
         setHourlyData(Array(24).fill(0))

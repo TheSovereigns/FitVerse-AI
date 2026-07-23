@@ -100,35 +100,31 @@ export default function AdminUsersPage() {
     fetchUsers()
   }, [currentPage, filter])
 
-  const fetchUsers = async () => {
+  const fetchUsers = async (search?: string) => {
     setLoading(true)
     try {
-      const { data: { user: authUser } } = await supabase.auth.getUser()
-      if (!authUser) {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session?.access_token) {
         setLoading(false)
         return
       }
 
-      let query = supabase
-        .from('profiles')
-        .select('*', { count: 'exact' })
-        .order('created_at', { ascending: false })
-        .range((currentPage - 1) * pageSize, currentPage * pageSize - 1)
+      const params = new URLSearchParams({
+        page: String(currentPage),
+        pageSize: String(pageSize),
+        filter
+      })
+      if (search) params.set('search', search)
 
-      if (filter === "free") {
-        query = query.eq('plan', 'free')
-      } else if (filter === "pro") {
-        query = query.eq('plan', 'pro')
-      } else if (filter === "premium") {
-        query = query.eq('plan', 'premium')
-      }
+      const res = await fetch(`/api/admin/users-list?${params}`, {
+        headers: { Authorization: `Bearer ${session.access_token}` }
+      })
 
-      const { data, count, error } = await query
+      if (!res.ok) throw new Error(`API error: ${res.status}`)
 
-      if (error) throw error
-
-      setUsers(data || [])
-      setTotalCount(count || 0)
+      const data = await res.json()
+      setUsers(data.users || [])
+      setTotalCount(data.total || 0)
     } catch (error) {
       console.error("Error fetching users:", error)
     } finally {
@@ -144,21 +140,27 @@ export default function AdminUsersPage() {
 
     setLoading(true)
     try {
-      const { data: { user: authUser } } = await supabase.auth.getUser()
-      if (!authUser) {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session?.access_token) {
         setLoading(false)
         return
       }
 
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .or(`email.ilike.%${searchQuery}%,name.ilike.%${searchQuery}%`)
-        .order('created_at', { ascending: false })
-        .limit(100)
+      const params = new URLSearchParams({
+        page: '1',
+        pageSize: '100',
+        filter: 'all',
+        search: searchQuery
+      })
 
-      if (error) throw error
-      setUsers(data || [])
+      const res = await fetch(`/api/admin/users-list?${params}`, {
+        headers: { Authorization: `Bearer ${session.access_token}` }
+      })
+
+      if (!res.ok) throw new Error(`API error: ${res.status}`)
+
+      const data = await res.json()
+      setUsers(data.users || [])
     } catch (error) {
       console.error("Error searching users:", error)
     } finally {
