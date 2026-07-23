@@ -20,6 +20,11 @@ export function usePlanLimits() {
     
     try {
       logger.info("[usePlanLimits] Refreshing plan for user:", user.id)
+
+      // Ensure auth context is set for RLS
+      const { data: { user: authUser } } = await supabase.auth.getUser()
+      if (!authUser) return
+
       const { data, error } = await supabase
         .from('profiles')
         .select('plan')
@@ -50,11 +55,12 @@ export function usePlanLimits() {
       try {
         let data: { plan: string } | null = null
 
-        // Ensure we have a fresh session before querying (RLS requires valid JWT)
-        const { data: { session } } = await supabase.auth.getSession()
-        if (!session?.access_token) {
-          logger.warn("[usePlanLimits] No valid session, attempting refresh")
-          await supabase.auth.refreshSession()
+        // Ensure auth context is set for RLS
+        const { data: { user: authUser } } = await supabase.auth.getUser()
+        if (!authUser) {
+          logger.warn("[usePlanLimits] No authenticated user")
+          setIsLoading(false)
+          return
         }
 
         const { data: byId, error: errById } = await supabase

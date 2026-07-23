@@ -160,8 +160,12 @@ export async function middleware(request: NextRequest) {
   if (isProtectedRoute || isAdminRoute) {
     const user = await getSession(request)
 
-    // Not authenticated - redirect to login
+    // Not authenticated
     if (!user) {
+      // API routes get 401 JSON, pages get redirect
+      if (path.startsWith("/api/")) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+      }
       const redirectUrl = new URL("/auth/login", request.url)
       redirectUrl.searchParams.set("redirect", path)
       return NextResponse.redirect(redirectUrl)
@@ -171,7 +175,9 @@ export async function middleware(request: NextRequest) {
     if (isAdminRoute) {
       const admin = await isAdmin(user.id)
       if (!admin) {
-        // User is not admin - redirect to home
+        if (path.startsWith("/api/")) {
+          return NextResponse.json({ error: "Forbidden" }, { status: 403 })
+        }
         return NextResponse.redirect(new URL("/", request.url))
       }
     }
