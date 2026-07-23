@@ -114,7 +114,11 @@ export function usePlanLimits() {
     isLoading,
     refreshPlan,
     canScan: () => canScanToday(plan, scansToday),
-    canGenerateWorkout: (count: number) => canGenerateWorkout(plan, count),
+    canGenerateWorkout: (count: number) => {
+      const extraWorkouts = parseInt(localStorage.getItem('fitverse-extra-workouts') || '0')
+      const adjustedCount = Math.max(0, count - extraWorkouts)
+      return canGenerateWorkout(plan, adjustedCount)
+    },
     canGenerateDiet: (count: number) => canGenerateDiet(plan, count),
     incrementScans,
     remainingScans: limits.scansPerDay === 'unlimited'

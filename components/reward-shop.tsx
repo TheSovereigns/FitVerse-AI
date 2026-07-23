@@ -4,6 +4,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTranslation } from "@/lib/i18n";
 import { logger } from "@/lib/logger";
+import { toast } from "sonner";
 import {
   ShoppingBag,
   Zap,
@@ -122,7 +123,43 @@ export function RewardShop({ isLocked = false }: RewardShopProps) {
     const updated = [...purchases, record];
     setPurchases(updated);
     localStorage.setItem("shop_purchases", JSON.stringify(updated));
+
+    applyItemEffect(item.id);
     setConfirmItem(null);
+  };
+
+  const applyItemEffect = (itemId: string) => {
+    switch (itemId) {
+      case "theme-dark":
+        localStorage.setItem("fitverse-accent", "#8B5CF6");
+        document.documentElement.style.setProperty("--accent", "#8B5CF6");
+        toast.success("Midnight Theme applied!");
+        break;
+      case "theme-neon":
+        localStorage.setItem("fitverse-accent", "#06B6D4");
+        document.documentElement.style.setProperty("--accent", "#06B6D4");
+        toast.success("Neon Glow Theme applied!");
+        break;
+      case "trial-extended":
+        const current = localStorage.getItem("fitverse-trial-end");
+        const base = current ? new Date(current) : new Date();
+        base.setDate(base.getDate() + 7);
+        localStorage.setItem("fitverse-trial-end", base.toISOString());
+        toast.success("Trial extended by 7 days!");
+        break;
+      case "extra-workouts":
+        const extra = parseInt(localStorage.getItem("fitverse-extra-workouts") || "0") + 5;
+        localStorage.setItem("fitverse-extra-workouts", extra.toString());
+        toast.success("5 extra workouts added!");
+        break;
+      case "priority-support":
+        localStorage.setItem("fitverse-priority-support", "true");
+        toast.success("Priority support activated!");
+        break;
+      case "custom-avatar":
+        toast.success("Go to Profile to upload your avatar!");
+        break;
+    }
   };
 
   const categories = [...new Set(shopItems.map((i) => i.category))];
