@@ -16,8 +16,26 @@ function getGoogle() {
 
 export const maxDuration = 30
 
-async function checkRecipeLimit(_userId: string, _plan: string): Promise<boolean> {
-  return true
+async function checkRecipeLimit(userId: string, plan: string): Promise<boolean> {
+  const limits = PLAN_LIMITS[plan as keyof typeof PLAN_LIMITS]
+  if (!limits) return false
+  if (limits.dietsPerMonth === 'unlimited') return true
+
+  const supabaseAdmin = getSupabaseAdmin()
+  if (!supabaseAdmin) return true
+
+  const startOfMonth = new Date()
+  startOfMonth.setDate(1)
+  startOfMonth.setHours(0, 0, 0, 0)
+
+  const { count } = await supabaseAdmin
+    .from("ai_messages")
+    .select("id", { count: "exact", head: true })
+    .eq("user_id", userId)
+    .eq("category", "recipes")
+    .gte("created_at", startOfMonth.toISOString())
+
+  return (count || 0) < limits.dietsPerMonth
 }
 
 const recipesSchema = z.object({

@@ -172,7 +172,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         options: {
           data: {
             name,
-            country: 'BR',
+            country: navigator.language.startsWith('en') ? 'US' : 'BR',
           },
         },
       })

@@ -22,22 +22,39 @@ export function usePresence(options: UsePresenceOptions = {}): void {
       lastSeenUpdateRef.current = now
       try {
         await supabase.rpc("update_last_seen", { p_user_id: userId })
-      } catch (error) {
-        console.error("Error updating last_seen:", error)
-      }
+      } catch {}
     }
   }, [updateIntervalMs])
 
   useEffect(() => {
-    if (!enabled || !user?.id) {
-      return
-    }
+    if (!enabled || !user?.id) return
 
-    const initializePresence = async () => {
-      // Presence desabilitado temporariamente
-      return
-    }
+    updateLastSeen(user.id)
 
-    initializePresence()
-  }, [enabled, user?.id, user?.email, channelName, updateIntervalMs, updateLastSeen])
+    const interval = setInterval(() => {
+      if (user?.id) updateLastSeen(user.id)
+    }, updateIntervalMs)
+
+    const channel = supabase.channel(channelName)
+    channelRef.current = channel
+
+    channel
+      .on("presence", { event: "sync" }, () => {})
+      .subscribe(async (status) => {
+        if (status === "SUBSCRIBED") {
+          await channel.track({
+            user_id: user.id,
+            online_at: new Date().toISOString(),
+          })
+        }
+      })
+
+    return () => {
+      clearInterval(interval)
+      if (channelRef.current) {
+        channelRef.current.unsubscribe()
+        channelRef.current = null
+      }
+    }
+  }, [enabled, user?.id, channelName, updateIntervalMs, updateLastSeen])
 }

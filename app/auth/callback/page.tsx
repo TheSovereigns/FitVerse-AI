@@ -30,7 +30,7 @@ async function ensureProfileExists(userId: string, email: string) {
     name: null,
     plan: 'free',
     is_admin: false,
-    country: 'BR',
+    country: navigator.language.startsWith('en') ? 'US' : 'BR',
   })
 }
 
