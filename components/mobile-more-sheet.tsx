@@ -76,7 +76,7 @@ export function MobileMoreSheet({ open, onClose, onNavigate, isFeatureLocked }: 
       ]
     },
     {
-      title: "Biohacking",
+      title: "Fitness",
       items: [
         { view: "longevity", icon: Heart, label: t("nav_longevity") },
         { view: "fasting", icon: Timer, label: t("nav_fasting"), feature: "fasting" },

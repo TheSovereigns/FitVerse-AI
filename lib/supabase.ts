@@ -99,12 +99,6 @@ export async function getCurrentUser() {
 // Helper function to get user profile
 export async function getUserProfile(userId: string): Promise<Profile | null> {
   try {
-    const { data: { user: authUser } } = await supabase.auth.getUser()
-    if (!authUser) {
-      logger.warn("[getUserProfile] No authenticated user")
-      return null
-    }
-
     const { data, error } = await supabase
       .from('profiles')
       .select('*')
@@ -112,14 +106,23 @@ export async function getUserProfile(userId: string): Promise<Profile | null> {
       .maybeSingle()
 
     if (data) {
-      logger.info("[getUserProfile] Found by id:", data.id, "plan:", data.plan)
       return data
     }
 
     if (error) {
       logger.warn("[getUserProfile] Error by id:", error.message, error.code)
+      if (error.code === "PGRST301" || error.message?.includes("JWT")) {
+        await supabase.auth.refreshSession()
+        const { data: retry } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', userId)
+          .maybeSingle()
+        if (retry) return retry
+      }
     }
 
+    const { data: { user: authUser } } = await supabase.auth.getUser()
     const email = authUser?.email || ''
 
     if (email) {
@@ -130,12 +133,10 @@ export async function getUserProfile(userId: string): Promise<Profile | null> {
         .maybeSingle()
 
       if (existingByEmail) {
-        logger.info("[getUserProfile] Found by email:", email, "plan:", existingByEmail.plan)
         return existingByEmail
       }
     }
 
-    logger.info("[getUserProfile] No profile found for:", userId, email)
     return null
   } catch (e) {
     logger.error("[getUserProfile] Exception:", e)
@@ -152,12 +153,6 @@ export async function isUserAdmin(userId: string): Promise<boolean> {
 // Shared helper: find profile by user.id, fallback to email
 export async function findProfile(userId: string, email?: string | null): Promise<Profile | null> {
   try {
-    const { data: { user: authUser } } = await supabase.auth.getUser()
-    if (!authUser) {
-      logger.warn("[findProfile] No authenticated user")
-      return null
-    }
-
     const { data, error } = await supabase
       .from('profiles')
       .select('*')
@@ -166,31 +161,33 @@ export async function findProfile(userId: string, email?: string | null): Promis
 
     if (error) {
       logger.warn("[findProfile] Error fetching by id:", error.message, error.code)
+      if (error.code === "PGRST301" || error.message?.includes("JWT")) {
+        await supabase.auth.refreshSession()
+        const { data: retry } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', userId)
+          .maybeSingle()
+        if (retry) return retry
+      }
     }
 
     if (data) {
-      logger.info("[findProfile] Found by id:", data.id, "plan:", data.plan, "is_admin:", data.is_admin)
       return data
     }
 
     if (email) {
-      const { data: byEmail, error: emailErr } = await supabase
+      const { data: byEmail } = await supabase
         .from('profiles')
         .select('*')
         .eq('email', email)
         .maybeSingle()
 
-      if (emailErr) {
-        logger.warn("[findProfile] Error fetching by email:", emailErr.message, emailErr.code)
-      }
-
       if (byEmail) {
-        logger.info("[findProfile] Found by email:", byEmail.id, "plan:", byEmail.plan, "is_admin:", byEmail.is_admin)
         return byEmail
       }
     }
 
-    logger.warn("[findProfile] No profile found for userId:", userId, "email:", email)
     return null
   } catch (e) {
     logger.error("[findProfile] Exception:", e)

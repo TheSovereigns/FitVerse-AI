@@ -13,102 +13,67 @@ export function usePlanLimits() {
   const [limits, setLimits] = useState(PLAN_LIMITS.free)
   const [scansToday, setScansToday] = useState(0)
   const [isLoading, setIsLoading] = useState(true)
-  const [, forceRefresh] = useState(0)
 
-  const refreshPlan = useCallback(async () => {
-    if (!user) return
-    
+  const fetchPlan = useCallback(async () => {
+    if (!user?.id) return
+
     try {
-      logger.info("[usePlanLimits] Refreshing plan for user:", user.id)
-
-      // Ensure auth context is set for RLS
-      const { data: { user: authUser } } = await supabase.auth.getUser()
-      if (!authUser) return
-
       const { data, error } = await supabase
         .from('profiles')
         .select('plan')
         .eq('id', user.id)
         .maybeSingle()
 
-      logger.info("[usePlanLimits] Refresh result:", { data, error })
+      if (error) {
+        logger.error("[usePlanLimits] Query error:", error.message, error.code)
+        if (error.code === "PGRST301" || error.message?.includes("JWT")) {
+          await supabase.auth.refreshSession()
+          const { data: retry } = await supabase
+            .from('profiles')
+            .select('plan')
+            .eq('id', user.id)
+            .maybeSingle()
+          if (retry?.plan) {
+            const p = retry.plan as Plan
+            setPlan(p)
+            setLimits(getPlanLimits(p))
+            logger.info("[usePlanLimits] Plan set after refresh:", p)
+          }
+        }
+        return
+      }
 
       if (data?.plan) {
-        const userPlan = data.plan as Plan
-        setPlan(userPlan)
-        setLimits(getPlanLimits(userPlan))
-        logger.info("[usePlanLimits] Plan refreshed to:", userPlan)
+        const p = data.plan as Plan
+        setPlan(p)
+        setLimits(getPlanLimits(p))
+        logger.info("[usePlanLimits] Plan set to:", p)
+      } else {
+        logger.warn("[usePlanLimits] No profile found for user:", user.id)
       }
     } catch (e) {
-      logger.error("[usePlanLimits] Refresh error:", e)
+      logger.error("[usePlanLimits] Error:", e)
+    } finally {
+      setIsLoading(false)
     }
-  }, [user])
+  }, [user?.id])
 
-  // Fetch plan from database on mount and when user changes
+  const refreshPlan = useCallback(async () => {
+    if (!user?.id) return
+    await fetchPlan()
+  }, [user?.id, fetchPlan])
+
   useEffect(() => {
     if (!user) {
       setIsLoading(false)
       return
     }
 
-    const fetchPlan = async () => {
-      try {
-        let data: { plan: string } | null = null
-
-        // Ensure auth context is set for RLS
-        const { data: { user: authUser } } = await supabase.auth.getUser()
-        if (!authUser) {
-          logger.warn("[usePlanLimits] No authenticated user")
-          setIsLoading(false)
-          return
-        }
-
-        const { data: byId, error: errById } = await supabase
-          .from('profiles')
-          .select('plan')
-          .eq('id', user.id)
-          .maybeSingle()
-
-        if (errById) {
-          logger.error("[usePlanLimits] Query error:", errById.message, errById.code)
-        }
-
-        if (byId) {
-          data = byId
-        } else if (user.email) {
-          const { data: byEmail } = await supabase
-            .from('profiles')
-            .select('plan')
-            .eq('email', user.email)
-            .maybeSingle()
-          if (byEmail) data = byEmail
-        }
-
-        logger.info("[usePlanLimits] Fetch result:", { data })
-
-        if (data?.plan) {
-          const userPlan = data.plan as Plan
-          setPlan(userPlan)
-          setLimits(getPlanLimits(userPlan))
-          logger.info("[usePlanLimits] Plan set to:", userPlan)
-        } else {
-          logger.warn("[usePlanLimits] No profile found, keeping default plan:", plan)
-        }
-      } catch (e) {
-        logger.error("[usePlanLimits] Error:", e)
-      } finally {
-        setIsLoading(false)
-      }
-    }
-
     fetchPlan()
 
     const pollInterval = setInterval(fetchPlan, 30000)
-
-    return () => {
-      clearInterval(pollInterval)
-    }
-  }, [user])
+    return () => clearInterval(pollInterval)
+  }, [user, fetchPlan])
 
   useEffect(() => {
     if (!user) return
@@ -147,8 +112,8 @@ export function usePlanLimits() {
     canGenerateWorkout: (count: number) => canGenerateWorkout(plan, count),
     canGenerateDiet: (count: number) => canGenerateDiet(plan, count),
     incrementScans,
-    remainingScans: limits.scansPerDay === 'unlimited' 
-      ? 'Ilimitados' 
+    remainingScans: limits.scansPerDay === 'unlimited'
+      ? 'Ilimitados'
       : `${Math.max(0, (limits.scansPerDay as number) - scansToday)} de ${limits.scansPerDay}`,
   }
 }

@@ -17,8 +17,8 @@ export function UserProfile({ onNavigateToSettings, onNavigateToSubscription }: 
             title: "Conta & Segurança",
             items: [
                 { icon: Shield, label: "Privacidade e Segurança", color: "text-[#32D74B]" },
-                { icon: Bell, label: "Notificações Biometricas", color: "text-[#FF453A]" },
-                { icon: CreditCard, label: "Bio-Assinatura", color: "text-[#0A84FF]", action: onNavigateToSubscription }
+                { icon: Bell, label: "Notificações", color: "text-[#FF453A]" },
+                { icon: CreditCard, label: "Assinatura", color: "text-[#0A84FF]", action: onNavigateToSubscription }
             ]
         },
         {
@@ -48,7 +48,7 @@ export function UserProfile({ onNavigateToSettings, onNavigateToSubscription }: 
                     </div>
                 </motion.div>
                 
-                <h1 className="text-4xl font-black tracking-tighter text-foreground mb-1">Biohacker Alpha</h1>
+                <h1 className="text-4xl font-black tracking-tighter text-foreground mb-1">Atleta Alpha</h1>
                 <p className="text-sm font-black text-muted-foreground uppercase tracking-[0.4em] opacity-40">User ID: #2409-Z</p>
 
                 <div className="mt-8 w-full glass-strong border-white/20 rounded-[2.5rem] p-6 flex items-center justify-between shadow-2xl">
@@ -58,7 +58,7 @@ export function UserProfile({ onNavigateToSettings, onNavigateToSubscription }: 
                         </div>
                         <div className="text-left">
                             <p className="font-black tracking-tight">Assinatura Premium</p>
-                            <p className="text-xs font-bold text-muted-foreground opacity-60">Status: Bio-Ativo</p>
+                            <p className="text-xs font-bold text-muted-foreground opacity-60">Status: Ativo</p>
                         </div>
                     </div>
                     <Badge className="bg-primary text-white font-black px-4 py-2 rounded-full shadow-lg shadow-primary/20">LEVEL 26</Badge>

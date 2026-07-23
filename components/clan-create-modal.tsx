@@ -64,7 +64,7 @@ export function ClanCreateModal({ isOpen, onClose, onCreate, isLoading }: ClanCr
                 <Input
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  placeholder={isEnglish ? "e.g., BioHackers United" : "ex.: BioHackers Unidos"}
+                  placeholder={isEnglish ? "e.g., FitVerse United" : "ex.: FitVerse Unidos"}
                   className="h-12 rounded-xl border-white/10 bg-black/30 text-sm"
                   maxLength={30}
                 />

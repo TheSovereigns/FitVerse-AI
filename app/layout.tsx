@@ -57,6 +57,23 @@ export default function RootLayout({
         <link rel="icon" href="/icon.svg" type="image/svg+xml" />
         <link rel="preconnect" href="https://*.supabase.co" />
         <link rel="dns-prefetch" href="https://*.supabase.co" />
+        <script dangerouslySetInnerHTML={{ __html: `
+          (function(){
+            try {
+              var saved = localStorage.getItem("fitverse-accent");
+              var colors = {green:"#34D399",blue:"#0A84FF",purple:"#BF5AF2",pink:"#FF375F",orange:"#FF9500",red:"#FF453A"};
+              var hex = colors[saved];
+              if (!hex) return;
+              var r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16);
+              var s = document.documentElement.style;
+              s.setProperty("--brand", hex);
+              s.setProperty("--brand-foreground", r<128?"#FFFFFF":"#0A0A0A");
+              s.setProperty("--brand-muted", "rgba("+r+","+g+","+b+",0.12)");
+              s.setProperty("--brand-hover", "rgba("+r+","+g+","+b+",0.20)");
+              s.setProperty("--ring", hex);
+            } catch(e){}
+          })();
+        ` }} />
         {process.env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN && (
           <script
             defer

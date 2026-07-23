@@ -17,7 +17,7 @@ export function BenefitsSection({ id }: BenefitsSectionProps) {
   const benefits = [
     {
       icon: ScanLine,
-      title: t("onboard_benefit1_title") || "Bio-Scan IA",
+      title: t("onboard_benefit1_title") || "Scan IA",
       desc: t("onboard_benefit1_desc") || "Escaneie qualquer alimento e a IA analisa instantaneamente",
     },
     {

@@ -40,6 +40,7 @@ import { cn } from "@/lib/utils"
 import { useTranslation } from "@/lib/i18n"
 import { logger } from "@/lib/logger"
 import { useAuth } from "@/hooks/useAuth"
+import { usePlanLimits } from "@/hooks/usePlanLimits"
 
 type SettingRowProps = {
   icon: React.ElementType
@@ -91,6 +92,18 @@ function SettingsGroup({
   )
 }
 
+function applyAccentColor(hex: string) {
+  const r = parseInt(hex.slice(1, 3), 16)
+  const g = parseInt(hex.slice(3, 5), 16)
+  const b = parseInt(hex.slice(5, 7), 16)
+  const html = document.documentElement
+  html.style.setProperty("--brand", hex)
+  html.style.setProperty("--brand-foreground", `rgb(${r < 128 ? 255 : 10}, ${r < 128 ? 255 : 10}, ${r < 128 ? 255 : 10})`)
+  html.style.setProperty("--brand-muted", `rgba(${r}, ${g}, ${b}, 0.12)`)
+  html.style.setProperty("--brand-hover", `rgba(${r}, ${g}, ${b}, 0.20)`)
+  html.style.setProperty("--ring", hex)
+}
+
 function ThemeSection() {
   const { t } = useTranslation()
   const [theme, setThemeState] = useState<string>("dark")
@@ -99,7 +112,11 @@ function ThemeSection() {
   useEffect(() => {
     try {
       const saved = localStorage.getItem("fitverse-accent")
-      if (saved) setAccent(saved)
+      if (saved) {
+        setAccent(saved)
+        const match = ACCENT_COLORS.find((c) => c.id === saved)
+        if (match) applyAccentColor(match.color)
+      }
       const html = document.documentElement
       if (html.classList.contains("dark")) setThemeState("dark")
       else if (html.classList.contains("light")) setThemeState("light")
@@ -165,7 +182,7 @@ function ThemeSection() {
           {ACCENT_COLORS.map((color) => (
             <button
               key={color.id}
-              onClick={() => { setAccent(color.id); localStorage.setItem("fitverse-accent", color.id) }}
+              onClick={() => { setAccent(color.id); localStorage.setItem("fitverse-accent", color.id); applyAccentColor(color.color) }}
               className={cn(
                 "relative h-9 w-9 rounded-xl transition-all border-2",
                 accent === color.id ? "border-foreground scale-110" : "border-transparent hover:scale-105"
@@ -250,6 +267,7 @@ function WearableSection() {
 export function SettingsPage({ onBack }: { onBack?: () => void }) {
   const { t, locale, setLocale } = useTranslation()
   const { signOut, user } = useAuth()
+  const { plan: currentPlan } = usePlanLimits()
   const router = useRouter()
   const [userSubscription, setUserSubscription] = useState<string>("free")
   const [notificationsEnabled, setNotificationsEnabled] = useState(true)
@@ -285,7 +303,6 @@ export function SettingsPage({ onBack }: { onBack?: () => void }) {
       try {
         const data = await findProfile(user.id, user.email)
         if (data) {
-          setUserSubscription(data.plan || "free")
           setAdsEnabled(data.ads_enabled !== false)
           setIsAdmin(data.is_admin === true)
         }
@@ -295,6 +312,12 @@ export function SettingsPage({ onBack }: { onBack?: () => void }) {
     }
     fetchProfile()
   }, [user])
+
+  useEffect(() => {
+    if (currentPlan) {
+      setUserSubscription(currentPlan)
+    }
+  }, [currentPlan])
 
   useEffect(() => {
     if (user?.user_metadata?.is_admin === true) setIsAdmin(true)

@@ -179,7 +179,7 @@ export function ScanDashboard({ onScan, isScanning = false }: ScanDashboardProps
                 <Scan className="h-5 w-5" />
               </div>
               <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-medium text-foreground">BioScore #{2409 + index}</p>
+                <p className="truncate text-sm font-medium text-foreground">Score #{2409 + index}</p>
                 <p className="text-xs text-muted-foreground">{t("scan_yesterday")} 14:05</p>
               </div>
               <span className="rounded-full bg-brand/10 px-2.5 py-1 text-xs font-medium text-brand">{t("scan_good")}</span>

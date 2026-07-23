@@ -14,7 +14,7 @@ const features = [
   { icon: UtensilsCrossed, title: "Meal Plans", desc: "Personalized weekly meal plans with shopping lists and macro tracking." },
   { icon: MessageCircle, title: "AI Coach", desc: "24/7 nutrition and fitness chatbot that knows your profile." },
   { icon: Heart, title: "Health Tracking", desc: "Sleep, stress, mood, fasting, and biological age analysis." },
-  { icon: Brain, title: "Biohacking", desc: "Supplement recommendations, longevity scoring, and optimization tips." },
+  { icon: Brain, title: "Fitness", desc: "Supplement recommendations, longevity scoring, and optimization tips." },
 ]
 
 const plans = [
@@ -42,8 +42,8 @@ const plans = [
     name: "Premium",
     price: "$29.90",
     period: "/month",
-    description: "Complete biohacking experience",
-    features: ["Everything in Pro", "Biological age analysis", "Metabolic plan", "Guided meditation", "Predictive analytics", "Weekly reports", "Reward shop", "Priority support"],
+    description: "Complete fitness experience",
+    features: ["Everything in Pro", "Health age analysis", "Metabolic plan", "Guided meditation", "Predictive analytics", "Weekly reports", "Reward shop", "Priority support"],
     cta: "Go Premium",
     href: "/auth/signup",
     popular: false,
@@ -100,7 +100,7 @@ export function LandingPage() {
               Your Body.<br /><span className="text-gradient">Optimized.</span>
             </h1>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-10">
-              Scan food, generate workouts, plan meals, and track your health — all powered by advanced AI. Your personal biohacking coach in your pocket.
+              Scan food, generate workouts, plan meals, and track your health — all powered by advanced AI. Your personal fitness coach in your pocket.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <Link href="/auth/signup" className="flex items-center gap-2 bg-brand text-brand-foreground px-8 py-4 rounded-2xl text-lg font-bold hover:opacity-90 transition-opacity shadow-lg shadow-brand/20">

@@ -213,23 +213,23 @@ export default function DashboardPage() {
 
       let token = ''
       try {
-        for (let i = 0; i < localStorage.length; i++) {
-          const key = localStorage.key(i)
-          if (key && key.includes('sb-') && key.includes('-auth-token')) {
-            const storedSession = localStorage.getItem(key)
-            if (storedSession) {
-              const parsed = JSON.parse(storedSession)
-              if (parsed?.access_token) { token = parsed.access_token; break }
+        const sessionPromise = supabase.auth.getSession()
+        const timeoutPromise = new Promise<never>((_, reject) => setTimeout(() => reject(new Error('Timeout')), 8000))
+        try {
+          const { data: sessionData } = await Promise.race([sessionPromise, timeoutPromise])
+          token = sessionData.session?.access_token || ''
+        } catch (e) { logger.error("[Page] Session promise timed out:", e) }
+        if (!token) {
+          for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i)
+            if (key && key.includes('sb-') && key.includes('-auth-token')) {
+              const storedSession = localStorage.getItem(key)
+              if (storedSession) {
+                const parsed = JSON.parse(storedSession)
+                if (parsed?.access_token) { token = parsed.access_token; break }
+              }
             }
           }
-        }
-        if (!token) {
-          const sessionPromise = supabase.auth.getSession()
-          const timeoutPromise = new Promise<never>((_, reject) => setTimeout(() => reject(new Error('Timeout')), 8000))
-          try {
-            const { data: sessionData } = await Promise.race([sessionPromise, timeoutPromise])
-            token = sessionData.session?.access_token || ''
-          } catch (e) { logger.error("[Page] Session promise timed out:", e) }
         }
       } catch (e) { logger.error("[Page] Failed to get auth token:", e) }
       if (!token) throw new Error(isEnglish ? "Please sign in again before scanning." : "Entre novamente antes de escanear.")

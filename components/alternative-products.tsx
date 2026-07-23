@@ -13,7 +13,7 @@ const alternatives = [
   {
     id: "1",
     name: "Barra de Proteína Natural",
-    brand: "BioFit",
+    brand: "FitNutri",
     score: 88,
     price: "R$ 8,90",
     image: "/organic-protein-bar.jpg",

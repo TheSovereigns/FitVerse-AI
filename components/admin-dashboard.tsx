@@ -587,7 +587,7 @@ export function AdminDashboard() {
                       color: "text-purple-400",
                       accent: "bg-purple-500/10 border-purple-500/20",
                       glow: "shadow-purple-500/20",
-                      features: ["Tudo do Pro", "Personal Trainer dedicado", "Análise biométrica", "Acesso antecipado"],
+                      features: ["Tudo do Pro", "Personal Trainer dedicado", "Análise de composição corporal", "Acesso antecipado"],
                     },
                   ].map((plan, i) => {
                     const planUsers = users.filter(u => u.plan === plan.title);
