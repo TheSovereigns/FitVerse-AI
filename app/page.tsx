@@ -95,6 +95,7 @@ export default function DashboardPage() {
 
   const [authTimedOut, setAuthTimedOut] = useState(false)
   const [moreSheetOpen, setMoreSheetOpen] = useState(false)
+  const [pendingScan, setPendingScan] = useState<{ analysis: ProductAnalysis; displayImage: string } | null>(null)
   const bottomNavInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
@@ -261,12 +262,8 @@ export default function DashboardPage() {
         throw new Error(errorData?.error || t("page_error_ai_fail"))
       }
       const analysis: ProductAnalysis = await response.json()
-      addScannedProduct(analysis)
       setAnalysisResult(analysis)
-      const scanId = (analysis as any).scanId || `local-${Date.now()}`
-      const scannedAt = (analysis as any).scannedAt || new Date().toISOString()
-      addScanHistory({ id: scanId, name: analysis.productName, scannedAt, score: analysis.longevityScore, image: displayImage })
-      incrementScans()
+      setPendingScan({ analysis, displayImage })
     } catch (error) {
       const message = error instanceof Error ? error.message : t("page_error_retry")
       setScanError(message)
@@ -275,6 +272,24 @@ export default function DashboardPage() {
     } finally {
       setIsAnalyzing(false)
     }
+  }
+
+  const handleSaveScan = () => {
+    if (!pendingScan) return
+    const { analysis, displayImage } = pendingScan
+    addScannedProduct(analysis)
+    const scanId = (analysis as any).scanId || `local-${Date.now()}`
+    const scannedAt = (analysis as any).scannedAt || new Date().toISOString()
+    addScanHistory({ id: scanId, name: analysis.productName, scannedAt, score: analysis.longevityScore, image: displayImage })
+    incrementScans()
+    setPendingScan(null)
+    toast.success(isEnglish ? "Scan saved!" : "Escaneamento salvo!")
+  }
+
+  const handleDiscardScan = () => {
+    setPendingScan(null)
+    setAnalysisResult(null)
+    setCurrentView("dashboard")
   }
 
   const handleNavScan = () => bottomNavInputRef.current?.click()
@@ -359,7 +374,7 @@ export default function DashboardPage() {
                     </Button>
                   </div>
                 </div>
-              ) : isAnalyzing || !analysisResult ? <ProductSkeleton /> : <ProductResult result={analysisResult} onBack={() => setCurrentView("dashboard")} imageData={scannedImage || undefined} />
+              ) : isAnalyzing || !analysisResult ? <ProductSkeleton /> : <ProductResult result={analysisResult} onBack={() => setCurrentView("dashboard")} imageData={scannedImage || undefined} onSave={handleSaveScan} onDiscard={handleDiscardScan} hasPendingSave={!!pendingScan} />
             )}
             {currentView === "recipes" && <RecipesTab />}
             {currentView === "training" && <TrainingTab />}
