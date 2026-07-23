@@ -156,16 +156,6 @@ export function ProductResult({ result, onBack, imageData, onSave, onDiscard, ha
           <ArrowLeft className="w-8 h-8" />
         </Button>
         <div className="flex items-center gap-3">
-          {hasPendingSave && (
-            <>
-              <Button onClick={onDiscard} variant="ghost" className="h-10 px-4 rounded-xl text-xs font-semibold text-muted-foreground hover:text-foreground hover:bg-muted border border-border">
-                {t("pr_discard") || "Descartar"}
-              </Button>
-              <Button onClick={onSave} className="h-10 px-5 rounded-xl bg-brand text-white text-xs font-semibold hover:bg-brand/90">
-                {t("pr_save") || "Salvar"}
-              </Button>
-            </>
-          )}
           <ShareActivityButton
             activityType="scan"
             activityData={{

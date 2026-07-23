@@ -444,6 +444,45 @@ export default function DashboardPage() {
       <AdBanner position="bottom" />
       <MobileBottomNav currentView={currentView} onNavigate={setCurrentView} onOpenMore={() => setMoreSheetOpen(true)} />
       <MobileMoreSheet open={moreSheetOpen} onClose={() => setMoreSheetOpen(false)} onNavigate={setCurrentView} isFeatureLocked={isFeatureLocked} />
+
+      {/* Save/Discard Scan Modal */}
+      {pendingScan && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={handleDiscardScan} />
+          <div className="relative w-full max-w-sm rounded-3xl glass-strong border border-border p-8 text-center space-y-6 animate-scale-in">
+            <div className="w-16 h-16 mx-auto rounded-2xl bg-brand/10 flex items-center justify-center">
+              <ScanLine className="w-8 h-8 text-brand" />
+            </div>
+            <div>
+              <h2 className="text-xl font-black text-foreground mb-1">
+                {isEnglish ? "Save scan?" : "Salvar escaneamento?"}
+              </h2>
+              <p className="text-sm text-muted-foreground">
+                {pendingScan.analysis.productName}
+              </p>
+              <div className="mt-2 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-brand/10">
+                <span className="text-sm font-bold text-brand">{pendingScan.analysis.longevityScore}</span>
+                <span className="text-xs text-muted-foreground">/ 100</span>
+              </div>
+            </div>
+            <div className="flex gap-3">
+              <Button
+                onClick={handleDiscardScan}
+                variant="ghost"
+                className="flex-1 h-12 rounded-xl border border-border text-muted-foreground hover:text-foreground hover:bg-muted font-semibold text-sm"
+              >
+                {isEnglish ? "Discard" : "Descartar"}
+              </Button>
+              <Button
+                onClick={handleSaveScan}
+                className="flex-1 h-12 rounded-xl bg-brand text-white hover:bg-brand/90 font-semibold text-sm"
+              >
+                {isEnglish ? "Save" : "Salvar"}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
