@@ -5,11 +5,7 @@ import { useTranslation } from "@/lib/i18n"
 import type { View } from "@/lib/types"
 import {
   Home, ScanLine, Dumbbell, ChefHat,
-  Moon, Brain, Apple,
-  Heart, Timer, Smile, ListChecks,
-  Trophy, Swords, Gift,
-  User, Settings, Users, MessageCircle,
-  Salad, Wind
+  Users, MessageCircle, User, Settings
 } from "lucide-react"
 
 interface SidebarProps {
@@ -21,21 +17,12 @@ interface SidebarProps {
 export function DesktopSidebar({ currentView, onNavigate, isFeatureLocked }: SidebarProps) {
   const { t } = useTranslation()
 
-  const items: { view: View; icon: any; label: string; divider?: boolean }[] = [
+  const items: { view: View; icon: any; label: string }[] = [
     { view: "home", icon: Home, label: t("nav_home") },
     { view: "dashboard", icon: ScanLine, label: t("nav_bioscan") },
     { view: "training", icon: Dumbbell, label: t("nav_workouts") },
     { view: "recipes", icon: ChefHat, label: t("nav_recipes") },
     { view: "clans", icon: Users, label: t("nav_clans") },
-    { view: "sleep", icon: Moon, label: t("nav_sleep"), divider: true },
-    { view: "planner", icon: Salad, label: t("nav_diet") },
-    { view: "longevity", icon: Heart, label: t("nav_longevity") },
-    { view: "fasting", icon: Timer, label: t("nav_fasting") },
-    { view: "mood", icon: Smile, label: t("nav_mood") },
-    { view: "habits", icon: ListChecks, label: t("nav_habits") },
-    { view: "seasons", icon: Trophy, label: t("nav_seasons"), divider: true },
-    { view: "boss-battles", icon: Swords, label: t("nav_boss_battles") },
-    { view: "reward-shop", icon: Gift, label: t("nav_reward_shop") },
   ]
 
   return (
@@ -48,21 +35,19 @@ export function DesktopSidebar({ currentView, onNavigate, isFeatureLocked }: Sid
 
       <nav className="flex-1 px-1.5 space-y-0.5 overflow-y-auto scrollbar-thin">
         {items.map((item) => (
-          <div key={item.view}>
-            {item.divider && <div className="h-px bg-border/50 mx-1 my-1.5" />}
-            <button
-              onClick={() => onNavigate(item.view)}
-              className={cn(
-                "flex flex-col items-center gap-0.5 w-full py-1.5 rounded-xl transition-all",
-                currentView === item.view
-                  ? "bg-brand-muted text-brand"
-                  : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
-              )}
-            >
-              <item.icon className="w-[18px] h-[18px]" />
-              <span className="text-[7px] font-medium leading-none truncate max-w-[52px]">{item.label}</span>
-            </button>
-          </div>
+          <button
+            key={item.view}
+            onClick={() => onNavigate(item.view)}
+            className={cn(
+              "flex flex-col items-center gap-0.5 w-full py-1.5 rounded-xl transition-all",
+              currentView === item.view
+                ? "bg-brand-muted text-brand"
+                : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+            )}
+          >
+            <item.icon className="w-[18px] h-[18px]" />
+            <span className="text-[7px] font-medium leading-none truncate max-w-[52px]">{item.label}</span>
+          </button>
         ))}
       </nav>
 
