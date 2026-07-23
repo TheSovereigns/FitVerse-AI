@@ -54,7 +54,7 @@ const MoodTracker = lazy(() => import("@/components/mood-tracker").then(m => ({ 
 const HabitBuilder = lazy(() => import("@/components/habit-builder").then(m => ({ default: m.HabitBuilder })))
 const GuidedMeditation = lazy(() => import("@/components/guided-meditation").then(m => ({ default: m.GuidedMeditation })))
 const SeasonSystem = lazy(() => import("@/components/season-system").then(m => ({ default: m.SeasonSystem })))
-const BossBattles = lazy(() => import("@/components/boss-battles").then(m => ({ default: m.BossBattles })))
+const BattlePass = lazy(() => import("@/components/battle-pass").then(m => ({ default: m.BattlePass })))
 const RewardShop = lazy(() => import("@/components/reward-shop").then(m => ({ default: m.RewardShop })))
 const FoodDiary = lazy(() => import("@/components/food-diary").then(m => ({ default: m.FoodDiary })))
 const BodyTracker = lazy(() => import("@/components/body-tracker").then(m => ({ default: m.BodyTracker })))
@@ -148,7 +148,7 @@ export default function DashboardPage() {
       mood: t("nav_mood"), habits: t("nav_habits"),
       meditation: t("nav_meditation"),
       seasons: t("nav_seasons"),
-      "boss-battles": t("nav_boss_battles"),
+      "battle-pass": isEnglish ? "Battle Pass" : "Passe de Batalha",
       "reward-shop": t("nav_reward_shop"),
     }
     return titles[currentView] || t("view_fitverse")
@@ -288,9 +288,6 @@ export default function DashboardPage() {
     setPendingScan(null)
 
     const result = recordAction("scan")
-    if (result.bossVictory) {
-      toast.success(isEnglish ? `Boss defeated! +${result.bossXpEarned} XP` : `Boss derrotado! +${result.bossXpEarned} XP`)
-    }
     if (result.newAchievements.length > 0) {
       toast.success(isEnglish ? `Achievement unlocked! +${result.newAchievements.length} achievements` : `Conquista desbloqueada! +${result.newAchievements.length} conquistas`)
     }
@@ -313,7 +310,7 @@ export default function DashboardPage() {
     if (plan === "premium") return false
     if (plan === "pro") {
       const proFeatures = ["sleep", "stress", "health-checkin", "meal-planner", "dietary", "smart-substitutions",
-        "periodization", "workout-feedback", "mobility", "fasting", "mood", "seasons", "boss-battles"]
+        "periodization", "workout-feedback", "mobility", "fasting", "mood", "seasons", "battle-pass"]
       return !proFeatures.includes(feature)
     }
     const freeFeatures = ["longevity", "habits", "workout-feedback", "seasons"]
@@ -434,7 +431,7 @@ export default function DashboardPage() {
 
             {/* Gamification */}
             {currentView === "seasons" && <SeasonSystem />}
-            {currentView === "boss-battles" && <BossBattles isLocked={isFeatureLocked("boss-battles")} />}
+            {currentView === "battle-pass" && <BattlePass isLocked={isFeatureLocked("battle-pass")} />}
             {currentView === "reward-shop" && <RewardShop isLocked={isFeatureLocked("reward-shop")} />}
             {currentView === "food-diary" && <FoodDiary onBack={() => setCurrentView("home")} />}
             {currentView === "body" && <BodyTracker />}

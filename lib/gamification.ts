@@ -4,7 +4,6 @@ import { logger } from "./logger"
 
 const STORAGE_KEYS = {
   stats: "fitverse-gamification-stats",
-  bossState: "fitverse-boss-state",
   achievements: "fitverse-achievements",
   xp: "fitverse-xp",
   coins: "fitverse-coins",
@@ -18,31 +17,6 @@ export interface GamificationStats {
   currentStreak: number
   longestStreak: number
   lastActiveDate: string | null
-}
-
-export interface BossState {
-  currentBossIndex: number
-  bossHp: number
-  battleStarted: boolean
-  battleHistory: Array<{
-    bossName: string
-    date: string
-    won: boolean
-    damageDealt: number
-  }>
-}
-
-const BOSS_CONFIG = [
-  { name: "Sedentary Slime", maxHp: 500, xpReward: 200 },
-  { name: "Junk Food Dragon", maxHp: 800, xpReward: 350 },
-  { name: "Stress Phantom", maxHp: 1200, xpReward: 500 },
-]
-
-const TASK_DAMAGE: Record<string, number> = {
-  scan: 25,
-  workout: 50,
-  water: 15,
-  habit: 20,
 }
 
 const ACHIEVEMENTS = [
@@ -86,15 +60,6 @@ function getStats(): GamificationStats {
     currentStreak: 0,
     longestStreak: 0,
     lastActiveDate: null,
-  })
-}
-
-function getBossState(): BossState {
-  return safeGet(STORAGE_KEYS.bossState, {
-    currentBossIndex: 0,
-    bossHp: BOSS_CONFIG[0].maxHp,
-    battleStarted: false,
-    battleHistory: [],
   })
 }
 
@@ -146,41 +111,9 @@ function checkAchievements(stats: GamificationStats): string[] {
   return newUnlocks
 }
 
-function dealBossDamage(type: string): { victory: boolean; xpEarned: number } {
-  const state = getBossState()
-  if (!state.battleStarted || state.bossHp <= 0) return { victory: false, xpEarned: 0 }
-
-  const damage = TASK_DAMAGE[type] || 0
-  const newHp = Math.max(0, state.bossHp - damage)
-  const boss = BOSS_CONFIG[state.currentBossIndex]
-
-  const newState: BossState = {
-    ...state,
-    bossHp: newHp,
-  }
-
-  if (newHp <= 0) {
-    newState.battleHistory = [
-      ...state.battleHistory,
-      { bossName: boss.name, date: new Date().toISOString(), won: true, damageDealt: boss.maxHp },
-    ]
-    safeSet(STORAGE_KEYS.bossState, newState)
-
-    const xp = getXp() + boss.xpReward
-    safeSet(STORAGE_KEYS.xp, xp)
-
-    return { victory: true, xpEarned: boss.xpReward }
-  }
-
-  safeSet(STORAGE_KEYS.bossState, newState)
-  return { victory: false, xpEarned: 0 }
-}
-
 export interface GamificationResult {
   stats: GamificationStats
   newAchievements: string[]
-  bossVictory: boolean
-  bossXpEarned: number
   totalXp: number
   totalCoins: number
 }
@@ -202,10 +135,8 @@ export function recordAction(type: "scan" | "workout" | "water" | "habit"): Gami
     return sum + (ach?.xpReward || 0)
   }, 0)
 
-  const { victory, xpEarned: bossXp } = dealBossDamage(type)
-
   const baseXp = type === "scan" ? 10 : type === "workout" ? 25 : type === "water" ? 5 : 10
-  const totalNewXp = baseXp + achXp + bossXp
+  const totalNewXp = baseXp + achXp
   const totalXp = getXp() + totalNewXp
   safeSet(STORAGE_KEYS.xp, totalXp)
 
@@ -216,37 +147,14 @@ export function recordAction(type: "scan" | "workout" | "water" | "habit"): Gami
   return {
     stats,
     newAchievements,
-    bossVictory: victory,
-    bossXpEarned: bossXp,
     totalXp,
     totalCoins,
   }
 }
 
-export function advanceBoss(): void {
-  const state = getBossState()
-  const nextIndex = (state.currentBossIndex + 1) % BOSS_CONFIG.length
-  safeSet(STORAGE_KEYS.bossState, {
-    ...state,
-    currentBossIndex: nextIndex,
-    bossHp: BOSS_CONFIG[nextIndex].maxHp,
-    battleStarted: false,
-  })
-}
-
-export function startBossBattle(): void {
-  const state = getBossState()
-  safeSet(STORAGE_KEYS.bossState, {
-    ...state,
-    bossHp: BOSS_CONFIG[state.currentBossIndex].maxHp,
-    battleStarted: true,
-  })
-}
-
 export function getGamificationData() {
   return {
     stats: getStats(),
-    bossState: getBossState(),
     xp: getXp(),
     coins: getCoins(),
     unlockedAchievements: safeGet<string[]>(STORAGE_KEYS.achievements, []),

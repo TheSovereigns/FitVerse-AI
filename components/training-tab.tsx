@@ -326,9 +326,6 @@ export function TrainingTab({ userGoal }: TrainingTabProps) {
           onClose={() => setActiveSessionWorkout(null)}
           onComplete={() => {
             const result = recordAction("workout")
-            if (result.bossVictory) {
-              toast.success(locale === "en-US" ? `Boss defeated! +${result.bossXpEarned} XP` : `Boss derrotado! +${result.bossXpEarned} XP`)
-            }
             if (result.newAchievements.length > 0) {
               toast.success(locale === "en-US" ? `Achievement unlocked!` : `Conquista desbloqueada!`)
             }

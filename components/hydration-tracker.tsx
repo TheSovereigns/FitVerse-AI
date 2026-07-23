@@ -50,10 +50,7 @@ export function HydrationTracker() {
       notifications.success("Meta de hidratação atingida!")
     }
     if (amount > 0) {
-      const result = recordAction("water")
-      if (result.bossVictory) {
-        notifications.success("Boss defeated!")
-      }
+      recordAction("water")
     }
   }
 

@@ -143,5 +143,5 @@ export type View =
   | 'periodization' | 'workout-feedback' | 'equipment' | 'mobility'
   | 'longevity' | 'fasting' | 'biological-age'
   | 'mood' | 'habits' | 'meditation'
-  | 'seasons' | 'boss-battles' | 'reward-shop'
+  | 'seasons' | 'battle-pass' | 'reward-shop'
   | 'food-diary' | 'body'
