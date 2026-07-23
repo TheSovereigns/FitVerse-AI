@@ -99,6 +99,12 @@ export async function getCurrentUser() {
 // Helper function to get user profile
 export async function getUserProfile(userId: string): Promise<Profile | null> {
   try {
+    const { data: { session } } = await supabase.auth.getSession()
+    if (!session?.access_token) {
+      logger.warn("[getUserProfile] No valid session, attempting refresh")
+      await supabase.auth.refreshSession()
+    }
+
     const { data, error } = await supabase
       .from('profiles')
       .select('*')
@@ -147,6 +153,12 @@ export async function isUserAdmin(userId: string): Promise<boolean> {
 // Shared helper: find profile by user.id, fallback to email
 export async function findProfile(userId: string, email?: string | null): Promise<Profile | null> {
   try {
+    const { data: { session } } = await supabase.auth.getSession()
+    if (!session?.access_token) {
+      logger.warn("[findProfile] No valid session, attempting refresh")
+      await supabase.auth.refreshSession()
+    }
+
     const { data, error } = await supabase
       .from('profiles')
       .select('*')
