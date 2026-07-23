@@ -175,6 +175,27 @@ export function ProductResult({ result, onBack, imageData }: ProductResultProps)
         <div className="absolute inset-0 mesh-gradient opacity-10 group-hover:opacity-20 transition-opacity" />
         
         <div className="relative z-10 flex flex-col md:flex-row items-center gap-12">
+           {/* Scanned Image */}
+           {imageData && (
+             <motion.div 
+               initial={{ scale: 0.8, opacity: 0 }}
+               animate={{ scale: 1, opacity: 1 }}
+               transition={{ delay: 0.2 }}
+               className="relative shrink-0"
+             >
+               <div className="w-32 h-32 md:w-40 md:h-40 rounded-2xl overflow-hidden border-2 border-border shadow-xl">
+                 <img 
+                   src={imageData} 
+                   alt={result.productName}
+                   className="w-full h-full object-cover"
+                 />
+               </div>
+               <div className="absolute -bottom-2 -right-2 w-8 h-8 rounded-full bg-emerald-500 flex items-center justify-center shadow-lg">
+                 <Check className="w-4 h-4 text-white" />
+               </div>
+             </motion.div>
+           )}
+
            {/* Score Ring */}
            <div className="relative shrink-0">
               <div className="absolute inset-0 bg-primary/20 blur-[40px] rounded-full" />
