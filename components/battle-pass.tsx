@@ -31,27 +31,27 @@ const tiers: TierReward[] = [
   { tier: 2, xpRequired: 1000, label: "+10% XP Boost", value: "1.1", type: "xp-boost", icon: <Zap className="w-4 h-4 text-blue-400" /> },
   { tier: 3, xpRequired: 1500, label: "100 Coins", value: "100", type: "coins", icon: <Star className="w-4 h-4 text-yellow-400" /> },
   { tier: 4, xpRequired: 2000, label: "1 Extra Workout", value: "1", type: "workout-skip", icon: <Dumbbell className="w-4 h-4 text-green-400" /> },
-  { tier: 5, xpRequired: 2500, label: "150 Coins", value: "150", type: "coins", icon: <Star className="w-4 h-4 text-yellow-400" /> },
+  { tier: 5, xpRequired: 2500, label: "Cupom 10% OFF Premium", value: "PREM10", type: "coupon", icon: <Award className="w-4 h-4 text-purple-400" /> },
   { tier: 6, xpRequired: 3000, label: "+15% XP Boost", value: "1.15", type: "xp-boost", icon: <Zap className="w-4 h-4 text-blue-400" /> },
   { tier: 7, xpRequired: 3500, label: "200 Coins", value: "200", type: "coins", icon: <Star className="w-4 h-4 text-yellow-400" /> },
   { tier: 8, xpRequired: 4000, label: "2 Extra Workouts", value: "2", type: "workout-skip", icon: <Dumbbell className="w-4 h-4 text-green-400" /> },
   { tier: 9, xpRequired: 4500, label: "250 Coins", value: "250", type: "coins", icon: <Star className="w-4 h-4 text-yellow-400" /> },
-  { tier: 10, xpRequired: 5000, label: "+20% XP Boost", value: "1.2", type: "xp-boost", icon: <Zap className="w-4 h-4 text-blue-400" /> },
+  { tier: 10, xpRequired: 5000, label: "Cupom 15% OFF Premium", value: "PREM15", type: "coupon", icon: <Award className="w-4 h-4 text-purple-400" /> },
   { tier: 11, xpRequired: 5500, label: "300 Coins", value: "300", type: "coins", icon: <Star className="w-4 h-4 text-yellow-400" /> },
   { tier: 12, xpRequired: 6000, label: "3 Extra Workouts", value: "3", type: "workout-skip", icon: <Dumbbell className="w-4 h-4 text-green-400" /> },
   { tier: 13, xpRequired: 6500, label: "350 Coins", value: "350", type: "coins", icon: <Star className="w-4 h-4 text-yellow-400" /> },
   { tier: 14, xpRequired: 7000, label: "+25% XP Boost", value: "1.25", type: "xp-boost", icon: <Zap className="w-4 h-4 text-blue-400" /> },
-  { tier: 15, xpRequired: 7500, label: "500 Coins", value: "500", type: "coins", icon: <Star className="w-4 h-4 text-yellow-400" /> },
+  { tier: 15, xpRequired: 7500, label: "Cupom 20% OFF Premium", value: "PREM20", type: "coupon", icon: <Award className="w-4 h-4 text-purple-400" /> },
   { tier: 16, xpRequired: 8000, label: "5 Extra Workouts", value: "5", type: "workout-skip", icon: <Dumbbell className="w-4 h-4 text-green-400" /> },
   { tier: 17, xpRequired: 8500, label: "600 Coins", value: "600", type: "coins", icon: <Star className="w-4 h-4 text-yellow-400" /> },
   { tier: 18, xpRequired: 9000, label: "+30% XP Boost", value: "1.3", type: "xp-boost", icon: <Zap className="w-4 h-4 text-blue-400" /> },
   { tier: 19, xpRequired: 9500, label: "700 Coins", value: "700", type: "coins", icon: <Star className="w-4 h-4 text-yellow-400" /> },
-  { tier: 20, xpRequired: 10000, label: "7 Extra Workouts", value: "7", type: "workout-skip", icon: <Dumbbell className="w-4 h-4 text-green-400" /> },
+  { tier: 20, xpRequired: 10000, label: "Cupom 25% OFF Premium", value: "PREM25", type: "coupon", icon: <Award className="w-4 h-4 text-purple-400" /> },
   { tier: 21, xpRequired: 10500, label: "800 Coins", value: "800", type: "coins", icon: <Star className="w-4 h-4 text-yellow-400" /> },
   { tier: 22, xpRequired: 11000, label: "+35% XP Boost", value: "1.35", type: "xp-boost", icon: <Zap className="w-4 h-4 text-blue-400" /> },
   { tier: 23, xpRequired: 11500, label: "900 Coins", value: "900", type: "coins", icon: <Star className="w-4 h-4 text-yellow-400" /> },
   { tier: 24, xpRequired: 12000, label: "10 Extra Workouts", value: "10", type: "workout-skip", icon: <Dumbbell className="w-4 h-4 text-green-400" /> },
-  { tier: 25, xpRequired: 12500, label: "1000 Coins", value: "1000", type: "coins", icon: <Star className="w-4 h-4 text-yellow-400" /> },
+  { tier: 25, xpRequired: 12500, label: "Cupom 30% OFF Premium", value: "PREM30", type: "coupon", icon: <Award className="w-4 h-4 text-purple-400" /> },
   { tier: 26, xpRequired: 13000, label: "+40% XP Boost", value: "1.4", type: "xp-boost", icon: <Zap className="w-4 h-4 text-blue-400" /> },
   { tier: 27, xpRequired: 13500, label: "1200 Coins", value: "1200", type: "coins", icon: <Star className="w-4 h-4 text-yellow-400" /> },
   { tier: 28, xpRequired: 14000, label: "12 Extra Workouts", value: "12", type: "workout-skip", icon: <Dumbbell className="w-4 h-4 text-green-400" /> },
@@ -103,6 +103,11 @@ export function BattlePass({ isLocked = false }: BattlePassProps) {
       case "workout-skip":
         const extra = parseInt(localStorage.getItem("fitverse-extra-workouts") || "0") + parseInt(value)
         localStorage.setItem("fitverse-extra-workouts", extra.toString())
+        break
+      case "coupon":
+        const coupons = JSON.parse(localStorage.getItem("fitverse-coupons") || "[]")
+        coupons.push({ code: value, date: new Date().toISOString() })
+        localStorage.setItem("fitverse-coupons", JSON.stringify(coupons))
         break
       case "premium-trial":
         const trialEnd = new Date()
