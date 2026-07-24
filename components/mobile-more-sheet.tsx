@@ -10,7 +10,7 @@ import {
   Calculator, Salad, Pill, ArrowLeftRight,
   Timer, Zap, Dumbbell, Wind,
   Heart, Smile, ListChecks,
-  Trophy, Gift,
+  Trophy,
   X, Utensils, Ruler
 } from "lucide-react"
 
@@ -97,7 +97,6 @@ export function MobileMoreSheet({ open, onClose, onNavigate, isFeatureLocked }: 
       items: [
         { view: "seasons", icon: Trophy, label: t("nav_seasons"), feature: "seasons" },
         { view: "battle-pass", icon: Trophy, label: isEnglish ? "Battle Pass" : "Passe de Batalha" },
-        { view: "reward-shop", icon: Gift, label: t("nav_reward_shop"), feature: "reward-shop" },
       ]
     },
     {

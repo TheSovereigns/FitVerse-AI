@@ -55,7 +55,6 @@ const HabitBuilder = lazy(() => import("@/components/habit-builder").then(m => (
 const GuidedMeditation = lazy(() => import("@/components/guided-meditation").then(m => ({ default: m.GuidedMeditation })))
 const SeasonSystem = lazy(() => import("@/components/season-system").then(m => ({ default: m.SeasonSystem })))
 const BattlePass = lazy(() => import("@/components/battle-pass").then(m => ({ default: m.BattlePass })))
-const RewardShop = lazy(() => import("@/components/reward-shop").then(m => ({ default: m.RewardShop })))
 const FoodDiary = lazy(() => import("@/components/food-diary").then(m => ({ default: m.FoodDiary })))
 const BodyTracker = lazy(() => import("@/components/body-tracker").then(m => ({ default: m.BodyTracker })))
 
@@ -149,7 +148,6 @@ export default function DashboardPage() {
       meditation: t("nav_meditation"),
       seasons: t("nav_seasons"),
       "battle-pass": isEnglish ? "Battle Pass" : "Passe de Batalha",
-      "reward-shop": t("nav_reward_shop"),
     }
     return titles[currentView] || t("view_fitverse")
   }
@@ -432,7 +430,6 @@ export default function DashboardPage() {
             {/* Gamification */}
             {currentView === "seasons" && <SeasonSystem />}
             {currentView === "battle-pass" && <BattlePass isLocked={isFeatureLocked("battle-pass")} />}
-            {currentView === "reward-shop" && <RewardShop isLocked={isFeatureLocked("reward-shop")} />}
             {currentView === "food-diary" && <FoodDiary onBack={() => setCurrentView("home")} />}
             {currentView === "body" && <BodyTracker />}
             </FeatureErrorBoundary>

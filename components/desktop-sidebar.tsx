@@ -8,7 +8,7 @@ import {
   Home, ScanLine, Dumbbell, ChefHat,
   Moon, Brain, Apple, Wind,
   Heart, Timer, Smile, ListChecks,
-  Trophy, Gift,
+  Trophy,
   User, Settings, Users, MessageCircle,
   Salad, Pill, ArrowLeftRight, Zap,
   ChevronDown, Utensils, Ruler
@@ -69,7 +69,6 @@ export function DesktopSidebar({ currentView, onNavigate, isFeatureLocked }: Sid
       items: [
         { view: "seasons", icon: Trophy, label: t("nav_seasons"), feature: "seasons" },
         { view: "battle-pass", icon: Trophy, label: isEnglish ? "Battle Pass" : "Passe de Batalha" },
-        { view: "reward-shop", icon: Gift, label: t("nav_reward_shop"), feature: "reward-shop" },
       ]
     },
   ]
