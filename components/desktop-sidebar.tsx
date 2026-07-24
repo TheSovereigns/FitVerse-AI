@@ -11,7 +11,8 @@ import {
   Trophy,
   User, Settings, Users, MessageCircle,
   Salad, Pill, ArrowLeftRight, Zap,
-  ChevronDown, Utensils, Ruler
+  ChevronDown, Utensils, Ruler,
+  Calendar, TrendingUp, Flame, BarChart3
 } from "lucide-react"
 
 interface SidebarProps {
@@ -69,6 +70,16 @@ export function DesktopSidebar({ currentView, onNavigate, isFeatureLocked }: Sid
       items: [
         { view: "seasons", icon: Trophy, label: t("nav_seasons"), feature: "seasons" },
         { view: "battle-pass", icon: Trophy, label: isEnglish ? "Battle Pass" : "Passe de Batalha" },
+      ]
+    },
+    {
+      key: "progress", icon: TrendingUp, label: isEnglish ? "Progress" : "Progresso",
+      items: [
+        { view: "weekly-report", icon: Calendar, label: isEnglish ? "Weekly Report" : "Rel. Semanal" },
+        { view: "body-evolution", icon: TrendingUp, label: isEnglish ? "Body Evolution" : "Evolucao" },
+        { view: "streak-calendar", icon: Flame, label: isEnglish ? "Streak" : "Sequencia" },
+        { view: "achievements-page", icon: Trophy, label: isEnglish ? "Achievements" : "Conquistas" },
+        { view: "analytics-charts", icon: BarChart3, label: isEnglish ? "Analytics" : "Analises" },
       ]
     },
   ]

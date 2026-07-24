@@ -145,3 +145,4 @@ export type View =
   | 'mood' | 'habits' | 'meditation'
   | 'seasons' | 'battle-pass'
   | 'food-diary' | 'body'
+  | 'weekly-report' | 'body-evolution' | 'streak-calendar' | 'achievements-page' | 'analytics-charts'

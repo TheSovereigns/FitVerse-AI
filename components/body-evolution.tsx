@@ -1,293 +1,290 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect, useCallback, useMemo } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import {
-  Camera, X, ArrowLeft, ArrowRight, Trash2, ChevronLeft,
-  Weight, Ruler, TrendingUp, TrendingDown,
-} from "lucide-react"
+import { Ruler, TrendingUp, TrendingDown, Trash2, Plus, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { cn } from "@/lib/utils"
+import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip, CartesianGrid } from "recharts"
 import { useTranslation } from "@/lib/i18n"
+import { cn } from "@/lib/utils"
 import { logger } from "@/lib/logger"
+import { format } from "date-fns"
+import { ptBR } from "date-fns/locale"
 
-interface BodyPhoto {
-  id: string
-  url: string
-  type: "front" | "side" | "back"
+interface Measurement {
   date: string
-}
-
-interface BodyMetric {
-  date?: string
   weight?: number
-  bodyFat?: number
   chest?: number
   waist?: number
   hips?: number
   arms?: number
+  thighs?: number
 }
 
-interface EvolutionEntry {
-  date: string
-  photos: BodyPhoto[]
-  metrics: BodyMetric
-}
+const STORAGE_KEY = "fitverse-body-measurements"
 
 export function BodyEvolution() {
   const { t, locale } = useTranslation()
   const isEnglish = locale === "en-US"
-  const [entries, setEntries] = useState<EvolutionEntry[]>([])
-  const [selectedEntry, setSelectedEntry] = useState<number>(0)
-  const [showUpload, setShowUpload] = useState(false)
-  const [compareMode, setCompareMode] = useState(false)
-  const [compareIndex, setCompareIndex] = useState(1)
-  const [sliderPos, setSliderPos] = useState(50)
+  const [measurements, setMeasurements] = useState<Measurement[]>([])
+  const [showForm, setShowForm] = useState(false)
+  const [formData, setFormData] = useState<Partial<Measurement>>({})
+  const [selectedField, setSelectedField] = useState<keyof Measurement>("weight")
 
   useEffect(() => {
     try {
-      const saved = localStorage.getItem("bodyEvolution")
-      if (saved) setEntries(JSON.parse(saved))
+      const saved = localStorage.getItem(STORAGE_KEY)
+      if (saved) setMeasurements(JSON.parse(saved))
     } catch (e) {
-      logger.error("[BodyEvolution] Failed to parse bodyEvolution:", e)
+      logger.error("[BodyEvolution] Failed to parse measurements:", e)
     }
   }, [])
 
-  const saveEntries = useCallback((data: EvolutionEntry[]) => {
-    localStorage.setItem("bodyEvolution", JSON.stringify(data))
-    setEntries(data)
+  const saveMeasurements = useCallback((data: Measurement[]) => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data))
+    setMeasurements(data)
   }, [])
 
-  const handlePhotoUpload = async (type: "front" | "side" | "back", file: File) => {
-    const reader = new FileReader()
-    reader.onload = () => {
-      const today = new Date().toISOString().split("T")[0]!
-      const photo: BodyPhoto = {
-        id: Date.now().toString(),
-        url: reader.result as string,
-        type,
-        date: today,
-      }
-
-      const existing = entries.find((e) => e.date === today)
-      if (existing) {
-        const updated = entries.map((e) => {
-          if (e.date === today) {
-            return { ...e, photos: [...e.photos.filter((p) => p.type !== type), photo] }
-          }
-          return e
-        })
-        saveEntries(updated)
-      } else {
-        saveEntries([{ date: today, photos: [photo], metrics: {} }, ...entries])
-      }
+  const handleSave = () => {
+    if (!formData.weight) return
+    const newMeasurement: Measurement = {
+      date: new Date().toISOString(),
+      weight: formData.weight ? Number(formData.weight) : undefined,
+      chest: formData.chest ? Number(formData.chest) : undefined,
+      waist: formData.waist ? Number(formData.waist) : undefined,
+      hips: formData.hips ? Number(formData.hips) : undefined,
+      arms: formData.arms ? Number(formData.arms) : undefined,
+      thighs: formData.thighs ? Number(formData.thighs) : undefined,
     }
-    reader.readAsDataURL(file)
+    saveMeasurements([newMeasurement, ...measurements])
+    setFormData({})
+    setShowForm(false)
   }
 
-  const handleMetricSave = (date: string, metrics: BodyMetric) => {
-    const updated = entries.map((e) =>
-      e.date === date ? { ...e, metrics: { ...e.metrics, ...metrics } } : e
-    )
-    saveEntries(updated)
+  const handleDelete = (index: number) => {
+    const updated = measurements.filter((_, i) => i !== index)
+    saveMeasurements(updated)
   }
 
-  const deleteEntry = (date: string) => {
-    saveEntries(entries.filter((e) => e.date !== date))
-    setSelectedEntry(0)
-  }
+  const chartData = useMemo(() => {
+    return [...measurements]
+      .reverse()
+      .map((m) => ({
+        date: format(new Date(m.date), "dd/MM", { locale: isEnglish ? undefined : ptBR }),
+        [selectedField]: m[selectedField] ?? null,
+      }))
+  }, [measurements, selectedField])
 
-  const getTrend = (field: keyof BodyMetric) => {
-    if (entries.length < 2) return null
-    const current = entries[selectedEntry]?.metrics?.[field] as number | undefined
-    const prev = entries[Math.min(selectedEntry + 1, entries.length - 1)]?.metrics?.[field] as number | undefined
+  const latest = measurements[0]
+  const previous = measurements[1]
+
+  const getTrend = (current?: number, prev?: number) => {
     if (!current || !prev) return null
-    return current - prev
+    const diff = current - prev
+    return { value: Math.abs(diff), direction: diff > 0 ? "up" : diff < 0 ? "down" : "same" }
   }
 
-  const currentEntry = entries[selectedEntry]
-  const compareEntry = entries[compareIndex]
+  const weightTrend = getTrend(latest?.weight, previous?.weight)
+
+  const fields: { key: keyof Measurement; label: string; unit: string }[] = [
+    { key: "weight", label: isEnglish ? "Weight" : "Peso", unit: "kg" },
+    { key: "chest", label: isEnglish ? "Chest" : "Peito", unit: "cm" },
+    { key: "waist", label: isEnglish ? "Waist" : "Cintura", unit: "cm" },
+    { key: "hips", label: isEnglish ? "Hips" : "Quadril", unit: "cm" },
+    { key: "arms", label: isEnglish ? "Arms" : "Bracos", unit: "cm" },
+    { key: "thighs", label: isEnglish ? "Thighs" : "Coxas", unit: "cm" },
+  ]
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 12 }}
+      initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
-      className="relative overflow-hidden rounded-[1.5rem] border border-white/10 bg-black/40 backdrop-blur-2xl"
+      className="glass-strong border border-border rounded-2xl p-6"
     >
-      <div className="absolute inset-0 bg-gradient-to-br from-purple-500/6 via-transparent to-pink-500/4" />
-
-      <div className="relative p-5">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-2">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-purple-500/15 border border-purple-500/20">
-              <Camera className="h-4 w-4 text-purple-400" />
-            </div>
-            <div>
-              <h3 className="text-sm font-black text-foreground">
-                {isEnglish ? "Body Evolution" : "Evolucao Corporal"}
-              </h3>
-              <p className="text-[9px] font-black uppercase tracking-widest text-foreground/50">
-                {entries.length} {isEnglish ? "records" : "registros"}
-              </p>
-            </div>
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-2.5">
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-muted">
+            <Ruler className="h-4 w-4 text-brand" />
           </div>
-          <Button
-            onClick={() => setShowUpload(!showUpload)}
-            className="h-8 rounded-lg bg-purple-500/15 border border-purple-500/20 px-3 text-[9px] font-black uppercase tracking-widest text-purple-400 hover:bg-purple-500/25"
-          >
-            <Camera className="h-3 w-3 mr-1" />
-            {isEnglish ? "New" : "Novo"}
-          </Button>
-        </div>
-
-        <AnimatePresence>
-          {showUpload && (
-            <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: "auto", opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              className="overflow-hidden mb-4"
-            >
-              <div className="rounded-xl border border-purple-500/15 bg-purple-500/5 p-4">
-                <p className="text-xs font-bold text-foreground/50 mb-3">
-                  {isEnglish ? "Take or select photos" : "Tire ou selecione fotos"}
-                </p>
-                <div className="grid grid-cols-3 gap-2">
-                  {(["front", "side", "back"] as const).map((type) => (
-                    <label
-                      key={type}
-                      className="flex flex-col items-center gap-1 rounded-xl border border-purple-500/15 bg-black/30 p-3 cursor-pointer hover:bg-purple-500/10 transition-all"
-                    >
-                      <Camera className="h-5 w-5 text-purple-400/60" />
-                      <span className="text-[9px] font-black uppercase tracking-widest text-foreground/50">
-                        {type === "front" ? (isEnglish ? "Front" : "Frente") : type === "side" ? (isEnglish ? "Side" : "Lado") : (isEnglish ? "Back" : "Costas")}
-                      </span>
-                      <input
-                        type="file"
-                        accept="image/*"
-                        capture="environment"
-                        className="hidden"
-                        onChange={(e) => {
-                          const file = e.target.files?.[0]
-                          if (file) handlePhotoUpload(type, file)
-                        }}
-                      />
-                    </label>
-                  ))}
-                </div>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {entries.length === 0 ? (
-          <div className="rounded-xl border border-purple-500/10 bg-black/20 p-8 text-center">
-            <Camera className="mx-auto mb-3 h-10 w-10 text-purple-400/20" />
-            <p className="text-sm font-bold text-foreground/50">
-              {isEnglish ? "No photos yet. Start tracking your evolution!" : "Nenhuma foto ainda. Comece a acompanhar sua evolucao!"}
+          <div>
+            <h3 className="text-sm font-semibold text-foreground">
+              {isEnglish ? "Body Evolution" : "Evolucao Corporal"}
+            </h3>
+            <p className="text-xs text-muted-foreground">
+              {measurements.length} {isEnglish ? "measurements" : "registros"}
             </p>
           </div>
-        ) : (
-          <>
-            <div className="flex items-center justify-between mb-3">
-              <Button
-                onClick={() => setSelectedEntry(Math.min(selectedEntry + 1, entries.length - 1))}
-                disabled={selectedEntry >= entries.length - 1}
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8 rounded-lg"
-              >
-                <ChevronLeft className="h-4 w-4 rotate-180" />
-              </Button>
-              <p className="text-sm font-black text-foreground">
-                {new Date(currentEntry?.date || "").toLocaleDateString(isEnglish ? "en-US" : "pt-BR", { day: "numeric", month: "long", year: "numeric" })}
+        </div>
+        <Button
+          onClick={() => setShowForm(!showForm)}
+          className="h-8 rounded-lg bg-brand-muted border border-border px-3 text-xs font-medium text-brand hover:bg-brand/20"
+        >
+          {showForm ? <X className="h-3 w-3" /> : <Plus className="h-3 w-3 mr-1" />}
+          {showForm ? (isEnglish ? "Close" : "Fechar") : (isEnglish ? "New" : "Novo")}
+        </Button>
+      </div>
+
+      <AnimatePresence>
+        {showForm && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            className="overflow-hidden mb-4"
+          >
+            <div className="rounded-xl border border-border bg-muted/30 p-4">
+              <p className="text-xs font-medium text-muted-foreground mb-3">
+                {isEnglish ? "Log today's measurements" : "Registrar medidas de hoje"}
               </p>
+              <div className="grid grid-cols-3 gap-2 mb-3">
+                {fields.map(({ key, label, unit }) => (
+                  <div key={key}>
+                    <label className="text-[10px] font-medium text-muted-foreground mb-1 block">
+                      {label} ({unit})
+                    </label>
+                    <Input
+                      type="number"
+                      step="0.1"
+                      placeholder={unit}
+                      value={(formData[key] as number) ?? ""}
+                      onChange={(e) => setFormData({ ...formData, [key]: e.target.value ? Number(e.target.value) : undefined })}
+                      className="h-8 rounded-lg text-xs bg-background border-border"
+                    />
+                  </div>
+                ))}
+              </div>
               <Button
-                onClick={() => setSelectedEntry(Math.max(selectedEntry - 1, 0))}
-                disabled={selectedEntry <= 0}
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8 rounded-lg"
+                onClick={handleSave}
+                disabled={!formData.weight}
+                className="w-full h-9 rounded-xl text-xs font-medium bg-brand hover:bg-brand/90 text-white disabled:opacity-50"
               >
-                <ChevronLeft className="h-4 w-4" />
+                {isEnglish ? "Save Measurements" : "Salvar Medidas"}
               </Button>
             </div>
-
-            {currentEntry?.photos && currentEntry.photos.length > 0 ? (
-              <div className="grid grid-cols-3 gap-2 mb-4">
-                {(["front", "side", "back"] as const).map((type) => {
-                  const photo = currentEntry.photos.find((p) => p.type === type)
-                  return (
-                    <div key={type} className="aspect-[3/4] rounded-xl overflow-hidden border border-purple-500/10 bg-black/30 relative">
-                      {photo ? (
-                        <img src={photo.url} alt="" className="w-full h-full object-cover" />
-                      ) : (
-                        <div className="flex items-center justify-center h-full">
-                          <Camera className="h-6 w-6 text-purple-400/20" />
-                        </div>
-                      )}
-                      <div className="absolute bottom-1 inset-x-0 text-center">
-                        <span className="text-[8px] font-black uppercase tracking-widest text-white/50 bg-black/50 rounded-full px-2 py-0.5">
-                          {type === "front" ? (isEnglish ? "Front" : "Frente") : type === "side" ? (isEnglish ? "Side" : "Lado") : (isEnglish ? "Back" : "Costas")}
-                        </span>
-                      </div>
-                    </div>
-                  )
-                })}
-              </div>
-            ) : (
-              <div className="rounded-xl border border-purple-500/10 bg-black/20 p-4 text-center mb-4">
-                <p className="text-xs text-foreground/50">
-                  {isEnglish ? "No photos for this date" : "Nenhuma foto para esta data"}
-                </p>
-              </div>
-            )}
-
-            {currentEntry?.metrics && Object.keys(currentEntry.metrics).length > 0 && (
-              <div className="grid grid-cols-3 gap-2 mb-4">
-                {[
-                  { label: isEnglish ? "Weight" : "Peso", field: "weight", unit: "kg" },
-                  { label: isEnglish ? "Body Fat" : "Gordura", field: "bodyFat", unit: "%" },
-                  { label: isEnglish ? "Waist" : "Cintura", field: "waist", unit: "cm" },
-                ].map(({ label, field, unit }) => {
-                  const value = currentEntry.metrics[field as keyof BodyMetric] as number | undefined
-                  const trend = getTrend(field as keyof BodyMetric)
-                  return (
-                    <div key={field} className="rounded-xl border border-purple-500/10 bg-black/30 p-3 text-center">
-                      <p className="text-lg font-black text-foreground">{value ? `${value}` : "—"}</p>
-                      <p className="text-[8px] font-black uppercase tracking-widest text-foreground/50">{unit}</p>
-                      {trend !== null && (
-                        <div className="flex items-center justify-center gap-0.5 mt-1">
-                          {trend > 0 ? (
-                            <TrendingUp className="h-2.5 w-2.5 text-red-400" />
-                          ) : trend < 0 ? (
-                            <TrendingDown className="h-2.5 w-2.5 text-emerald-400" />
-                          ) : null}
-                          <span className={cn("text-[8px] font-bold", trend > 0 ? "text-red-400" : "text-emerald-400")}>
-                            {trend > 0 ? "+" : ""}{trend.toFixed(1)}
-                          </span>
-                        </div>
-                      )}
-                    </div>
-                  )
-                })}
-              </div>
-            )}
-
-            {entries.length > 1 && (
-              <Button
-                onClick={() => deleteEntry(currentEntry!.date)}
-                variant="ghost"
-                className="w-full h-8 rounded-lg text-[9px] font-black uppercase tracking-widest text-red-400/50 hover:text-red-400"
-              >
-                <Trash2 className="h-3 w-3 mr-1" />
-                {isEnglish ? "Delete this entry" : "Excluir este registro"}
-              </Button>
-            )}
-          </>
+          </motion.div>
         )}
-      </div>
+      </AnimatePresence>
+
+      {latest && (
+        <div className="grid grid-cols-3 gap-2 mb-4">
+          {fields.slice(0, 3).map(({ key, label, unit }) => {
+            const value = latest[key] as number | undefined
+            const trend = getTrend(latest[key] as number | undefined, previous?.[key] as number | undefined)
+            return (
+              <div key={key} className="text-center p-2 rounded-xl bg-muted/50">
+                <p className="text-lg font-bold text-foreground">{value ?? "—"}</p>
+                <p className="text-[10px] text-muted-foreground">{unit}</p>
+                {trend && (
+                  <div className="flex items-center justify-center gap-0.5 mt-1">
+                    {trend.direction === "up" ? (
+                      <TrendingUp className="h-2.5 w-2.5 text-red-500" />
+                    ) : trend.direction === "down" ? (
+                      <TrendingDown className="h-2.5 w-2.5 text-emerald-500" />
+                    ) : null}
+                    <span className={cn("text-[10px] font-medium", trend.direction === "up" ? "text-red-500" : "text-emerald-500")}>
+                      {trend.direction === "up" ? "+" : "-"}{trend.value.toFixed(1)}
+                    </span>
+                  </div>
+                )}
+              </div>
+            )
+          })}
+        </div>
+      )}
+
+      {measurements.length > 0 && (
+        <div className="mb-4">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-xs font-medium text-muted-foreground">
+              {isEnglish ? "Trends" : "Tendencias"}
+            </span>
+            <select
+              value={selectedField}
+              onChange={(e) => setSelectedField(e.target.value as keyof Measurement)}
+              className="text-xs bg-muted border border-border rounded-lg px-2 py-1 text-foreground"
+            >
+              {fields.map(({ key, label }) => (
+                <option key={key} value={key}>{label}</option>
+              ))}
+            </select>
+          </div>
+          <div className="h-48">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={chartData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                <XAxis dataKey="date" tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }} axisLine={false} tickLine={false} width={35} />
+                <Tooltip
+                  contentStyle={{ fontSize: 11, background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 8 }}
+                  formatter={(value: number) => [`${value}`, fields.find((f) => f.key === selectedField)?.label]}
+                />
+                <Line
+                  type="monotone"
+                  dataKey={selectedField}
+                  stroke="hsl(var(--brand))"
+                  strokeWidth={2}
+                  dot={{ r: 3, fill: "hsl(var(--brand))" }}
+                  connectNulls
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+      )}
+
+      {measurements.length > 0 && (
+        <div>
+          <p className="text-[10px] font-medium text-muted-foreground mb-2 uppercase tracking-wider">
+            {isEnglish ? "Measurement History" : "Historico de Medidas"}
+          </p>
+          <div className="overflow-x-auto">
+            <table className="w-full text-xs">
+              <thead>
+                <tr className="border-b border-border">
+                  <th className="text-left py-2 text-muted-foreground font-medium">{isEnglish ? "Date" : "Data"}</th>
+                  {fields.map(({ key, label, unit }) => (
+                    <th key={key} className="text-right py-2 text-muted-foreground font-medium">
+                      {label} ({unit})
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {measurements.map((m, i) => (
+                  <tr key={m.date} className="border-b border-border/50 hover:bg-muted/30 transition-colors">
+                    <td className="py-2 text-foreground">
+                      {format(new Date(m.date), "dd/MM/yyyy")}
+                    </td>
+                    {fields.map(({ key }) => (
+                      <td key={key} className="text-right py-2 text-foreground">
+                        {(m[key] as number) ?? "—"}
+                      </td>
+                    ))}
+                    <td className="text-right py-2">
+                      <button
+                        onClick={() => handleDelete(i)}
+                        className="p-1 rounded hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors"
+                      >
+                        <Trash2 className="h-3 w-3" />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {measurements.length === 0 && !showForm && (
+        <div className="rounded-xl border border-border bg-muted/20 p-8 text-center">
+          <Ruler className="mx-auto mb-3 h-10 w-10 text-muted-foreground/30" />
+          <p className="text-sm font-medium text-muted-foreground">
+            {isEnglish ? "No measurements yet. Start tracking your body evolution!" : "Nenhuma medida ainda. Comece a acompanhar sua evolucao corporal!"}
+          </p>
+        </div>
+      )}
     </motion.div>
   )
 }

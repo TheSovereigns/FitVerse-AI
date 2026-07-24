@@ -1,157 +1,119 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useMemo } from "react"
 import { motion } from "framer-motion"
-import {
-  TrendingUp, TrendingDown, Minus, Calendar, Flame, Dumbbell,
-  ScanLine, Wheat, Target, Sparkles, ChevronRight, RefreshCw,
-} from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { cn } from "@/lib/utils"
-import { useWeeklyReport } from "@/hooks/useWeeklyReport"
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts"
+import { Calendar, Dumbbell, ScanLine, Droplets, Heart, Zap, Star, Trophy } from "lucide-react"
 import { useTranslation } from "@/lib/i18n"
+import { cn } from "@/lib/utils"
+import { logger } from "@/lib/logger"
+import { startOfWeek, endOfWeek, format, eachDayOfInterval, subDays, isSameDay } from "date-fns"
+import { ptBR, enUS } from "date-fns/locale"
+
+interface DayData {
+  day: string
+  label: string
+  scans: number
+  workouts: number
+  water: number
+  habits: number
+  score: number
+}
+
+function safeGet<T>(key: string, fallback: T): T {
+  try {
+    const raw = localStorage.getItem(key)
+    return raw ? JSON.parse(raw) : fallback
+  } catch {
+    return fallback
+  }
+}
 
 export function WeeklyReport() {
-  const { t, locale } = useTranslation()
+  const { locale } = useTranslation()
   const isEnglish = locale === "en-US"
-  const { report, aiInsight, isLoading, generateReport } = useWeeklyReport()
+  const dateLocale = isEnglish ? enUS : ptBR
 
-  if (isLoading && !report) {
-    return (
-      <div className="rounded-[1.5rem] border border-white/14 bg-[#090704]/70 p-6 backdrop-blur-2xl">
-        <div className="flex items-center justify-center py-8">
-          <div className="h-6 w-6 rounded-full border-2 border-foreground/40 border-t-transparent animate-spin" />
-        </div>
-      </div>
-    )
-  }
+  const weekStart = startOfWeek(new Date(), { weekStartsOn: 1 })
+  const weekEnd = endOfWeek(new Date(), { weekStartsOn: 1 })
+  const weekDays = eachDayOfInterval({ start: weekStart, end: weekEnd })
 
-  if (!report) return null
+  const data = useMemo(() => {
+    const gamStats = safeGet("fitverse-gamification-stats", { totalScans: 0, totalWorkouts: 0, totalWater: 0, totalHabits: 0 })
+    const hydrationHistory = safeGet<Array<{ date: string; amount: number }>>("fitverse-hydration-history", [])
+    const habitLogs = safeGet<Array<{ date: string; completed: string[] }>>("habit_logs", [])
+    const scanHistory = safeGet<Array<{ scannedAt: string }>>("fitverse-scan-history", [])
+    const xp = safeGet("fitverse-xp", 0)
+    const coins = safeGet("fitverse-coins", 0)
 
-  const TrendIcon = ({ value }: { value: number }) => {
-    if (value > 0) return <TrendingUp className="h-3 w-3 text-emerald-400" />
-    if (value < 0) return <TrendingDown className="h-3 w-3 text-red-400" />
-    return <Minus className="h-3 w-3 text-foreground/30" />
-  }
+    const dailyData: DayData[] = weekDays.map((date) => {
+      const dateStr = format(date, "yyyy-MM-dd")
+      const label = format(date, "EEE", { locale: dateLocale })
+      const dayScans = scanHistory.filter(s => s.scannedAt?.startsWith(dateStr)).length
+      const dayWater = hydrationHistory.filter(h => h.date === dateStr).reduce((sum, h) => sum + (h.amount || 0), 0)
+      const dayHabits = habitLogs.find(h => h.date === dateStr)?.completed?.length || 0
+      const score = dayScans + dayWater + dayHabits
 
-  const maxCalories = Math.max(...report.dailyData.map((d) => d.calories), 1)
+      return { day: dateStr, label, scans: dayScans, workouts: 0, water: dayWater, habits: dayHabits, score }
+    })
+
+    const weekScans = dailyData.reduce((s, d) => s + d.scans, 0)
+    const weekWater = dailyData.reduce((s, d) => s + d.water, 0)
+    const weekHabits = dailyData.reduce((s, d) => s + d.habits, 0)
+
+    return { dailyData, weekScans, weekWater, weekHabits, totalScans: gamStats.totalScans, totalWorkouts: gamStats.totalWorkouts, xp, coins }
+  }, [])
+
+  const stats = [
+    { icon: ScanLine, label: isEnglish ? "Scans" : "Scans", value: data.weekScans, color: "text-blue-400" },
+    { icon: Dumbbell, label: isEnglish ? "Workouts" : "Treinos", value: data.totalWorkouts, color: "text-green-400" },
+    { icon: Droplets, label: isEnglish ? "Water (L)" : "Agua (L)", value: (data.weekWater).toFixed(1), color: "text-cyan-400" },
+    { icon: Heart, label: isEnglish ? "Habits" : "Habitos", value: data.weekHabits, color: "text-red-400" },
+    { icon: Zap, label: "XP", value: data.xp.toLocaleString(), color: "text-yellow-400" },
+    { icon: Star, label: isEnglish ? "Coins" : "Moedas", value: data.coins.toLocaleString(), color: "text-orange-400" },
+  ]
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 12 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="relative overflow-hidden rounded-[1.5rem] border border-white/14 bg-[#090704]/70 backdrop-blur-2xl"
-    >
-      <div className="absolute inset-0 bg-gradient-to-br from-blue-500/6 via-transparent to-purple-500/4" />
-
-      <div className="relative p-5">
-        <div className="flex items-center justify-between mb-5">
-          <div className="flex items-center gap-2">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-500/15 border border-blue-500/20">
-              <Calendar className="h-4 w-4 text-blue-400" />
-            </div>
-            <div>
-              <h3 className="text-sm font-black text-foreground">
-                {isEnglish ? "Weekly Report" : "Relatorio Semanal"}
-              </h3>
-              <p className="text-[9px] font-black uppercase tracking-widest text-foreground/30">
-                {report.weekLabel}
-              </p>
-            </div>
-          </div>
-          <Button
-            onClick={generateReport}
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8 rounded-lg border border-white/10 bg-white/8"
-          >
-            <RefreshCw className={cn("h-3.5 w-3.5 text-foreground/50", isLoading && "animate-spin")} />
-          </Button>
-        </div>
-
-        <div className="grid grid-cols-2 gap-2 mb-4">
-          <div className="rounded-xl border border-white/10 bg-black/30 p-3">
-            <div className="flex items-center justify-between mb-1">
-              <ScanLine className="h-4 w-4 text-emerald-400" />
-              <TrendIcon value={report.scanTrend} />
-            </div>
-            <p className="text-xl font-black text-foreground">{report.totalScans}</p>
-            <p className="text-[9px] font-black uppercase tracking-widest text-foreground/30">
-              {isEnglish ? "Scans" : "Scans"}
-              {report.scanTrend !== 0 && (
-                <span className={cn("ml-1", report.scanTrend > 0 ? "text-emerald-400" : "text-red-400")}>
-                  {report.scanTrend > 0 ? "+" : ""}{report.scanTrend}%
-                </span>
-              )}
-            </p>
-          </div>
-          <div className="rounded-xl border border-white/10 bg-black/30 p-3">
-            <div className="flex items-center justify-between mb-1">
-              <Dumbbell className="h-4 w-4 text-blue-400" />
-              <TrendIcon value={report.workoutTrend} />
-            </div>
-            <p className="text-xl font-black text-foreground">{report.totalWorkouts}</p>
-            <p className="text-[9px] font-black uppercase tracking-widest text-foreground/30">
-              {isEnglish ? "Workouts" : "Treinos"}
-              {report.workoutTrend !== 0 && (
-                <span className={cn("ml-1", report.workoutTrend > 0 ? "text-emerald-400" : "text-red-400")}>
-                  {report.workoutTrend > 0 ? "+" : ""}{report.workoutTrend}%
-                </span>
-              )}
-            </p>
-          </div>
-          <div className="rounded-xl border border-white/10 bg-black/30 p-3">
-            <Target className="h-4 w-4 text-foreground/60 mb-1" />
-            <p className="text-xl font-black text-foreground">{report.avgScore}</p>
-            <p className="text-[9px] font-black uppercase tracking-widest text-foreground/30">
-              {isEnglish ? "Avg Score" : "Score Medio"}
-            </p>
-          </div>
-          <div className="rounded-xl border border-white/10 bg-black/30 p-3">
-            <Flame className="h-4 w-4 text-red-400 mb-1" />
-            <p className="text-xl font-black text-foreground">{report.daysActive}/7</p>
-            <p className="text-[9px] font-black uppercase tracking-widest text-foreground/30">
-              {isEnglish ? "Active Days" : "Dias Ativos"}
-            </p>
-          </div>
-        </div>
-
-        <div className="mb-4">
-          <p className="text-[9px] font-black uppercase tracking-widest text-foreground/30 mb-2">
-            {isEnglish ? "Calories by Day" : "Calorias por Dia"}
-          </p>
-          <div className="flex items-end justify-between gap-1 h-20">
-            {report.dailyData.map((day, i) => {
-              const dayName = new Date(day.date).toLocaleDateString(isEnglish ? "en-US" : "pt-BR", { weekday: "short" })
-              return (
-                <div key={i} className="flex-1 flex flex-col items-center gap-1">
-                  <div className="w-full bg-foreground/10 rounded-t-md relative overflow-hidden flex-1 min-h-[4px]">
-                    <motion.div
-                      initial={{ height: 0 }}
-                      animate={{ height: `${(day.calories / maxCalories) * 100}%` }}
-                      className="absolute bottom-0 w-full rounded-t-md bg-gradient-to-t from-blue-500/60 to-blue-400/40"
-                      transition={{ delay: i * 0.05, duration: 0.5 }}
-                    />
-                  </div>
-                  <span className="text-[8px] font-bold text-foreground/25">{dayName}</span>
-                </div>
-              )
-            })}
-          </div>
-        </div>
-
-        {aiInsight && (
-          <div className="rounded-xl border border-blue-500/15 bg-blue-500/5 p-4">
-            <div className="flex items-center gap-2 mb-2">
-              <Sparkles className="h-4 w-4 text-blue-400" />
-              <span className="text-[9px] font-black uppercase tracking-widest text-blue-400/70">
-                {isEnglish ? "AI Insight" : "Insight da IA"}
-              </span>
-            </div>
-            <p className="text-sm text-foreground/70 leading-relaxed">{aiInsight}</p>
-          </div>
-        )}
+    <div className="glass-strong border border-border rounded-2xl p-6">
+      <div className="flex items-center gap-2 mb-4">
+        <Calendar className="w-5 h-5 text-brand" />
+        <h2 className="text-lg font-semibold text-foreground">{isEnglish ? "Weekly Report" : "Relatorio Semanal"}</h2>
       </div>
-    </motion.div>
+
+      <p className="text-xs text-muted-foreground mb-4">
+        {format(weekStart, "dd MMM", { locale: dateLocale })} - {format(weekEnd, "dd MMM, yyyy", { locale: dateLocale })}
+      </p>
+
+      <div className="grid grid-cols-3 gap-2 mb-6">
+        {stats.map((stat, i) => (
+          <motion.div
+            key={stat.label}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: i * 0.05 }}
+            className="p-3 rounded-xl border border-border bg-card"
+          >
+            <stat.icon className={cn("w-4 h-4 mb-1", stat.color)} />
+            <p className="text-lg font-bold text-foreground">{stat.value}</p>
+            <p className="text-[10px] text-muted-foreground">{stat.label}</p>
+          </motion.div>
+        ))}
+      </div>
+
+      <div className="rounded-xl border border-border bg-card p-4">
+        <h3 className="text-sm font-medium text-foreground mb-3">{isEnglish ? "Daily Activity" : "Atividade Diaria"}</h3>
+        <ResponsiveContainer width="100%" height={180}>
+          <BarChart data={data.dailyData}>
+            <XAxis dataKey="label" tick={{ fontSize: 10, fill: "#71717A" }} />
+            <YAxis tick={{ fontSize: 10, fill: "#71717A" }} />
+            <Tooltip
+              contentStyle={{ background: "#18181B", border: "1px solid #27272A", borderRadius: 8, fontSize: 12 }}
+              labelStyle={{ color: "#FAFAFA" }}
+            />
+            <Bar dataKey="score" fill="hsl(var(--brand))" radius={[4, 4, 0, 0]} />
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
+    </div>
   )
 }

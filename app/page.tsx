@@ -57,6 +57,11 @@ const SeasonSystem = lazy(() => import("@/components/season-system").then(m => (
 const BattlePass = lazy(() => import("@/components/battle-pass").then(m => ({ default: m.BattlePass })))
 const FoodDiary = lazy(() => import("@/components/food-diary").then(m => ({ default: m.FoodDiary })))
 const BodyTracker = lazy(() => import("@/components/body-tracker").then(m => ({ default: m.BodyTracker })))
+const WeeklyReport = lazy(() => import("@/components/weekly-report").then(m => ({ default: m.WeeklyReport })))
+const BodyEvolution = lazy(() => import("@/components/body-evolution").then(m => ({ default: m.BodyEvolution })))
+const StreakCalendar = lazy(() => import("@/components/streak-calendar").then(m => ({ default: m.StreakCalendar })))
+const AchievementsPage = lazy(() => import("@/components/achievements-page").then(m => ({ default: m.AchievementsPage })))
+const AnalyticsCharts = lazy(() => import("@/components/analytics-charts").then(m => ({ default: m.AnalyticsCharts })))
 
 import { HomeSkeleton, TrainingSkeleton, RecipesSkeleton, ChatSkeleton, SettingsSkeleton, ProfileSkeleton, PlannerSkeleton } from "@/components/skeleton-loaders-views"
 
@@ -148,6 +153,11 @@ export default function DashboardPage() {
       meditation: t("nav_meditation"),
       seasons: t("nav_seasons"),
       "battle-pass": isEnglish ? "Battle Pass" : "Passe de Batalha",
+      "weekly-report": isEnglish ? "Weekly Report" : "Relatorio Semanal",
+      "body-evolution": isEnglish ? "Body Evolution" : "Evolucao Corporal",
+      "streak-calendar": isEnglish ? "Streak" : "Sequencia",
+      "achievements-page": isEnglish ? "Achievements" : "Conquistas",
+      "analytics-charts": isEnglish ? "Analytics" : "Analises",
     }
     return titles[currentView] || t("view_fitverse")
   }
@@ -308,7 +318,8 @@ export default function DashboardPage() {
     if (plan === "premium") return false
     if (plan === "pro") {
       const proFeatures = ["sleep", "stress", "health-checkin", "meal-planner", "dietary", "smart-substitutions",
-        "periodization", "workout-feedback", "mobility", "fasting", "mood", "seasons", "battle-pass"]
+        "periodization", "workout-feedback", "mobility", "fasting", "mood", "seasons", "battle-pass",
+        "weekly-report", "body-evolution", "streak-calendar", "achievements-page", "analytics-charts"]
       return !proFeatures.includes(feature)
     }
     const freeFeatures = ["longevity", "habits", "workout-feedback", "seasons"]
@@ -430,6 +441,11 @@ export default function DashboardPage() {
             {/* Gamification */}
             {currentView === "seasons" && <SeasonSystem />}
             {currentView === "battle-pass" && <BattlePass isLocked={isFeatureLocked("battle-pass")} />}
+            {currentView === "weekly-report" && <WeeklyReport />}
+            {currentView === "body-evolution" && <BodyEvolution />}
+            {currentView === "streak-calendar" && <StreakCalendar />}
+            {currentView === "achievements-page" && <AchievementsPage />}
+            {currentView === "analytics-charts" && <AnalyticsCharts />}
             {currentView === "food-diary" && <FoodDiary onBack={() => setCurrentView("home")} />}
             {currentView === "body" && <BodyTracker />}
             </FeatureErrorBoundary>

@@ -11,7 +11,8 @@ import {
   Timer, Zap, Dumbbell, Wind,
   Heart, Smile, ListChecks,
   Trophy,
-  X, Utensils, Ruler
+  X, Utensils, Ruler,
+  Calendar, TrendingUp, Flame, BarChart3
 } from "lucide-react"
 
 interface MobileMoreSheetProps {
@@ -104,6 +105,16 @@ export function MobileMoreSheet({ open, onClose, onNavigate, isFeatureLocked }: 
       items: [
         { view: "food-diary", icon: Utensils, label: isEnglish ? "Food Diary" : "Diario Alimentar" },
         { view: "body", icon: Ruler, label: isEnglish ? "Body Measurements" : "Medidas Corporais" },
+      ]
+    },
+    {
+      title: isEnglish ? "Progress" : "Progresso",
+      items: [
+        { view: "weekly-report", icon: Calendar, label: isEnglish ? "Weekly Report" : "Rel. Semanal" },
+        { view: "body-evolution", icon: TrendingUp, label: isEnglish ? "Body Evolution" : "Evolucao" },
+        { view: "streak-calendar", icon: Flame, label: isEnglish ? "Streak" : "Sequencia" },
+        { view: "achievements-page", icon: Trophy, label: isEnglish ? "Achievements" : "Conquistas" },
+        { view: "analytics-charts", icon: BarChart3, label: isEnglish ? "Analytics" : "Analises" },
       ]
     },
   ]
