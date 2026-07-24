@@ -59,6 +59,80 @@ const tiers: TierReward[] = [
   { tier: 30, xpRequired: 15000, label: "7 Dias Premium Gratis", value: "7days", type: "premium-trial", icon: <Award className="w-5 h-5 text-yellow-400" /> },
 ]
 
+interface Coupon {
+  id: string
+  code: string
+  date: string
+  used: boolean
+}
+
+function CouponsList() {
+  const { locale } = useTranslation()
+  const isEnglish = locale === "en-US"
+  const [coupons, setCoupons] = useState<Coupon[]>([])
+
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem("fitverse-coupons")
+      if (stored) setCoupons(JSON.parse(stored))
+    } catch {}
+  }, [])
+
+  const markUsed = (id: string) => {
+    const updated = coupons.map(c => c.id === id ? { ...c, used: true } : c)
+    setCoupons(updated)
+    localStorage.setItem("fitverse-coupons", JSON.stringify(updated))
+  }
+
+  const activeCoupons = coupons.filter(c => !c.used)
+  const usedCoupons = coupons.filter(c => c.used)
+
+  if (activeCoupons.length === 0 && usedCoupons.length === 0) {
+    return (
+      <p className="text-xs text-muted-foreground">
+        {isEnglish ? "No coupons yet. Reach tier 5+ to earn discount coupons!" : "Nenhum cupom ainda. Atinga o nivel 5+ para ganhar cupons de desconto!"}
+      </p>
+    )
+  }
+
+  return (
+    <div className="space-y-2">
+      {activeCoupons.map((coupon) => (
+        <div key={coupon.id} className="flex items-center justify-between p-3 rounded-xl border border-border bg-card">
+          <div className="flex items-center gap-2">
+            <Award className="w-4 h-4 text-purple-400" />
+            <div>
+              <p className="text-sm font-medium text-foreground">{coupon.code}</p>
+              <p className="text-xs text-muted-foreground">{isEnglish ? "Premium discount" : "Desconto Premium"}</p>
+            </div>
+          </div>
+          <button
+            onClick={() => markUsed(coupon.id)}
+            className="px-3 py-1.5 rounded-lg text-xs font-medium bg-brand text-white hover:bg-brand/90"
+          >
+            {isEnglish ? "Use" : "Usar"}
+          </button>
+        </div>
+      ))}
+      {usedCoupons.length > 0 && (
+        <details className="group">
+          <summary className="text-xs text-muted-foreground cursor-pointer hover:text-foreground">
+            {isEnglish ? `Used (${usedCoupons.length})` : `Usados (${usedCoupons.length})`}
+          </summary>
+          <div className="mt-2 space-y-1">
+            {usedCoupons.map((coupon) => (
+              <div key={coupon.id} className="flex items-center gap-2 p-2 rounded-lg bg-muted/30 opacity-60">
+                <Check className="w-3 h-3 text-green-500" />
+                <span className="text-xs text-muted-foreground line-through">{coupon.code}</span>
+              </div>
+            ))}
+          </div>
+        </details>
+      )}
+    </div>
+  )
+}
+
 export function BattlePass({ isLocked = false }: BattlePassProps) {
   const { t, locale } = useTranslation()
   const isEnglish = locale === "en-US"
@@ -106,7 +180,7 @@ export function BattlePass({ isLocked = false }: BattlePassProps) {
         break
       case "coupon":
         const coupons = JSON.parse(localStorage.getItem("fitverse-coupons") || "[]")
-        coupons.push({ code: value, date: new Date().toISOString() })
+        coupons.push({ id: `coupon-${Date.now()}`, code: value, date: new Date().toISOString(), used: false })
         localStorage.setItem("fitverse-coupons", JSON.stringify(coupons))
         break
       case "premium-trial":
@@ -224,6 +298,12 @@ export function BattlePass({ isLocked = false }: BattlePassProps) {
             </motion.div>
           )
         })}
+      </div>
+
+      {/* Meus Cupons */}
+      <div className="mt-4">
+        <h3 className="text-sm font-medium text-foreground mb-2">{isEnglish ? "My Coupons" : "Meus Cupons"}</h3>
+        <CouponsList />
       </div>
 
       {/* How it works */}
