@@ -318,11 +318,12 @@ export default function DashboardPage() {
     if (plan === "premium") return false
     if (plan === "pro") {
       const proFeatures = ["sleep", "stress", "health-checkin", "meal-planner", "dietary", "smart-substitutions",
-        "periodization", "workout-feedback", "mobility", "fasting", "mood", "seasons", "battle-pass",
-        "weekly-report", "body-evolution", "streak-calendar", "achievements-page", "analytics-charts"]
+        "periodization", "mobility", "fasting", "mood"]
       return !proFeatures.includes(feature)
     }
-    const freeFeatures = ["longevity", "habits", "workout-feedback", "seasons"]
+    const freeFeatures = ["longevity", "habits", "workout-feedback", "seasons",
+      "battle-pass", "weekly-report", "body-evolution", "streak-calendar",
+      "achievements-page", "analytics-charts", "food-diary", "body"]
     return !freeFeatures.includes(feature)
   }
 

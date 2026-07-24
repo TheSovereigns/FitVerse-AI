@@ -9,11 +9,8 @@ import { PLAN_LIMITS, getPlanLimits, canScanToday, canGenerateWorkout, canGenera
 
 export function usePlanLimits() {
   const { user } = useAuth()
-  const [plan, setPlan] = useState<Plan>(() => {
-    if (typeof window === 'undefined') return 'free'
-    return (localStorage.getItem('fitverse-plan') as Plan) || 'free'
-  })
-  const [limits, setLimits] = useState(() => getPlanLimits((typeof window !== 'undefined' ? (localStorage.getItem('fitverse-plan') as Plan) : null) || 'free'))
+  const [plan, setPlan] = useState<Plan>('free')
+  const [limits, setLimits] = useState(() => getPlanLimits('free'))
   const [scansToday, setScansToday] = useState(0)
   const [isLoading, setIsLoading] = useState(true)
 
