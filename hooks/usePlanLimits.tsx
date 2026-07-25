@@ -8,11 +8,28 @@ import type { Plan } from "@/lib/plan-limits"
 import { PLAN_LIMITS, getPlanLimits, canScanToday, canGenerateWorkout, canGenerateDiet } from "@/lib/plan-limits"
 
 export function usePlanLimits() {
-  const { user } = useAuth()
-  const [plan, setPlan] = useState<Plan>('free')
-  const [limits, setLimits] = useState(() => getPlanLimits('free'))
+  const { user, profile } = useAuth()
+  const [plan, setPlan] = useState<Plan>(() => {
+    if (typeof window === 'undefined') return 'free'
+    return (localStorage.getItem('fitverse-plan') as Plan) || 'free'
+  })
+  const [limits, setLimits] = useState(() => getPlanLimits((typeof window !== 'undefined' ? (localStorage.getItem('fitverse-plan') as Plan) : null) || 'free'))
   const [scansToday, setScansToday] = useState(0)
   const [isLoading, setIsLoading] = useState(true)
+
+  // Sync plan from auth profile (most reliable source)
+  useEffect(() => {
+    if (profile?.plan) {
+      const p = profile.plan as Plan
+      if (p && p !== plan) {
+        setPlan(p)
+        setLimits(getPlanLimits(p))
+        localStorage.setItem('fitverse-plan', p)
+        logger.info("[usePlanLimits] Plan synced from profile:", p)
+      }
+      setIsLoading(false)
+    }
+  }, [profile?.plan])
 
   const fetchPlan = useCallback(async () => {
     if (!user?.id) return
@@ -49,9 +66,9 @@ export function usePlanLimits() {
         setPlan(p)
         setLimits(getPlanLimits(p))
         localStorage.setItem('fitverse-plan', p)
-        logger.info("[usePlanLimits] Plan set to:", p)
+        logger.info("[usePlanLimits] Plan set to:", p, "from Supabase for user:", user.id)
       } else {
-        logger.warn("[usePlanLimits] No profile found for user:", user.id)
+        logger.warn("[usePlanLimits] No profile/plan found for user:", user.id, "data:", data)
       }
     } catch (e) {
       logger.error("[usePlanLimits] Error:", e)
