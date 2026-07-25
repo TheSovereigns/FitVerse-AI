@@ -29,6 +29,8 @@ import {
   Dumbbell,
   TrendingDown,
   Minus,
+  Trophy,
+  ScanLine,
 } from "lucide-react"
 import { ScanHistory } from "@/components/scan-history"
 import { DailySummary } from "@/components/daily-summary"
@@ -83,6 +85,14 @@ export function HealthProfile({ scanHistory, onNavigateToSettings, onNavigateToS
   })
   const [isSavingProfile, setIsSavingProfile] = useState(false)
 
+  const [gamStats, setGamStats] = useState({
+    currentStreak: 0,
+    longestStreak: 0,
+  })
+  const [totalXp, setTotalXp] = useState(0)
+  const [unlockedAchievements, setUnlockedAchievements] = useState<string[]>([])
+  const [latestWeight, setLatestWeight] = useState<number | null>(null)
+
   useEffect(() => {
     if (!user) return
     const name = user.user_metadata?.full_name || user.user_metadata?.name || user.email?.split("@")[0] || t("profile_default_name")
@@ -121,6 +131,30 @@ export function HealthProfile({ scanHistory, onNavigateToSettings, onNavigateToS
     }
     loadProfileData()
   }, [user])
+
+  useEffect(() => {
+    try {
+      const rawStats = localStorage.getItem("fitverse-gamification-stats")
+      if (rawStats) {
+        const parsed = JSON.parse(rawStats)
+        setGamStats({
+          currentStreak: parsed.currentStreak || 0,
+          longestStreak: parsed.longestStreak || 0,
+        })
+      }
+      const rawXp = localStorage.getItem("fitverse-xp")
+      if (rawXp) setTotalXp(Number(JSON.parse(rawXp)) || 0)
+      const rawAch = localStorage.getItem("fitverse-achievements")
+      if (rawAch) setUnlockedAchievements(JSON.parse(rawAch))
+      const rawMeasurements = localStorage.getItem("fitverse-body-measurements")
+      if (rawMeasurements) {
+        const measurements = JSON.parse(rawMeasurements)
+        if (measurements.length > 0 && measurements[0].weight) {
+          setLatestWeight(measurements[0].weight)
+        }
+      }
+    } catch {}
+  }, [])
 
   const handleSaveName = async () => {
     if (!editName.trim() || !user) return
@@ -264,6 +298,54 @@ export function HealthProfile({ scanHistory, onNavigateToSettings, onNavigateToS
   const userSubscription = currentPlan || "free"
   const scoreStroke = averageScore >= 70 ? "#34D399" : averageScore >= 40 ? "#FFD60A" : "#FF453A"
 
+  const bmiWeight = latestWeight || profileData.weight
+  const bmiHeight = profileData.height
+  const bmi =
+    bmiWeight && bmiHeight && bmiHeight > 0
+      ? Math.round((bmiWeight / ((bmiHeight / 100) ** 2)) * 10) / 10
+      : null
+  const bmiCategory = bmi
+    ? bmi < 18.5
+      ? "underweight"
+      : bmi < 25
+        ? "normal"
+        : bmi < 30
+          ? "overweight"
+          : "obese"
+    : null
+
+  const userLevel = Math.floor(totalXp / 500) + 1
+  const xpInLevel = totalXp % 500
+  const xpProgress = (xpInLevel / 500) * 100
+
+  const ACHIEVEMENT_ICONS: Record<string, React.ReactNode> = {
+    "first-scan": <ScanLine className="h-3 w-3" />,
+    "scan-10": <ScanLine className="h-3 w-3" />,
+    "scan-50": <ScanLine className="h-3 w-3" />,
+    "scan-100": <ScanLine className="h-3 w-3" />,
+    "workout-1": <Dumbbell className="h-3 w-3" />,
+    "workout-10": <Dumbbell className="h-3 w-3" />,
+    "workout-50": <Dumbbell className="h-3 w-3" />,
+    "streak-3": <Flame className="h-3 w-3" />,
+    "streak-7": <Flame className="h-3 w-3" />,
+    "streak-30": <Flame className="h-3 w-3" />,
+    "streak-100": <Flame className="h-3 w-3" />,
+    "hydration-7": <Heart className="h-3 w-3" />,
+  }
+
+  const planLabel =
+    userSubscription === "pro"
+      ? t("hp_plan_pro")
+      : userSubscription === "premium"
+        ? t("hp_plan_premium")
+        : t("hp_plan_free")
+  const planColor =
+    userSubscription === "pro"
+      ? "bg-blue-500/15 text-blue-400 border-blue-500/30"
+      : userSubscription === "premium"
+        ? "bg-yellow-500/15 text-yellow-400 border-yellow-500/30"
+        : "bg-muted text-muted-foreground border-border"
+
   const handleSubscriptionClick = () => {
     if (onNavigateToSubscription) {
       onNavigateToSubscription()
@@ -317,6 +399,9 @@ export function HealthProfile({ scanHistory, onNavigateToSettings, onNavigateToS
                   <h1 className="truncate text-2xl font-bold text-foreground md:text-3xl">
                     {displayName}
                   </h1>
+                  <span className={cn("shrink-0 rounded-full border px-2 py-0.5 text-[10px] font-semibold", planColor)}>
+                    {planLabel}
+                  </span>
                   <Button
                     size="icon"
                     variant="ghost"
@@ -335,6 +420,59 @@ export function HealthProfile({ scanHistory, onNavigateToSettings, onNavigateToS
                 <Activity className="h-3.5 w-3.5 text-muted-foreground" />
                 <p className="text-xs text-muted-foreground">{user?.email || ""}</p>
               </div>
+
+              {unlockedAchievements.length > 0 && (
+                <div className="mt-2 flex items-center gap-1.5">
+                  {unlockedAchievements.slice(0, 6).map((achId) => (
+                    <motion.div
+                      key={achId}
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      className="flex h-6 w-6 items-center justify-center rounded-full bg-yellow-500/15 text-yellow-400"
+                      title={achId}
+                    >
+                      {ACHIEVEMENT_ICONS[achId] || <Trophy className="h-3 w-3" />}
+                    </motion.div>
+                  ))}
+                  {unlockedAchievements.length > 6 && (
+                    <span className="text-[10px] text-muted-foreground">+{unlockedAchievements.length - 6}</span>
+                  )}
+                </div>
+              )}
+
+              {gamStats.currentStreak > 0 && (
+                <div className="mt-2 flex items-center gap-1.5">
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    className="flex items-center gap-1 rounded-full bg-orange-500/15 px-2 py-0.5 text-orange-400"
+                  >
+                    <Flame className="h-3 w-3" />
+                    <span className="text-[10px] font-bold">{gamStats.currentStreak}</span>
+                    <span className="text-[9px]">{t("hp_days")}</span>
+                  </motion.div>
+                </div>
+              )}
+
+              {totalXp > 0 && (
+                <div className="mt-2 flex items-center gap-2">
+                  <div className="flex items-center gap-1 rounded-full bg-purple-500/15 px-2 py-0.5 text-purple-400">
+                    <Zap className="h-3 w-3" />
+                    <span className="text-[10px] font-bold">{t("hp_level")} {userLevel}</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <div className="h-1.5 w-16 overflow-hidden rounded-full bg-border">
+                      <motion.div
+                        className="h-full rounded-full bg-purple-400"
+                        initial={{ width: 0 }}
+                        animate={{ width: `${xpProgress}%` }}
+                        transition={{ duration: 0.8, ease: "easeOut" }}
+                      />
+                    </div>
+                    <span className="text-[9px] text-muted-foreground">{xpInLevel}/500 XP</span>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 
@@ -486,6 +624,42 @@ export function HealthProfile({ scanHistory, onNavigateToSettings, onNavigateToS
               </div>
             ))}
           </div>
+
+          {bmi !== null && (
+            <motion.div
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mt-3 rounded-xl bg-muted/30 p-3"
+            >
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Scale className="h-3.5 w-3.5 text-muted-foreground" />
+                  <span className="text-[9px] text-muted-foreground">{t("hp_bmi")}</span>
+                </div>
+                <span
+                  className={cn(
+                    "rounded-full px-2 py-0.5 text-[10px] font-semibold",
+                    bmiCategory === "normal"
+                      ? "bg-green-500/15 text-green-400"
+                      : bmiCategory === "underweight"
+                        ? "bg-blue-500/15 text-blue-400"
+                        : bmiCategory === "overweight"
+                          ? "bg-yellow-500/15 text-yellow-400"
+                          : "bg-red-500/15 text-red-400"
+                  )}
+                >
+                  {bmiCategory === "underweight"
+                    ? t("hp_bmi_underweight")
+                    : bmiCategory === "normal"
+                      ? t("hp_bmi_normal")
+                      : bmiCategory === "overweight"
+                        ? t("hp_bmi_overweight")
+                        : t("hp_bmi_obese")}
+                </span>
+              </div>
+              <p className="mt-1 text-xl font-bold text-foreground">{bmi}</p>
+            </motion.div>
+          )}
         )}
       </motion.section>
 

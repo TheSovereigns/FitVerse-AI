@@ -11,6 +11,9 @@ import {
   Clock,
   Flame,
   Info,
+  Minus,
+  Plus,
+  ShoppingCart,
   Sparkles,
   Utensils,
   Users,
@@ -37,14 +40,27 @@ type Recipe = {
 
 interface RecipeModalProps {
   recipe: Recipe
+  portions?: number
+  onPortionsChange?: (delta: number) => void
+  onGenerateShoppingList?: () => void
+  shoppingListAdded?: boolean
   onClose: () => void
 }
 
-export function RecipeModal({ recipe, onClose }: RecipeModalProps) {
+export function RecipeModal({
+  recipe,
+  portions: propsPortions,
+  onPortionsChange,
+  onGenerateShoppingList,
+  shoppingListAdded,
+  onClose,
+}: RecipeModalProps) {
   const { t } = useTranslation()
+  const portions = propsPortions || recipe.servings || 1
+  const factor = portions / (recipe.servings || 1)
   const totalMacros = Math.max(
     1,
-    (recipe.macros?.protein || 0) + (recipe.macros?.carbs || 0) + (recipe.macros?.fat || 0)
+    Math.round(((recipe.macros?.protein || 0) + (recipe.macros?.carbs || 0) + (recipe.macros?.fat || 0)) * factor)
   )
 
   const getDifficultyLabel = (diff: string) => {
@@ -107,9 +123,8 @@ export function RecipeModal({ recipe, onClose }: RecipeModalProps) {
               <section className="grid grid-cols-2 gap-3 md:grid-cols-4">
                 {[
                   { label: t("rm_time"), val: recipe.prepTime, icon: Clock },
-                  { label: t("rm_energy"), val: `${recipe.macros.calories} kcal`, icon: Flame },
+                  { label: t("rm_energy"), val: `${Math.round(recipe.macros.calories * factor)} kcal`, icon: Flame },
                   { label: t("rm_level"), val: getDifficultyLabel(recipe.difficulty), icon: ChefHat },
-                  { label: t("rm_servings"), val: recipe.servings || 1, icon: Users },
                 ].map((stat) => (
                   <div key={stat.label} className="rounded-2xl border border-white/10 bg-black/38 p-3 shadow-lg backdrop-blur-xl md:p-4">
                     <stat.icon className="h-5 w-5 text-foreground/70" />
@@ -117,6 +132,34 @@ export function RecipeModal({ recipe, onClose }: RecipeModalProps) {
                     <p className="mt-1 text-[9px] font-black uppercase tracking-widest text-foreground/38">{stat.label}</p>
                   </div>
                 ))}
+                <div className="rounded-2xl border border-white/10 bg-black/38 p-3 shadow-lg backdrop-blur-xl md:p-4">
+                  <Users className="h-5 w-5 text-foreground/70" />
+                  <div className="mt-3 flex items-center gap-2">
+                    {onPortionsChange && (
+                      <motion.button
+                        type="button"
+                        whileTap={{ scale: 0.85 }}
+                        onClick={() => onPortionsChange(-1)}
+                        disabled={portions <= 1}
+                        className="flex h-6 w-6 items-center justify-center rounded-lg border border-white/10 bg-white/10 text-foreground transition hover:bg-white/20 disabled:opacity-40"
+                      >
+                        <Minus className="h-3 w-3" />
+                      </motion.button>
+                    )}
+                    <p className="text-lg font-black leading-tight text-foreground md:text-xl">{portions}</p>
+                    {onPortionsChange && (
+                      <motion.button
+                        type="button"
+                        whileTap={{ scale: 0.85 }}
+                        onClick={() => onPortionsChange(1)}
+                        className="flex h-6 w-6 items-center justify-center rounded-lg border border-white/10 bg-white/10 text-foreground transition hover:bg-white/20"
+                      >
+                        <Plus className="h-3 w-3" />
+                      </motion.button>
+                    )}
+                  </div>
+                  <p className="mt-1 text-[9px] font-black uppercase tracking-widest text-foreground/38">{t("rm_servings")}</p>
+                </div>
               </section>
 
               <section className="relative overflow-hidden rounded-[1.75rem] border border-white/10 bg-black/42 p-4 shadow-xl backdrop-blur-2xl md:p-5">
@@ -127,14 +170,14 @@ export function RecipeModal({ recipe, onClose }: RecipeModalProps) {
                       {t("rm_energy")}
                     </h3>
                     <span className="rounded-full border border-white/10 bg-white/10 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-foreground">
-                      {recipe.macros.calories} kcal
+                      {Math.round(recipe.macros.calories * factor)} kcal
                     </span>
                   </div>
                   <div className="grid gap-4 md:grid-cols-3">
                     {[
-                      { label: t("rm_prot"), val: recipe.macros.protein, bar: "bg-foreground/20" },
-                      { label: t("rm_carb"), val: recipe.macros.carbs, bar: "bg-foreground/20" },
-                      { label: t("rm_fat"), val: recipe.macros.fat, bar: "bg-foreground/20" },
+                      { label: t("rm_prot"), val: Math.round(recipe.macros.protein * factor), bar: "bg-foreground/20" },
+                      { label: t("rm_carb"), val: Math.round(recipe.macros.carbs * factor), bar: "bg-foreground/20" },
+                      { label: t("rm_fat"), val: Math.round(recipe.macros.fat * factor), bar: "bg-foreground/20" },
                     ].map((macro) => (
                       <div key={macro.label} className="rounded-2xl border border-white/10 bg-white/10 p-3">
                         <div className="mb-2 flex items-end justify-between">
@@ -208,6 +251,29 @@ export function RecipeModal({ recipe, onClose }: RecipeModalProps) {
                     ))}
                   </div>
                 </section>
+              )}
+
+              {onGenerateShoppingList && (
+                <motion.div
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                >
+                  <motion.button
+                    type="button"
+                    whileTap={{ scale: 0.97 }}
+                    onClick={onGenerateShoppingList}
+                    disabled={shoppingListAdded}
+                    className={cn(
+                      "flex w-full items-center justify-center gap-3 rounded-2xl border p-4 text-sm font-black uppercase tracking-[0.14em] transition",
+                      shoppingListAdded
+                        ? "border-white/10 bg-white/10 text-foreground/50"
+                        : "border-white/10 bg-white/10 text-foreground hover:bg-white/16"
+                    )}
+                  >
+                    <ShoppingCart className="h-5 w-5" />
+                    {shoppingListAdded ? t("recipes_shopping_list_added") : t("recipes_shopping_list")}
+                  </motion.button>
+                </motion.div>
               )}
             </div>
           </ScrollArea>

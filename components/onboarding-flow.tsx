@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion"
 import {
   ChevronRight, ChevronLeft, Rocket, Moon, Brain, AlertTriangle,
   Dumbbell, Apple, Scale, Heart, Zap, Check, Loader2,
+  Droplets, Target, Activity, Calendar,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -68,24 +69,38 @@ export function OnboardingFlow({ onComplete }: { onComplete: () => void }) {
     }))
   }
 
-  const totalSteps = 8
+  const totalSteps = 12
   const progress = ((step + 1) / totalSteps) * 100
 
   const canProceed = () => {
     switch (step) {
       case 0: return data.name.trim().length > 0
       case 1: return data.age && data.weight && data.height && data.gender
-      case 2: return data.goal && data.activityLevel
-      case 3: return data.sleepHours && data.sleepQuality && data.stressLevel
-      case 4: return true
-      case 5: return data.experience
-      case 6: return true
+      case 2: return data.goal
+      case 3: return data.activityLevel
+      case 4: return data.sleepHours && data.sleepQuality && data.stressLevel
+      case 5: return true
+      case 6: return data.experience
       case 7: return true
+      case 8: return data.workoutsPerWeek
+      case 9: return data.waterIntake
+      case 10: return true
+      case 11: return true
       default: return true
     }
   }
 
   const handleNext = async () => {
+    if (step === 2) {
+      localStorage.setItem("fitverse-fitness-goal", data.goal)
+    } else if (step === 3) {
+      localStorage.setItem("fitverse-activity-level", data.activityLevel)
+    } else if (step === 8) {
+      localStorage.setItem("fitverse-workout-frequency", data.workoutsPerWeek)
+    } else if (step === 9) {
+      localStorage.setItem("fitverse-water-goal", data.waterIntake)
+    }
+
     if (step < totalSteps - 1) {
       setStep(step + 1)
     } else {
@@ -310,67 +325,86 @@ export function OnboardingFlow({ onComplete }: { onComplete: () => void }) {
                 <div className="space-y-6">
                   <div className="text-center mb-8">
                     <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
-                      <Zap className="h-8 w-8 text-primary" />
+                      <Target className="h-8 w-8 text-primary" />
                     </div>
                     <h2 className="text-2xl font-bold text-foreground">
-                      {l("Seus objetivos", "Your goals")}
+                      {l("Qual seu objetivo principal?", "What's your main goal?")}
                     </h2>
+                    <p className="text-sm text-muted-foreground mt-2">
+                      {l("Isso vai guiar todo o seu plano", "This will guide your entire plan")}
+                    </p>
                   </div>
 
-                  <div className="space-y-3">
-                    <label className="text-xs text-muted-foreground uppercase tracking-wider">{l("Objetivo", "Goal")}</label>
-                    <div className="grid grid-cols-2 gap-2">
-                      {[
-                        { value: "lose_weight", label: l("Perder Peso", "Lose Weight"), icon: "📉" },
-                        { value: "gain_muscle", label: l("Ganhar Massa", "Gain Muscle"), icon: "💪" },
-                        { value: "maintain", label: l("Manter Peso", "Maintain"), icon: "⚖️" },
-                        { value: "improve_health", label: l("Melhorar Saude", "Improve Health"), icon: "❤️" },
-                      ].map((g) => (
-                        <button
-                          key={g.value}
-                          onClick={() => update("goal", g.value)}
-                          className={cn(
-                            "p-4 rounded-2xl border text-left transition-all",
-                            data.goal === g.value
-                              ? "border-primary bg-primary/10"
-                              : "border-border bg-card hover:bg-accent"
-                          )}
-                        >
-                          <span className="text-xl">{g.icon}</span>
-                          <p className={cn("text-sm font-semibold mt-2", data.goal === g.value ? "text-primary" : "text-foreground")}>{g.label}</p>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="space-y-3">
-                    <label className="text-xs text-muted-foreground uppercase tracking-wider">{l("Nivel de Atividade", "Activity Level")}</label>
-                    <div className="space-y-2">
-                      {[
-                        { value: "sedentary", label: l("Sedentario (pouco ou nenhum exercicio)", "Sedentary (little or no exercise)") },
-                        { value: "moderate", label: l("Moderado (1-3x por semana)", "Moderate (1-3x per week)") },
-                        { value: "active", label: l("Ativo (3-5x por semana)", "Active (3-5x per week)") },
-                        { value: "athlete", label: l("Atleta (6-7x por semana)", "Athlete (6-7x per week)") },
-                      ].map((a) => (
-                        <button
-                          key={a.value}
-                          onClick={() => update("activityLevel", a.value)}
-                          className={cn(
-                            "w-full p-3 rounded-xl border text-left text-sm transition-all",
-                            data.activityLevel === a.value
-                              ? "border-primary bg-primary/10 text-primary font-semibold"
-                              : "border-border bg-card text-muted-foreground hover:bg-accent"
-                          )}
-                        >
-                          {a.label}
-                        </button>
-                      ))}
-                    </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    {[
+                      { value: "lose_weight", label: l("Perder peso", "Lose weight"), icon: "📉", desc: l("Queimar gordura e definir", "Burn fat and tone up") },
+                      { value: "gain_muscle", label: l("Ganhar massa", "Gain muscle"), icon: "💪", desc: l("Construir musculos e forca", "Build muscle and strength") },
+                      { value: "maintain", label: l("Manter saude", "Maintain health"), icon: "⚖️", desc: l("Manter forma e equilibrio", "Stay fit and balanced") },
+                      { value: "improve_performance", label: l("Melhorar performance", "Improve performance"), icon: "🚀", desc: l("Evoluir seu desempenho", "Evolve your performance") },
+                    ].map((g) => (
+                      <button
+                        key={g.value}
+                        onClick={() => update("goal", g.value)}
+                        className={cn(
+                          "p-4 rounded-2xl border text-left transition-all",
+                          data.goal === g.value
+                            ? "border-primary bg-primary/10"
+                            : "border-border bg-card hover:bg-accent"
+                        )}
+                      >
+                        <span className="text-2xl">{g.icon}</span>
+                        <p className={cn("text-sm font-semibold mt-2", data.goal === g.value ? "text-primary" : "text-foreground")}>{g.label}</p>
+                        <p className="text-xs text-muted-foreground mt-1">{g.desc}</p>
+                      </button>
+                    ))}
                   </div>
                 </div>
               )}
 
               {step === 3 && (
+                <div className="space-y-6">
+                  <div className="text-center mb-8">
+                    <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
+                      <Activity className="h-8 w-8 text-primary" />
+                    </div>
+                    <h2 className="text-2xl font-bold text-foreground">
+                      {l("Seu nivel de atividade", "Your activity level")}
+                    </h2>
+                    <p className="text-sm text-muted-foreground mt-2">
+                      {l("Para calibrar a intensidade dos treinos", "To calibrate workout intensity")}
+                    </p>
+                  </div>
+
+                  <div className="space-y-2">
+                    {[
+                      { value: "sedentary", label: l("Sedentario", "Sedentary"), desc: l("Pouco ou nenhum exercicio", "Little or no exercise"), icon: "🪑" },
+                      { value: "light", label: l("Leve", "Light"), desc: l("1-2x por semana", "1-2x per week"), icon: "🚶" },
+                      { value: "moderate", label: l("Moderado", "Moderate"), desc: l("3-4x por semana", "3-4x per week"), icon: "🏃" },
+                      { value: "intense", label: l("Intenso", "Intense"), desc: l("5-6x por semana", "5-6x per week"), icon: "🔥" },
+                      { value: "athlete", label: l("Atleta", "Athlete"), desc: l("Treino diario e rigoroso", "Daily and rigorous training"), icon: "🏆" },
+                    ].map((a) => (
+                      <button
+                        key={a.value}
+                        onClick={() => update("activityLevel", a.value)}
+                        className={cn(
+                          "w-full p-4 rounded-xl border text-left transition-all flex items-center gap-3",
+                          data.activityLevel === a.value
+                            ? "border-primary bg-primary/10"
+                            : "border-border bg-card hover:bg-accent"
+                        )}
+                      >
+                        <span className="text-xl">{a.icon}</span>
+                        <div>
+                          <p className={cn("text-sm font-semibold", data.activityLevel === a.value ? "text-primary" : "text-foreground")}>{a.label}</p>
+                          <p className="text-xs text-muted-foreground">{a.desc}</p>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {step === 4 && (
                 <div className="space-y-6">
                   <div className="text-center mb-8">
                     <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
@@ -455,7 +489,7 @@ export function OnboardingFlow({ onComplete }: { onComplete: () => void }) {
                 </div>
               )}
 
-              {step === 4 && (
+              {step === 5 && (
                 <div className="space-y-6">
                   <div className="text-center mb-8">
                     <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
@@ -491,7 +525,7 @@ export function OnboardingFlow({ onComplete }: { onComplete: () => void }) {
                 </div>
               )}
 
-              {step === 5 && (
+              {step === 6 && (
                 <div className="space-y-6">
                   <div className="text-center mb-8">
                     <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
@@ -555,7 +589,7 @@ export function OnboardingFlow({ onComplete }: { onComplete: () => void }) {
                 </div>
               )}
 
-              {step === 6 && (
+              {step === 7 && (
                 <div className="space-y-6">
                   <div className="text-center mb-8">
                     <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
@@ -597,7 +631,110 @@ export function OnboardingFlow({ onComplete }: { onComplete: () => void }) {
                 </div>
               )}
 
-              {step === 7 && (
+              {step === 8 && (
+                <div className="space-y-6">
+                  <div className="text-center mb-8">
+                    <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
+                      <Calendar className="h-8 w-8 text-primary" />
+                    </div>
+                    <h2 className="text-2xl font-bold text-foreground">
+                      {l("Treinos por semana", "Workouts per week")}
+                    </h2>
+                    <p className="text-sm text-muted-foreground mt-2">
+                      {l("Quantos dias voce quer treinar?", "How many days do you want to train?")}
+                    </p>
+                  </div>
+
+                  <div className="grid grid-cols-4 gap-2">
+                    {["1", "2", "3", "4", "5", "6", "7"].map((w) => (
+                      <button
+                        key={w}
+                        onClick={() => update("workoutsPerWeek", w)}
+                        className={cn(
+                          "h-14 rounded-xl border text-sm font-semibold transition-all",
+                          data.workoutsPerWeek === w
+                            ? "border-primary bg-primary/10 text-primary"
+                            : "border-border bg-card text-muted-foreground hover:bg-accent"
+                        )}
+                      >
+                        {w}x
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {step === 9 && (
+                <div className="space-y-6">
+                  <div className="text-center mb-8">
+                    <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
+                      <Droplets className="h-8 w-8 text-primary" />
+                    </div>
+                    <h2 className="text-2xl font-bold text-foreground">
+                      {l("Meta de agua diaria", "Daily water goal")}
+                    </h2>
+                    <p className="text-sm text-muted-foreground mt-2">
+                      {l("Manter-se hidratado e essencial", "Staying hydrated is essential")}
+                    </p>
+                  </div>
+
+                  <div className="grid grid-cols-3 gap-2">
+                    {["1.5", "2", "2.5", "3", "3.5", "4"].map((w) => (
+                      <button
+                        key={w}
+                        onClick={() => update("waterIntake", w)}
+                        className={cn(
+                          "h-14 rounded-xl border text-sm font-semibold transition-all",
+                          data.waterIntake === w
+                            ? "border-primary bg-primary/10 text-primary"
+                            : "border-border bg-card text-muted-foreground hover:bg-accent"
+                        )}
+                      >
+                        {w}L
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {step === 10 && (
+                <div className="space-y-6">
+                  <div className="text-center mb-8">
+                    <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
+                      <Brain className="h-8 w-8 text-primary" />
+                    </div>
+                    <h2 className="text-2xl font-bold text-foreground">
+                      {l("Fumante", "Smoker")}
+                    </h2>
+                    <p className="text-sm text-muted-foreground mt-2">
+                      {l("Isso afeta sua capacidade respiratoria", "This affects your respiratory capacity")}
+                    </p>
+                  </div>
+
+                  <div className="grid grid-cols-3 gap-2">
+                    {[
+                      { value: "no", label: l("Nao", "No") },
+                      { value: "former", label: l("Ex-fumante", "Former") },
+                      { value: "yes", label: l("Sim", "Yes") },
+                    ].map((s) => (
+                      <button
+                        key={s.value}
+                        onClick={() => update("smokingStatus", s.value)}
+                        className={cn(
+                          "h-12 rounded-xl border text-sm font-semibold transition-all",
+                          data.smokingStatus === s.value
+                            ? "border-primary bg-primary/10 text-primary"
+                            : "border-border bg-card text-muted-foreground hover:bg-accent"
+                        )}
+                      >
+                        {s.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {step === 11 && (
                 <div className="space-y-6">
                   <div className="text-center mb-8">
                     <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
@@ -609,70 +746,6 @@ export function OnboardingFlow({ onComplete }: { onComplete: () => void }) {
                     <p className="text-sm text-muted-foreground mt-2">
                       {l("Iremos gerar seu plano personalizado com IA", "We'll generate your personalized AI plan")}
                     </p>
-                  </div>
-
-                  <div className="space-y-3">
-                    <label className="text-xs text-muted-foreground uppercase tracking-wider">{l("Treinos por Semana", "Workouts per Week")}</label>
-                    <div className="grid grid-cols-4 gap-2">
-                      {["2", "3", "4", "5"].map((w) => (
-                        <button
-                          key={w}
-                          onClick={() => update("workoutsPerWeek", w)}
-                          className={cn(
-                            "h-12 rounded-xl border text-sm font-semibold transition-all",
-                            data.workoutsPerWeek === w
-                              ? "border-primary bg-primary/10 text-primary"
-                              : "border-border bg-card text-muted-foreground hover:bg-accent"
-                          )}
-                        >
-                          {w}x
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="space-y-3">
-                    <label className="text-xs text-muted-foreground uppercase tracking-wider">{l("Fumante", "Smoker")}</label>
-                    <div className="grid grid-cols-3 gap-2">
-                      {[
-                        { value: "no", label: l("Nao", "No") },
-                        { value: "former", label: l("Ex-fumante", "Former") },
-                        { value: "yes", label: l("Sim", "Yes") },
-                      ].map((s) => (
-                        <button
-                          key={s.value}
-                          onClick={() => update("smokingStatus", s.value)}
-                          className={cn(
-                            "h-12 rounded-xl border text-sm font-semibold transition-all",
-                            data.smokingStatus === s.value
-                              ? "border-primary bg-primary/10 text-primary"
-                              : "border-border bg-card text-muted-foreground hover:bg-accent"
-                          )}
-                        >
-                          {s.label}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="space-y-3">
-                    <label className="text-xs text-muted-foreground uppercase tracking-wider">{l("Agua por Dia (L)", "Water per Day (L)")}</label>
-                    <div className="grid grid-cols-4 gap-2">
-                      {["1.5", "2", "2.5", "3"].map((w) => (
-                        <button
-                          key={w}
-                          onClick={() => update("waterIntake", w)}
-                          className={cn(
-                            "h-12 rounded-xl border text-sm font-semibold transition-all",
-                            data.waterIntake === w
-                              ? "border-primary bg-primary/10 text-primary"
-                              : "border-border bg-card text-muted-foreground hover:bg-accent"
-                          )}
-                        >
-                          {w}L
-                        </button>
-                      ))}
-                    </div>
                   </div>
                 </div>
               )}

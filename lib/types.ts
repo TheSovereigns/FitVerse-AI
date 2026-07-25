@@ -146,3 +146,4 @@ export type View =
   | 'seasons' | 'battle-pass'
   | 'food-diary' | 'body'
   | 'weekly-report' | 'body-evolution' | 'streak-calendar' | 'achievements-page' | 'analytics-charts'
+  | 'smart-reminders' | 'monthly-report'

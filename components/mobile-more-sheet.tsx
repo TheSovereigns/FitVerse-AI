@@ -10,7 +10,7 @@ import {
   Calculator, Salad, Pill, ArrowLeftRight,
   Timer, Zap, Dumbbell, Wind,
   Heart, Smile, ListChecks,
-  Trophy,
+  Trophy, Bell,
   X, Utensils, Ruler,
   Calendar, TrendingUp, Flame, BarChart3
 } from "lucide-react"
@@ -56,6 +56,7 @@ export function MobileMoreSheet({ open, onClose, onNavigate, isFeatureLocked }: 
         { view: "stress", icon: Brain, label: t("nav_stress"), feature: "stress" },
         { view: "health-checkin", icon: Activity, label: t("nav_health_checkin"), feature: "health-checkin" },
         { view: "supplements", icon: Apple, label: t("nav_supplements"), feature: "supplements" },
+        { view: "smart-reminders", icon: Bell, label: isEnglish ? "Reminders" : "Lembretes" },
       ]
     },
     {
@@ -115,6 +116,7 @@ export function MobileMoreSheet({ open, onClose, onNavigate, isFeatureLocked }: 
         { view: "streak-calendar", icon: Flame, label: isEnglish ? "Streak" : "Sequencia" },
         { view: "achievements-page", icon: Trophy, label: isEnglish ? "Achievements" : "Conquistas" },
         { view: "analytics-charts", icon: BarChart3, label: isEnglish ? "Analytics" : "Analises" },
+        { view: "monthly-report", icon: Calendar, label: isEnglish ? "Monthly Report" : "Rel. Mensal" },
       ]
     },
   ]

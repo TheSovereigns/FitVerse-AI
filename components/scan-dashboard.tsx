@@ -1,11 +1,12 @@
 "use client"
 
-import { useRef, useState } from "react"
+import { useRef, useState, useEffect, useMemo } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { useTranslation } from "@/lib/i18n"
-import { Camera, ChevronRight, Scan, Upload, Barcode, Sparkles } from "lucide-react"
+import { Camera, ChevronRight, Scan, Upload, Barcode, Sparkles, Search, Heart, X } from "lucide-react"
+import { toast } from "sonner"
 import { BarcodeScanner } from "@/components/barcode-scanner"
 
 interface ScanDashboardProps {
@@ -17,8 +18,45 @@ export function ScanDashboard({ onScan, isScanning = false }: ScanDashboardProps
   const { t } = useTranslation()
   const [isDragging, setIsDragging] = useState(false)
   const [showBarcodeScanner, setShowBarcodeScanner] = useState(false)
+  const [searchQuery, setSearchQuery] = useState("")
+  const [scanHistory, setScanHistory] = useState<Array<{ id?: string; name?: string; scannedAt?: string; score?: number; image?: string }>>([])
+  const [favorites, setFavorites] = useState<string[]>([])
   const fileInputRef = useRef<HTMLInputElement>(null)
   const cameraInputRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem("fitverse-scan-history")
+      if (stored) setScanHistory(JSON.parse(stored))
+    } catch {}
+    try {
+      const stored = localStorage.getItem("fitverse-favorites")
+      if (stored) setFavorites(JSON.parse(stored))
+    } catch {}
+  }, [])
+
+  const toggleFavorite = (id: string) => {
+    setFavorites(prev => {
+      const next = prev.includes(id) ? prev.filter(f => f !== id) : [...prev, id]
+      localStorage.setItem("fitverse-favorites", JSON.stringify(next))
+      toast.success(prev.includes(id) ? t("scan_removed_favorite") : t("scan_added_favorite"))
+      return next
+    })
+  }
+
+  const recentScans = useMemo(() => {
+    return scanHistory.slice(0, 10)
+  }, [scanHistory])
+
+  const favoriteScans = useMemo(() => {
+    return scanHistory.filter(s => s.id && favorites.includes(s.id))
+  }, [scanHistory, favorites])
+
+  const filteredScans = useMemo(() => {
+    if (!searchQuery.trim()) return scanHistory
+    const q = searchQuery.toLowerCase()
+    return scanHistory.filter(s => s.name?.toLowerCase().includes(q))
+  }, [scanHistory, searchQuery])
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -45,6 +83,28 @@ export function ScanDashboard({ onScan, isScanning = false }: ScanDashboardProps
           {t("scan_subtitle")}
         </p>
       </motion.section>
+
+      {/* Search Bar */}
+      <motion.div
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.05 }}
+        className="relative"
+      >
+        <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <input
+          type="text"
+          placeholder={t("scan_search_placeholder")}
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="w-full rounded-2xl border border-border bg-card py-3 pl-11 pr-10 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-brand/30"
+        />
+        {searchQuery && (
+          <button onClick={() => setSearchQuery("")} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
+            <X className="h-4 w-4" />
+          </button>
+        )}
+      </motion.div>
 
       {/* Scan Area */}
       <motion.div
@@ -161,32 +221,129 @@ export function ScanDashboard({ onScan, isScanning = false }: ScanDashboardProps
         <input type="file" ref={cameraInputRef} className="hidden" accept="image/*" capture="environment" onChange={handleFileSelect} />
       </motion.div>
 
-      {/* Recent Scans Placeholder */}
-      <motion.section
-        initial={{ opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.1 }}
-        className="rounded-2xl glass-strong p-5"
-      >
-        <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-base font-semibold text-foreground">{t("scan_history_title")}</h2>
-          <ChevronRight className="h-4 w-4 text-muted-foreground" />
-        </div>
-        <div className="space-y-3">
-          {[1, 2].map((_, index) => (
-            <div key={index} className="flex items-center gap-3 rounded-xl bg-muted/50 p-3">
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-muted text-muted-foreground">
-                <Scan className="h-5 w-5" />
+      {/* Search Results */}
+      {searchQuery && (
+        <motion.section
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="rounded-2xl glass-strong p-5"
+        >
+          <h2 className="text-base font-semibold text-foreground mb-4">
+            {filteredScans.length} {t("scan_search_placeholder")}
+          </h2>
+          <div className="space-y-3">
+            {filteredScans.length === 0 && (
+              <p className="text-sm text-muted-foreground text-center py-4">{t("scan_no_results")}</p>
+            )}
+            {filteredScans.map((scan, index) => (
+              <div key={scan.id || index} className="flex items-center gap-3 rounded-xl bg-muted/50 p-3">
+                {scan.image ? (
+                  <img src={scan.image} alt="" className="h-12 w-12 rounded-xl object-cover" />
+                ) : (
+                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-muted text-muted-foreground">
+                    <Scan className="h-5 w-5" />
+                  </div>
+                )}
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm font-medium text-foreground">{scan.name || `Score #${index + 1}`}</p>
+                  <p className="text-xs text-muted-foreground">{scan.scannedAt ? new Date(scan.scannedAt).toLocaleDateString() : ""}</p>
+                </div>
+                {scan.score != null && (
+                  <span className="rounded-full bg-brand/10 px-2.5 py-1 text-xs font-medium text-brand">{scan.score}</span>
+                )}
+                {scan.id && (
+                  <button onClick={() => toggleFavorite(scan.id!)} className="ml-1">
+                    <Heart className={cn("h-5 w-5", favorites.includes(scan.id) ? "fill-rose-500 text-rose-500" : "text-muted-foreground")} />
+                  </button>
+                )}
               </div>
-              <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-medium text-foreground">Score #{2409 + index}</p>
-                <p className="text-xs text-muted-foreground">{t("scan_yesterday")} 14:05</p>
+            ))}
+          </div>
+        </motion.section>
+      )}
+
+      {/* Favorites Section */}
+      {!searchQuery && favoriteScans.length > 0 && (
+        <motion.section
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="rounded-2xl glass-strong p-5"
+        >
+          <div className="mb-4 flex items-center justify-between">
+            <h2 className="text-base font-semibold text-foreground flex items-center gap-2">
+              <Heart className="h-4 w-4 text-rose-500 fill-rose-500" />
+              {t("scan_favorites")}
+            </h2>
+          </div>
+          <div className="space-y-3">
+            {favoriteScans.map((scan, index) => (
+              <div key={scan.id || index} className="flex items-center gap-3 rounded-xl bg-muted/50 p-3">
+                {scan.image ? (
+                  <img src={scan.image} alt="" className="h-12 w-12 rounded-xl object-cover" />
+                ) : (
+                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-muted text-muted-foreground">
+                    <Scan className="h-5 w-5" />
+                  </div>
+                )}
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm font-medium text-foreground">{scan.name || `Score #${index + 1}`}</p>
+                  <p className="text-xs text-muted-foreground">{scan.scannedAt ? new Date(scan.scannedAt).toLocaleDateString() : ""}</p>
+                </div>
+                {scan.score != null && (
+                  <span className="rounded-full bg-brand/10 px-2.5 py-1 text-xs font-medium text-brand">{scan.score}</span>
+                )}
+                <button onClick={() => toggleFavorite(scan.id!)}>
+                  <Heart className="h-5 w-5 fill-rose-500 text-rose-500" />
+                </button>
               </div>
-              <span className="rounded-full bg-brand/10 px-2.5 py-1 text-xs font-medium text-brand">{t("scan_good")}</span>
-            </div>
-          ))}
-        </div>
-      </motion.section>
+            ))}
+          </div>
+        </motion.section>
+      )}
+
+      {/* Recent Scans */}
+      {!searchQuery && (
+        <motion.section
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.15 }}
+          className="rounded-2xl glass-strong p-5"
+        >
+          <div className="mb-4 flex items-center justify-between">
+            <h2 className="text-base font-semibold text-foreground">{t("scan_recent")}</h2>
+            <ChevronRight className="h-4 w-4 text-muted-foreground" />
+          </div>
+          <div className="space-y-3">
+            {recentScans.length === 0 && (
+              <p className="text-sm text-muted-foreground text-center py-4">{t("scan_no_results")}</p>
+            )}
+            {recentScans.map((scan, index) => (
+              <div key={scan.id || index} className="flex items-center gap-3 rounded-xl bg-muted/50 p-3">
+                {scan.image ? (
+                  <img src={scan.image} alt="" className="h-12 w-12 rounded-xl object-cover" />
+                ) : (
+                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-muted text-muted-foreground">
+                    <Scan className="h-5 w-5" />
+                  </div>
+                )}
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm font-medium text-foreground">{scan.name || `Score #${index + 1}`}</p>
+                  <p className="text-xs text-muted-foreground">{scan.scannedAt ? new Date(scan.scannedAt).toLocaleDateString() : ""}</p>
+                </div>
+                {scan.score != null && (
+                  <span className="rounded-full bg-brand/10 px-2.5 py-1 text-xs font-medium text-brand">{scan.score}</span>
+                )}
+                {scan.id && (
+                  <button onClick={() => toggleFavorite(scan.id!)} className="ml-1">
+                    <Heart className={cn("h-5 w-5", favorites.includes(scan.id) ? "fill-rose-500 text-rose-500" : "text-muted-foreground")} />
+                  </button>
+                )}
+              </div>
+            ))}
+          </div>
+        </motion.section>
+      )}
 
       {showBarcodeScanner && (
         <BarcodeScanner

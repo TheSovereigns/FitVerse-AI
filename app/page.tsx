@@ -62,6 +62,8 @@ const BodyEvolution = lazy(() => import("@/components/body-evolution").then(m =>
 const StreakCalendar = lazy(() => import("@/components/streak-calendar").then(m => ({ default: m.StreakCalendar })))
 const AchievementsPage = lazy(() => import("@/components/achievements-page").then(m => ({ default: m.AchievementsPage })))
 const AnalyticsCharts = lazy(() => import("@/components/analytics-charts").then(m => ({ default: m.AnalyticsCharts })))
+const SmartReminders = lazy(() => import("@/components/smart-reminders").then(m => ({ default: m.SmartReminders })))
+const MonthlyReport = lazy(() => import("@/components/monthly-report").then(m => ({ default: m.MonthlyReport })))
 
 import { HomeSkeleton, TrainingSkeleton, RecipesSkeleton, ChatSkeleton, SettingsSkeleton, ProfileSkeleton, PlannerSkeleton } from "@/components/skeleton-loaders-views"
 
@@ -158,6 +160,8 @@ export default function DashboardPage() {
       "streak-calendar": isEnglish ? "Streak" : "Sequencia",
       "achievements-page": isEnglish ? "Achievements" : "Conquistas",
       "analytics-charts": isEnglish ? "Analytics" : "Analises",
+      "smart-reminders": isEnglish ? "Reminders" : "Lembretes",
+      "monthly-report": isEnglish ? "Monthly Report" : "Rel. Mensal",
     }
     return titles[currentView] || t("view_fitverse")
   }
@@ -323,7 +327,8 @@ export default function DashboardPage() {
     }
     const freeFeatures = ["longevity", "habits", "workout-feedback", "seasons",
       "battle-pass", "weekly-report", "body-evolution", "streak-calendar",
-      "achievements-page", "analytics-charts", "food-diary", "body"]
+      "achievements-page", "analytics-charts", "food-diary", "body",
+      "smart-reminders", "monthly-report"]
     return !freeFeatures.includes(feature)
   }
 
@@ -449,6 +454,8 @@ export default function DashboardPage() {
             {currentView === "analytics-charts" && <AnalyticsCharts />}
             {currentView === "food-diary" && <FoodDiary onBack={() => setCurrentView("home")} />}
             {currentView === "body" && <BodyTracker />}
+            {currentView === "smart-reminders" && <SmartReminders />}
+            {currentView === "monthly-report" && <MonthlyReport />}
             </FeatureErrorBoundary>
           </Suspense>
         </main>

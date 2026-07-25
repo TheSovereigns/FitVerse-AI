@@ -12,8 +12,13 @@ import {
   ChefHat,
   Clock,
   Flame,
+  Heart,
+  HeartOff,
   Loader2,
+  Minus,
+  Plus,
   Search,
+  ShoppingCart,
   Sparkles,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
@@ -46,6 +51,9 @@ export function RecipesTab({ metabolicPlan }: RecipesTabProps) {
   const [generationError, setGenerationError] = useState<string | null>(null)
   const [recipes, setRecipes] = useState<Recipe[]>([])
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null)
+  const [savedRecipes, setSavedRecipes] = useState<Recipe[]>([])
+  const [selectedPortions, setSelectedPortions] = useState<Record<number, number>>({})
+  const [shoppingListRecipe, setShoppingListRecipe] = useState<string | null>(null)
 
   const isEnglish = locale === "en-US"
   const totalCalories = useMemo(
@@ -62,6 +70,63 @@ export function RecipesTab({ metabolicPlan }: RecipesTabProps) {
       }
     } catch {}
   }, [])
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem("fitverse-saved-recipes")
+      if (saved) {
+        const parsed = JSON.parse(saved)
+        if (Array.isArray(parsed)) setSavedRecipes(parsed)
+      }
+    } catch {}
+  }, [])
+
+  const isRecipeSaved = (recipe: Recipe) =>
+    savedRecipes.some((r) => r.name === recipe.name)
+
+  const toggleSaveRecipe = (recipe: Recipe) => {
+    let updated: Recipe[]
+    if (isRecipeSaved(recipe)) {
+      updated = savedRecipes.filter((r) => r.name !== recipe.name)
+      toast.info(isEnglish ? "Recipe removed from favorites" : "Receita removida dos favoritos")
+    } else {
+      updated = [...savedRecipes, recipe]
+      toast.success(isEnglish ? "Recipe saved to favorites!" : "Receita salva nos favoritos!")
+    }
+    setSavedRecipes(updated)
+    localStorage.setItem("fitverse-saved-recipes", JSON.stringify(updated))
+  }
+
+  const generateShoppingList = (recipe: Recipe, portions: number) => {
+    const factor = portions / (recipe.servings || 1)
+    const items = recipe.ingredients.map((ing) => {
+      const match = ing.match(/^([\d.,]+)\s*([a-zA-Z]+)\s+(.+)/)
+      if (match) {
+        const qty = parseFloat(match[1].replace(",", "."))
+        const unit = match[2]
+        const name = match[3]
+        const scaledQty = Math.round(qty * factor * 100) / 100
+        return { name, quantity: `${scaledQty} ${unit}` }
+      }
+      return { name: ing, quantity: isEnglish ? "as needed" : "a gosto" }
+    })
+
+    const existing = JSON.parse(localStorage.getItem("fitverse-shopping-list") || "[]")
+    const newItems = [...existing, ...items.map((i) => ({ ...i, recipeName: recipe.name }))]
+    localStorage.setItem("fitverse-shopping-list", JSON.stringify(newItems))
+    setShoppingListRecipe(recipe.name)
+    setTimeout(() => setShoppingListRecipe(null), 2000)
+    toast.success(isEnglish ? "Ingredients added to shopping list!" : "Ingredientes adicionados à lista de compras!")
+  }
+
+  const getPortions = (index: number, recipe: Recipe) =>
+    selectedPortions[index] || recipe.servings || 1
+
+  const updatePortions = (index: number, delta: number, recipe: Recipe) => {
+    const current = getPortions(index, recipe)
+    const next = Math.max(1, current + delta)
+    setSelectedPortions((prev) => ({ ...prev, [index]: next }))
+  }
 
   const handleGenerateRecipes = async (ingredientOverride?: string) => {
     const nextIngredient = ingredientOverride ?? ingredient
@@ -301,7 +366,16 @@ export function RecipesTab({ metabolicPlan }: RecipesTabProps) {
               className="grid grid-cols-1 gap-4 sm:grid-cols-2"
             >
               {recipes.map((recipe, index) => (
-                <RecipeCard key={`${recipe.name}-${index}`} recipe={recipe} index={index} onOpen={() => setSelectedRecipe(recipe)} />
+                <RecipeCard
+                  key={`${recipe.name}-${index}`}
+                  recipe={recipe}
+                  index={index}
+                  portions={getPortions(index, recipe)}
+                  onPortionsChange={(delta) => updatePortions(index, delta, recipe)}
+                  isSaved={isRecipeSaved(recipe)}
+                  onToggleSave={() => toggleSaveRecipe(recipe)}
+                  onOpen={() => setSelectedRecipe(recipe)}
+                />
               ))}
             </motion.div>
           ) : (
@@ -357,13 +431,95 @@ export function RecipesTab({ metabolicPlan }: RecipesTabProps) {
           )}
         </AnimatePresence>
 
-        {selectedRecipe && <RecipeModal recipe={selectedRecipe} onClose={() => setSelectedRecipe(null)} />}
+        {/* Saved Recipes Section */}
+        {savedRecipes.length > 0 && (
+          <motion.section
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="space-y-3"
+          >
+            <div className="flex items-center gap-2">
+              <Heart className="h-4 w-4 text-destructive fill-destructive" />
+              <span className="text-xs font-medium text-muted-foreground">
+                {t("recipes_saved_section")}
+              </span>
+            </div>
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              <AnimatePresence>
+                {savedRecipes.map((recipe, index) => (
+                  <motion.div
+                    key={`saved-${recipe.name}-${index}`}
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.95 }}
+                    className="group relative rounded-xl glass-strong p-4"
+                  >
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="min-w-0 flex-1">
+                        <h4 className="truncate text-sm font-bold text-foreground">{recipe.name}</h4>
+                        <p className="mt-1 text-[10px] text-muted-foreground">
+                          {recipe.macros?.calories || 0} kcal · {recipe.prepTime}
+                        </p>
+                      </div>
+                      <div className="flex shrink-0 gap-1">
+                        <button
+                          type="button"
+                          onClick={() => setSelectedRecipe(recipe)}
+                          className="flex h-7 w-7 items-center justify-center rounded-lg bg-muted/50 text-muted-foreground transition hover:bg-muted hover:text-foreground"
+                          aria-label={t("recipes_view")}
+                        >
+                          <ArrowRight className="h-3.5 w-3.5" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => toggleSaveRecipe(recipe)}
+                          className="flex h-7 w-7 items-center justify-center rounded-lg bg-destructive/10 text-destructive transition hover:bg-destructive/20"
+                          aria-label={t("recipes_unsave")}
+                        >
+                          <HeartOff className="h-3.5 w-3.5" />
+                        </button>
+                      </div>
+                    </div>
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+            </div>
+          </motion.section>
+        )}
+
+        {selectedRecipe && (
+          <RecipeModal
+            recipe={selectedRecipe}
+            portions={getPortions(recipes.indexOf(selectedRecipe), selectedRecipe)}
+            onPortionsChange={(delta) => updatePortions(recipes.indexOf(selectedRecipe), delta, selectedRecipe)}
+            onGenerateShoppingList={() => generateShoppingList(selectedRecipe, getPortions(recipes.indexOf(selectedRecipe), selectedRecipe))}
+            shoppingListAdded={shoppingListRecipe === selectedRecipe.name}
+            onClose={() => setSelectedRecipe(null)}
+          />
+        )}
       </div>
     </div>
   )
 }
 
-function RecipeCard({ recipe, index, onOpen }: { recipe: Recipe; index: number; onOpen: () => void }) {
+function RecipeCard({
+  recipe,
+  index,
+  portions,
+  onPortionsChange,
+  isSaved,
+  onToggleSave,
+  onOpen,
+}: {
+  recipe: Recipe
+  index: number
+  portions: number
+  onPortionsChange: (delta: number) => void
+  isSaved: boolean
+  onToggleSave: () => void
+  onOpen: () => void
+}) {
+  const { t } = useTranslation()
   const macros = [
     { label: "P", value: recipe.macros?.protein || 0, color: "text-brand" },
     { label: "C", value: recipe.macros?.carbs || 0, color: "text-warning" },
@@ -384,8 +540,21 @@ function RecipeCard({ recipe, index, onOpen }: { recipe: Recipe; index: number; 
         <span className="rounded-full bg-muted px-2.5 py-1 text-[10px] font-medium text-muted-foreground">
           {recipe.difficulty}
         </span>
-        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand text-white opacity-0 transition group-hover:opacity-100">
-          <ArrowRight className="h-3.5 w-3.5" />
+        <div className="flex items-center gap-1">
+          <motion.button
+            type="button"
+            whileTap={{ scale: 0.85 }}
+            onClick={(e) => { e.stopPropagation(); onToggleSave() }}
+            className="flex h-8 w-8 items-center justify-center rounded-lg transition hover:bg-muted"
+            aria-label={isSaved ? t("recipes_unsave") : t("recipes_save")}
+          >
+            <Heart
+              className={cn("h-4 w-4 transition-colors", isSaved ? "text-destructive fill-destructive" : "text-muted-foreground")}
+            />
+          </motion.button>
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand text-white opacity-0 transition group-hover:opacity-100">
+            <ArrowRight className="h-3.5 w-3.5" />
+          </div>
         </div>
       </div>
 
@@ -407,15 +576,42 @@ function RecipeCard({ recipe, index, onOpen }: { recipe: Recipe; index: number; 
         </span>
         <span className="flex items-center gap-1 rounded-full bg-muted/50 px-2 py-1">
           <Flame className="h-3 w-3" />
-          {recipe.macros?.calories || 0} kcal
+          {Math.round((recipe.macros?.calories || 0) * (portions / (recipe.servings || 1)))} kcal
         </span>
+      </div>
+
+      {/* Portion Adjuster */}
+      <div className="mt-3 flex items-center gap-2 rounded-xl bg-muted/50 px-3 py-2" onClick={(e) => e.stopPropagation()}>
+        <span className="text-[10px] font-medium text-muted-foreground">{t("recipes_portions")}</span>
+        <div className="ml-auto flex items-center gap-1">
+          <motion.button
+            type="button"
+            whileTap={{ scale: 0.85 }}
+            onClick={() => onPortionsChange(-1)}
+            disabled={portions <= 1}
+            className="flex h-6 w-6 items-center justify-center rounded-md bg-muted text-foreground transition hover:bg-muted/80 disabled:opacity-40"
+          >
+            <Minus className="h-3 w-3" />
+          </motion.button>
+          <span className="w-6 text-center text-sm font-bold text-foreground">{portions}</span>
+          <motion.button
+            type="button"
+            whileTap={{ scale: 0.85 }}
+            onClick={() => onPortionsChange(1)}
+            className="flex h-6 w-6 items-center justify-center rounded-md bg-muted text-foreground transition hover:bg-muted/80"
+          >
+            <Plus className="h-3 w-3" />
+          </motion.button>
+        </div>
       </div>
 
       <div className="mt-3 grid grid-cols-3 gap-2">
         {macros.map((macro) => (
           <div key={macro.label} className="rounded-lg bg-muted/50 p-2 text-center">
             <p className="text-[10px] text-muted-foreground">{macro.label}</p>
-            <p className={cn("text-sm font-bold", macro.color)}>{macro.value}g</p>
+            <p className={cn("text-sm font-bold", macro.color)}>
+              {Math.round(macro.value * (portions / (recipe.servings || 1)))}g
+            </p>
           </div>
         ))}
       </div>

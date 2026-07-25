@@ -1,13 +1,14 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { motion } from "framer-motion"
+import { useState, useEffect, useMemo } from "react"
+import { motion, AnimatePresence } from "framer-motion"
 import { useTranslation } from "@/lib/i18n"
 import { useLocalStorage } from "@/hooks/useLocalStorage"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { notifications } from "@/lib/notifications"
-import { Droplets, Plus, Minus, Target, TrendingUp } from "lucide-react"
+import { Droplets, Plus, Minus, Target, Pencil, X } from "lucide-react"
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts"
 import { format } from "date-fns"
 import { cn } from "@/lib/utils"
 import { recordAction } from "@/lib/gamification"
@@ -18,13 +19,27 @@ interface HydrationEntry {
   goal: number
 }
 
+const quickAdd = [
+  { amount: 0.25, label: "250ml", icon: "🥛" },
+  { amount: 0.5, label: "500ml", icon: "🍶" },
+  { amount: 1.0, label: "1L", icon: "💧" },
+]
+
 export function HydrationTracker() {
-  const { t } = useTranslation()
+  const { t, locale } = useTranslation()
+  const isEnglish = locale === "en-US"
   const [todayEntry, setTodayEntry] = useLocalStorage<HydrationEntry | null>("fitverse-hydration-today", null)
   const [history, setHistory] = useLocalStorage<HydrationEntry[]>("fitverse-hydration-history", [])
-  const [goal, setGoal] = useState(2.5)
+  const [savedGoal, setSavedGoal] = useLocalStorage<number>("fitverse-water-goal", 2.5)
+  const [goal, setGoal] = useState(savedGoal)
+  const [editingGoal, setEditingGoal] = useState(false)
+  const [goalInput, setGoalInput] = useState(savedGoal.toString())
 
   const today = format(new Date(), "yyyy-MM-dd")
+
+  useEffect(() => {
+    setGoal(savedGoal)
+  }, [savedGoal])
 
   useEffect(() => {
     if (todayEntry && todayEntry.date !== today) {
@@ -47,18 +62,50 @@ export function HydrationTracker() {
     const newAmount = Math.max(0, currentAmount + amount)
     setTodayEntry({ date: today, amount: newAmount, goal })
     if (newAmount >= goal && !isGoalMet) {
-      notifications.success("Meta de hidratação atingida!")
+      notifications.success(t("hyd_goal_achieved"))
     }
     if (amount > 0) {
       recordAction("water")
     }
   }
 
-  const quickAdd = [0.25, 0.5, 1.0]
+  const saveGoal = () => {
+    const parsed = parseFloat(goalInput)
+    if (!isNaN(parsed) && parsed > 0 && parsed <= 10) {
+      setSavedGoal(parsed)
+      setGoal(parsed)
+      setEditingGoal(false)
+      notifications.success(t("hyd_goal_toast"))
+    }
+  }
 
-  const averageLast7 = history.length > 0
-    ? (history.slice(0, 7).reduce((acc, h) => acc + h.amount, 0) / Math.min(history.length, 7)).toFixed(1)
-    : "0"
+  const averageLast7 = useMemo(() => {
+    if (history.length === 0) return "0"
+    return (history.slice(0, 7).reduce((acc, h) => acc + h.amount, 0) / Math.min(history.length, 7)).toFixed(1)
+  }, [history])
+
+  const streakDays = useMemo(() => {
+    return history.filter((h) => h.amount >= h.goal).length
+  }, [history])
+
+  const weekData = useMemo(() => {
+    const dayLabels = isEnglish
+      ? ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+      : ["Seg", "Ter", "Qua", "Qui", "Sex", "Sáb", "Dom"]
+    const days: { name: string; amount: number; goal: number }[] = []
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date()
+      d.setDate(d.getDate() - i)
+      const key = format(d, "yyyy-MM-dd")
+      const entry = history.find((h) => h.date === key)
+      days.push({
+        name: dayLabels[(d.getDay() + 6) % 7]!,
+        amount: entry?.amount || 0,
+        goal: entry?.goal || goal,
+      })
+    }
+    return days
+  }, [history, goal, isEnglish])
 
   return (
     <div className="space-y-4">
@@ -92,20 +139,41 @@ export function HydrationTracker() {
           <div className="absolute inset-0 flex flex-col items-center justify-center">
             <Droplets className="w-6 h-6 text-brand mb-1" />
             <span className="text-2xl font-bold">{currentAmount.toFixed(1)}</span>
-            <span className="text-xs text-muted-foreground">de {goal}L</span>
+            <span className="text-xs text-muted-foreground">{t("hyd_goal_of")} {goal}{t("hyd_liters_short")}</span>
+            <span className="text-xs font-semibold text-brand mt-0.5">{Math.round(percentage)}%</span>
           </div>
         </div>
 
-        {isGoalMet && (
-          <motion.div
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-success/10 text-success text-sm font-medium"
+        <AnimatePresence>
+          {isGoalMet && (
+            <motion.div
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-success/10 text-success text-sm font-medium"
+            >
+              <Target className="w-3 h-3" />
+              {t("hyd_goal_achieved")}
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+
+      <div className="grid grid-cols-3 gap-2">
+        {quickAdd.map((preset) => (
+          <motion.button
+            key={preset.amount}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => addWater(preset.amount)}
+            className={cn(
+              "flex flex-col items-center gap-1 py-3 px-2 rounded-xl border transition-all",
+              "bg-brand-muted border-brand/20 hover:bg-brand/10 active:bg-brand/20"
+            )}
           >
-            <Target className="w-3 h-3" />
-            Meta atingida!
-          </motion.div>
-        )}
+            <span className="text-xl">{preset.icon}</span>
+            <span className="text-sm font-bold text-foreground">{preset.label}</span>
+          </motion.button>
+        ))}
       </div>
 
       <div className="flex items-center justify-center gap-3">
@@ -118,17 +186,15 @@ export function HydrationTracker() {
         >
           <Minus className="w-4 h-4" />
         </Button>
-        {quickAdd.map((amount) => (
-          <Button
-            key={amount}
-            variant="outline"
-            size="lg"
-            onClick={() => addWater(amount)}
-            className="rounded-xl"
-          >
-            +{amount}L
-          </Button>
-        ))}
+        <Button
+          variant="outline"
+          size="lg"
+          onClick={() => setEditingGoal(true)}
+          className="rounded-xl gap-1.5 px-3"
+        >
+          <Pencil className="w-3 h-3" />
+          <span className="text-xs">{t("hyd_edit_goal")}</span>
+        </Button>
         <Button
           size="lg"
           onClick={() => addWater(0.25)}
@@ -138,46 +204,67 @@ export function HydrationTracker() {
         </Button>
       </div>
 
+      <AnimatePresence>
+        {editingGoal && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            className="overflow-hidden"
+          >
+            <div className="flex items-center gap-2 p-3 rounded-xl border border-border bg-card">
+              <span className="text-xs text-muted-foreground whitespace-nowrap">{t("hyd_liters")}:</span>
+              <input
+                type="number"
+                min="0.5"
+                max="10"
+                step="0.1"
+                value={goalInput}
+                onChange={(e) => setGoalInput(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && saveGoal()}
+                className="flex-1 h-8 text-sm bg-muted border border-border rounded-lg px-2 text-foreground"
+                autoFocus
+              />
+              <Button size="sm" onClick={saveGoal} className="h-8 px-3 rounded-lg text-xs">
+                {t("hyd_save_goal")}
+              </Button>
+              <Button size="sm" variant="ghost" onClick={() => { setEditingGoal(false); setGoalInput(goal.toString()) }} className="h-8 w-8 p-0 rounded-lg">
+                <X className="w-3 h-3" />
+              </Button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <div className="grid grid-cols-2 gap-3">
         <Card>
           <CardContent className="p-3 text-center">
-            <p className="text-xs text-muted-foreground mb-1">Média 7 dias</p>
-            <p className="text-lg font-bold">{averageLast7}L</p>
+            <p className="text-xs text-muted-foreground mb-1">{t("hyd_avg_7d")}</p>
+            <p className="text-lg font-bold">{averageLast7}{t("hyd_liters_short")}</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-3 text-center">
-            <p className="text-xs text-muted-foreground mb-1">Dias seguidos</p>
-            <p className="text-lg font-bold">
-              {history.filter((h) => h.amount >= h.goal).length}
-            </p>
+            <p className="text-xs text-muted-foreground mb-1">{t("hyd_streak")}</p>
+            <p className="text-lg font-bold">{streakDays}</p>
           </CardContent>
         </Card>
       </div>
 
       <div>
-        <p className="text-xs text-muted-foreground mb-2">Últimos 7 dias</p>
-        <div className="flex items-end gap-1 h-16">
-          {Array.from({ length: 7 }).map((_, i) => {
-            const dayIndex = 6 - i
-            const entry = history[dayIndex]
-            const height = entry ? (entry.amount / goal) * 100 : 0
-            return (
-              <div key={i} className="flex-1 flex flex-col items-center gap-1">
-                <div className="w-full bg-muted rounded-sm overflow-hidden" style={{ height: "100%" }}>
-                  <motion.div
-                    className={cn("w-full rounded-sm", entry && entry.amount >= entry.goal ? "bg-brand" : "bg-muted-foreground/30")}
-                    initial={{ height: 0 }}
-                    animate={{ height: `${Math.min(height, 100)}%` }}
-                    transition={{ delay: i * 0.05 }}
-                  />
-                </div>
-                <span className="text-[9px] text-muted-foreground">
-                  {format(new Date(Date.now() - dayIndex * 86400000), "EEE")}
-                </span>
-              </div>
-            )
-          })}
+        <p className="text-xs text-muted-foreground mb-2">{t("hyd_weekly_chart")}</p>
+        <div className="h-32">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={weekData}>
+              <XAxis dataKey="name" tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }} axisLine={false} tickLine={false} />
+              <YAxis domain={[0, "auto"]} tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }} axisLine={false} tickLine={false} width={25} />
+              <Tooltip
+                contentStyle={{ fontSize: 11, background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 8 }}
+                formatter={(value: number, name: string) => [`${value.toFixed(1)}${t("hyd_liters_short")}`, isEnglish ? "Intake" : "Ingestão"]}
+              />
+              <Bar dataKey="amount" fill="hsl(var(--brand))" radius={[4, 4, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
         </div>
       </div>
     </div>

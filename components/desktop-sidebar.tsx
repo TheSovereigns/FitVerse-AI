@@ -8,7 +8,7 @@ import {
   Home, ScanLine, Dumbbell, ChefHat,
   Moon, Brain, Apple, Wind,
   Heart, Timer, Smile, ListChecks,
-  Trophy,
+  Trophy, Bell,
   User, Settings, Users, MessageCircle,
   Salad, Pill, ArrowLeftRight, Zap,
   ChevronDown, Utensils, Ruler,
@@ -46,6 +46,7 @@ export function DesktopSidebar({ currentView, onNavigate, isFeatureLocked }: Sid
         { view: "fasting", icon: Timer, label: t("nav_fasting"), feature: "fasting" },
         { view: "longevity", icon: Heart, label: t("nav_longevity") },
         { view: "biological-age", icon: Smile, label: t("nav_biological_age"), feature: "biological-age" },
+        { view: "smart-reminders", icon: Bell, label: isEnglish ? "Reminders" : "Lembretes" },
       ]
     },
     {
@@ -80,6 +81,7 @@ export function DesktopSidebar({ currentView, onNavigate, isFeatureLocked }: Sid
         { view: "streak-calendar", icon: Flame, label: isEnglish ? "Streak" : "Sequencia" },
         { view: "achievements-page", icon: Trophy, label: isEnglish ? "Achievements" : "Conquistas" },
         { view: "analytics-charts", icon: BarChart3, label: isEnglish ? "Analytics" : "Analises" },
+        { view: "monthly-report", icon: Calendar, label: isEnglish ? "Monthly Report" : "Rel. Mensal" },
       ]
     },
   ]

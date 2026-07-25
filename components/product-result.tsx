@@ -1,12 +1,13 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import { useState, useMemo, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { ArrowLeft, AlertTriangle, Check, Activity, ShieldCheck, AlertCircle, Flame, Dumbbell, Wheat, Droplets, Target, BarChart, Sparkles, ChevronRight, Zap, Heart, Brain, Bone, Shield, Leaf, Droplet, Scale, Plus, Minus, Info, Clock, Pill, Apple, Cookie, AlertOctagon, TrendingUp, TrendingDown, Minus as MinusIcon, ChevronDown, ChevronUp } from "lucide-react"
+import { ArrowLeft, AlertTriangle, Check, Activity, ShieldCheck, AlertCircle, Flame, Dumbbell, Wheat, Droplets, Target, BarChart, Sparkles, ChevronRight, Zap, Heart, Brain, Bone, Shield, Leaf, Droplet, Scale, Plus, Minus, Info, Clock, Pill, Apple, Cookie, AlertOctagon, TrendingUp, TrendingDown, Minus as MinusIcon, ChevronDown, ChevronUp, GitCompareArrows } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
 import { ShareActivityButton } from "@/components/share-activity-button"
+import { toast } from "sonner"
 
 export interface ProductAnalysis {
   productName: string
@@ -64,6 +65,54 @@ export function ProductResult({ result, onBack, imageData, onSave, onDiscard, ha
   const [grams, setGrams] = useState(defaultGrams)
   const [showIngredients, setShowIngredients] = useState(false)
   const [showAllAllergens, setShowAllAllergens] = useState(false)
+  const [isFavorite, setIsFavorite] = useState(false)
+  const [isComparing, setIsComparing] = useState(false)
+
+  useEffect(() => {
+    if (!result) return
+    try {
+      const favs = JSON.parse(localStorage.getItem("fitverse-favorites") || "[]") as string[]
+      setIsFavorite(favs.includes(result.productName))
+    } catch {}
+    try {
+      const compare = JSON.parse(localStorage.getItem("fitverse-compare") || "null") as { productName: string } | null
+      setIsComparing(compare?.productName === result.productName)
+    } catch {}
+  }, [result])
+
+  const toggleFavorite = () => {
+    if (!result) return
+    try {
+      const favs = JSON.parse(localStorage.getItem("fitverse-favorites") || "[]") as string[]
+      const next = favs.includes(result.productName)
+        ? favs.filter(f => f !== result.productName)
+        : [...favs, result.productName]
+      localStorage.setItem("fitverse-favorites", JSON.stringify(next))
+      setIsFavorite(next.includes(result.productName))
+      toast.success(next.includes(result.productName) ? t("scan_added_favorite") : t("scan_removed_favorite"))
+    } catch {}
+  }
+
+  const toggleCompare = () => {
+    if (!result) return
+    try {
+      const current = JSON.parse(localStorage.getItem("fitverse-compare") || "null") as { productName: string } | null
+      if (current?.productName === result.productName) {
+        localStorage.removeItem("fitverse-compare")
+        setIsComparing(false)
+      } else {
+        localStorage.setItem("fitverse-compare", JSON.stringify({
+          productName: result.productName,
+          brand: result.brand,
+          score: result.longevityScore,
+          macros: result.macros,
+          category: result.category,
+        }))
+        setIsComparing(true)
+        toast.success(t("scan_compared"))
+      }
+    } catch {}
+  }
   
   const adjustedMacros = useMemo(() => {
     if (!result?.macros) return null
@@ -156,6 +205,12 @@ export function ProductResult({ result, onBack, imageData, onSave, onDiscard, ha
           <ArrowLeft className="w-8 h-8" />
         </Button>
         <div className="flex items-center gap-3">
+          <button onClick={toggleFavorite} className="w-14 h-14 rounded-2xl bg-card border border-border haptic-press flex items-center justify-center" aria-label="Favorite">
+            <Heart className={cn("w-8 h-8", isFavorite ? "fill-rose-500 text-rose-500" : "")} />
+          </button>
+          <button onClick={toggleCompare} className={cn("w-14 h-14 rounded-2xl border haptic-press flex items-center justify-center", isComparing ? "bg-brand/10 border-brand/30" : "bg-card border-border")} aria-label="Compare">
+            <GitCompareArrows className={cn("w-8 h-8", isComparing ? "text-brand" : "")} />
+          </button>
           <ShareActivityButton
             activityType="scan"
             activityData={{
@@ -601,6 +656,56 @@ export function ProductResult({ result, onBack, imageData, onSave, onDiscard, ha
           </p>
         </div>
       )}
+
+      {/* Compare Side by Side */}
+      {(() => {
+        try {
+          const stored = localStorage.getItem("fitverse-compare")
+          if (!stored) return null
+          const compare = JSON.parse(stored) as { productName: string; brand?: string; score?: number; macros?: { calories: number; protein: number; carbs: number; fat: number }; category?: string }
+          if (!compare || compare.productName === result.productName) return null
+          return (
+            <motion.div
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              className="bg-card border border-border rounded-2xl p-6"
+            >
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-sm font-black uppercase tracking-[0.4em] opacity-30">{t("scan_compare")}</h3>
+                <button onClick={() => { localStorage.removeItem("fitverse-compare"); setIsComparing(false) }} className="text-xs font-bold text-muted-foreground underline">
+                  {t("scan_clear_compare")}
+                </button>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="p-4 rounded-2xl bg-primary/5 border border-primary/20">
+                  <p className="text-xs font-bold text-primary uppercase tracking-widest mb-2">{result.productName}</p>
+                  {result.brand && <p className="text-xs text-muted-foreground mb-1">{result.brand}</p>}
+                  <p className={cn("text-3xl font-black", getScoreColor(score))}>{score}</p>
+                  {result.macros && (
+                    <div className="mt-2 space-y-1 text-xs text-muted-foreground">
+                      <p>{result.macros.calories} kcal</p>
+                      <p>P: {result.macros.protein}g | C: {result.macros.carbs}g | G: {result.macros.fat}g</p>
+                    </div>
+                  )}
+                </div>
+                <div className="p-4 rounded-2xl bg-muted/30 border border-border">
+                  <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-2">{compare.productName}</p>
+                  {compare.brand && <p className="text-xs text-muted-foreground mb-1">{compare.brand}</p>}
+                  {compare.score != null && (
+                    <p className={cn("text-3xl font-black", getScoreColor(compare.score))}>{compare.score}</p>
+                  )}
+                  {compare.macros && (
+                    <div className="mt-2 space-y-1 text-xs text-muted-foreground">
+                      <p>{compare.macros.calories} kcal</p>
+                      <p>P: {compare.macros.protein}g | C: {compare.macros.carbs}g | G: {compare.macros.fat}g</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </motion.div>
+          )
+        } catch { return null }
+      })()}
     </div>
   )
 }

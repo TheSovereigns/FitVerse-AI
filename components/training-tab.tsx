@@ -1,12 +1,12 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useCallback } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Dialog, DialogContent } from "@/components/ui/dialog"
-import { Activity, ArrowRight, Building2, Clock, Dumbbell, Flame, Home, Play, Swords, User, Zap } from "lucide-react"
+import { Activity, ArrowRight, Building2, Clock, Dumbbell, Flame, Home, Play, Swords, User, Zap, Heart, HeartOff, TrendingUp, TrendingDown, Minus, History, Bookmark, Star } from "lucide-react"
 import { logger } from "@/lib/logger"
 import { WorkoutGenerator } from "@/components/workout-generator"
 import { ActiveWorkoutSession } from "@/components/active-workout-session"
@@ -42,6 +42,29 @@ interface TrainingTabProps {
   metabolicPlan?: any
   scanHistory?: any[]
   userGoal?: string
+}
+
+interface WorkoutHistoryEntry {
+  id: string
+  workoutName: string
+  category: string
+  date: string
+  duration: string
+  exercisesCompleted: number
+  totalExercises: number
+  exercises?: Exercise[]
+}
+
+interface SavedWorkout {
+  id: string
+  workout: Workout
+  savedAt: string
+  sessions: WorkoutSession[]
+}
+
+interface WorkoutSession {
+  date: string
+  exercises: { name: string; weight?: string; reps?: string; sets?: string }[]
 }
 
 const sampleWorkouts: Workout[] = [
@@ -103,6 +126,9 @@ export function TrainingTab({ userGoal }: TrainingTabProps) {
   const [activeSessionWorkout, setActiveSessionWorkout] = useState<Workout | null>(null)
   const [liveWorkout, setLiveWorkout] = useState<Workout | null>(null)
   const [selectedExerciseDetail, setSelectedExerciseDetail] = useState<any>(null)
+  const [workoutHistory, setWorkoutHistory] = useState<WorkoutHistoryEntry[]>([])
+  const [savedWorkouts, setSavedWorkouts] = useState<SavedWorkout[]>([])
+  const [activeSubTab, setActiveSubTab] = useState<"generated" | "saved" | "history">("generated")
 
   useEffect(() => {
     const savedWorkouts = localStorage.getItem("nutritrain-workouts")
@@ -123,6 +149,57 @@ export function TrainingTab({ userGoal }: TrainingTabProps) {
       localStorage.setItem("nutritrain-workouts", JSON.stringify(generatedWorkouts))
     }
   }, [generatedWorkouts])
+
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem("fitverse-workout-history")
+      if (raw) setWorkoutHistory(JSON.parse(raw))
+    } catch (e) {
+      logger.error("[TrainingTab] Failed to parse workout history:", e)
+    }
+  }, [])
+
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem("fitverse-saved-workouts")
+      if (raw) setSavedWorkouts(JSON.parse(raw))
+    } catch (e) {
+      logger.error("[TrainingTab] Failed to parse saved workouts:", e)
+    }
+  }, [])
+
+  const handleSaveWorkout = useCallback((workout: Workout) => {
+    setSavedWorkouts((prev) => {
+      const exists = prev.find((s) => s.workout.name === workout.name)
+      if (exists) {
+        toast.info(locale === "en-US" ? "Workout already saved." : "Treino já salvo.")
+        return prev
+      }
+      const entry: SavedWorkout = {
+        id: `${workout.name}-${Date.now()}`,
+        workout,
+        savedAt: new Date().toISOString(),
+        sessions: [],
+      }
+      const next = [...prev, entry]
+      localStorage.setItem("fitverse-saved-workouts", JSON.stringify(next))
+      toast.success(locale === "en-US" ? "Workout saved!" : "Treino salvo!")
+      return next
+    })
+  }, [locale])
+
+  const handleUnsaveWorkout = useCallback((id: string) => {
+    setSavedWorkouts((prev) => {
+      const next = prev.filter((s) => s.id !== id)
+      localStorage.setItem("fitverse-saved-workouts", JSON.stringify(next))
+      toast.success(locale === "en-US" ? "Workout removed." : "Treino removido.")
+      return next
+    })
+  }, [locale])
+
+  const isWorkoutSaved = useCallback((workoutName: string) => {
+    return savedWorkouts.some((s) => s.workout.name === workoutName)
+  }, [savedWorkouts])
 
   const handleGenerateWorkouts = async (criteria: any) => {
     setIsGenerating(true)
@@ -234,29 +311,59 @@ export function TrainingTab({ userGoal }: TrainingTabProps) {
         </div>
       </motion.section>
 
-      {/* Filters */}
-      <div className="flex gap-2 overflow-x-auto pb-1">
-        {filters.map((filter) => {
-          const Icon = filter.icon
-          const isActive = activeFilter === filter.id
+      {/* Sub-tabs */}
+      <div className="flex gap-1 rounded-xl bg-muted/50 p-1">
+        {[
+          { id: "generated" as const, label: t("training_new_workout").replace("+ ", ""), icon: Zap },
+          { id: "saved" as const, label: t("training_tab_saved"), icon: Bookmark },
+          { id: "history" as const, label: t("training_tab_history"), icon: History },
+        ].map((tab) => {
+          const Icon = tab.icon
+          const isActive = activeSubTab === tab.id
           return (
             <button
-              key={filter.id}
+              key={tab.id}
               type="button"
-              onClick={() => setActiveFilter(filter.id)}
+              onClick={() => setActiveSubTab(tab.id)}
               className={cn(
-                "flex shrink-0 items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-medium transition-all",
+                "flex flex-1 items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-xs font-medium transition-all",
                 isActive
-                  ? "bg-brand/10 text-brand"
-                  : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                  ? "bg-background text-foreground shadow-sm"
+                  : "text-muted-foreground hover:text-foreground"
               )}
             >
               <Icon className="h-3.5 w-3.5" />
-              {filter.label}
+              {tab.label}
             </button>
           )
         })}
       </div>
+
+      {/* Filters (only for generated tab) */}
+      {activeSubTab === "generated" && (
+        <div className="flex gap-2 overflow-x-auto pb-1">
+          {filters.map((filter) => {
+            const Icon = filter.icon
+            const isActive = activeFilter === filter.id
+            return (
+              <button
+                key={filter.id}
+                type="button"
+                onClick={() => setActiveFilter(filter.id)}
+                className={cn(
+                  "flex shrink-0 items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-medium transition-all",
+                  isActive
+                    ? "bg-brand/10 text-brand"
+                    : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                )}
+              >
+                <Icon className="h-3.5 w-3.5" />
+                {filter.label}
+              </button>
+            )
+          })}
+        </div>
+      )}
 
       {/* Generating / Error */}
       <AnimatePresence>
@@ -287,25 +394,103 @@ export function TrainingTab({ userGoal }: TrainingTabProps) {
         )}
       </AnimatePresence>
 
-      {/* Workout Cards */}
-      {filteredWorkouts.length > 0 ? (
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-          {filteredWorkouts.map((workout, index) => (
-            <WorkoutCard key={`${workout.name}-${index}`} workout={workout} index={index} onStart={setActiveSessionWorkout} onStartLive={setLiveWorkout} onExerciseClick={setSelectedExerciseDetail} />
-          ))}
-        </div>
-      ) : (
-        <div className="rounded-2xl glass-strong p-8 text-center">
-          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-muted">
-            <Swords className="h-7 w-7 text-muted-foreground" />
-          </div>
-          <h3 className="text-lg font-bold text-foreground">{t("training_empty_title")}</h3>
-          <p className="mx-auto mt-2 max-w-sm text-sm text-muted-foreground">{t("training_empty_body")}</p>
-          <Button onClick={() => setShowGeneratorModal(true)} className="mt-5 h-11 rounded-xl bg-foreground px-6 text-sm font-medium text-background hover:bg-foreground/90">
-            {t("training_sync_btn")}
-          </Button>
-        </div>
-      )}
+      {/* Content based on sub-tab */}
+      <AnimatePresence mode="wait">
+        {activeSubTab === "generated" && (
+          <motion.div
+            key="generated"
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+          >
+            {filteredWorkouts.length > 0 ? (
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                {filteredWorkouts.map((workout, index) => (
+                  <WorkoutCard
+                    key={`${workout.name}-${index}`}
+                    workout={workout}
+                    index={index}
+                    onStart={setActiveSessionWorkout}
+                    onStartLive={setLiveWorkout}
+                    onExerciseClick={setSelectedExerciseDetail}
+                    onSave={handleSaveWorkout}
+                    isSaved={isWorkoutSaved(workout.name)}
+                  />
+                ))}
+              </div>
+            ) : (
+              <div className="rounded-2xl glass-strong p-8 text-center">
+                <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-muted">
+                  <Swords className="h-7 w-7 text-muted-foreground" />
+                </div>
+                <h3 className="text-lg font-bold text-foreground">{t("training_empty_title")}</h3>
+                <p className="mx-auto mt-2 max-w-sm text-sm text-muted-foreground">{t("training_empty_body")}</p>
+                <Button onClick={() => setShowGeneratorModal(true)} className="mt-5 h-11 rounded-xl bg-foreground px-6 text-sm font-medium text-background hover:bg-foreground/90">
+                  {t("training_sync_btn")}
+                </Button>
+              </div>
+            )}
+          </motion.div>
+        )}
+
+        {activeSubTab === "saved" && (
+          <motion.div
+            key="saved"
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+          >
+            {savedWorkouts.length > 0 ? (
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                {savedWorkouts.map((saved, index) => (
+                  <SavedWorkoutCard
+                    key={saved.id}
+                    saved={saved}
+                    index={index}
+                    onUnsave={handleUnsaveWorkout}
+                    onStart={setActiveSessionWorkout}
+                    onStartLive={setLiveWorkout}
+                    onExerciseClick={setSelectedExerciseDetail}
+                  />
+                ))}
+              </div>
+            ) : (
+              <div className="rounded-2xl glass-strong p-8 text-center">
+                <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-muted">
+                  <Bookmark className="h-7 w-7 text-muted-foreground" />
+                </div>
+                <h3 className="text-lg font-bold text-foreground">{t("training_saved_title")}</h3>
+                <p className="mx-auto mt-2 max-w-sm text-sm text-muted-foreground">{t("training_saved_empty")}</p>
+              </div>
+            )}
+          </motion.div>
+        )}
+
+        {activeSubTab === "history" && (
+          <motion.div
+            key="history"
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+          >
+            {workoutHistory.length > 0 ? (
+              <div className="space-y-3">
+                {workoutHistory.slice(0, 10).map((entry, index) => (
+                  <HistoryEntry key={entry.id} entry={entry} index={index} />
+                ))}
+              </div>
+            ) : (
+              <div className="rounded-2xl glass-strong p-8 text-center">
+                <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-muted">
+                  <History className="h-7 w-7 text-muted-foreground" />
+                </div>
+                <h3 className="text-lg font-bold text-foreground">{t("training_history_title")}</h3>
+                <p className="mx-auto mt-2 max-w-sm text-sm text-muted-foreground">{t("training_history_empty")}</p>
+              </div>
+            )}
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Generator Modal */}
       <Dialog open={showGeneratorModal} onOpenChange={setShowGeneratorModal}>
@@ -324,11 +509,43 @@ export function TrainingTab({ userGoal }: TrainingTabProps) {
         <ActiveWorkoutSession
           workout={activeSessionWorkout}
           onClose={() => setActiveSessionWorkout(null)}
-          onComplete={() => {
+          onComplete={(data: any) => {
             const result = recordAction("workout")
             if (result.newAchievements.length > 0) {
               toast.success(locale === "en-US" ? `Achievement unlocked!` : `Conquista desbloqueada!`)
             }
+            const entry: WorkoutHistoryEntry = {
+              id: `${activeSessionWorkout.name}-${Date.now()}`,
+              workoutName: activeSessionWorkout.name,
+              category: activeSessionWorkout.category,
+              date: new Date().toISOString(),
+              duration: data?.elapsedTime ? `${Math.floor(data.elapsedTime / 60)}m ${data.elapsedTime % 60}s` : activeSessionWorkout.duration,
+              exercisesCompleted: activeSessionWorkout.exercises.length,
+              totalExercises: activeSessionWorkout.exercises.length,
+              exercises: activeSessionWorkout.exercises,
+            }
+            setWorkoutHistory((prev) => {
+              const next = [entry, ...prev].slice(0, 50)
+              localStorage.setItem("fitverse-workout-history", JSON.stringify(next))
+              return next
+            })
+            setSavedWorkouts((prev) => {
+              const idx = prev.findIndex((s) => s.workout.name === activeSessionWorkout.name)
+              if (idx === -1) return prev
+              const session: WorkoutSession = {
+                date: new Date().toISOString(),
+                exercises: activeSessionWorkout.exercises.map((e) => ({
+                  name: e.name,
+                  weight: typeof e.notes === "string" ? e.notes : undefined,
+                  reps: String(e.reps ?? ""),
+                  sets: String(e.sets ?? ""),
+                })),
+              }
+              const updated = [...prev]
+              updated[idx] = { ...updated[idx], sessions: [...updated[idx].sessions, session] }
+              localStorage.setItem("fitverse-saved-workouts", JSON.stringify(updated))
+              return updated
+            })
             setActiveSessionWorkout(null)
           }}
         />
@@ -353,7 +570,7 @@ export function TrainingTab({ userGoal }: TrainingTabProps) {
   )
 }
 
-function WorkoutCard({ workout, index, onStart, onStartLive, onExerciseClick }: { workout: Workout; index: number; onStart: (workout: Workout) => void; onStartLive: (workout: Workout) => void; onExerciseClick: (exercise: Exercise) => void }) {
+function WorkoutCard({ workout, index, onStart, onStartLive, onExerciseClick, onSave, isSaved }: { workout: Workout; index: number; onStart: (workout: Workout) => void; onStartLive: (workout: Workout) => void; onExerciseClick: (exercise: Exercise) => void; onSave: (workout: Workout) => void; isSaved: boolean }) {
   const { t } = useTranslation()
 
   return (
@@ -427,8 +644,215 @@ function WorkoutCard({ workout, index, onStart, onStartLive, onExerciseClick }: 
           <Button onClick={() => onStartLive(workout)} variant="outline" className="h-11 w-11 rounded-xl border-border px-0">
             <Zap className="h-4 w-4" />
           </Button>
+          <Button
+            onClick={() => onSave(workout)}
+            variant="outline"
+            className={cn(
+              "h-11 w-11 rounded-xl border-border px-0 transition-colors",
+              isSaved ? "bg-brand/10 border-brand/30 text-brand" : ""
+            )}
+          >
+            {isSaved ? <Heart className="h-4 w-4 fill-brand" /> : <HeartOff className="h-4 w-4" />}
+          </Button>
         </div>
       </div>
     </motion.article>
+  )
+}
+
+function SavedWorkoutCard({ saved, index, onUnsave, onStart, onStartLive, onExerciseClick }: { saved: SavedWorkout; index: number; onUnsave: (id: string) => void; onStart: (workout: Workout) => void; onStartLive: (workout: Workout) => void; onExerciseClick: (exercise: Exercise) => void }) {
+  const { t, locale } = useTranslation()
+  const workout = saved.workout
+  const lastSession = saved.sessions[saved.sessions.length - 1]
+  const hasProgression = saved.sessions.length >= 2
+
+  return (
+    <motion.article
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: index * 0.05 }}
+      className="flex flex-col overflow-hidden rounded-2xl glass-strong"
+    >
+      <div className="flex items-center justify-between border-b border-border p-5">
+        <div className="flex items-center gap-3">
+          <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-brand/10">
+            <Star className="h-5 w-5 text-brand fill-brand" />
+          </div>
+          <div>
+            <h3 className="text-base font-bold text-foreground">{workout.name}</h3>
+            <span className="text-xs text-muted-foreground">{workout.category} · {saved.sessions.length} {t("training_history_exercises")}</span>
+          </div>
+        </div>
+        <Badge variant="secondary" className="bg-brand/10 text-brand border-0 text-[10px]">
+          {t("training_saved_badge")}
+        </Badge>
+      </div>
+
+      <div className="flex flex-1 flex-col p-5">
+        <div className="mb-4 flex gap-3">
+          <span className="flex items-center gap-1 rounded-lg bg-muted/50 px-2.5 py-1.5 text-xs text-muted-foreground">
+            <Clock className="h-3 w-3" />
+            {workout.duration}
+          </span>
+          <span className="flex items-center gap-1 rounded-lg bg-muted/50 px-2.5 py-1.5 text-xs text-muted-foreground">
+            <Flame className="h-3 w-3" />
+            {workout.calories}
+          </span>
+        </div>
+
+        {hasProgression && (
+          <div className="mb-4 rounded-xl bg-muted/30 p-3">
+            <div className="flex items-center gap-1.5 mb-2">
+              <TrendingUp className="h-3.5 w-3.5 text-brand" />
+              <span className="text-xs font-medium text-foreground">{t("training_progression_title")}</span>
+            </div>
+            <ProgressionTracker sessions={saved.sessions} locale={locale} />
+          </div>
+        )}
+
+        {lastSession && (
+          <div className="mb-4 rounded-xl bg-muted/30 p-3">
+            <p className="text-[10px] text-muted-foreground mb-1">{t("training_history_date")}: {new Date(lastSession.date).toLocaleDateString(locale === "en-US" ? "en-US" : "pt-BR")}</p>
+            <div className="space-y-1">
+              {lastSession.exercises.slice(0, 3).map((e, i) => (
+                <p key={i} className="text-xs text-foreground">
+                  {e.name} — {e.sets}x{e.reps}{e.weight ? ` @ ${e.weight}` : ""}
+                </p>
+              ))}
+              {lastSession.exercises.length > 3 && (
+                <p className="text-[10px] text-muted-foreground">+{lastSession.exercises.length - 3} more</p>
+              )}
+            </div>
+          </div>
+        )}
+
+        <div className="mb-4 flex-1 space-y-2">
+          {workout.exercises.slice(0, 3).map((exercise, exerciseIndex) => (
+            <button
+              key={`${exercise.name}-${exerciseIndex}`}
+              type="button"
+              onClick={() => onExerciseClick(exercise)}
+              className="flex w-full items-center justify-between rounded-xl bg-muted/30 p-3 text-left transition hover:bg-muted/50"
+            >
+              <div className="flex min-w-0 items-center gap-3">
+                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-muted text-[10px] font-bold text-foreground">{exerciseIndex + 1}</span>
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-medium text-foreground">{exercise.name}</p>
+                  <p className="text-[10px] text-muted-foreground">{exercise.sets}x{exercise.reps} - {exercise.rest}</p>
+                </div>
+              </div>
+              <ArrowRight className="h-3.5 w-3.5 text-muted-foreground/40" />
+            </button>
+          ))}
+        </div>
+
+        <div className="flex gap-2">
+          <Button onClick={() => onStart(workout)} className="flex-1 h-11 rounded-xl bg-brand text-sm font-semibold text-white hover:bg-brand/90">
+            <Play className="mr-2 h-4 w-4 fill-background" />
+            {t("training_start_btn")}
+          </Button>
+          <Button onClick={() => onStartLive(workout)} variant="outline" className="h-11 w-11 rounded-xl border-border px-0">
+            <Zap className="h-4 w-4" />
+          </Button>
+          <Button onClick={() => onUnsave(saved.id)} variant="outline" className="h-11 w-11 rounded-xl border-destructive/30 px-0 text-destructive hover:bg-destructive/10">
+            <HeartOff className="h-4 w-4" />
+          </Button>
+        </div>
+      </div>
+    </motion.article>
+  )
+}
+
+function ProgressionTracker({ sessions, locale }: { sessions: WorkoutSession[]; locale: string }) {
+  const { t } = useTranslation()
+  if (sessions.length < 2) {
+    return <p className="text-xs text-muted-foreground">{t("training_progression_no_data")}</p>
+  }
+
+  const prev = sessions[sessions.length - 2]
+  const curr = sessions[sessions.length - 1]
+
+  const comparisons: { exercise: string; type: "weight" | "reps"; status: "up" | "down" | "same"; prevVal: string; currVal: string }[] = []
+
+  for (const currEx of curr.exercises) {
+    const prevEx = prev.exercises.find((e) => e.name === currEx.name)
+    if (!prevEx) continue
+
+    if (currEx.weight && prevEx.weight && currEx.weight !== prevEx.weight) {
+      const prevNum = parseFloat(prevEx.weight.replace(/[^0-9.]/g, ""))
+      const currNum = parseFloat(currEx.weight.replace(/[^0-9.]/g, ""))
+      comparisons.push({
+        exercise: currEx.name,
+        type: "weight",
+        status: currNum > prevNum ? "up" : currNum < prevNum ? "down" : "same",
+        prevVal: prevEx.weight,
+        currVal: currEx.weight,
+      })
+    }
+
+    if (currEx.reps && prevEx.reps && currEx.reps !== prevEx.reps) {
+      const prevNum = parseInt(prevEx.reps.replace(/[^0-9]/g, ""), 10)
+      const currNum = parseInt(currEx.reps.replace(/[^0-9]/g, ""), 10)
+      if (!isNaN(prevNum) && !isNaN(currNum)) {
+        comparisons.push({
+          exercise: currEx.name,
+          type: "reps",
+          status: currNum > prevNum ? "up" : currNum < prevNum ? "down" : "same",
+          prevVal: prevEx.reps,
+          currVal: currEx.reps,
+        })
+      }
+    }
+  }
+
+  if (comparisons.length === 0) {
+    return <p className="text-xs text-muted-foreground">{t("training_progression_no_data")}</p>
+  }
+
+  return (
+    <div className="space-y-1.5">
+      {comparisons.slice(0, 4).map((c, i) => (
+        <div key={i} className="flex items-center justify-between text-xs">
+          <span className="text-muted-foreground truncate max-w-[120px]">{c.exercise}</span>
+          <div className="flex items-center gap-1.5">
+            <span className="text-muted-foreground">{c.prevVal}</span>
+            <span className="text-muted-foreground/50">→</span>
+            <span className="font-medium text-foreground">{c.currVal}</span>
+            {c.status === "up" && <TrendingUp className="h-3 w-3 text-emerald-500" />}
+            {c.status === "down" && <TrendingDown className="h-3 w-3 text-red-500" />}
+            {c.status === "same" && <Minus className="h-3 w-3 text-muted-foreground/50" />}
+          </div>
+        </div>
+      ))}
+    </div>
+  )
+}
+
+function HistoryEntry({ entry, index }: { entry: WorkoutHistoryEntry; index: number }) {
+  const { t, locale } = useTranslation()
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: index * 0.03 }}
+      className="flex items-center gap-4 rounded-xl glass-strong p-4"
+    >
+      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand/10">
+        <Dumbbell className="h-5 w-5 text-brand" />
+      </div>
+      <div className="min-w-0 flex-1">
+        <p className="text-sm font-medium text-foreground truncate">{entry.workoutName}</p>
+        <div className="flex items-center gap-2 mt-0.5">
+          <span className="text-[10px] text-muted-foreground">
+            {new Date(entry.date).toLocaleDateString(locale === "en-US" ? "en-US" : "pt-BR", { month: "short", day: "numeric" })}
+          </span>
+          <span className="text-muted-foreground/30">·</span>
+          <span className="text-[10px] text-muted-foreground">{entry.duration}</span>
+          <span className="text-muted-foreground/30">·</span>
+          <span className="text-[10px] text-muted-foreground">{entry.exercisesCompleted}/{entry.totalExercises} {t("training_history_exercises")}</span>
+        </div>
+      </div>
+    </motion.div>
   )
 }
