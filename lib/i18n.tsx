@@ -17,7 +17,7 @@ const translations = {
     nav_substitutions: "Troca", nav_periodization: "Periodizar", nav_workout_feedback: "Feedback",
     nav_equipment: "Equipamento", nav_mobility: "Mobilidade", nav_longevity: "Longevidade",
     nav_fasting: "Jejum", nav_biological_age: "Idade", nav_mood: "Humor",
-    nav_habits: "Hábitos", nav_meditation: "Meditação", nav_seasons: "Temporadas",
+    nav_habits: "Hábitos", nav_meditation: "Meditação", nav_seasons: "Tabela de Classificação",
     // Views
     view_home: "Dashboard", view_bioscan: "FitScan", view_recipes: "IA Chef",
     view_training: "Planos", view_profile: "Perfil", view_planner: "Metabolismo",
@@ -636,7 +636,7 @@ const translations = {
     nav_substitutions: "Substitutes", nav_periodization: "Periodization", nav_workout_feedback: "Feedback",
     nav_equipment: "Equipment", nav_mobility: "Mobility", nav_longevity: "Longevity",
     nav_fasting: "Fasting",     nav_biological_age: "Age", nav_mood: "Mood",
-    nav_habits: "Habits", nav_meditation: "Meditation", nav_seasons: "Seasons",
+    nav_habits: "Habits", nav_meditation: "Meditation", nav_seasons: "Leaderboard",
     // Views
     view_home: "Dashboard", view_bioscan: "FitScan", view_recipes: "AI Chef",
     view_training: "Plans", view_profile: "Profile", view_planner: "Metabolism",

@@ -70,7 +70,7 @@ export function DesktopSidebar({ currentView, onNavigate, isFeatureLocked }: Sid
       key: "game", icon: Trophy, label: t("nav_seasons"),
       items: [
         { view: "seasons", icon: Trophy, label: t("nav_seasons"), feature: "seasons" },
-        { view: "battle-pass", icon: Trophy, label: isEnglish ? "Battle Pass" : "Passe de Batalha" },
+        { view: "battle-pass", icon: Zap, label: isEnglish ? "Battle Pass" : "Passe de Batalha" },
       ]
     },
     {

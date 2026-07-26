@@ -304,21 +304,13 @@ export function HealthProfile({ scanHistory, onNavigateToSettings, onNavigateToS
     bmiWeight && bmiHeight && bmiHeight > 0
       ? Math.round((bmiWeight / ((bmiHeight / 100) ** 2)) * 10) / 10
       : null
-  const bmiCategory = bmi
-    ? bmi < 18.5
-      ? "underweight"
-      : bmi < 25
-        ? "normal"
-        : bmi < 30
-          ? "overweight"
-          : "obese"
-    : null
+  const bmiCategory = bmi ? (bmi < 18.5 ? "underweight" : bmi < 25 ? "normal" : bmi < 30 ? "overweight" : "obese") : null
 
   const userLevel = Math.floor(totalXp / 500) + 1
   const xpInLevel = totalXp % 500
   const xpProgress = (xpInLevel / 500) * 100
 
-  const ACHIEVEMENT_ICONS: Record<string, React.ReactNode> = {
+  const ACHIEVEMENT_ICONS = {
     "first-scan": <ScanLine className="h-3 w-3" />,
     "scan-10": <ScanLine className="h-3 w-3" />,
     "scan-50": <ScanLine className="h-3 w-3" />,
@@ -333,18 +325,8 @@ export function HealthProfile({ scanHistory, onNavigateToSettings, onNavigateToS
     "hydration-7": <Heart className="h-3 w-3" />,
   }
 
-  const planLabel =
-    userSubscription === "pro"
-      ? t("hp_plan_pro")
-      : userSubscription === "premium"
-        ? t("hp_plan_premium")
-        : t("hp_plan_free")
-  const planColor =
-    userSubscription === "pro"
-      ? "bg-blue-500/15 text-blue-400 border-blue-500/30"
-      : userSubscription === "premium"
-        ? "bg-yellow-500/15 text-yellow-400 border-yellow-500/30"
-        : "bg-muted text-muted-foreground border-border"
+  const planLabel = userSubscription === "pro" ? t("hp_plan_pro") : userSubscription === "premium" ? t("hp_plan_premium") : t("hp_plan_free")
+  const planColor = userSubscription === "pro" ? "bg-blue-500/15 text-blue-400 border-blue-500/30" : userSubscription === "premium" ? "bg-yellow-500/15 text-yellow-400 border-yellow-500/30" : "bg-muted text-muted-foreground border-border"
 
   const handleSubscriptionClick = () => {
     if (onNavigateToSubscription) {
@@ -609,6 +591,7 @@ export function HealthProfile({ scanHistory, onNavigateToSettings, onNavigateToS
             </div>
           </div>
         ) : (
+          <>
           <div className="grid grid-cols-2 gap-3 md:grid-cols-5">
             {[
               { icon: Calendar, label: t("hp_age"), value: profileData.age ? `${profileData.age} ${t("hp_years")}` : "—" },
@@ -639,27 +622,16 @@ export function HealthProfile({ scanHistory, onNavigateToSettings, onNavigateToS
                 <span
                   className={cn(
                     "rounded-full px-2 py-0.5 text-[10px] font-semibold",
-                    bmiCategory === "normal"
-                      ? "bg-green-500/15 text-green-400"
-                      : bmiCategory === "underweight"
-                        ? "bg-blue-500/15 text-blue-400"
-                        : bmiCategory === "overweight"
-                          ? "bg-yellow-500/15 text-yellow-400"
-                          : "bg-red-500/15 text-red-400"
+                    bmiCategory === "normal" ? "bg-green-500/15 text-green-400" : bmiCategory === "underweight" ? "bg-blue-500/15 text-blue-400" : bmiCategory === "overweight" ? "bg-yellow-500/15 text-yellow-400" : "bg-red-500/15 text-red-400"
                   )}
                 >
-                  {bmiCategory === "underweight"
-                    ? t("hp_bmi_underweight")
-                    : bmiCategory === "normal"
-                      ? t("hp_bmi_normal")
-                      : bmiCategory === "overweight"
-                        ? t("hp_bmi_overweight")
-                        : t("hp_bmi_obese")}
+                  {bmiCategory === "underweight" ? t("hp_bmi_underweight") : bmiCategory === "normal" ? t("hp_bmi_normal") : bmiCategory === "overweight" ? t("hp_bmi_overweight") : t("hp_bmi_obese")}
                 </span>
               </div>
               <p className="mt-1 text-xl font-bold text-foreground">{bmi}</p>
             </motion.div>
           )}
+          </>
         )}
       </motion.section>
 
@@ -798,10 +770,10 @@ function StatCard({
   value,
   children,
 }: {
-  icon: React.ElementType
+  icon: any
   label: string
   value: number
-  children?: React.ReactNode
+  children?: any
 }) {
   return (
     <div className="flex min-h-[150px] flex-col items-center justify-center rounded-xl glass-strong p-3 text-center">

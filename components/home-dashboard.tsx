@@ -78,16 +78,16 @@ export function HomeDashboard({
   const calorieRingOffset = calorieRingCircumference - (progressPercent / 100) * calorieRingCircumference
 
   const motivationQuotes = useMemo(() => [
-    locale === "pt" ? "A disciplina é a ponte entre metas e realizações." : "Discipline is the bridge between goals and accomplishment.",
-    locale === "pt" ? "O corpo alcança o que a mente acredita." : "The body achieves what the mind believes.",
-    locale === "pt" ? "Não treine para ser forte, treine para ser invencível." : "Don't train to be strong, train to be invincible.",
-    locale === "pt" ? "Cada gota de suor te aproxima do seu melhor." : "Every drop of sweat brings you closer to your best self.",
-    locale === "pt" ? "A saúde é a maior riqueza." : "Health is the greatest wealth.",
-    locale === "pt" ? "Pequenos passos todos os dias levam a grandes resultados." : "Small steps every day lead to big results.",
-    locale === "pt" ? "Seu corpo é o reflexo do seu estilo de vida." : "Your body is a reflection of your lifestyle.",
-    locale === "pt" ? "Comece onde você está, use o que tem, faça o que puder." : "Start where you are, use what you have, do what you can.",
-    locale === "pt" ? "A consistência é mais importante que a intensidade." : "Consistency is more important than intensity.",
-    locale === "pt" ? "Invista em você. É o melhor investimento que existe." : "Invest in yourself. It's the best investment there is.",
+    locale === "pt-BR" ? "A disciplina é a ponte entre metas e realizações." : "Discipline is the bridge between goals and accomplishment.",
+    locale === "pt-BR" ? "O corpo alcança o que a mente acredita." : "The body achieves what the mind believes.",
+    locale === "pt-BR" ? "Não treine para ser forte, treine para ser invencível." : "Don't train to be strong, train to be invincible.",
+    locale === "pt-BR" ? "Cada gota de suor te aproxima do seu melhor." : "Every drop of sweat brings you closer to your best self.",
+    locale === "pt-BR" ? "A saúde é a maior riqueza." : "Health is the greatest wealth.",
+    locale === "pt-BR" ? "Pequenos passos todos os dias levam a grandes resultados." : "Small steps every day lead to big results.",
+    locale === "pt-BR" ? "Seu corpo é o reflexo do seu estilo de vida." : "Your body is a reflection of your lifestyle.",
+    locale === "pt-BR" ? "Comece onde você está, use o que tem, faça o que puder." : "Start where you are, use what you have, do what you can.",
+    locale === "pt-BR" ? "A consistência é mais importante que a intensidade." : "Consistency is more important than intensity.",
+    locale === "pt-BR" ? "Invista em você. É o melhor investimento que existe." : "Invest in yourself. It's the best investment there is.",
   ], [locale])
 
   const [motivationalQuote] = useState(() => motivationQuotes[Math.floor(Math.random() * motivationQuotes.length)])
@@ -100,7 +100,7 @@ export function HomeDashboard({
 
   useEffect(() => {
     try {
-      const dayNames = locale === "pt" ? ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"] : ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
+      const dayNames = locale === "pt-BR" ? ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"] : ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
 
       const scanHistory = JSON.parse(localStorage.getItem("fitverse-scan-history") || "[]") as Array<{ scannedAt: string }>
       const hydrationHistory = JSON.parse(localStorage.getItem("fitverse-hydration-history") || "[]") as Array<{ date: string; amount: number }>
@@ -146,8 +146,8 @@ export function HomeDashboard({
         setRecentAchievement(achievementMap[lastId] || null)
       }
 
-      setTodayXP(gamStats.totalScans ? gamStats.totalScans * 10 + gamStats.totalWorkouts * 25 : 0)
-      setTodayCoins(gamStats.totalScans ? gamStats.totalScans * 5 + gamStats.totalWorkouts * 15 : 0)
+      setTodayXP(gamStats.totalScans ? gamStats.totalScans * 10 + (gamStats.totalWorkouts || 0) * 25 : 0)
+      setTodayCoins(gamStats.totalScans ? gamStats.totalScans * 5 + (gamStats.totalWorkouts || 0) * 15 : 0)
     } catch {}
   }, [locale])
 

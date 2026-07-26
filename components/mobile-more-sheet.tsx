@@ -98,7 +98,7 @@ export function MobileMoreSheet({ open, onClose, onNavigate, isFeatureLocked }: 
       title: "Gamification",
       items: [
         { view: "seasons", icon: Trophy, label: t("nav_seasons"), feature: "seasons" },
-        { view: "battle-pass", icon: Trophy, label: isEnglish ? "Battle Pass" : "Passe de Batalha" },
+        { view: "battle-pass", icon: Zap, label: isEnglish ? "Battle Pass" : "Passe de Batalha" },
       ]
     },
     {
