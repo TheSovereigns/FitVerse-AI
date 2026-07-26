@@ -86,7 +86,7 @@ interface Coupon {
 }
 
 function CouponsList() {
-  const { locale } = useTranslation()
+  const { t, locale } = useTranslation()
   const isEnglish = locale === "en-US"
   const [coupons, setCoupons] = useState<Coupon[]>([])
 
@@ -109,7 +109,7 @@ function CouponsList() {
   if (activeCoupons.length === 0 && usedCoupons.length === 0) {
     return (
       <p className="text-xs text-muted-foreground text-center py-4">
-        {isEnglish ? "No coupons yet. Reach tier 5+ to earn discount coupons!" : "Nenhum cupom ainda. Atinga o nivel 5+ para ganhar cupons de desconto!"}
+        {t("bp_no_coupons")}
       </p>
     )
   }
@@ -124,21 +124,21 @@ function CouponsList() {
             </div>
             <div>
               <p className="text-sm font-bold text-foreground">{coupon.code}</p>
-              <p className="text-[10px] text-muted-foreground">{isEnglish ? "Premium discount" : "Desconto Premium"}</p>
+              <p className="text-[10px] text-muted-foreground">{t("bp_premium_discount")}</p>
             </div>
           </div>
           <button
             onClick={() => markUsed(coupon.id)}
             className="rounded-lg bg-brand px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-brand/90"
           >
-            {isEnglish ? "Use" : "Usar"}
+            Use
           </button>
         </div>
       ))}
       {usedCoupons.length > 0 && (
         <details className="group">
           <summary className="cursor-pointer text-xs text-muted-foreground hover:text-foreground">
-            {isEnglish ? `Used (${usedCoupons.length})` : `Usados (${usedCoupons.length})`}
+            {t("bp_used")} ({usedCoupons.length})
           </summary>
           <div className="mt-2 space-y-1">
             {usedCoupons.map((coupon) => (
@@ -224,18 +224,31 @@ export function BattlePass({ isLocked = false }: BattlePassProps) {
     scrollRef.current.scrollBy({ left: amount, behavior: "smooth" })
   }
 
+  const getLocalizedLabel = (label: string): string => {
+    if (isEnglish) {
+      if (label === "+1 Treino") return "+1 Workout"
+      if (label === "+2 Treinos") return "+2 Workouts"
+      if (label === "+3 Treinos") return "+3 Workouts"
+      if (label === "+5 Treinos") return "+5 Workouts"
+      if (label === "+10 Treinos") return "+10 Workouts"
+      if (label === "+12 Treinos") return "+12 Workouts"
+      if (label === "7 Dias Premium") return "7 Days Premium"
+    }
+    return label
+  }
+
   if (isLocked) {
     return (
       <div className="relative overflow-hidden rounded-2xl border border-border p-6">
         <div className="absolute inset-0 bg-muted/50 backdrop-blur-sm flex items-center justify-center z-10">
           <div className="text-center">
             <Lock className="h-10 w-10 mx-auto mb-2 text-muted-foreground" />
-            <p className="font-medium text-foreground">Pro Feature</p>
-            <p className="text-sm text-muted-foreground">{isEnglish ? "Unlock Battle Pass" : "Desbloqueie o Passe de Batalha"}</p>
+            <p className="font-medium text-foreground">{t("bp_pro_feature")}</p>
+            <p className="text-sm text-muted-foreground">{t("bp_unlock_battle_pass")}</p>
           </div>
         </div>
         <div className="opacity-30 pointer-events-none">
-          <h2 className="text-lg font-semibold text-foreground">{isEnglish ? "Battle Pass" : "Passe de Batalha"}</h2>
+          <h2 className="text-lg font-semibold text-foreground">{t("bp_battle_pass")}</h2>
         </div>
       </div>
     )
@@ -258,7 +271,7 @@ export function BattlePass({ isLocked = false }: BattlePassProps) {
               <Trophy className="h-4 w-4 text-purple-400" />
             </div>
             <span className="rounded-full bg-purple-500/20 px-2 py-0.5 text-[10px] font-bold text-purple-400">
-              BATTLE PASS
+              {t("bp_battle_pass")}
             </span>
           </div>
 
@@ -269,7 +282,7 @@ export function BattlePass({ isLocked = false }: BattlePassProps) {
                 <span className="text-sm text-muted-foreground">/ 30</span>
               </div>
               <p className="text-xs text-muted-foreground mt-0.5">
-                {totalXp.toLocaleString()} XP {isEnglish ? "total" : "total"}
+                {totalXp.toLocaleString()} XP {t("bp_total_xp")}
               </p>
             </div>
             <div className="text-right">
@@ -277,7 +290,7 @@ export function BattlePass({ isLocked = false }: BattlePassProps) {
                 {xpInCurrentTier}/{XP_PER_TIER} XP
               </p>
               <p className="text-[10px] text-muted-foreground">
-                {isEnglish ? "to next tier" : "para proximo nivel"}
+                {t("bp_to_next_level")}
               </p>
             </div>
           </div>
@@ -302,7 +315,7 @@ export function BattlePass({ isLocked = false }: BattlePassProps) {
         className="relative"
       >
         <div className="flex items-center justify-between mb-2 px-1">
-          <h3 className="text-sm font-semibold text-foreground">{isEnglish ? "Rewards Track" : "Trilha de Recompensas"}</h3>
+          <h3 className="text-sm font-semibold text-foreground">{t("bp_rewards_track")}</h3>
           <div className="flex gap-1">
             <button
               onClick={() => scrollTo("left")}
@@ -374,7 +387,7 @@ export function BattlePass({ isLocked = false }: BattlePassProps) {
                   "text-center text-[9px] font-semibold leading-tight",
                   unlocked ? "text-foreground" : "text-muted-foreground"
                 )}>
-                  {tier.label}
+                  {getLocalizedLabel(tier.label)}
                 </p>
 
                 {/* Status indicator */}
@@ -431,7 +444,7 @@ export function BattlePass({ isLocked = false }: BattlePassProps) {
                 </div>
                 <div className="flex-1">
                   <div className="flex items-center gap-2">
-                    <h4 className="text-sm font-semibold text-foreground">{selectedTier.label}</h4>
+                    <h4 className="text-sm font-semibold text-foreground">{getLocalizedLabel(selectedTier.label)}</h4>
                     <span
                       className={cn(
                         "rounded-full px-1.5 py-0.5 text-[9px] font-bold uppercase",
@@ -439,11 +452,11 @@ export function BattlePass({ isLocked = false }: BattlePassProps) {
                         rarityColors[selectedTier.rarity].text
                       )}
                     >
-                      {selectedTier.rarity}
+                      {t(`bp_rarity_${selectedTier.rarity}`)}
                     </span>
                   </div>
                   <p className="text-xs text-muted-foreground mt-0.5">
-                    {isEnglish ? "Tier" : "Nivel"} {selectedTier.tier} · {selectedTier.xpRequired.toLocaleString()} XP
+                    {t("bp_current_level")} {selectedTier.tier} · {selectedTier.xpRequired.toLocaleString()} XP
                   </p>
                 </div>
                 {selectedTier.tier <= currentTier && !claimedRewards.includes(selectedTier.tier) && (
@@ -455,7 +468,7 @@ export function BattlePass({ isLocked = false }: BattlePassProps) {
                     className="rounded-lg bg-brand px-4 py-2 text-xs font-semibold text-white transition-colors hover:bg-brand/90"
                   >
                     <span className="flex items-center gap-1">
-                      {isEnglish ? "Claim" : "Resgatar"}
+                      {t("bp_claim")}
                       <ArrowRight className="h-3 w-3" />
                     </span>
                   </button>
@@ -463,7 +476,7 @@ export function BattlePass({ isLocked = false }: BattlePassProps) {
                 {claimedRewards.includes(selectedTier.tier) && (
                   <span className="flex items-center gap-1 rounded-full bg-green-500/10 px-2.5 py-1 text-xs font-medium text-green-400">
                     <Check className="h-3 w-3" />
-                    {isEnglish ? "Claimed" : "Resgatado"}
+                    {t("bp_claimed")}
                   </span>
                 )}
               </div>
@@ -483,7 +496,7 @@ export function BattlePass({ isLocked = false }: BattlePassProps) {
           <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-purple-500/15">
             <Award className="h-3.5 w-3.5 text-purple-400" />
           </div>
-          <h3 className="text-sm font-semibold text-foreground">{isEnglish ? "My Coupons" : "Meus Cupons"}</h3>
+          <h3 className="text-sm font-semibold text-foreground">{t("bp_my_coupons")}</h3>
         </div>
         <CouponsList />
       </motion.div>
@@ -499,14 +512,14 @@ export function BattlePass({ isLocked = false }: BattlePassProps) {
           <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-brand/15">
             <Sparkles className="h-3.5 w-3.5 text-brand" />
           </div>
-          <h3 className="text-sm font-semibold text-foreground">{isEnglish ? "How to Earn XP" : "Como Ganhar XP"}</h3>
+          <h3 className="text-sm font-semibold text-foreground">{t("bp_how_to_earn")}</h3>
         </div>
         <div className="grid grid-cols-2 gap-2">
           {[
-            { icon: "ScanLine", label: isEnglish ? "Scan Food" : "Escanear", xp: isEnglish ? "+10 XP" : "+10 XP" },
-            { icon: "Dumbbell", label: isEnglish ? "Workout" : "Treino", xp: isEnglish ? "+25 XP" : "+25 XP" },
-            { icon: "Droplets", label: isEnglish ? "Track Water" : "Agua", xp: isEnglish ? "+5 XP" : "+5 XP" },
-            { icon: "Target", label: isEnglish ? "Build Habits" : "Habitos", xp: isEnglish ? "+15 XP" : "+15 XP" },
+            { icon: "ScanLine", label: t("bp_scan_food"), xp: "+10 XP" },
+            { icon: "Dumbbell", label: t("bp_workout"), xp: "+25 XP" },
+            { icon: "Droplets", label: t("bp_track_water"), xp: "+5 XP" },
+            { icon: "Target", label: t("bp_build_habits"), xp: "+15 XP" },
           ].map((item, i) => (
             <div key={i} className="flex items-center gap-2 rounded-lg bg-muted/30 p-2.5">
               <span className="text-[10px] font-bold text-brand">{item.xp}</span>

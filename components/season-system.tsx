@@ -63,7 +63,7 @@ const currentSeason = {
   ],
 }
 
-function getLeaderboard(userXp: number) {
+function getLeaderboard(userXp: number, t: (key: string) => string) {
   const players = [
     { name: "FitQueen", emoji: "👑", level: 42 },
     { name: "GymRat99", emoji: "🐀", level: 38 },
@@ -85,7 +85,7 @@ function getLeaderboard(userXp: number) {
 
   entries.push({
     rank: 0,
-    name: "Você",
+    name: t("lb_you"),
     xp: userXp,
     emoji: "💪",
     level: Math.floor(userXp / 500) + 1,
@@ -141,18 +141,18 @@ export function SeasonSystem() {
     currentSeason.challenges.reduce((best, c) => (c.day <= daysElapsed ? c : best), currentSeason.challenges[0])
 
   const gamData = getGamificationData()
-  const leaderboard = getLeaderboard(gamData.xp)
+  const leaderboard = getLeaderboard(gamData.xp, t)
   const userRank = leaderboard.find((e) => e.isUser)?.rank || leaderboard.length
 
   const todayTasks = [
     {
-      label: `${currentChallenge!.workouts} Workout${currentChallenge!.workouts > 1 ? "s" : ""}`,
+      label: `${currentChallenge!.workouts} ${currentChallenge!.workouts > 1 ? t("lb_workouts") : t("lb_workout")}`,
       icon: Dumbbell,
       color: "text-blue-400",
       bg: "bg-blue-500/10",
     },
     {
-      label: `${currentChallenge!.scans} Food Scan${currentChallenge!.scans > 1 ? "s" : ""}`,
+      label: `${currentChallenge!.scans} ${currentChallenge!.scans > 1 ? t("lb_food_scans") : t("lb_food_scan")}`,
       icon: ScanLine,
       color: "text-green-400",
       bg: "bg-green-500/10",
@@ -182,7 +182,7 @@ export function SeasonSystem() {
               <Trophy className="h-4 w-4 text-brand" />
             </div>
             <span className="rounded-full bg-brand/20 px-2 py-0.5 text-[10px] font-bold text-brand">
-              {isEnglish ? "SEASON 3" : "TEMPORADA 3"}
+              {t("lb_season_3")}
             </span>
           </div>
 
@@ -193,13 +193,13 @@ export function SeasonSystem() {
             <div className="flex items-center gap-1.5">
               <Clock className="h-3.5 w-3.5 text-muted-foreground" />
               <span className="text-xs font-medium text-foreground">
-                {isEnglish ? `${daysRemaining}d left` : `${daysRemaining}d restantes`}
+                {`${daysRemaining} ${t("lb_days_left")}`}
               </span>
             </div>
             <div className="flex items-center gap-1.5">
               <Flame className="h-3.5 w-3.5 text-orange-400" />
               <span className="text-xs font-medium text-foreground">
-                {daysElapsed}/{currentSeason.totalDays} {isEnglish ? "days" : "dias"}
+                {daysElapsed}/{currentSeason.totalDays} {t("lb_days")}
               </span>
             </div>
           </div>
@@ -233,10 +233,10 @@ export function SeasonSystem() {
           </div>
           <div className="flex-1">
             <p className="text-sm font-semibold text-foreground">
-              {isEnglish ? "Your Rank" : "Sua Posicao"}
+              {t("lb_your_rank")}
             </p>
             <p className="text-xs text-muted-foreground">
-              {gamData.xp.toLocaleString()} XP {isEnglish ? "earned" : "ganho"}
+              {gamData.xp.toLocaleString()} XP {t("lb_earned")}
             </p>
           </div>
           <div className="flex items-center gap-1 rounded-full bg-brand/20 px-2.5 py-1">
@@ -256,9 +256,9 @@ export function SeasonSystem() {
         className="flex gap-1 rounded-xl border border-border bg-muted/30 p-1"
       >
         {([
-          { id: "leaderboard" as const, icon: Users, label: isEnglish ? "Leaderboard" : "Ranking" },
-          { id: "challenges" as const, icon: Target, label: isEnglish ? "Challenges" : "Desafios" },
-          { id: "rewards" as const, icon: Award, label: isEnglish ? "Rewards" : "Recompensas" },
+          { id: "leaderboard" as const, icon: Users, label: t("lb_leaderboard") },
+          { id: "challenges" as const, icon: Target, label: t("lb_challenges") },
+          { id: "rewards" as const, icon: Award, label: t("lb_rewards") },
         ]).map((tab) => (
           <button
             key={tab.id}
@@ -347,7 +347,7 @@ export function SeasonSystem() {
                       {entry.name}
                       {entry.isUser && (
                         <span className="ml-1.5 text-[9px] font-bold text-brand bg-brand/15 px-1.5 py-0.5 rounded-full">
-                          VOCÊ
+                          {t("lb_you").toUpperCase()}
                         </span>
                       )}
                     </p>
@@ -377,10 +377,10 @@ export function SeasonSystem() {
               <div className="flex items-center gap-2 mb-3">
                 <Sparkles className="h-4 w-4 text-brand" />
                 <h3 className="text-sm font-semibold text-foreground">
-                  {isEnglish ? "Today's Challenges" : "Desafios de Hoje"}
+                  {t("lb_todays_challenges")}
                 </h3>
                 <span className="ml-auto rounded-full bg-brand/15 px-2 py-0.5 text-[10px] font-bold text-brand">
-                  {isEnglish ? `Day ${daysElapsed}` : `Dia ${daysElapsed}`}
+                  {`${t("lb_day")} ${daysElapsed}`}
                 </span>
               </div>
               <div className="space-y-2">
@@ -405,7 +405,7 @@ export function SeasonSystem() {
             {/* Season Challenges Timeline */}
             <div className="rounded-xl border border-border bg-card p-4">
               <h3 className="text-sm font-semibold text-foreground mb-3">
-                {isEnglish ? "Challenge Roadmap" : "Roteiro de Desafios"}
+                {t("lb_challenge_roadmap")}
               </h3>
               <div className="space-y-1">
                 {currentSeason.challenges.map((ch, i) => {
@@ -432,7 +432,7 @@ export function SeasonSystem() {
                       </div>
                       <div className="flex-1">
                         <p className={cn("text-xs font-medium", isCurrent ? "text-foreground" : "text-muted-foreground")}>
-                          {isEnglish ? `Day ${ch.day}` : `Dia ${ch.day}`}
+                          {`${t("lb_day")} ${ch.day}`}
                         </p>
                         <p className="text-[10px] text-muted-foreground">
                           {ch.workouts}W · {ch.scans}S · {ch.water}L
@@ -487,15 +487,17 @@ export function SeasonSystem() {
                     </div>
                     <div className="flex-1">
                       <div className="flex items-center gap-2">
-                        <h4 className="text-sm font-semibold text-foreground">{reward.badge}</h4>
+                      <h4 className="text-sm font-semibold text-foreground">
+                        {reward.badge === "Early Bird" ? (isEnglish ? "Early Bird" : "Madrugador") : reward.badge === "Legend" ? (isEnglish ? "Legend" : "Lenda") : reward.badge}
+                      </h4>
                         {isUnlocked && (
                           <span className="rounded-full bg-green-500/15 px-1.5 py-0.5 text-[9px] font-bold text-green-400">
-                            {isEnglish ? "UNLOCKED" : "DESBLOQUEADO"}
+                            {t("lb_unlocked")}
                           </span>
                         )}
                       </div>
                       <p className="text-xs text-muted-foreground mt-0.5">
-                        {isEnglish ? `Day ${reward.day}` : `Dia ${reward.day}`} · {reward.xp} XP
+                        {`${t("lb_day")} ${reward.day}`} · {reward.xp} XP
                       </p>
                     </div>
                     <div
@@ -517,7 +519,7 @@ export function SeasonSystem() {
                 onClick={() => setShowHistory(!showHistory)}
                 className="flex w-full items-center justify-between rounded-xl border border-border bg-card px-4 py-3 text-sm text-muted-foreground transition-colors hover:bg-muted/30"
               >
-                <span className="font-medium">{isEnglish ? "Past Seasons" : "Temporadas Anteriores"}</span>
+                <span className="font-medium">{t("lb_past_seasons")}</span>
                 <ChevronDown
                   className={cn("h-4 w-4 transition-transform", showHistory && "rotate-180")}
                 />
@@ -533,7 +535,7 @@ export function SeasonSystem() {
                     <div className="mt-2 space-y-2">
                       {seasonHistory.length === 0 ? (
                         <p className="p-3 text-center text-xs text-muted-foreground">
-                          {isEnglish ? "No past seasons yet" : "Nenhuma temporada anterior ainda"}
+                          {t("lb_no_past_seasons")}
                         </p>
                       ) : (
                         seasonHistory.map((s) => (

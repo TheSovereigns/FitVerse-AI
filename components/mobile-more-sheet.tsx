@@ -56,7 +56,7 @@ export function MobileMoreSheet({ open, onClose, onNavigate, isFeatureLocked }: 
         { view: "stress", icon: Brain, label: t("nav_stress"), feature: "stress" },
         { view: "health-checkin", icon: Activity, label: t("nav_health_checkin"), feature: "health-checkin" },
         { view: "supplements", icon: Apple, label: t("nav_supplements"), feature: "supplements" },
-        { view: "smart-reminders", icon: Bell, label: isEnglish ? "Reminders" : "Lembretes" },
+        { view: "smart-reminders", icon: Bell, label: t("misc_reminders") },
       ]
     },
     {
@@ -79,7 +79,7 @@ export function MobileMoreSheet({ open, onClose, onNavigate, isFeatureLocked }: 
       ]
     },
     {
-      title: "Fitness",
+      title: t("common_fitness"),
       items: [
         { view: "longevity", icon: Heart, label: t("nav_longevity") },
         { view: "fasting", icon: Timer, label: t("nav_fasting"), feature: "fasting" },
@@ -87,7 +87,7 @@ export function MobileMoreSheet({ open, onClose, onNavigate, isFeatureLocked }: 
       ]
     },
     {
-      title: "Mental",
+      title: t("common_mental"),
       items: [
         { view: "mood", icon: Smile, label: t("nav_mood"), feature: "mood" },
         { view: "habits", icon: ListChecks, label: t("nav_habits") },
@@ -95,28 +95,28 @@ export function MobileMoreSheet({ open, onClose, onNavigate, isFeatureLocked }: 
       ]
     },
     {
-      title: "Gamification",
+      title: t("common_gamification"),
       items: [
         { view: "seasons", icon: Trophy, label: t("nav_seasons"), feature: "seasons" },
-        { view: "battle-pass", icon: Zap, label: isEnglish ? "Battle Pass" : "Passe de Batalha" },
+        { view: "battle-pass", icon: Zap, label: t("bp_battle_pass") },
       ]
     },
     {
-      title: isEnglish ? "Tracking" : "Acompanhamento",
+      title: t("common_tracking"),
       items: [
-        { view: "food-diary", icon: Utensils, label: isEnglish ? "Food Diary" : "Diario Alimentar" },
-        { view: "body", icon: Ruler, label: isEnglish ? "Body Measurements" : "Medidas Corporais" },
+        { view: "food-diary", icon: Utensils, label: t("misc_food_diary") },
+        { view: "body", icon: Ruler, label: t("misc_body_measurements") },
       ]
     },
     {
-      title: isEnglish ? "Progress" : "Progresso",
+      title: t("common_progress"),
       items: [
-        { view: "weekly-report", icon: Calendar, label: isEnglish ? "Weekly Report" : "Rel. Semanal" },
-        { view: "body-evolution", icon: TrendingUp, label: isEnglish ? "Body Evolution" : "Evolucao" },
-        { view: "streak-calendar", icon: Flame, label: isEnglish ? "Streak" : "Sequencia" },
-        { view: "achievements-page", icon: Trophy, label: isEnglish ? "Achievements" : "Conquistas" },
-        { view: "analytics-charts", icon: BarChart3, label: isEnglish ? "Analytics" : "Analises" },
-        { view: "monthly-report", icon: Calendar, label: isEnglish ? "Monthly Report" : "Rel. Mensal" },
+        { view: "weekly-report", icon: Calendar, label: t("misc_weekly_report") },
+        { view: "body-evolution", icon: TrendingUp, label: t("misc_body_evolution") },
+        { view: "streak-calendar", icon: Flame, label: t("misc_streak") },
+        { view: "achievements-page", icon: Trophy, label: t("misc_achievements") },
+        { view: "analytics-charts", icon: BarChart3, label: t("misc_analytics") },
+        { view: "monthly-report", icon: Calendar, label: t("misc_monthly_report") },
       ]
     },
   ]

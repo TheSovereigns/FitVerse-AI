@@ -21,19 +21,21 @@ interface HabitLog {
 
 interface HabitBuilderProps {}
 
-const defaultHabits: Habit[] = [
-  { id: "water", name: "Drink 2L water", icon: "💧", custom: false },
-  { id: "sleep", name: "Sleep 7h+", icon: "😴", custom: false },
-  { id: "walk", name: "Walk 8000 steps", icon: "🚶", custom: false },
-  { id: "vitamins", name: "Take vitamins", icon: "💊", custom: false },
-  { id: "meditate", name: "Meditate 5min", icon: "🧘", custom: false },
-  { id: "no-sugar", name: "No sugar", icon: "🚫", custom: false },
-  { id: "read", name: "Read 10min", icon: "📖", custom: false },
-];
+function getDefaultHabits(t: (key: string) => string): Habit[] {
+  return [
+    { id: "water", name: t("hb_habit_drink_water"), icon: "💧", custom: false },
+    { id: "sleep", name: t("hb_habit_sleep"), icon: "😴", custom: false },
+    { id: "walk", name: t("hb_habit_walk"), icon: "🚶", custom: false },
+    { id: "vitamins", name: t("hb_habit_vitamins"), icon: "💊", custom: false },
+    { id: "meditate", name: t("hb_habit_meditate"), icon: "🧘", custom: false },
+    { id: "no-sugar", name: t("hb_habit_no_sugar"), icon: "🚫", custom: false },
+    { id: "read", name: t("hb_habit_read"), icon: "📖", custom: false },
+  ];
+}
 
 export function HabitBuilder({}: HabitBuilderProps) {
-  const { t } = useTranslation();
-  const [habits, setHabits] = useState<Habit[]>(defaultHabits);
+  const { t, locale } = useTranslation();
+  const [habits, setHabits] = useState<Habit[]>(() => getDefaultHabits(t));
   const [logs, setLogs] = useState<HabitLog[]>([]);
   const [newHabitName, setNewHabitName] = useState("");
   const [showAdd, setShowAdd] = useState(false);
@@ -42,7 +44,7 @@ export function HabitBuilder({}: HabitBuilderProps) {
     try {
       const storedHabits = localStorage.getItem("habit_list");
       const storedLogs = localStorage.getItem("habit_logs");
-      if (storedHabits) setHabits([...defaultHabits, ...JSON.parse(storedHabits)]);
+      if (storedHabits) setHabits([...getDefaultHabits(t), ...JSON.parse(storedHabits)]);
       if (storedLogs) setLogs(JSON.parse(storedLogs));
     } catch (e) {
       logger.error("[HabitBuilder] Failed to parse habit_list/habit_logs:", e)
@@ -127,7 +129,7 @@ export function HabitBuilder({}: HabitBuilderProps) {
     const log = logs.find((l) => l.date === dateStr);
     const completed = log?.completed.length || 0;
     return {
-      day: d.toLocaleDateString("en", { weekday: "short" }),
+      day: d.toLocaleDateString(locale, { weekday: "short" }),
       rate: habits.length ? Math.round((completed / habits.length) * 100) : 0,
     };
   });
@@ -137,7 +139,7 @@ export function HabitBuilder({}: HabitBuilderProps) {
   return (
     <div className="glass-strong border border-border rounded-2xl p-6">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-semibold text-foreground">Habit Builder</h2>
+        <h2 className="text-lg font-semibold text-foreground">{t("hb_title")}</h2>
         <div className="flex items-center gap-1 text-sm border-brand/20 bg-brand-muted px-2 py-0.5 rounded-lg">
           <Zap className="w-4 h-4 text-brand" />
           <span>{totalXp} XP</span>
@@ -146,7 +148,7 @@ export function HabitBuilder({}: HabitBuilderProps) {
 
       <div className="mb-6">
         <div className="flex items-center justify-between mb-2">
-          <span className="text-sm text-muted-foreground">Daily Progress</span>
+          <span className="text-sm text-muted-foreground">{t("hb_daily_progress")}</span>
           <span className="text-sm font-medium text-foreground">{dailyPercent}%</span>
         </div>
         <div className="w-full h-2 bg-muted rounded-full overflow-hidden">
@@ -200,7 +202,7 @@ export function HabitBuilder({}: HabitBuilderProps) {
       </div>
 
       <div className="mb-6">
-        <h3 className="text-sm font-medium text-foreground mb-2">Weekly Heatmap</h3>
+        <h3 className="text-sm font-medium text-foreground mb-2">{t("hb_weekly_heatmap")}</h3>
         <div className="flex gap-1">
           {weeklyData.map((d, i) => (
             <div key={i} className="flex-1 text-center">
@@ -229,7 +231,7 @@ export function HabitBuilder({}: HabitBuilderProps) {
                 type="text"
                 value={newHabitName}
                 onChange={(e) => setNewHabitName(e.target.value)}
-                placeholder="New habit name"
+                placeholder={t("hb_new_habit_placeholder")}
                 className="flex-1 px-3 py-2 rounded-xl border border-border bg-card text-foreground text-sm focus:outline-none focus:ring-1 focus:ring-ring"
                 onKeyDown={(e) => e.key === "Enter" && addCustomHabit()}
               />
@@ -237,7 +239,7 @@ export function HabitBuilder({}: HabitBuilderProps) {
                 onClick={addCustomHabit}
                 className="px-3 py-2 rounded-xl bg-brand text-white text-sm"
               >
-                Add
+                {t("hb_add")}
               </button>
             </div>
           </motion.div>
@@ -248,7 +250,7 @@ export function HabitBuilder({}: HabitBuilderProps) {
             className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-xl border border-border text-sm text-muted-foreground hover:bg-muted transition-colors"
           >
             <Plus className="w-4 h-4" />
-            Add Custom Habit
+            {t("hb_add_custom")}
           </motion.button>
         )}
       </AnimatePresence>

@@ -30,7 +30,7 @@ function safeGet<T>(key: string, fallback: T): T {
 }
 
 export function WeeklyReport() {
-  const { locale } = useTranslation()
+  const { t, locale } = useTranslation()
   const isEnglish = locale === "en-US"
   const dateLocale = isEnglish ? enUS : ptBR
 
@@ -65,9 +65,9 @@ export function WeeklyReport() {
   }, [])
 
   const stats = [
-    { icon: ScanLine, label: isEnglish ? "Scans" : "Scans", value: data.weekScans, color: "text-blue-400" },
+    { icon: ScanLine, label: t("wr_scans"), value: data.weekScans, color: "text-blue-400" },
     { icon: Dumbbell, label: isEnglish ? "Workouts" : "Treinos", value: data.totalWorkouts, color: "text-green-400" },
-    { icon: Droplets, label: isEnglish ? "Water (L)" : "Agua (L)", value: (data.weekWater).toFixed(1), color: "text-cyan-400" },
+    { icon: Droplets, label: t("wr_water"), value: (data.weekWater).toFixed(1), color: "text-cyan-400" },
     { icon: Heart, label: isEnglish ? "Habits" : "Habitos", value: data.weekHabits, color: "text-red-400" },
     { icon: Zap, label: "XP", value: data.xp.toLocaleString(), color: "text-yellow-400" },
     { icon: Star, label: isEnglish ? "Coins" : "Moedas", value: data.coins.toLocaleString(), color: "text-orange-400" },
@@ -77,7 +77,7 @@ export function WeeklyReport() {
     <div className="glass-strong border border-border rounded-2xl p-6">
       <div className="flex items-center gap-2 mb-4">
         <Calendar className="w-5 h-5 text-brand" />
-        <h2 className="text-lg font-semibold text-foreground">{isEnglish ? "Weekly Report" : "Relatorio Semanal"}</h2>
+        <h2 className="text-lg font-semibold text-foreground">{t("wr_weekly_report")}</h2>
       </div>
 
       <p className="text-xs text-muted-foreground mb-4">

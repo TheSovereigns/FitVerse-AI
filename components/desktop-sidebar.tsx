@@ -46,7 +46,7 @@ export function DesktopSidebar({ currentView, onNavigate, isFeatureLocked }: Sid
         { view: "fasting", icon: Timer, label: t("nav_fasting"), feature: "fasting" },
         { view: "longevity", icon: Heart, label: t("nav_longevity") },
         { view: "biological-age", icon: Smile, label: t("nav_biological_age"), feature: "biological-age" },
-        { view: "smart-reminders", icon: Bell, label: isEnglish ? "Reminders" : "Lembretes" },
+        { view: "smart-reminders", icon: Bell, label: t("misc_reminders") },
       ]
     },
     {
@@ -70,18 +70,18 @@ export function DesktopSidebar({ currentView, onNavigate, isFeatureLocked }: Sid
       key: "game", icon: Trophy, label: t("nav_seasons"),
       items: [
         { view: "seasons", icon: Trophy, label: t("nav_seasons"), feature: "seasons" },
-        { view: "battle-pass", icon: Zap, label: isEnglish ? "Battle Pass" : "Passe de Batalha" },
+        { view: "battle-pass", icon: Zap, label: t("bp_battle_pass") },
       ]
     },
     {
-      key: "progress", icon: TrendingUp, label: isEnglish ? "Progress" : "Progresso",
+      key: "progress", icon: TrendingUp, label: t("common_progress"),
       items: [
-        { view: "weekly-report", icon: Calendar, label: isEnglish ? "Weekly Report" : "Rel. Semanal" },
-        { view: "body-evolution", icon: TrendingUp, label: isEnglish ? "Body Evolution" : "Evolucao" },
-        { view: "streak-calendar", icon: Flame, label: isEnglish ? "Streak" : "Sequencia" },
-        { view: "achievements-page", icon: Trophy, label: isEnglish ? "Achievements" : "Conquistas" },
-        { view: "analytics-charts", icon: BarChart3, label: isEnglish ? "Analytics" : "Analises" },
-        { view: "monthly-report", icon: Calendar, label: isEnglish ? "Monthly Report" : "Rel. Mensal" },
+        { view: "weekly-report", icon: Calendar, label: t("misc_weekly_report") },
+        { view: "body-evolution", icon: TrendingUp, label: t("misc_body_evolution") },
+        { view: "streak-calendar", icon: Flame, label: t("misc_streak") },
+        { view: "achievements-page", icon: Trophy, label: t("misc_achievements") },
+        { view: "analytics-charts", icon: BarChart3, label: t("misc_analytics") },
+        { view: "monthly-report", icon: Calendar, label: t("misc_monthly_report") },
       ]
     },
   ]
@@ -179,16 +179,16 @@ export function DesktopSidebar({ currentView, onNavigate, isFeatureLocked }: Sid
           className={cn("flex items-center gap-2 w-full py-1.5 rounded-xl transition-all", currentView === "food-diary" ? "bg-brand-muted text-brand" : "text-muted-foreground hover:text-foreground hover:bg-muted/50", isWide ? "px-2" : "flex-col px-0")}
         >
           <Utensils className="w-[18px] h-[18px] shrink-0" />
-          {isWide && <span className="text-xs font-medium truncate">{isEnglish ? "Diary" : "Diario"}</span>}
-          {!isWide && <span className="text-[7px] font-medium leading-none">{isEnglish ? "Diary" : "Diario"}</span>}
+          {isWide && <span className="text-xs font-medium truncate">{t("common_diary")}</span>}
+          {!isWide && <span className="text-[7px] font-medium leading-none">{t("common_diary")}</span>}
         </button>
         <button
           onClick={() => onNavigate("body")}
           className={cn("flex items-center gap-2 w-full py-1.5 rounded-xl transition-all", currentView === "body" ? "bg-brand-muted text-brand" : "text-muted-foreground hover:text-foreground hover:bg-muted/50", isWide ? "px-2" : "flex-col px-0")}
         >
           <Ruler className="w-[18px] h-[18px] shrink-0" />
-          {isWide && <span className="text-xs font-medium truncate">{isEnglish ? "Body" : "Corpo"}</span>}
-          {!isWide && <span className="text-[7px] font-medium leading-none">{isEnglish ? "Body" : "Corpo"}</span>}
+          {isWide && <span className="text-xs font-medium truncate">{t("common_body")}</span>}
+          {!isWide && <span className="text-[7px] font-medium leading-none">{t("common_body")}</span>}
         </button>
       </nav>
 
@@ -198,8 +198,8 @@ export function DesktopSidebar({ currentView, onNavigate, isFeatureLocked }: Sid
           className={cn("flex items-center gap-2 w-full py-1.5 rounded-xl transition-all", currentView === "chatbot" ? "bg-brand-muted text-brand" : "text-muted-foreground hover:text-foreground hover:bg-muted/50", isWide ? "px-2" : "flex-col px-0")}
         >
           <MessageCircle className="w-[18px] h-[18px] shrink-0" />
-          {isWide && <span className="text-xs font-medium truncate">Chat</span>}
-          {!isWide && <span className="text-[7px] font-medium leading-none">Chat</span>}
+          {isWide && <span className="text-xs font-medium truncate">{t("common_chat")}</span>}
+          {!isWide && <span className="text-[7px] font-medium leading-none">{t("common_chat")}</span>}
         </button>
         <button
           onClick={() => onNavigate("profile")}

@@ -253,7 +253,7 @@ export function HomeDashboard({
             <div className="absolute inset-0 flex flex-col items-center justify-center">
               <Flame className="h-4 w-4 text-brand mb-0.5" />
               <span className="text-2xl font-bold text-foreground">{goals ? remainingCalories : "--"}</span>
-              <span className="text-[10px] text-muted-foreground">kcal left</span>
+              <span className="text-[10px] text-muted-foreground">{t("hd_kcal_left")}</span>
             </div>
           </div>
 
@@ -268,9 +268,9 @@ export function HomeDashboard({
               </div>
 
               <div className="grid grid-cols-3 gap-2">
-                <MacroPill label="P" value={`${Math.round(dailyTotals.protein)}g`} color="text-brand" />
-                <MacroPill label="C" value={`${Math.round(dailyTotals.carbs)}g`} color="text-warning" />
-                <MacroPill label="G" value={`${Math.round(dailyTotals.fat)}g`} color="text-destructive" />
+                <MacroPill label={t("common_p")} value={`${Math.round(dailyTotals.protein)}g`} color="text-brand" />
+                <MacroPill label={t("common_c")} value={`${Math.round(dailyTotals.carbs)}g`} color="text-warning" />
+                <MacroPill label={t("common_g")} value={`${Math.round(dailyTotals.fat)}g`} color="text-destructive" />
               </div>
 
               <Button

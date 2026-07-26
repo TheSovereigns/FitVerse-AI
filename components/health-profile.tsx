@@ -703,9 +703,9 @@ export function HealthProfile({ scanHistory, onNavigateToSettings, onNavigateToS
         className="grid grid-cols-3 gap-3"
       >
         {[
-          { label: "Healthy", value: distribution.healthy, color: "bg-brand" },
-          { label: "Moderate", value: distribution.moderate, color: "bg-warning" },
-          { label: "Risk", value: distribution.poor, color: "bg-destructive" },
+          { label: t("common_healthy"), value: distribution.healthy, color: "bg-brand" },
+          { label: t("common_moderate"), value: distribution.moderate, color: "bg-warning" },
+          { label: t("common_risk"), value: distribution.poor, color: "bg-destructive" },
         ].map((item) => (
           <div key={item.label} className="rounded-xl glass-strong p-4">
             <div className="flex items-center justify-between mb-2">
@@ -752,7 +752,7 @@ export function HealthProfile({ scanHistory, onNavigateToSettings, onNavigateToS
           </div>
           <div>
             <h3 className="text-sm font-semibold text-foreground">{t("summary_title") || "Resumo do Dia"}</h3>
-            <p className="text-[10px] text-muted-foreground">FitVerse activity</p>
+            <p className="text-[10px] text-muted-foreground">{t("common_fitverse_activity")}</p>
           </div>
         </div>
         <DailySummary />

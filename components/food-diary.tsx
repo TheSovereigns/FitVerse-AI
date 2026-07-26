@@ -91,10 +91,10 @@ export function FoodDiary({ onBack }: { onBack: () => void }) {
       {/* Totals */}
       <div className="grid grid-cols-4 gap-3">
         {[
-          { label: "kcal", value: totals.cal, color: "text-brand" },
-          { label: "P", value: totals.pro, color: "text-blue-400" },
-          { label: "C", value: totals.carb, color: "text-yellow-400" },
-          { label: "G", value: totals.fat, color: "text-rose-400" },
+          { label: t("fd_kcal"), value: totals.cal, color: "text-brand" },
+          { label: t("common_p"), value: totals.pro, color: "text-blue-400" },
+          { label: t("common_c"), value: totals.carb, color: "text-yellow-400" },
+          { label: t("common_g"), value: totals.fat, color: "text-rose-400" },
         ].map(m => (
           <div key={m.label} className="glass-strong rounded-xl p-3 text-center">
             <p className={cn("text-lg font-bold", m.color)}>{m.value}</p>
@@ -113,7 +113,7 @@ export function FoodDiary({ onBack }: { onBack: () => void }) {
               <div className="flex items-center gap-2">
                 <meal.icon className="w-4 h-4 text-muted-foreground" />
                 <span className="text-sm font-semibold text-foreground">{meal.label[locale] || meal.label["pt-BR"]}</span>
-                <span className="text-xs text-muted-foreground">{mealCal} kcal</span>
+                <span className="text-xs text-muted-foreground">{mealCal} {t("fd_kcal")}</span>
               </div>
               <button onClick={() => { setSelectedMeal(meal.key); setShowAdd(true) }} className="w-7 h-7 rounded-lg bg-brand/10 flex items-center justify-center text-brand hover:bg-brand/20 transition-colors">
                 <Plus className="w-4 h-4" />
@@ -174,10 +174,10 @@ export function FoodDiary({ onBack }: { onBack: () => void }) {
 
               <div className="grid grid-cols-4 gap-2">
                 {[
-                  { key: "calories", label: "kcal" },
-                  { key: "protein", label: "P (g)" },
-                  { key: "carbs", label: "C (g)" },
-                  { key: "fat", label: "G (g)" },
+                  { key: "calories", label: t("fd_kcal") },
+                  { key: "protein", label: t("fd_protein_g") },
+                  { key: "carbs", label: t("fd_carbs_g") },
+                  { key: "fat", label: t("fd_fat_g") },
                 ].map(f => (
                   <Input key={f.key} type="number" value={(form as any)[f.key]}
                     onChange={e => setForm({...form, [f.key]: e.target.value})}

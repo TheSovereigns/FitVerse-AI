@@ -47,7 +47,7 @@ interface HabitLog {
 }
 
 export function MonthlyReport() {
-  const { locale } = useTranslation()
+  const { t, locale } = useTranslation()
   const isEnglish = locale === "en-US"
   const dateLocale = isEnglish ? enUS : ptBR
 
@@ -135,9 +135,9 @@ export function MonthlyReport() {
   }, [])
 
   const stats = [
-    { icon: ScanLine, label: isEnglish ? "Scans" : "Scans", value: data.monthScans, color: "text-blue-400" },
+    { icon: ScanLine, label: t("mr_scans"), value: data.monthScans, color: "text-blue-400" },
     { icon: Dumbbell, label: isEnglish ? "Workouts" : "Treinos", value: data.monthWorkouts, color: "text-green-400" },
-    { icon: Droplets, label: isEnglish ? "Water (L)" : "Agua (L)", value: data.monthWater.toFixed(1), color: "text-cyan-400" },
+    { icon: Droplets, label: t("mr_water"), value: data.monthWater.toFixed(1), color: "text-cyan-400" },
     { icon: Heart, label: isEnglish ? "Habits" : "Habitos", value: data.monthHabits, color: "text-red-400" },
     { icon: Zap, label: "XP", value: data.xp.toLocaleString(), color: "text-yellow-400" },
     { icon: Star, label: isEnglish ? "Coins" : "Moedas", value: data.coins.toLocaleString(), color: "text-orange-400" },
@@ -152,7 +152,7 @@ export function MonthlyReport() {
       <div className="flex items-center gap-2 mb-1">
         <Calendar className="w-5 h-5 text-brand" />
         <h2 className="text-lg font-semibold text-foreground">
-          {isEnglish ? "Monthly Report" : "Relatorio Mensal"}
+          {t("mr_monthly_report")}
         </h2>
       </div>
       <p className="text-xs text-muted-foreground mb-4">
@@ -298,7 +298,7 @@ export function MonthlyReport() {
                 </div>
                 <div className="flex items-center gap-3">
                   <span className="text-[10px] text-muted-foreground">
-                    {food.count} {isEnglish ? "scans" : "scans"}
+                    {food.count} {t("mr_scans_lower")}
                   </span>
                   <span className="text-xs font-semibold text-brand">
                     {food.avgScore}

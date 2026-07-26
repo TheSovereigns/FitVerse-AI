@@ -17,7 +17,7 @@ interface DailySummary {
 }
 
 export function DailySummary() {
-  const { t } = useTranslation()
+  const { t, locale } = useTranslation()
   const { plan } = usePlanLimits()
   const isPremium = plan === "pro" || plan === "premium"
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split("T")[0])
@@ -98,7 +98,7 @@ export function DailySummary() {
       
       days.push({
         date: dateStr,
-        dayName: date.toLocaleDateString("pt-BR", { weekday: "short" }),
+        dayName: date.toLocaleDateString(locale ?? "en-US", { weekday: "short" }),
         scans: dayScans.length,
         calories: dayMacros.calories,
         protein: dayMacros.protein,
@@ -137,7 +137,7 @@ export function DailySummary() {
 
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr)
-    return date.toLocaleDateString("pt-BR", { day: "numeric", month: "long" })
+    return date.toLocaleDateString(locale ?? "en-US", { day: "numeric", month: "long" })
   }
 
   return (
@@ -205,22 +205,22 @@ export function DailySummary() {
           <div className="text-center">
             <Flame className="w-5 h-5 mx-auto mb-1 text-[#FF453A]" />
             <p className="text-xl font-black">{totalMacros.calories}</p>
-            <p className="text-xs opacity-40">KCAL</p>
+            <p className="text-xs opacity-40">{t("common_kcal")}</p>
           </div>
           <div className="text-center">
             <Dumbbell className="w-5 h-5 mx-auto mb-1 text-[#0A84FF]" />
             <p className="text-xl font-black">{totalMacros.protein}g</p>
-            <p className="text-xs opacity-40">PROT</p>
+            <p className="text-xs opacity-40">{t("common_protein")}</p>
           </div>
           <div className="text-center">
             <Wheat className="w-5 h-5 mx-auto mb-1 text-[#FFD60A]" />
             <p className="text-xl font-black">{totalMacros.carbs}g</p>
-            <p className="text-xs opacity-40">CARB</p>
+            <p className="text-xs opacity-40">{t("common_carbs")}</p>
           </div>
           <div className="text-center">
             <Droplets className="w-5 h-5 mx-auto mb-1 text-[#FF375F]" />
             <p className="text-xl font-black">{totalMacros.fat}g</p>
-            <p className="text-xs opacity-40">FAT</p>
+            <p className="text-xs opacity-40">{t("common_fat")}</p>
           </div>
         </div>
       </div>
@@ -282,7 +282,7 @@ export function DailySummary() {
                   <div>
                     <p className="font-bold">{item.productName}</p>
                     <p className="text-xs opacity-40">
-                      {item.macros?.calories || 0} KCAL
+                      {item.macros?.calories || 0} {t("common_kcal")}
                     </p>
                   </div>
                 </div>
@@ -303,8 +303,8 @@ export function DailySummary() {
               <div key={i} className="glass-strong border-white/10 rounded-xl p-4 flex items-center gap-3">
                 <Dumbbell className="w-6 h-6 text-foreground" />
                 <div>
-                  <p className="font-bold">{workout.name || "Treino"}</p>
-                  <p className="text-xs opacity-40">{workout.exercises?.length || 0} exercícios</p>
+                  <p className="font-bold">{workout.name || t("ds_workout")}</p>
+                  <p className="text-xs opacity-40">{workout.exercises?.length || 0} {t("ds_exercises")}</p>
                 </div>
               </div>
             ))}
@@ -313,8 +313,8 @@ export function DailySummary() {
               <div key={i} className="glass-strong border-emerald-500/20 rounded-xl p-4 flex items-center gap-3">
                 <Wheat className="w-6 h-6 text-emerald-400" />
                 <div>
-                  <p className="font-bold">{diet.name || "Dieta"}</p>
-                  <p className="text-xs opacity-40">{diet.meals?.length || 0} refeições</p>
+                  <p className="font-bold">{diet.name || t("ds_diet")}</p>
+                  <p className="text-xs opacity-40">{diet.meals?.length || 0} {t("ds_meals")}</p>
                 </div>
               </div>
             ))}
