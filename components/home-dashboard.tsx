@@ -40,7 +40,7 @@ export function HomeDashboard({
   const [waterCups, setWaterCups] = useState(0)
 
   const dailyTotals = useMemo(() => {
-    if (!dailyActivity.scannedProducts || dailyActivity.scannedProducts.length === 0) {
+    if (!dailyActivity?.scannedProducts || dailyActivity.scannedProducts.length === 0) {
       return { calories: 0, protein: 0, carbs: 0, fat: 0 }
     }
     return dailyActivity.scannedProducts.reduce((acc: any, product: any) => {
@@ -59,7 +59,7 @@ export function HomeDashboard({
   const progressPercent = goals ? Math.min(Math.round((consumedCalories / goals.calories) * 100), 100) : 0
 
   const averageLongevityScore = useMemo(() => {
-    if (!dailyActivity.scannedProducts || dailyActivity.scannedProducts.length === 0) return 0
+    if (!dailyActivity?.scannedProducts || dailyActivity.scannedProducts.length === 0) return 0
     const total = dailyActivity.scannedProducts.reduce((acc: number, product: any) => acc + (product.longevityScore || 0), 0)
     return Math.round(total / dailyActivity.scannedProducts.length)
   }, [dailyActivity.scannedProducts])
@@ -394,7 +394,7 @@ export function HomeDashboard({
           </Button>
         </div>
 
-        {dailyActivity.scannedProducts.length > 0 ? (
+        {dailyActivity?.scannedProducts?.length > 0 ? (
           <div className="space-y-2">
             {dailyActivity.scannedProducts.slice(0, 3).map((product: any, index: number) => (
               <motion.div

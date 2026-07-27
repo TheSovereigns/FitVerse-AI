@@ -218,9 +218,9 @@ function WearableSection() {
   }
 
   const items = [
-    { id: "google_fit", name: "Google Fit", icon: Activity },
-    { id: "apple_health", name: "Apple Health", icon: Heart },
-    { id: "fitbit", name: "Fitbit", icon: Watch },
+    { id: "google_fit", name: t("sp_google_fit"), icon: Activity },
+    { id: "apple_health", name: t("sp_apple_health"), icon: Heart },
+    { id: "fitbit", name: t("sp_fitbit"), icon: Watch },
   ]
 
   return (
@@ -230,7 +230,7 @@ function WearableSection() {
           <Watch className="h-4 w-4" />
         </div>
         <div>
-          <h3 className="text-sm font-medium text-foreground">Wearables</h3>
+          <h3 className="text-sm font-medium text-foreground">{t("sp_wearables")}</h3>
           <p className="text-xs text-muted-foreground">
             {Object.values(connected).some(Boolean) ? t("sp_wearables_connected") : t("sp_wearables_not_connected")}
           </p>
@@ -461,9 +461,9 @@ export function SettingsPage({ onBack }: { onBack?: () => void }) {
       {/* Status Cards */}
       <section className="grid grid-cols-3 gap-3">
         {[
-          { label: "Plan", value: userSubscription.toUpperCase(), icon: ShieldCheck },
-          { label: "Ads", value: adsEnabled ? "ON" : "OFF", icon: Zap },
-          { label: "Lang", value: locale === "pt-BR" ? "PT" : "EN", icon: Globe },
+          { label: t("sp_plan"), value: userSubscription.toUpperCase(), icon: ShieldCheck },
+          { label: t("sp_ads"), value: adsEnabled ? t("sp_on") : t("sp_off"), icon: Zap },
+          { label: t("sp_lang"), value: locale === "pt-BR" ? t("sp_pt") : t("sp_en"), icon: Globe },
         ].map((item) => (
           <div key={item.label} className="rounded-xl glass-strong p-4 text-center">
             <item.icon className="mx-auto h-4 w-4 text-brand mb-2" />
@@ -585,8 +585,8 @@ export function SettingsPage({ onBack }: { onBack?: () => void }) {
       </SettingsGroup>
 
       {isAdmin && (
-        <SettingsGroup icon={ShieldCheck} title="Admin">
-          <SettingRow icon={ShieldCheck} title="Admin Dashboard" description="Acessar painel administrativo" isLast>
+        <SettingsGroup icon={ShieldCheck} title={t("sp_admin")}>
+          <SettingRow icon={ShieldCheck} title={t("sp_admin_dashboard")} description={t("sp_admin_desc")} isLast>
             <Button variant="ghost" onClick={() => router.push("/admin-dashboard")} className="h-9 rounded-xl bg-muted px-4 text-xs font-medium text-muted-foreground hover:text-foreground">
               {t("sp_access")}
               <ChevronRight className="ml-1 h-3 w-3" />

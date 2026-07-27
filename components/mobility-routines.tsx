@@ -28,6 +28,7 @@ interface MobilityExercise {
 interface MobilityRoutine {
   id: string
   name: string
+  nameKey: string
   type: "pre" | "post" | "daily"
   duration: string
   exercises: MobilityExercise[]
@@ -39,17 +40,18 @@ interface MobilityRoutinesProps {
 }
 
 const BODY_AREAS = [
-  { id: "shoulders", label: "Shoulders" },
-  { id: "hips", label: "Hips" },
-  { id: "spine", label: "Spine" },
-  { id: "ankles", label: "Ankles" },
-  { id: "wrists", label: "Wrists" },
+  { id: "shoulders", label: "Shoulders", labelKey: "mr_shoulders" },
+  { id: "hips", label: "Hips", labelKey: "mr_hips" },
+  { id: "spine", label: "Spine", labelKey: "mr_spine" },
+  { id: "ankles", label: "Ankles", labelKey: "mr_ankles" },
+  { id: "wrists", label: "Wrists", labelKey: "mr_wrists" },
 ]
 
 const ROUTINES: MobilityRoutine[] = [
   {
     id: "pre-workout",
     name: "Pre-Workout Mobility",
+    nameKey: "mr_pre_workout",
     type: "pre",
     duration: "5-10 min",
     exercises: [
@@ -100,6 +102,7 @@ const ROUTINES: MobilityRoutine[] = [
   {
     id: "post-workout",
     name: "Post-Workout Stretching",
+    nameKey: "mr_post_workout",
     type: "post",
     duration: "5-10 min",
     exercises: [
@@ -143,6 +146,7 @@ const ROUTINES: MobilityRoutine[] = [
   {
     id: "daily-mobility",
     name: "Daily Mobility Routine",
+    nameKey: "mr_daily",
     type: "daily",
     duration: "15 min",
     exercises: [
@@ -352,7 +356,7 @@ export function MobilityRoutines({
             <div>
               <div className="flex items-center justify-between mb-1.5">
                 <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">
-                  {currentRoutine?.name || ""}
+                  {currentRoutine ? t(currentRoutine.nameKey) : ""}
                 </span>
                 <span className="text-[10px] text-brand">
                   {activeExercise + 1}/{filteredExercises.length}
@@ -410,10 +414,10 @@ export function MobilityRoutines({
               </div>
               <div className="text-left">
                 <p className="text-xs font-medium text-foreground">
-                  {showVideo ? "Hide" : "Show"} Demo
+                  {showVideo ? t("mr_hide") : t("mr_show")} {t("mr_demo")}
                 </p>
                 <p className="text-[10px] text-muted-foreground">
-                  Visual demonstration
+                  {t("mr_visual_demo")}
                 </p>
               </div>
             </button>
@@ -460,7 +464,7 @@ export function MobilityRoutines({
                 onClick={handleExerciseComplete}
                 className="h-10 px-4 rounded-xl border border-border bg-card flex items-center justify-center hover:bg-muted transition-colors"
               >
-                <span className="text-xs font-medium text-muted-foreground">Skip</span>
+                <span className="text-xs font-medium text-muted-foreground">{t("mr_skip")}</span>
               </button>
             </div>
           </motion.div>
@@ -500,7 +504,7 @@ export function MobilityRoutines({
                         : "bg-card text-muted-foreground border-border hover:border-brand/30"
                     }`}
                   >
-                    {area.label}
+                    {t(area.labelKey)}
                   </button>
                 ))}
               </div>
@@ -535,7 +539,7 @@ export function MobilityRoutines({
                     </div>
                     <div className="flex-1 min-w-0">
                       <h4 className="text-sm font-medium text-foreground">
-                        {routine.name}
+                        {t(routine.nameKey)}
                       </h4>
                       <div className="flex items-center gap-3 mt-1">
                         <span className="text-[11px] text-muted-foreground">
@@ -567,7 +571,7 @@ export function MobilityRoutines({
                       size="sm"
                       className="h-8 text-[11px] bg-brand text-white hover:bg-brand/90 disabled:opacity-40"
                     >
-                      Start
+                      {t("mr_start")}
                     </Button>
                   </div>
                 </motion.div>

@@ -111,7 +111,7 @@ export function SeasonSystem() {
               </div>
               <div>
                 <span className="text-[10px] font-black uppercase tracking-widest text-brand">{t("lb_season_3")}</span>
-                <p className="text-sm font-bold text-foreground">{currentSeason.name}</p>
+                <p className="text-sm font-bold text-foreground">{t("ls_season_name")}</p>
               </div>
             </div>
             <div className="text-right">
@@ -124,7 +124,7 @@ export function SeasonSystem() {
             </div>
           </div>
 
-          <p className="text-xs text-muted-foreground mb-3">{currentSeason.description}</p>
+          <p className="text-xs text-muted-foreground mb-3">{t("ls_season_desc")}</p>
 
           {/* Progress bar */}
           <div className="relative">
@@ -162,7 +162,7 @@ export function SeasonSystem() {
           </div>
           <div className="flex-1">
             <p className="text-sm font-bold text-foreground">{t("lb_your_rank")}</p>
-            <p className="text-xs text-muted-foreground">{gamData.xp.toLocaleString()} XP {t("lb_earned")}</p>
+            <p className="text-xs text-muted-foreground">{gamData.xp.toLocaleString()} {t("ls_xp")} {t("lb_earned")}</p>
           </div>
           <div className="flex items-center gap-1.5 rounded-full bg-brand/15 px-3 py-1.5 border border-brand/20">
             <TrendingUp className="h-3.5 w-3.5 text-brand" />
@@ -231,7 +231,7 @@ export function SeasonSystem() {
                     )}>
                       <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent" />
                       <span className="relative text-2xl font-black mb-0.5">{medals[i]}</span>
-                      <span className="relative text-[10px] font-bold text-muted-foreground">{entry.xp.toLocaleString()} XP</span>
+                      <span className="relative text-[10px] font-bold text-muted-foreground">{entry.xp.toLocaleString()} {t("ls_xp")}</span>
                     </div>
                   </div>
                 )
@@ -278,7 +278,7 @@ export function SeasonSystem() {
                   {/* XP */}
                   <div className="text-right">
                     <p className="text-sm font-black text-foreground">{entry.xp.toLocaleString()}</p>
-                    <p className="text-[10px] font-semibold text-muted-foreground">XP</p>
+                    <p className="text-[10px] font-semibold text-muted-foreground">{t("ls_xp")}</p>
                   </div>
                 </motion.div>
               ))}
@@ -400,7 +400,7 @@ export function SeasonSystem() {
                     <div className="flex-1">
                       <div className="flex items-center gap-2">
                         <h4 className="text-base font-bold text-foreground">
-                          {reward.badge === "Early Bird" ? (isEnglish ? "Early Bird" : "Madrugador") : reward.badge === "Legend" ? (isEnglish ? "Legend" : "Lenda") : reward.badge}
+                          {reward.badge === "Early Bird" ? t("ls_badge_early_bird") : reward.badge === "Legend" ? t("ls_badge_legend") : reward.badge === "Champion" ? t("ls_badge_champion") : reward.badge}
                         </h4>
                         {isUnlocked && (
                           <span className="rounded-full bg-green-500/15 px-2 py-0.5 text-[9px] font-black text-green-400 border border-green-500/20">
@@ -408,7 +408,7 @@ export function SeasonSystem() {
                           </span>
                         )}
                       </div>
-                      <p className="text-xs text-muted-foreground mt-0.5">{t("lb_day")} {reward.day} · {reward.xp} XP</p>
+                      <p className="text-xs text-muted-foreground mt-0.5">{t("lb_day")} {reward.day} · {reward.xp} {t("ls_xp")}</p>
                       {/* Progress to reward */}
                       {!isUnlocked && (
                         <div className="mt-2">
@@ -445,7 +445,7 @@ export function SeasonSystem() {
                       ) : seasonHistory.map((s) => (
                         <div key={s.seasonId} className="flex items-center gap-3 rounded-xl border border-border bg-muted/10 p-3">
                           <Trophy className="h-4 w-4 text-muted-foreground" />
-                          <div className="flex-1"><p className="text-sm font-medium text-foreground">{s.name}</p><p className="text-[10px] text-muted-foreground">{s.badge} · {s.xpEarned} XP</p></div>
+                          <div className="flex-1"><p className="text-sm font-medium text-foreground">{s.name}</p><p className="text-[10px] text-muted-foreground">{s.badge} · {s.xpEarned} {t("ls_xp")}</p></div>
                           {s.completed && <Medal className="h-4 w-4 text-yellow-400" />}
                         </div>
                       ))}

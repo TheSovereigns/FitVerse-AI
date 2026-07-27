@@ -39,18 +39,18 @@ interface WorkoutFeedbackProps {
   onSubmit?: (feedback: FeedbackEntry) => void
 }
 
-const DIFFICULTY_LABELS = ["Very Easy", "Easy", "Moderate", "Hard", "Max Effort"]
-const ENERGY_LABELS = ["Exhausted", "Low", "Normal", "Good", "Energized"]
+const DIFFICULTY_KEYS = ["wf_difficulty_very_easy", "wf_difficulty_easy", "wf_difficulty_moderate", "wf_difficulty_hard", "wf_difficulty_max_effort"]
+const ENERGY_KEYS = ["wf_energy_exhausted", "wf_energy_low", "wf_energy_normal", "wf_energy_good", "wf_energy_energized"]
 
-const BODY_AREAS: PainArea[] = [
-  { id: "shoulders", label: "Shoulders", selected: false },
-  { id: "lower-back", label: "Lower Back", selected: false },
-  { id: "knees", label: "Knees", selected: false },
-  { id: "neck", label: "Neck", selected: false },
-  { id: "wrists", label: "Wrists", selected: false },
-  { id: "hips", label: "Hips", selected: false },
-  { id: "elbows", label: "Elbows", selected: false },
-  { id: "ankles", label: "Ankles", selected: false },
+const BODY_AREA_IDS = [
+  { id: "shoulders", key: "wf_area_shoulders" },
+  { id: "lower-back", key: "wf_area_lower_back" },
+  { id: "knees", key: "wf_area_knees" },
+  { id: "neck", key: "wf_area_neck" },
+  { id: "wrists", key: "wf_area_wrists" },
+  { id: "hips", key: "wf_area_hips" },
+  { id: "elbows", key: "wf_area_elbows" },
+  { id: "ankles", key: "wf_area_ankles" },
 ]
 
 const STORAGE_KEY = "fitverse-workout-feedback"
@@ -268,14 +268,14 @@ export function WorkoutFeedback({
                 <div className="space-y-1.5">
                   {painAreas.map((areaId) => {
                     const freq = getPainFrequency(areaId)
-                    const area = BODY_AREAS.find((a) => a.id === areaId)
+                    const area = BODY_AREA_IDS.find((a) => a.id === areaId)
                     return (
                       <div
                         key={areaId}
                         className="flex items-center justify-between"
                       >
                         <span className="text-xs text-muted-foreground">
-                          {area?.label}
+                          {area ? t(area.key) : areaId}
                         </span>
                         <div className="flex items-center gap-2">
                           <div className="h-1.5 w-16 bg-muted rounded-full overflow-hidden">
@@ -305,13 +305,13 @@ export function WorkoutFeedback({
                 </p>
                 <div className="grid grid-cols-2 gap-2">
                   <div className="p-2 rounded-lg bg-muted/50 text-center">
-                    <p className="text-[10px] text-muted-foreground mb-0.5">Previous</p>
+                    <p className="text-[10px] text-muted-foreground mb-0.5">{t("wf_previous")}</p>
                     <p className="text-sm font-semibold text-foreground">
                       {history[history.length - 2]!.difficulty}/5
                     </p>
                   </div>
                   <div className="p-2 rounded-lg bg-muted/50 text-center">
-                    <p className="text-[10px] text-muted-foreground mb-0.5">Today</p>
+                    <p className="text-[10px] text-muted-foreground mb-0.5">{t("wf_today")}</p>
                     <p className="text-sm font-semibold text-foreground">
                       {difficulty}/5
                     </p>
@@ -349,7 +349,7 @@ export function WorkoutFeedback({
                 ))}
               </div>
               <p className="text-[11px] text-muted-foreground text-center mt-1.5">
-                {DIFFICULTY_LABELS[difficulty - 1]}
+                {t(DIFFICULTY_KEYS[difficulty - 1])}
               </p>
             </div>
 
@@ -374,7 +374,7 @@ export function WorkoutFeedback({
                 ))}
               </div>
               <p className="text-[11px] text-muted-foreground text-center mt-1.5">
-                {ENERGY_LABELS[energy - 1]}
+                {t(ENERGY_KEYS[energy - 1])}
               </p>
             </div>
 
@@ -387,7 +387,7 @@ export function WorkoutFeedback({
                 </p>
               </div>
               <div className="flex flex-wrap gap-1.5">
-                {BODY_AREAS.map((area) => {
+                {BODY_AREA_IDS.map((area) => {
                   const isSelected = painAreas.includes(area.id)
                   const freq = getPainFrequency(area.id)
                   return (
@@ -400,7 +400,7 @@ export function WorkoutFeedback({
                           : "bg-card text-muted-foreground border-border hover:border-primary/30"
                       }`}
                     >
-                      {area.label}
+                      {t(area.key)}
                       {freq > 0 && (
                         <span className="ml-1 text-[9px] opacity-60">{freq}x</span>
                       )}

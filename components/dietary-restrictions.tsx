@@ -37,85 +37,85 @@ interface DietaryRestrictionsProps {
 const RESTRICTIONS = [
   {
     id: "vegetarian",
-    label: "Vegetarian",
-    description: "No meat or fish",
+    label: "dr_vegetarian",
+    description: "dr_vegetarian_desc",
     icon: Leaf,
     affected: ["meal-planner", "recipes"],
   },
   {
     id: "vegan",
-    label: "Vegan",
-    description: "No animal products",
+    label: "dr_vegan",
+    description: "dr_vegan_desc",
     icon: Leaf,
     affected: ["meal-planner", "recipes", "supplements"],
   },
   {
     id: "gluten-free",
-    label: "Gluten-Free",
-    description: "No wheat, barley, rye",
+    label: "dr_gluten_free",
+    description: "dr_gluten_free_desc",
     icon: WheatOff,
     affected: ["meal-planner", "recipes", "food-scan"],
   },
   {
     id: "lactose-free",
-    label: "Lactose-Free",
-    description: "No dairy lactose",
+    label: "dr_lactose_free",
+    description: "dr_lactose_free_desc",
     icon: MilkOff,
     affected: ["meal-planner", "recipes", "food-scan"],
   },
   {
     id: "diabetic",
-    label: "Diabetic",
-    description: "Low sugar, controlled carbs",
+    label: "dr_diabetic",
+    description: "dr_diabetic_desc",
     icon: Heart,
     affected: ["meal-planner", "micronutrient-analysis"],
   },
   {
     id: "hypertension",
-    label: "Hypertension",
-    description: "Low sodium diet",
+    label: "dr_hypertension",
+    description: "dr_hypertension_desc",
     icon: Activity,
     affected: ["meal-planner", "recipes"],
   },
   {
     id: "keto",
-    label: "Keto",
-    description: "High fat, very low carb",
+    label: "dr_keto",
+    description: "dr_keto_desc",
     icon: Flame,
     affected: ["meal-planner", "recipes", "macros"],
   },
   {
     id: "paleo",
-    label: "Paleo",
-    description: "Whole foods, no processed",
+    label: "dr_paleo",
+    description: "dr_paleo_desc",
     icon: Beef,
     affected: ["meal-planner", "recipes", "store"],
   },
   {
     id: "halal",
-    label: "Halal",
-    description: "Islamic dietary laws",
+    label: "dr_halal",
+    description: "dr_halal_desc",
     icon: ShieldCheck,
     affected: ["meal-planner", "recipes"],
   },
   {
     id: "kosher",
-    label: "Kosher",
-    description: "Jewish dietary laws",
+    label: "dr_kosher",
+    description: "dr_kosher_desc",
     icon: ShieldCheck,
     affected: ["meal-planner", "recipes"],
   },
   {
     id: "nut-free",
-    label: "Nut-Free",
-    description: "No tree nuts or peanuts",
+    label: "dr_nut_free",
+    description: "dr_nut_free_desc",
     icon: Nut,
     affected: ["meal-planner", "recipes", "food-scan"],
   },
   {
     id: "soy-free",
-    label: "Soy-Free",
-    description: "No soy products",
+    label: "dr_soy_free",
+    description: "dr_soy_free_desc",
     icon: Bean,
     affected: ["meal-planner", "recipes", "food-scan"],
   },
@@ -229,8 +229,8 @@ export function DietaryRestrictions({ onRestrictionsChange }: DietaryRestriction
                 </div>
               )}
               <Icon className={cn("w-4 h-4 mb-1.5", isSelected ? "text-brand" : "text-muted-foreground")} />
-              <span className="text-xs font-medium text-foreground">{r.label}</span>
-              <span className="text-[10px] text-muted-foreground mt-0.5">{r.description}</span>
+              <span className="text-xs font-medium text-foreground">{t(r.label)}</span>
+              <span className="text-[10px] text-muted-foreground mt-0.5">{t(r.description)}</span>
               <button
                 onClick={(e) => {
                   e.stopPropagation()
@@ -256,7 +256,7 @@ export function DietaryRestrictions({ onRestrictionsChange }: DietaryRestriction
             <div className="bg-muted/30 border border-border rounded-xl p-3 space-y-2">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-medium text-foreground">
-                  {RESTRICTIONS.find((r) => r.id === showInfo)?.label}
+                  {t(RESTRICTIONS.find((r) => r.id === showInfo)?.label ?? "")}
                 </span>
                 <button onClick={() => setShowInfo(null)}>
                   <X className="w-3.5 h-3.5 text-muted-foreground" />

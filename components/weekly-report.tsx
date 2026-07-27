@@ -1,13 +1,12 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import { useState, useMemo, useEffect } from "react"
 import { motion } from "framer-motion"
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts"
-import { Calendar, Dumbbell, ScanLine, Droplets, Heart, Zap, Star, Trophy } from "lucide-react"
+import { Calendar, Dumbbell, ScanLine, Droplets, Heart, Zap, Star } from "lucide-react"
 import { useTranslation } from "@/lib/i18n"
 import { cn } from "@/lib/utils"
-import { logger } from "@/lib/logger"
-import { startOfWeek, endOfWeek, format, eachDayOfInterval, subDays, isSameDay } from "date-fns"
+import { startOfWeek, endOfWeek, format, eachDayOfInterval } from "date-fns"
 import { ptBR, enUS } from "date-fns/locale"
 
 interface DayData {
@@ -33,12 +32,16 @@ export function WeeklyReport() {
   const { t, locale } = useTranslation()
   const isEnglish = locale === "en-US"
   const dateLocale = isEnglish ? enUS : ptBR
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => { setMounted(true) }, [])
 
   const weekStart = startOfWeek(new Date(), { weekStartsOn: 1 })
   const weekEnd = endOfWeek(new Date(), { weekStartsOn: 1 })
   const weekDays = eachDayOfInterval({ start: weekStart, end: weekEnd })
 
   const data = useMemo(() => {
+    if (!mounted) return { dailyData: [], weekScans: 0, weekWater: 0, weekHabits: 0, totalScans: 0, totalWorkouts: 0, xp: 0, coins: 0 }
     const gamStats = safeGet("fitverse-gamification-stats", { totalScans: 0, totalWorkouts: 0, totalWater: 0, totalHabits: 0 })
     const hydrationHistory = safeGet<Array<{ date: string; amount: number }>>("fitverse-hydration-history", [])
     const habitLogs = safeGet<Array<{ date: string; completed: string[] }>>("habit_logs", [])

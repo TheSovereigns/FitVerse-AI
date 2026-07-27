@@ -1,8 +1,8 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import { useState, useMemo, useEffect } from "react"
 import { motion } from "framer-motion"
-import { Calendar, Clock, Flame, Dumbbell, Wheat, Droplets, TrendingUp, Target, PieChart, Activity, ChevronRight, X, Download, Lock, Award } from "lucide-react"
+import { Flame, Dumbbell, Wheat, Droplets, TrendingUp, Target, PieChart, Activity, ChevronRight, Download, Lock } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
@@ -21,8 +21,12 @@ export function DailySummary() {
   const { plan } = usePlanLimits()
   const isPremium = plan === "pro" || plan === "premium"
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split("T")[0])
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => { setMounted(true) }, [])
 
   const dailyData = useMemo(() => {
+    if (!mounted) return { scans: [], workouts: [], diets: [] }
     const activity = localStorage.getItem("dailyActivity")
     const scans = activity ? JSON.parse(activity).scannedProducts || [] : []
     
@@ -76,6 +80,7 @@ export function DailySummary() {
   }, [dailyData.scans])
 
   const weekData = useMemo(() => {
+    if (!mounted) return []
     const days: Array<{ date: string; dayName: string; scans: number; calories: number; protein: number; carbs: number; fat: number }> = []
     for (let i = 6; i >= 0; i--) {
       const date = new Date()

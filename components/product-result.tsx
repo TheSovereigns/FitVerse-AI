@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { ArrowLeft, AlertTriangle, Check, Activity, ShieldCheck, AlertCircle, Flame, Dumbbell, Wheat, Droplets, Target, BarChart, Sparkles, ChevronRight, Zap, Heart, Brain, Bone, Shield, Leaf, Droplet, Scale, Plus, Minus, Info, Clock, Pill, Apple, Cookie, AlertOctagon, TrendingUp, TrendingDown, Minus as MinusIcon, ChevronDown, ChevronUp, GitCompareArrows } from "lucide-react"
+import { ArrowLeft, AlertTriangle, Check, AlertCircle, Flame, Dumbbell, Wheat, Droplets, Sparkles, Heart, Leaf, Droplet, Scale, Plus, Minus, Info, Pill, Apple, Cookie, AlertOctagon, TrendingUp, Target, ChevronDown, ChevronUp, GitCompareArrows } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
@@ -54,9 +54,13 @@ interface ProductResultProps {
 }
 
 import { useTranslation } from "@/lib/i18n"
+import { usePlanLimits } from "@/hooks/usePlanLimits"
+import { Lock } from "lucide-react"
 
 export function ProductResult({ result, onBack, imageData, onSave, onDiscard, hasPendingSave }: ProductResultProps) {
   const { t } = useTranslation()
+  const { plan } = usePlanLimits()
+  const isPremium = plan === "pro" || plan === "premium"
 
   const defaultGrams = result?.servingSize ? parseInt(result.servingSize.replace(/\D/g, '')) || 100 : 100
   const [grams, setGrams] = useState(defaultGrams)
@@ -64,6 +68,7 @@ export function ProductResult({ result, onBack, imageData, onSave, onDiscard, ha
   const [showAllAllergens, setShowAllAllergens] = useState(false)
   const [isFavorite, setIsFavorite] = useState(false)
   const [isComparing, setIsComparing] = useState(false)
+  const [compareData, setCompareData] = useState<{ productName: string; brand?: string; score?: number; macros?: { calories: number; protein: number; carbs: number; fat: number }; category?: string } | null>(null)
   const hasIngredientDetails = (result?.ingredientDetails?.length ?? 0) > 0
 
   const defaultIngredientWeights = useMemo(() => {
@@ -100,8 +105,22 @@ export function ProductResult({ result, onBack, imageData, onSave, onDiscard, ha
     try {
       const compare = JSON.parse(localStorage.getItem("fitverse-compare") || "null") as { productName: string } | null
       setIsComparing(compare?.productName === result.productName)
+      if (compare?.productName === result.productName) {
+        setCompareData(compare as { productName: string; brand?: string; score?: number; macros?: { calories: number; protein: number; carbs: number; fat: number }; category?: string })
+      }
     } catch {}
   }, [result])
+
+  useEffect(() => {
+    if (isComparing) {
+      try {
+        const stored = localStorage.getItem("fitverse-compare")
+        if (stored) setCompareData(JSON.parse(stored))
+      } catch {}
+    } else {
+      setCompareData(null)
+    }
+  }, [isComparing])
 
   const toggleFavorite = () => {
     if (!result) return
@@ -367,128 +386,141 @@ export function ProductResult({ result, onBack, imageData, onSave, onDiscard, ha
         </motion.div>
       )}
 
-      {/* Weight Adjustment - Multi-Ingredient or Single */}
+      {/* Weight Adjustment - Pro/Premium Only */}
       {result.macros && (
-        <motion.div 
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          className="bg-card border border-border rounded-2xl p-4 md:p-6"
-        >
-          <div className="flex items-center gap-3 mb-4">
-            <Scale className="w-6 h-6 text-primary" />
-            <span className="text-sm font-bold text-muted-foreground uppercase tracking-widest">{t("pr_weight_adjust")}</span>
-          </div>
+        isPremium ? (
+          <motion.div 
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            className="bg-card border border-border rounded-2xl p-4 md:p-6"
+          >
+            <div className="flex items-center gap-3 mb-4">
+              <Scale className="w-6 h-6 text-primary" />
+              <span className="text-sm font-bold text-muted-foreground uppercase tracking-widest">{t("pr_weight_adjust")}</span>
+            </div>
 
-          {hasIngredientDetails ? (
-            <div className="space-y-3">
-              <p className="text-xs text-muted-foreground mb-3">{t("pr_ingredients_detected").replace("{count}", String(ingredientWeights.length))}</p>
-              
-              {ingredientWeights.map((iw, i) => {
-                const originalIng = defaultIngredientWeights[i]
-                if (!originalIng) return null
-                const ratio = iw.grams / (originalIng.grams || 1)
-                const ingCal = Math.round(iw.calories * ratio)
-                const ingProt = Math.round(iw.protein * ratio)
-                const ingCarbs = Math.round(iw.carbs * ratio)
-                const ingFat = Math.round(iw.fat * ratio)
-                return (
-                  <div key={i} className="p-3 rounded-xl bg-foreground/5 border border-foreground/10">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm font-bold text-foreground">{iw.name}</span>
-                      <div className="flex items-center gap-2">
-                        <button 
-                          onClick={() => {
-                            const next = [...ingredientWeights]
-                            next[i] = { ...next[i], grams: Math.max(5, next[i].grams - 10) }
-                            setIngredientWeights(next)
-                          }} 
-                          className="w-8 h-8 rounded-full bg-muted/50 hover:bg-muted/80 flex items-center justify-center transition-colors"
-                        >
-                          <Minus className="w-4 h-4" />
-                        </button>
-                        <input 
-                          type="number" 
-                          value={iw.grams} 
-                          onChange={(e) => {
-                            const val = Math.max(5, parseInt(e.target.value) || 5)
-                            const next = [...ingredientWeights]
-                            next[i] = { ...next[i], grams: val }
-                            setIngredientWeights(next)
-                          }}
-                          className="w-16 text-center text-sm font-black bg-muted/30 rounded-lg px-2 py-1 border border-border focus:border-primary focus:outline-none"
-                        />
-                        <button 
-                          onClick={() => {
-                            const next = [...ingredientWeights]
-                            next[i] = { ...next[i], grams: next[i].grams + 10 }
-                            setIngredientWeights(next)
-                          }} 
-                          className="w-8 h-8 rounded-full bg-muted/50 hover:bg-muted/80 flex items-center justify-center transition-colors"
-                        >
-                          <Plus className="w-4 h-4" />
-                        </button>
-                        <span className="text-xs font-bold text-muted-foreground ml-1">g</span>
+            {hasIngredientDetails ? (
+              <div className="space-y-3">
+                <p className="text-xs text-muted-foreground mb-3">{t("pr_ingredients_detected").replace("{count}", String(ingredientWeights.length))}</p>
+                
+                {ingredientWeights.map((iw, i) => {
+                  const originalIng = defaultIngredientWeights[i]
+                  if (!originalIng) return null
+                  const ratio = iw.grams / (originalIng.grams || 1)
+                  const ingCal = Math.round(iw.calories * ratio)
+                  const ingProt = Math.round(iw.protein * ratio)
+                  const ingCarbs = Math.round(iw.carbs * ratio)
+                  const ingFat = Math.round(iw.fat * ratio)
+                  return (
+                    <div key={i} className="p-3 rounded-xl bg-foreground/5 border border-foreground/10">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-sm font-bold text-foreground">{iw.name}</span>
+                        <div className="flex items-center gap-2">
+                          <button 
+                            onClick={() => {
+                              const next = [...ingredientWeights]
+                              next[i] = { ...next[i], grams: Math.max(5, next[i].grams - 10) }
+                              setIngredientWeights(next)
+                            }} 
+                            className="w-8 h-8 rounded-full bg-muted/50 hover:bg-muted/80 flex items-center justify-center transition-colors"
+                          >
+                            <Minus className="w-4 h-4" />
+                          </button>
+                          <input 
+                            type="number" 
+                            value={iw.grams} 
+                            onChange={(e) => {
+                              const val = Math.max(5, parseInt(e.target.value) || 5)
+                              const next = [...ingredientWeights]
+                              next[i] = { ...next[i], grams: val }
+                              setIngredientWeights(next)
+                            }}
+                            className="w-16 text-center text-sm font-black bg-muted/30 rounded-lg px-2 py-1 border border-border focus:border-primary focus:outline-none"
+                          />
+                          <button 
+                            onClick={() => {
+                              const next = [...ingredientWeights]
+                              next[i] = { ...next[i], grams: next[i].grams + 10 }
+                              setIngredientWeights(next)
+                            }} 
+                            className="w-8 h-8 rounded-full bg-muted/50 hover:bg-muted/80 flex items-center justify-center transition-colors"
+                          >
+                            <Plus className="w-4 h-4" />
+                          </button>
+                          <span className="text-xs font-bold text-muted-foreground ml-1">g</span>
+                        </div>
+                      </div>
+                      <div className="flex gap-3 text-xs text-muted-foreground">
+                        <span><Flame className="w-3 h-3 inline text-[#FF453A]" /> {ingCal}</span>
+                        <span><Dumbbell className="w-3 h-3 inline text-[#0A84FF]" /> {ingProt}g</span>
+                        <span><Wheat className="w-3 h-3 inline text-[#FFD60A]" /> {ingCarbs}g</span>
+                        <span><Droplets className="w-3 h-3 inline text-[#FF375F]" /> {ingFat}g</span>
                       </div>
                     </div>
-                    <div className="flex gap-3 text-xs text-muted-foreground">
-                      <span><Flame className="w-3 h-3 inline text-[#FF453A]" /> {ingCal}</span>
-                      <span><Dumbbell className="w-3 h-3 inline text-[#0A84FF]" /> {ingProt}g</span>
-                      <span><Wheat className="w-3 h-3 inline text-[#FFD60A]" /> {ingCarbs}g</span>
-                      <span><Droplets className="w-3 h-3 inline text-[#FF375F]" /> {ingFat}g</span>
-                    </div>
-                  </div>
-                )
-              })}
+                  )
+                })}
 
-              <div className="flex items-center justify-between pt-3 border-t border-border">
-                <span className="text-xs font-bold text-muted-foreground uppercase">{t("pr_total")}</span>
-                <span className="text-lg font-black text-primary">{totalIngredientGrams}g</span>
-              </div>
-
-              <button 
-                onClick={() => {
-                  setIngredientWeights(defaultIngredientWeights)
-                }}
-                className="w-full text-xs font-bold text-muted-foreground hover:text-foreground py-2 rounded-xl hover:bg-muted/30 transition-colors"
-              >
-                {t("pr_reset_weights")}
-              </button>
-            </div>
-          ) : (
-            /* Single weight adjustment (backward compatible) */
-            <div className="flex flex-col items-center gap-4">
-              <div className="flex items-center gap-6">
-                <button onClick={decrementGrams} className="w-12 h-12 rounded-full bg-muted/50 hover:bg-muted/80 flex items-center justify-center transition-colors" aria-label="Diminuir 10g">
-                  <Minus className="w-6 h-6" />
-                </button>
-                
-                <div className="text-center min-w-[100px]">
-                  <p className="text-4xl font-black text-foreground tracking-tighter">{grams}g</p>
-                  <p className="text-xs font-bold text-primary opacity-60 uppercase tracking-widest">
-                    {grams === defaultGrams ? `(padrão ${defaultGrams}g)` : `(original ${defaultGrams}g)`}
-                  </p>
+                <div className="flex items-center justify-between pt-3 border-t border-border">
+                  <span className="text-xs font-bold text-muted-foreground uppercase">{t("pr_total")}</span>
+                  <span className="text-lg font-black text-primary">{totalIngredientGrams}g</span>
                 </div>
-                
-                <button onClick={incrementGrams} className="w-12 h-12 rounded-full bg-muted/50 hover:bg-muted/80 flex items-center justify-center transition-colors" aria-label="Aumentar 10g">
-                  <Plus className="w-6 h-6" />
+
+                <button 
+                  onClick={() => {
+                    setIngredientWeights(defaultIngredientWeights)
+                  }}
+                  className="w-full text-xs font-bold text-muted-foreground hover:text-foreground py-2 rounded-xl hover:bg-muted/30 transition-colors"
+                >
+                  {t("pr_reset_weights")}
                 </button>
               </div>
-              <input type="range" min="10" max="500" step="10" value={grams} onChange={(e) => setGrams(parseInt(e.target.value))} className="w-full max-w-xs accent-primary" />
+            ) : (
+              <div className="flex flex-col items-center gap-4">
+                <div className="flex items-center gap-6">
+                  <button onClick={decrementGrams} className="w-12 h-12 rounded-full bg-muted/50 hover:bg-muted/80 flex items-center justify-center transition-colors" aria-label="Diminuir 10g">
+                    <Minus className="w-6 h-6" />
+                  </button>
+                  
+                  <div className="text-center min-w-[100px]">
+                    <p className="text-4xl font-black text-foreground tracking-tighter">{grams}g</p>
+                    <p className="text-xs font-bold text-primary opacity-60 uppercase tracking-widest">
+                      {grams === defaultGrams ? `(padrão ${defaultGrams}g)` : `(original ${defaultGrams}g)`}
+                    </p>
+                  </div>
+                  
+                  <button onClick={incrementGrams} className="w-12 h-12 rounded-full bg-muted/50 hover:bg-muted/80 flex items-center justify-center transition-colors" aria-label="Aumentar 10g">
+                    <Plus className="w-6 h-6" />
+                  </button>
+                </div>
+                <input type="range" min="10" max="500" step="10" value={grams} onChange={(e) => setGrams(parseInt(e.target.value))} className="w-full max-w-xs accent-primary" />
+              </div>
+            )}
+          </motion.div>
+        ) : (
+          <motion.div 
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            className="bg-card border border-border rounded-2xl border-primary/30 p-4 md:p-6 flex flex-col items-center gap-4"
+          >
+            <div className="flex items-center gap-3">
+              <Lock className="w-6 h-6 text-primary" />
+              <span className="text-sm font-bold text-primary uppercase tracking-widest">{t("pr_weight_adjust")}</span>
             </div>
-          )}
-        </motion.div>
+            <p className="text-sm text-muted-foreground text-center">{t("pr_weight_desc")}</p>
+          </motion.div>
+        )
       )}
 
       {/* Macros */}
       {result.macros && (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
            {[
-              { label: "Calorias", val: adjustedMacros ? adjustedMacros.calories : result.macros.calories, icon: Flame, color: "text-[#FF453A]", unit: "kcal" },
-              { label: "Proteína", val: adjustedMacros ? adjustedMacros.protein : result.macros.protein, icon: Dumbbell, color: "text-[#0A84FF]", unit: "g" },
-              { label: "Carboidratos", val: adjustedMacros ? adjustedMacros.carbs : result.macros.carbs, icon: Wheat, color: "text-[#FFD60A]", unit: "g" },
-              { label: "Gordura", val: adjustedMacros ? adjustedMacros.fat : result.macros.fat, icon: Droplets, color: "text-[#FF375F]", unit: "g" },
-              ...(result.macros.fiber ? [{ label: "Fibra", val: adjustedMacros ? adjustedMacros.fiber : (result.macros.fiber || 0), icon: Leaf, color: "text-emerald-400", unit: "g" }] : []),
-              ...(result.macros.sugar ? [{ label: "Açúcar", val: adjustedMacros ? adjustedMacros.sugar : (result.macros.sugar || 0), icon: Cookie, color: "text-yellow-400", unit: "g" }] : []),
+              { label: "Calorias", val: (isPremium && adjustedMacros) ? adjustedMacros.calories : result.macros.calories, icon: Flame, color: "text-[#FF453A]", unit: "kcal" },
+              { label: "Proteína", val: (isPremium && adjustedMacros) ? adjustedMacros.protein : result.macros.protein, icon: Dumbbell, color: "text-[#0A84FF]", unit: "g" },
+              { label: "Carboidratos", val: (isPremium && adjustedMacros) ? adjustedMacros.carbs : result.macros.carbs, icon: Wheat, color: "text-[#FFD60A]", unit: "g" },
+              { label: "Gordura", val: (isPremium && adjustedMacros) ? adjustedMacros.fat : result.macros.fat, icon: Droplets, color: "text-[#FF375F]", unit: "g" },
+              ...(result.macros.fiber ? [{ label: "Fibra", val: (isPremium && adjustedMacros) ? adjustedMacros.fiber : (result.macros.fiber || 0), icon: Leaf, color: "text-emerald-400", unit: "g" }] : []),
+              ...(result.macros.sugar ? [{ label: "Açúcar", val: (isPremium && adjustedMacros) ? adjustedMacros.sugar : (result.macros.sugar || 0), icon: Cookie, color: "text-yellow-400", unit: "g" }] : []),
            ].map((m, i) => (
              <motion.div 
                key={i}
@@ -778,54 +810,46 @@ export function ProductResult({ result, onBack, imageData, onSave, onDiscard, ha
       )}
 
       {/* Compare Side by Side */}
-      {(() => {
-        try {
-          const stored = localStorage.getItem("fitverse-compare")
-          if (!stored) return null
-          const compare = JSON.parse(stored) as { productName: string; brand?: string; score?: number; macros?: { calories: number; protein: number; carbs: number; fat: number }; category?: string }
-          if (!compare || compare.productName === result.productName) return null
-          return (
-            <motion.div
-              initial={{ y: 20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              className="bg-card border border-border rounded-2xl p-6"
-            >
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-sm font-black uppercase tracking-[0.4em] opacity-30">{t("scan_compare")}</h3>
-                <button onClick={() => { localStorage.removeItem("fitverse-compare"); setIsComparing(false) }} className="text-xs font-bold text-muted-foreground underline">
-                  {t("scan_clear_compare")}
-                </button>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="p-4 rounded-2xl bg-primary/5 border border-primary/20">
-                  <p className="text-xs font-bold text-primary uppercase tracking-widest mb-2">{result.productName}</p>
-                  {result.brand && <p className="text-xs text-muted-foreground mb-1">{result.brand}</p>}
-                  <p className={cn("text-3xl font-black", getScoreColor(score))}>{score}</p>
-                  {result.macros && (
-                    <div className="mt-2 space-y-1 text-xs text-muted-foreground">
-                      <p>{result.macros.calories} kcal</p>
-                      <p>P: {result.macros.protein}g | C: {result.macros.carbs}g | G: {result.macros.fat}g</p>
-                    </div>
-                  )}
+      {compareData && compareData.productName !== result.productName && (
+        <motion.div
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          className="bg-card border border-border rounded-2xl p-6"
+        >
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-sm font-black uppercase tracking-[0.4em] opacity-30">{t("scan_compare")}</h3>
+            <button onClick={() => { localStorage.removeItem("fitverse-compare"); setIsComparing(false); setCompareData(null) }} className="text-xs font-bold text-muted-foreground underline">
+              {t("scan_clear_compare")}
+            </button>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="p-4 rounded-2xl bg-primary/5 border border-primary/20">
+              <p className="text-xs font-bold text-primary uppercase tracking-widest mb-2">{result.productName}</p>
+              {result.brand && <p className="text-xs text-muted-foreground mb-1">{result.brand}</p>}
+              <p className={cn("text-3xl font-black", getScoreColor(score))}>{score}</p>
+              {result.macros && (
+                <div className="mt-2 space-y-1 text-xs text-muted-foreground">
+                  <p>{result.macros.calories} kcal</p>
+                  <p>P: {result.macros.protein}g | C: {result.macros.carbs}g | G: {result.macros.fat}g</p>
                 </div>
-                <div className="p-4 rounded-2xl bg-muted/30 border border-border">
-                  <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-2">{compare.productName}</p>
-                  {compare.brand && <p className="text-xs text-muted-foreground mb-1">{compare.brand}</p>}
-                  {compare.score != null && (
-                    <p className={cn("text-3xl font-black", getScoreColor(compare.score))}>{compare.score}</p>
-                  )}
-                  {compare.macros && (
-                    <div className="mt-2 space-y-1 text-xs text-muted-foreground">
-                      <p>{compare.macros.calories} kcal</p>
-                      <p>P: {compare.macros.protein}g | C: {compare.macros.carbs}g | G: {compare.macros.fat}g</p>
-                    </div>
-                  )}
+              )}
+            </div>
+            <div className="p-4 rounded-2xl bg-muted/30 border border-border">
+              <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-2">{compareData.productName}</p>
+              {compareData.brand && <p className="text-xs text-muted-foreground mb-1">{compareData.brand}</p>}
+              {compareData.score != null && (
+                <p className={cn("text-3xl font-black", getScoreColor(compareData.score))}>{compareData.score}</p>
+              )}
+              {compareData.macros && (
+                <div className="mt-2 space-y-1 text-xs text-muted-foreground">
+                  <p>{compareData.macros.calories} kcal</p>
+                  <p>P: {compareData.macros.protein}g | C: {compareData.macros.carbs}g | G: {compareData.macros.fat}g</p>
                 </div>
-              </div>
-            </motion.div>
-          )
-        } catch { return null }
-      })()}
+              )}
+            </div>
+          </div>
+        </motion.div>
+      )}
     </div>
   )
 }

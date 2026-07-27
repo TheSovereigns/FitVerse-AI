@@ -56,15 +56,15 @@ interface MealPlannerProps {
 }
 
 const CATEGORIES = [
-  { key: "proteins", label: "Proteins", icon: Beef },
-  { key: "carbs", label: "Carbs", icon: Wheat },
-  { key: "vegetables", label: "Vegetables", icon: Carrot },
-  { key: "fruits", label: "Fruits", icon: Apple },
-  { key: "dairy", label: "Dairy", icon: Milk },
-  { key: "other", label: "Other", icon: Utensils },
+  { key: "proteins", label: "mp_cat_proteins", icon: Beef },
+  { key: "carbs", label: "mp_cat_carbs", icon: Wheat },
+  { key: "vegetables", label: "mp_cat_vegetables", icon: Carrot },
+  { key: "fruits", label: "mp_cat_fruits", icon: Apple },
+  { key: "dairy", label: "mp_cat_dairy", icon: Milk },
+  { key: "other", label: "mp_cat_other", icon: Utensils },
 ] as const
 
-const DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+const DAYS = ["mp_day_monday", "mp_day_tuesday", "mp_day_wednesday", "mp_day_thursday", "mp_day_friday", "mp_day_saturday", "mp_day_sunday"]
 
 const MEAL_ICONS: Record<string, typeof ChefHat> = {
   breakfast: Apple,
@@ -385,7 +385,7 @@ export function MealPlanner({ isLocked = false, onUpgrade, macros }: MealPlanner
                     >
                       <div className="flex items-center gap-2">
                         <Icon className="w-3.5 h-3.5 text-muted-foreground" />
-                        <span className="text-xs font-medium text-foreground">{label}</span>
+                        <span className="text-xs font-medium text-foreground">{t(label)}</span>
                         <Badge variant="secondary" className="text-[10px] h-5">
                           {items.length}
                         </Badge>

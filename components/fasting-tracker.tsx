@@ -46,8 +46,8 @@ const PROTOCOLS = [
   { id: "16:8", hours: 16, label: "16:8", desc: "16h fast, 8h eating" },
   { id: "18:6", hours: 18, label: "18:6", desc: "18h fast, 6h eating" },
   { id: "20:4", hours: 20, label: "20:4", desc: "20h fast, 4h eating" },
-  { id: "24h", hours: 24, label: "24h", desc: "24h extended fast" },
-  { id: "36h", hours: 36, label: "36h", desc: "36h extended fast" },
+  { id: "24h", hours: 24, label: "24h", desc: "ft_24h_desc" },
+  { id: "36h", hours: 36, label: "36h", desc: "ft_36h_desc" },
 ]
 
 const FASTING_STAGES = [
@@ -284,7 +284,7 @@ export function FastingTracker({ isLocked = false }: { isLocked?: boolean }) {
             <h3 className="text-sm font-semibold text-foreground">
               {isEnglish ? "Fasting Tracker" : "Rastreador de Jejum"}
             </h3>
-            <p className="text-xs text-muted-foreground">{currentStage!.name}</p>
+            <p className="text-xs text-muted-foreground">{t(`ft_${currentStage!.id}_name`)}</p>
           </div>
         </div>
         {isFasting && (
@@ -418,7 +418,7 @@ export function FastingTracker({ isLocked = false }: { isLocked?: boolean }) {
         <div className="w-px h-6 bg-border" />
         <div className="text-center">
           <p className="text-[10px] text-muted-foreground uppercase tracking-wider">{isEnglish ? "Stage" : "Estagio"}</p>
-          <p className="text-sm font-bold text-orange-500">{currentStage!.name.split(" ")[0]}</p>
+          <p className="text-sm font-bold text-orange-500">{t(`ft_${currentStage!.id}_short`)}</p>
         </div>
       </div>
 
@@ -452,7 +452,7 @@ export function FastingTracker({ isLocked = false }: { isLocked?: boolean }) {
                       <div className="flex-1">
                         <div className="flex items-center gap-2">
                           <span className={cn("text-xs font-semibold", isActive ? "text-foreground" : "text-muted-foreground", isPast && "opacity-60")}>
-                            {stage.name}
+                            {t(`ft_${stage.id}_name`)}
                           </span>
                           <span className="text-[9px] text-muted-foreground">
                             {stage.start}h — {stage.end}h
@@ -463,7 +463,7 @@ export function FastingTracker({ isLocked = false }: { isLocked?: boolean }) {
                             </span>
                           )}
                         </div>
-                        <p className="text-[10px] text-muted-foreground mt-0.5">{stage.tip}</p>
+                        <p className="text-[10px] text-muted-foreground mt-0.5">{t(`ft_${stage.id}_tip`)}</p>
                       </div>
                     </div>
                   )
@@ -546,9 +546,9 @@ export function FastingTracker({ isLocked = false }: { isLocked?: boolean }) {
       <div className="rounded-xl border border-border p-3">
         <div className="flex items-center gap-2 mb-1">
           <Info className="h-3.5 w-3.5 text-orange-500" />
-          <span className="text-xs font-semibold text-foreground">{currentStage!.name}</span>
+          <span className="text-xs font-semibold text-foreground">{t(`ft_${currentStage!.id}_name`)}</span>
         </div>
-        <p className="text-[11px] text-muted-foreground">{currentStage!.tip}</p>
+        <p className="text-[11px] text-muted-foreground">{t(`ft_${currentStage!.id}_tip`)}</p>
       </div>
     </motion.div>
   )

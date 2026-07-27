@@ -1,6 +1,6 @@
 "use client"
 
-import { useMemo } from "react"
+import { useState, useMemo, useEffect } from "react"
 import { motion } from "framer-motion"
 import {
   LineChart, Line, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid,
@@ -50,6 +50,9 @@ export function MonthlyReport() {
   const { t, locale } = useTranslation()
   const isEnglish = locale === "en-US"
   const dateLocale = isEnglish ? enUS : ptBR
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => { setMounted(true) }, [])
 
   const now = new Date()
   const monthStart = startOfMonth(now)
@@ -58,6 +61,7 @@ export function MonthlyReport() {
   const totalDaysInMonth = monthDays.length
 
   const data = useMemo(() => {
+    if (!mounted) return { dailyData: [], monthScans: 0, monthWater: 0, monthHabits: 0, daysActive: 0, consistency: 0, xp: 0, coins: 0, totalScans: 0, totalWorkouts: 0, weightData: [], topFoodsList: [] }
     const gamStats = safeGet("fitverse-gamification-stats", {
       totalScans: 0, totalWorkouts: 0, totalWater: 0, totalHabits: 0,
     })

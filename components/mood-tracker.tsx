@@ -25,14 +25,6 @@ interface MoodTrackerProps {
   isLocked?: boolean;
 }
 
-const moodOptions = [
-  { value: 1, emoji: "😊", label: "Great" },
-  { value: 2, emoji: "🙂", label: "Good" },
-  { value: 3, emoji: "😐", label: "Neutral" },
-  { value: 4, emoji: "😟", label: "Bad" },
-  { value: 5, emoji: "😰", label: "Terrible" },
-];
-
 const moodColors: Record<number, string> = {
   1: "#22c55e",
   2: "#84cc16",
@@ -43,6 +35,13 @@ const moodColors: Record<number, string> = {
 
 export function MoodTracker({ isLocked = false }: MoodTrackerProps) {
   const { t } = useTranslation();
+  const moodOptions = [
+    { value: 1, emoji: "😊", label: t("mt_great") },
+    { value: 2, emoji: "🙂", label: t("mt_good") },
+    { value: 3, emoji: "😐", label: t("mt_neutral") },
+    { value: 4, emoji: "😟", label: t("mt_bad") },
+    { value: 5, emoji: "😰", label: t("mt_terrible") },
+  ];
   const [entries, setEntries] = useState<MoodEntry[]>([]);
   const [selectedMood, setSelectedMood] = useState<number | null>(null);
   const [note, setNote] = useState("");
@@ -99,13 +98,13 @@ export function MoodTracker({ isLocked = false }: MoodTrackerProps) {
       : "flat";
 
   const getInsight = () => {
-    if (entries.length < 3) return "Keep logging to see patterns.";
+    if (entries.length < 3) return t("mt_insight_keep");
     const recent = entries.slice(-5);
     const avg = recent.reduce((s, e) => s + e.mood, 0) / recent.length;
-    if (avg <= 2) return "You've been feeling great! Keep it up.";
-    if (avg <= 3) return "Mood is stable. Consider adding exercise to boost it.";
-    if (avg >= 4) return "Try breathing exercises or a walk to improve your mood.";
-    return "Consistency is key. Track daily for better insights.";
+    if (avg <= 2) return t("mt_insight_great");
+    if (avg <= 3) return t("mt_insight_stable");
+    if (avg >= 4) return t("mt_insight_breathing");
+    return t("mt_insight_consistency");
   };
 
   if (isLocked) {
@@ -114,12 +113,12 @@ export function MoodTracker({ isLocked = false }: MoodTrackerProps) {
         <div className="absolute inset-0 bg-muted/50 backdrop-blur-sm flex items-center justify-center z-10">
           <div className="text-center">
             <Lock className="w-10 h-10 mx-auto mb-2 text-muted-foreground" />
-            <p className="text-foreground font-medium">Pro Feature</p>
-            <p className="text-sm text-muted-foreground">Unlock mood tracking</p>
+            <p className="text-foreground font-medium">{t("mt_pro_feature")}</p>
+            <p className="text-sm text-muted-foreground">{t("mt_unlock")}</p>
           </div>
         </div>
         <div className="opacity-30 pointer-events-none">
-          <h2 className="text-lg font-semibold text-foreground mb-4">Mood Tracker</h2>
+          <h2 className="text-lg font-semibold text-foreground mb-4">{t("mt_title")}</h2>
           <div className="flex gap-2">
             {moodOptions.map((m) => (
               <button key={m.value} className="text-2xl p-2 rounded-xl bg-muted">
@@ -134,10 +133,10 @@ export function MoodTracker({ isLocked = false }: MoodTrackerProps) {
 
   return (
     <div className="glass-strong border border-border rounded-2xl p-6">
-      <h2 className="text-lg font-semibold text-foreground mb-4">Mood Tracker</h2>
+      <h2 className="text-lg font-semibold text-foreground mb-4">{t("mt_title")}</h2>
 
       <div className="mb-6">
-        <p className="text-sm text-muted-foreground mb-3">How are you feeling today?</p>
+        <p className="text-sm text-muted-foreground mb-3">{t("mt_how_feeling")}</p>
         <div className="flex gap-2">
           {moodOptions.map((m) => (
             <motion.button
@@ -168,14 +167,14 @@ export function MoodTracker({ isLocked = false }: MoodTrackerProps) {
               type="text"
               value={note}
               onChange={(e) => setNote(e.target.value)}
-              placeholder="Add a note (optional)"
+              placeholder={t("mt_add_note")}
               className="w-full px-3 py-2 rounded-xl border border-border bg-card text-foreground text-sm focus:outline-none focus:ring-1 focus:ring-ring"
             />
             <button
               onClick={addEntry}
               className="mt-2 px-4 py-2 rounded-xl bg-brand text-white text-sm font-medium hover:bg-brand/90 transition-opacity"
             >
-              Save Mood
+              {t("mt_save")}
             </button>
           </motion.div>
         )}
@@ -184,7 +183,7 @@ export function MoodTracker({ isLocked = false }: MoodTrackerProps) {
       {entries.length > 0 && (
         <>
           <div className="flex items-center gap-2 mb-4">
-            <span className="text-sm text-muted-foreground">Average:</span>
+            <span className="text-sm text-muted-foreground">{t("mt_average")}</span>
             <span className="text-foreground font-medium">{avgMood.toFixed(1)}</span>
             {trend === "up" && <TrendingUp className="w-4 h-4 text-green-500" />}
             {trend === "down" && <TrendingDown className="w-4 h-4 text-red-500" />}
@@ -220,7 +219,7 @@ export function MoodTracker({ isLocked = false }: MoodTrackerProps) {
             onClick={() => setShowInsight(!showInsight)}
             className="w-full px-4 py-3 rounded-xl border border-border bg-card text-sm text-muted-foreground hover:bg-muted transition-colors text-left"
           >
-            <span className="font-medium text-foreground">AI Insight:</span> {getInsight()}
+            <span className="font-medium text-foreground">{t("mt_ai_insight")}</span> {getInsight()}
           </motion.button>
         </>
       )}

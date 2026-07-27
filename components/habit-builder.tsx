@@ -105,15 +105,14 @@ export function HabitBuilder({}: HabitBuilderProps) {
     const d = new Date();
     for (let i = 0; i < 365; i++) {
       const dateStr = d.toISOString().split("T")[0];
+      if (i === 0 && dateStr !== today) break;
       const log = logs.find((l) => l.date === dateStr);
       if (log?.completed.includes(habitId)) {
         streak++;
-        d.setDate(d.getDate() - 1);
       } else {
         break;
       }
-      if (i === 0 && dateStr !== today) break;
-      if (i > 0) d.setDate(d.getDate() - 1);
+      d.setDate(d.getDate() - 1);
     }
     return streak;
   };

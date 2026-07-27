@@ -22,6 +22,7 @@ interface Phase {
   id: string
   name: string
   nameKey: string
+  focusKey: string
   duration: string
   focus: string
   intensity: string
@@ -49,6 +50,7 @@ const PHASES: Phase[] = [
     id: "adaptation",
     name: "Adaptation",
     nameKey: "pe_adaptation",
+    focusKey: "pe_focus_adaptation",
     duration: "1-2 weeks",
     focus: "Movement patterns, form, baseline",
     intensity: "50-60% 1RM",
@@ -61,6 +63,7 @@ const PHASES: Phase[] = [
     id: "hypertrophy",
     name: "Hypertrophy",
     nameKey: "pe_hypertrophy",
+    focusKey: "pe_focus_hypertrophy",
     duration: "3-6 weeks",
     focus: "Muscle growth, time under tension",
     intensity: "65-80% 1RM",
@@ -73,6 +76,7 @@ const PHASES: Phase[] = [
     id: "strength",
     name: "Strength",
     nameKey: "pe_strength",
+    focusKey: "pe_focus_strength",
     duration: "7-9 weeks",
     focus: "Maximal force production",
     intensity: "80-95% 1RM",
@@ -85,6 +89,7 @@ const PHASES: Phase[] = [
     id: "deload",
     name: "Deload",
     nameKey: "pe_deload",
+    focusKey: "pe_focus_deload",
     duration: "10th week",
     focus: "Recovery, regeneration",
     intensity: "40-60% 1RM",
@@ -289,7 +294,7 @@ export function PeriodizationEngine({
                         isActive ? "text-foreground" : "text-muted-foreground"
                       }`}
                     >
-                      {phase.name}
+                      {t(phase.nameKey)}
                     </h4>
                     {isCompleted && (
                       <span className="text-[10px] text-emerald-500 font-medium">
@@ -324,7 +329,7 @@ export function PeriodizationEngine({
                     >
                       <p className="text-[11px] text-muted-foreground">
                         <span className="font-medium text-foreground">Focus:</span>{" "}
-                        {phase.focus}
+                        {t(phase.focusKey)}
                       </p>
                       <p className="text-[11px] text-muted-foreground">
                         <span className="font-medium text-foreground">Volume:</span>{" "}
@@ -355,7 +360,7 @@ export function PeriodizationEngine({
           >
             <div className="p-3 rounded-xl border border-border bg-muted/50">
               <p className="text-[10px] font-medium text-brand uppercase tracking-wider mb-2">
-                AI Generated Workout — {PHASES[activePhase]!.name}
+                AI Generated Workout — {t(PHASES[activePhase]!.nameKey)}
               </p>
               <ul className="space-y-1.5">
                 {getWorkoutForPhase(PHASES[activePhase]!).map((exercise, i) => (
@@ -380,7 +385,7 @@ export function PeriodizationEngine({
           variant="outline"
           className="flex-1 h-10 text-xs border-border text-foreground"
         >
-          {showWorkout ? "Hide" : isEnglish ? "View Workout" : "Ver Treino"}
+          {showWorkout ? t("pe_hide") : t("pe_view_workout")}
         </Button>
         <Button
           onClick={advancePhase}
@@ -388,8 +393,8 @@ export function PeriodizationEngine({
           className="flex-1 h-10 text-xs bg-brand text-white hover:bg-brand/90 disabled:opacity-40"
         >
           {activePhase >= PHASES.length - 1
-            ? isEnglish ? "Complete" : "Completar"
-            : isEnglish ? "Next Phase" : "Próxima Fase"}
+            ? t("pe_complete")
+            : t("pe_next_phase")}
         </Button>
       </div>
 
