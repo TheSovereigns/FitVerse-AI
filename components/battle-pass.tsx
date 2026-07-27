@@ -1,39 +1,22 @@
 "use client"
 
 import React, { useState, useEffect, useRef } from "react"
-import { motion, AnimatePresence } from "framer-motion"
+import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion"
 import { useTranslation } from "@/lib/i18n"
 import { logger } from "@/lib/logger"
 import {
-  Trophy,
-  Lock,
-  Check,
-  Star,
-  Zap,
-  Dumbbell,
-  Award,
-  ChevronLeft,
-  ChevronRight,
-  Gift,
-  Crown,
-  Sparkles,
-  ArrowRight,
+  Trophy, Lock, Check, Star, Zap, Dumbbell, Award,
+  ChevronLeft, ChevronRight, Gift, Crown, Sparkles,
+  ArrowRight, Flame, Shield, Target, Droplets, X, ScanLine,
 } from "lucide-react"
 import { getGamificationData } from "@/lib/gamification"
 import { cn } from "@/lib/utils"
 
-interface BattlePassProps {
-  isLocked?: boolean
-}
+interface BattlePassProps { isLocked?: boolean }
 
 interface TierReward {
-  tier: number
-  xpRequired: number
-  label: string
-  value: string
-  type: string
-  icon: React.ReactNode
-  rarity: "common" | "rare" | "epic" | "legendary"
+  tier: number; xpRequired: number; label: string; value: string
+  type: string; icon: React.ReactNode; rarity: "common" | "rare" | "epic" | "legendary"
 }
 
 const XP_PER_TIER = 500
@@ -71,83 +54,46 @@ const tiers: TierReward[] = [
   { tier: 30, xpRequired: 15000, label: "7 Dias Premium", value: "7days", type: "premium-trial", icon: <Crown className="w-6 h-6" />, rarity: "legendary" },
 ]
 
-const rarityColors = {
-  common: { border: "border-gray-500/30", bg: "bg-gray-500/10", text: "text-gray-400", glow: "" },
-  rare: { border: "border-blue-500/30", bg: "bg-blue-500/10", text: "text-blue-400", glow: "shadow-blue-500/10" },
-  epic: { border: "border-purple-500/30", bg: "bg-purple-500/10", text: "text-purple-400", glow: "shadow-purple-500/10" },
-  legendary: { border: "border-yellow-500/30", bg: "bg-yellow-500/10", text: "text-yellow-400", glow: "shadow-yellow-500/10" },
+const rarityConfig = {
+  common:  { border: "border-gray-400/25", bg: "bg-gray-400/8", text: "text-gray-300", glow: "", accent: "#9CA3AF" },
+  rare:    { border: "border-blue-400/30", bg: "bg-blue-500/10", text: "text-blue-400", glow: "shadow-[0_0_20px_rgba(59,130,246,0.15)]", accent: "#3B82F6" },
+  epic:    { border: "border-purple-400/30", bg: "bg-purple-500/10", text: "text-purple-400", glow: "shadow-[0_0_20px_rgba(168,85,247,0.15)]", accent: "#A855F7" },
+  legendary: { border: "border-yellow-400/30", bg: "bg-yellow-500/10", text: "text-yellow-400", glow: "shadow-[0_0_25px_rgba(234,179,8,0.2)]", accent: "#EAB308" },
 }
 
-interface Coupon {
-  id: string
-  code: string
-  date: string
-  used: boolean
-}
+interface Coupon { id: string; code: string; date: string; used: boolean }
 
 function CouponsList() {
-  const { t, locale } = useTranslation()
-  const isEnglish = locale === "en-US"
+  const { t } = useTranslation()
   const [coupons, setCoupons] = useState<Coupon[]>([])
-
   useEffect(() => {
-    try {
-      const stored = localStorage.getItem("fitverse-coupons")
-      if (stored) setCoupons(JSON.parse(stored))
-    } catch {}
+    try { const s = localStorage.getItem("fitverse-coupons"); if (s) setCoupons(JSON.parse(s)) } catch {}
   }, [])
-
   const markUsed = (id: string) => {
-    const updated = coupons.map(c => c.id === id ? { ...c, used: true } : c)
-    setCoupons(updated)
-    localStorage.setItem("fitverse-coupons", JSON.stringify(updated))
+    const u = coupons.map(c => c.id === id ? { ...c, used: true } : c)
+    setCoupons(u); localStorage.setItem("fitverse-coupons", JSON.stringify(u))
   }
-
-  const activeCoupons = coupons.filter(c => !c.used)
-  const usedCoupons = coupons.filter(c => c.used)
-
-  if (activeCoupons.length === 0 && usedCoupons.length === 0) {
-    return (
-      <p className="text-xs text-muted-foreground text-center py-4">
-        {t("bp_no_coupons")}
-      </p>
-    )
-  }
-
+  const active = coupons.filter(c => !c.used)
+  const used = coupons.filter(c => c.used)
+  if (active.length === 0 && used.length === 0)
+    return <p className="text-xs text-muted-foreground text-center py-6">{t("bp_no_coupons")}</p>
   return (
     <div className="space-y-2">
-      {activeCoupons.map((coupon) => (
-        <div key={coupon.id} className="flex items-center justify-between rounded-xl border border-purple-500/20 bg-purple-500/5 p-3">
-          <div className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-purple-500/15">
-              <Award className="h-4 w-4 text-purple-400" />
-            </div>
-            <div>
-              <p className="text-sm font-bold text-foreground">{coupon.code}</p>
-              <p className="text-[10px] text-muted-foreground">{t("bp_premium_discount")}</p>
-            </div>
+      {active.map(c => (
+        <div key={c.id} className="flex items-center justify-between rounded-xl border border-purple-500/20 bg-purple-500/5 p-3">
+          <div className="flex items-center gap-3">
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-purple-500/15"><Award className="h-4 w-4 text-purple-400" /></div>
+            <div><p className="text-sm font-bold text-foreground font-mono">{c.code}</p><p className="text-[10px] text-muted-foreground">{t("bp_premium_discount")}</p></div>
           </div>
-          <button
-            onClick={() => markUsed(coupon.id)}
-            className="rounded-lg bg-brand px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-brand/90"
-          >
-            Use
-          </button>
+          <button onClick={() => markUsed(c.id)} className="rounded-lg bg-brand px-4 py-1.5 text-xs font-semibold text-white hover:bg-brand/90 transition-colors">{t("bp_claim")}</button>
         </div>
       ))}
-      {usedCoupons.length > 0 && (
+      {used.length > 0 && (
         <details className="group">
-          <summary className="cursor-pointer text-xs text-muted-foreground hover:text-foreground">
-            {t("bp_used")} ({usedCoupons.length})
-          </summary>
-          <div className="mt-2 space-y-1">
-            {usedCoupons.map((coupon) => (
-              <div key={coupon.id} className="flex items-center gap-2 rounded-lg bg-muted/20 p-2 opacity-50">
-                <Check className="h-3 w-3 text-green-500" />
-                <span className="text-xs text-muted-foreground line-through">{coupon.code}</span>
-              </div>
-            ))}
-          </div>
+          <summary className="cursor-pointer text-xs text-muted-foreground hover:text-foreground">{t("bp_used")} ({used.length})</summary>
+          <div className="mt-2 space-y-1">{used.map(c => (
+            <div key={c.id} className="flex items-center gap-2 rounded-lg bg-muted/20 p-2 opacity-50"><Check className="h-3 w-3 text-green-500" /><span className="text-xs text-muted-foreground line-through">{c.code}</span></div>
+          ))}</div>
         </details>
       )}
     </div>
@@ -161,16 +107,13 @@ export function BattlePass({ isLocked = false }: BattlePassProps) {
   const [claimedRewards, setClaimedRewards] = useState<number[]>([])
   const scrollRef = useRef<HTMLDivElement>(null)
   const [selectedTier, setSelectedTier] = useState<TierReward | null>(null)
+  const [showCoupons, setShowCoupons] = useState(false)
 
   useEffect(() => {
     try {
-      const data = getGamificationData()
-      setTotalXp(data.xp)
-      const stored = localStorage.getItem("fitverse-battlepass-claimed")
-      if (stored) setClaimedRewards(JSON.parse(stored))
-    } catch (e) {
-      logger.error("[BattlePass] Failed to load:", e)
-    }
+      const data = getGamificationData(); setTotalXp(data.xp)
+      const s = localStorage.getItem("fitverse-battlepass-claimed"); if (s) setClaimedRewards(JSON.parse(s))
+    } catch (e) { logger.error("[BattlePass] Failed to load:", e) }
   }, [])
 
   const currentTier = Math.floor(totalXp / XP_PER_TIER)
@@ -181,352 +124,298 @@ export function BattlePass({ isLocked = false }: BattlePassProps) {
     if (claimedRewards.includes(tierNum)) return
     const tier = tiers.find(t => t.tier === tierNum)
     if (!tier || tierNum > currentTier) return
-
     applyReward(tier.type, tier.value)
-    const updated = [...claimedRewards, tierNum]
-    setClaimedRewards(updated)
+    const updated = [...claimedRewards, tierNum]; setClaimedRewards(updated)
     localStorage.setItem("fitverse-battlepass-claimed", JSON.stringify(updated))
   }
 
   const applyReward = (type: string, value: string) => {
     switch (type) {
-      case "coins": {
-        const coins = parseInt(localStorage.getItem("fitverse-coins") || "0") + parseInt(value)
-        localStorage.setItem("fitverse-coins", coins.toString())
-        break
-      }
-      case "xp-boost":
-        localStorage.setItem("fitverse-xp-boost", value)
-        break
-      case "workout-skip": {
-        const extra = parseInt(localStorage.getItem("fitverse-extra-workouts") || "0") + parseInt(value)
-        localStorage.setItem("fitverse-extra-workouts", extra.toString())
-        break
-      }
-      case "coupon": {
-        const coupons = JSON.parse(localStorage.getItem("fitverse-coupons") || "[]")
-        coupons.push({ id: `coupon-${Date.now()}`, code: value, date: new Date().toISOString(), used: false })
-        localStorage.setItem("fitverse-coupons", JSON.stringify(coupons))
-        break
-      }
-      case "premium-trial": {
-        const trialEnd = new Date()
-        trialEnd.setDate(trialEnd.getDate() + 7)
-        localStorage.setItem("fitverse-trial-end", trialEnd.toISOString())
-        break
-      }
+      case "coins": { const c = parseInt(localStorage.getItem("fitverse-coins") || "0") + parseInt(value); localStorage.setItem("fitverse-coins", c.toString()); break }
+      case "xp-boost": localStorage.setItem("fitverse-xp-boost", value); break
+      case "workout-skip": { const e = parseInt(localStorage.getItem("fitverse-extra-workouts") || "0") + parseInt(value); localStorage.setItem("fitverse-extra-workouts", e.toString()); break }
+      case "coupon": { const cs = JSON.parse(localStorage.getItem("fitverse-coupons") || "[]"); cs.push({ id: `coupon-${Date.now()}`, code: value, date: new Date().toISOString(), used: false }); localStorage.setItem("fitverse-coupons", JSON.stringify(cs)); break }
+      case "premium-trial": { const d = new Date(); d.setDate(d.getDate() + 7); localStorage.setItem("fitverse-trial-end", d.toISOString()); break }
     }
   }
 
   const scrollTo = (dir: "left" | "right") => {
     if (!scrollRef.current) return
-    const amount = dir === "left" ? -160 : 160
-    scrollRef.current.scrollBy({ left: amount, behavior: "smooth" })
+    scrollRef.current.scrollBy({ left: dir === "left" ? -170 : 170, behavior: "smooth" })
   }
 
   const getLocalizedLabel = (label: string): string => {
-    if (isEnglish) {
-      if (label === "+1 Treino") return "+1 Workout"
-      if (label === "+2 Treinos") return "+2 Workouts"
-      if (label === "+3 Treinos") return "+3 Workouts"
-      if (label === "+5 Treinos") return "+5 Workouts"
-      if (label === "+10 Treinos") return "+10 Workouts"
-      if (label === "+12 Treinos") return "+12 Workouts"
-      if (label === "7 Dias Premium") return "7 Days Premium"
-    }
+    if (!isEnglish) return label
+    if (label === "+1 Treino") return "+1 Workout"
+    if (label === "+2 Treinos") return "+2 Workouts"
+    if (label === "+3 Treinos") return "+3 Workouts"
+    if (label === "+5 Treinos") return "+5 Workouts"
+    if (label === "+10 Treinos") return "+10 Workouts"
+    if (label === "+12 Treinos") return "+12 Workouts"
+    if (label === "7 Dias Premium") return "7 Days Premium"
     return label
   }
 
   if (isLocked) {
     return (
-      <div className="relative overflow-hidden rounded-2xl border border-border p-6">
-        <div className="absolute inset-0 bg-muted/50 backdrop-blur-sm flex items-center justify-center z-10">
+      <div className="relative overflow-hidden rounded-3xl border border-border p-8">
+        <div className="absolute inset-0 bg-gradient-to-br from-muted/60 to-muted/30 backdrop-blur-md flex items-center justify-center z-10">
           <div className="text-center">
-            <Lock className="h-10 w-10 mx-auto mb-2 text-muted-foreground" />
-            <p className="font-medium text-foreground">{t("bp_pro_feature")}</p>
-            <p className="text-sm text-muted-foreground">{t("bp_unlock_battle_pass")}</p>
+            <div className="mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-2xl bg-muted/50"><Lock className="h-8 w-8 text-muted-foreground" /></div>
+            <p className="font-bold text-foreground text-lg">{t("bp_pro_feature")}</p>
+            <p className="text-sm text-muted-foreground mt-1">{t("bp_unlock_battle_pass")}</p>
           </div>
         </div>
-        <div className="opacity-30 pointer-events-none">
-          <h2 className="text-lg font-semibold text-foreground">{t("bp_battle_pass")}</h2>
-        </div>
+        <div className="h-40 opacity-20" />
       </div>
     )
   }
 
   return (
     <div className="relative mx-auto w-full max-w-2xl space-y-4 pb-safe-nav">
-      {/* Header */}
-      <motion.div
-        initial={{ opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="relative overflow-hidden rounded-2xl border border-border bg-gradient-to-br from-purple-500/20 via-brand/5 to-transparent p-5"
+      {/* ═══ EPIC HEADER ═══ */}
+      <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
+        className="relative overflow-hidden rounded-3xl border border-purple-500/20"
       >
-        <div className="absolute -right-8 -top-8 h-32 w-32 rounded-full bg-purple-500/10 blur-3xl" />
-        <div className="absolute -left-6 -bottom-6 h-24 w-24 rounded-full bg-brand/10 blur-2xl" />
+        {/* Animated background */}
+        <div className="absolute inset-0 bg-gradient-to-br from-purple-600/15 via-indigo-500/8 to-brand/10" />
+        <div className="absolute -right-12 -top-12 h-40 w-40 rounded-full bg-purple-500/15 blur-3xl" />
+        <div className="absolute -left-8 -bottom-8 h-32 w-32 rounded-full bg-brand/10 blur-3xl" />
+        <div className="absolute right-1/4 top-0 h-20 w-20 rounded-full bg-yellow-500/8 blur-2xl" />
 
-        <div className="relative">
-          <div className="flex items-center gap-2 mb-3">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-purple-500/20">
-              <Trophy className="h-4 w-4 text-purple-400" />
-            </div>
-            <span className="rounded-full bg-purple-500/20 px-2 py-0.5 text-[10px] font-bold text-purple-400">
-              {t("bp_battle_pass")}
-            </span>
-          </div>
-
-          <div className="flex items-end justify-between">
-            <div>
-              <div className="flex items-baseline gap-2">
-                <span className="text-3xl font-black text-foreground">{currentTier}</span>
-                <span className="text-sm text-muted-foreground">/ 30</span>
+        <div className="relative p-6">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2.5">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-purple-500/25 to-brand/15">
+                <Trophy className="h-5 w-5 text-purple-400" />
               </div>
-              <p className="text-xs text-muted-foreground mt-0.5">
-                {totalXp.toLocaleString()} XP {t("bp_total_xp")}
-              </p>
+              <div>
+                <span className="text-[10px] font-black uppercase tracking-widest text-purple-400">{t("bp_battle_pass")}</span>
+                <p className="text-[10px] text-muted-foreground">{totalXp.toLocaleString()} XP {t("bp_total_xp")}</p>
+              </div>
             </div>
             <div className="text-right">
-              <p className="text-xs text-muted-foreground">
-                {xpInCurrentTier}/{XP_PER_TIER} XP
-              </p>
-              <p className="text-[10px] text-muted-foreground">
-                {t("bp_to_next_level")}
-              </p>
+              <div className="flex items-baseline gap-1">
+                <span className="text-4xl font-black bg-gradient-to-r from-purple-400 to-brand bg-clip-text text-transparent">{currentTier}</span>
+                <span className="text-sm text-muted-foreground font-medium">/ 30</span>
+              </div>
+              <p className="text-[10px] text-muted-foreground">{t("bp_to_next_level")}</p>
             </div>
           </div>
 
-          <div className="mt-3">
-            <div className="h-3 overflow-hidden rounded-full bg-border/50">
+          {/* XP Progress bar */}
+          <div className="relative">
+            <div className="h-3.5 overflow-hidden rounded-full bg-black/30 border border-white/5">
               <motion.div
-                className="h-full rounded-full bg-gradient-to-r from-purple-500 to-brand"
+                className="h-full rounded-full bg-gradient-to-r from-purple-500 via-indigo-400 to-brand relative"
                 animate={{ width: `${progress}%` }}
-                transition={{ duration: 0.5 }}
-              />
+                transition={{ duration: 0.8, ease: "easeOut" }}
+              >
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+              </motion.div>
+            </div>
+            <div className="flex justify-between mt-1.5">
+              <span className="text-[10px] text-muted-foreground">{xpInCurrentTier} / {XP_PER_TIER} XP</span>
+              <span className="text-[10px] font-semibold text-purple-400">{Math.round(progress)}%</span>
             </div>
           </div>
         </div>
       </motion.div>
 
-      {/* Horizontal Tier Track */}
-      <motion.div
-        initial={{ opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.05 }}
-        className="relative"
+      {/* ═══ HORIZONTAL GAME TRACK ═══ */}
+      <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
+        className="relative rounded-3xl border border-border bg-card/50 p-4"
       >
-        <div className="flex items-center justify-between mb-2 px-1">
-          <h3 className="text-sm font-semibold text-foreground">{t("bp_rewards_track")}</h3>
-          <div className="flex gap-1">
-            <button
-              onClick={() => scrollTo("left")}
-              className="flex h-7 w-7 items-center justify-center rounded-lg border border-border bg-card text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-            >
-              <ChevronLeft className="h-3.5 w-3.5" />
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="text-sm font-bold text-foreground">{t("bp_rewards_track")}</h3>
+          <div className="flex gap-1.5">
+            <button onClick={() => scrollTo("left")} className="flex h-8 w-8 items-center justify-center rounded-xl border border-border bg-background/50 text-muted-foreground hover:text-foreground hover:bg-muted transition-all active:scale-95">
+              <ChevronLeft className="h-4 w-4" />
             </button>
-            <button
-              onClick={() => scrollTo("right")}
-              className="flex h-7 w-7 items-center justify-center rounded-lg border border-border bg-card text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-            >
-              <ChevronRight className="h-3.5 w-3.5" />
+            <button onClick={() => scrollTo("right")} className="flex h-8 w-8 items-center justify-center rounded-xl border border-border bg-background/50 text-muted-foreground hover:text-foreground hover:bg-muted transition-all active:scale-95">
+              <ChevronRight className="h-4 w-4" />
             </button>
           </div>
         </div>
 
-        <div
-          ref={scrollRef}
-          className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide"
-          style={{ scrollSnapType: "x mandatory", WebkitOverflowScrolling: "touch" }}
-        >
-          {tiers.map((tier) => {
-            const unlocked = tier.tier <= currentTier
-            const claimed = claimedRewards.includes(tier.tier)
-            const available = unlocked && !claimed
-            const colors = rarityColors[tier.rarity]
-            const isMilestone = tier.tier % 10 === 0 || tier.tier === 30
+        {/* Tier track with connecting line */}
+        <div className="relative">
+          {/* Connection line */}
+          <div className="absolute top-1/2 left-0 right-0 h-0.5 -translate-y-1/2 bg-border/50 z-0" />
 
-            return (
-              <motion.button
-                key={tier.tier}
-                onClick={() => setSelectedTier(selectedTier?.tier === tier.tier ? null : tier)}
-                className={cn(
-                  "relative flex shrink-0 flex-col items-center rounded-xl border-2 p-2 transition-all",
-                  "w-[100px] min-h-[130px]",
-                  unlocked
-                    ? cn(colors.border, colors.bg, selectedTier?.tier === tier.tier && "ring-2 ring-brand/50")
-                    : "border-border/30 bg-muted/20 opacity-50",
-                  isMilestone && unlocked && "min-h-[145px]"
-                )}
-                style={{ scrollSnapAlign: "center" }}
-                whileHover={{ scale: 1.03 }}
-                whileTap={{ scale: 0.97 }}
-              >
-                {/* Tier Number */}
-                <div
+          <div ref={scrollRef} className="flex gap-3 overflow-x-auto pb-3 pt-2 px-1 scrollbar-hide relative z-10"
+            style={{ scrollSnapType: "x mandatory", WebkitOverflowScrolling: "touch" }}
+          >
+            {tiers.map((tier) => {
+              const unlocked = tier.tier <= currentTier
+              const claimed = claimedRewards.includes(tier.tier)
+              const available = unlocked && !claimed
+              const colors = rarityConfig[tier.rarity]
+              const isMilestone = tier.tier % 5 === 0
+              const isLast = tier.tier === 30
+
+              return (
+                <motion.button key={tier.tier}
+                  onClick={() => setSelectedTier(selectedTier?.tier === tier.tier ? null : tier)}
                   className={cn(
-                    "mb-1 flex h-6 w-6 items-center justify-center rounded-md text-[10px] font-black",
-                    unlocked ? cn(colors.bg, colors.text) : "bg-muted text-muted-foreground"
+                    "relative flex shrink-0 flex-col items-center rounded-2xl border-2 p-2.5 transition-all",
+                    "w-[88px] min-h-[140px]",
+                    unlocked
+                      ? cn(colors.border, colors.bg, colors.glow, selectedTier?.tier === tier.tier && "ring-2 ring-brand/60 scale-105")
+                      : "border-border/30 bg-muted/10 opacity-40",
+                    isLast && "w-[96px] min-h-[155px]"
                   )}
+                  style={{ scrollSnapAlign: "center" }}
+                  whileHover={{ scale: unlocked ? 1.06 : 1.02 }}
+                  whileTap={{ scale: 0.95 }}
                 >
-                  {tier.tier}
-                </div>
+                  {/* Tier badge */}
+                  <div className={cn(
+                    "mb-2 flex h-7 w-7 items-center justify-center rounded-lg text-[11px] font-black",
+                    unlocked ? cn(colors.bg, colors.text) : "bg-muted/40 text-muted-foreground"
+                  )}>
+                    {tier.tier}
+                  </div>
 
-                {/* Icon */}
-                <div
-                  className={cn(
-                    "mb-1 flex h-10 w-10 items-center justify-center rounded-xl",
-                    unlocked ? colors.bg : "bg-muted/30"
-                  )}
-                >
-                  <span className={cn(unlocked ? colors.text : "text-muted-foreground")}>
-                    {tier.icon}
-                  </span>
-                </div>
+                  {/* Reward icon */}
+                  <div className={cn(
+                    "mb-2 flex h-12 w-12 items-center justify-center rounded-xl relative",
+                    unlocked ? colors.bg : "bg-muted/20"
+                  )}>
+                    <span className={cn(unlocked ? colors.text : "text-muted-foreground")}>{tier.icon}</span>
+                    {isMilestone && unlocked && (
+                      <div className="absolute -inset-0.5 rounded-xl bg-gradient-to-b from-yellow-400/20 to-transparent pointer-events-none" />
+                    )}
+                  </div>
 
-                {/* Label */}
-                <p className={cn(
-                  "text-center text-[9px] font-semibold leading-tight",
-                  unlocked ? "text-foreground" : "text-muted-foreground"
-                )}>
-                  {getLocalizedLabel(tier.label)}
-                </p>
+                  {/* Label */}
+                  <p className={cn(
+                    "text-center text-[9px] font-semibold leading-tight min-h-[24px] flex items-center",
+                    unlocked ? "text-foreground" : "text-muted-foreground"
+                  )}>
+                    {getLocalizedLabel(tier.label)}
+                  </p>
 
-                {/* Status indicator */}
-                <div className="mt-auto pt-1">
-                  {claimed ? (
-                    <div className="flex h-5 w-5 items-center justify-center rounded-full bg-green-500/20">
-                      <Check className="h-3 w-3 text-green-400" />
-                    </div>
-                  ) : available ? (
-                    <motion.div
-                      animate={{ scale: [1, 1.15, 1] }}
-                      transition={{ repeat: Infinity, duration: 1.5 }}
-                      className="flex h-5 w-5 items-center justify-center rounded-full bg-brand/20"
-                    >
-                      <Gift className="h-3 w-3 text-brand" />
-                    </motion.div>
-                  ) : (
-                    <div className="flex h-5 w-5 items-center justify-center rounded-full bg-muted/30">
-                      <Lock className="h-3 w-3 text-muted-foreground" />
-                    </div>
-                  )}
-                </div>
-
-                {/* Milestone glow */}
-                {isMilestone && unlocked && (
-                  <div className="absolute -inset-px rounded-xl bg-gradient-to-b from-yellow-500/20 to-transparent pointer-events-none" />
-                )}
-              </motion.button>
-            )
-          })}
+                  {/* Status */}
+                  <div className="mt-auto pt-1.5">
+                    {claimed ? (
+                      <div className="flex h-6 w-6 items-center justify-center rounded-full bg-green-500/20 border border-green-500/30">
+                        <Check className="h-3 w-3 text-green-400" />
+                      </div>
+                    ) : available ? (
+                      <motion.div animate={{ scale: [1, 1.2, 1], boxShadow: ["0 0 0 0 rgba(168,85,247,0)", "0 0 0 6px rgba(168,85,247,0.15)", "0 0 0 0 rgba(168,85,247,0)"] }}
+                        transition={{ repeat: Infinity, duration: 2 }}
+                        className="flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-br from-purple-500/30 to-brand/30 border border-brand/40"
+                      >
+                        <Gift className="h-3 w-3 text-brand" />
+                      </motion.div>
+                    ) : (
+                      <div className="flex h-6 w-6 items-center justify-center rounded-full bg-muted/20">
+                        <Lock className="h-3 w-3 text-muted-foreground/60" />
+                      </div>
+                    )}
+                  </div>
+                </motion.button>
+              )
+            })}
+          </div>
         </div>
       </motion.div>
 
-      {/* Selected Tier Detail */}
+      {/* ═══ TIER DETAIL SHEET ═══ */}
       <AnimatePresence>
         {selectedTier && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            className="overflow-hidden"
+          <motion.div initial={{ opacity: 0, y: 16, scale: 0.97 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 8, scale: 0.97 }}
+            className="rounded-2xl border border-border bg-card p-5"
           >
-            <div className="rounded-xl border border-border bg-card p-4">
-              <div className="flex items-center gap-4">
-                <div
-                  className={cn(
-                    "flex h-14 w-14 items-center justify-center rounded-xl",
-                    rarityColors[selectedTier.rarity].bg
-                  )}
-                >
-                  <span className={rarityColors[selectedTier.rarity].text}>
-                    {selectedTier.icon}
-                  </span>
-                </div>
-                <div className="flex-1">
-                  <div className="flex items-center gap-2">
-                    <h4 className="text-sm font-semibold text-foreground">{getLocalizedLabel(selectedTier.label)}</h4>
-                    <span
-                      className={cn(
-                        "rounded-full px-1.5 py-0.5 text-[9px] font-bold uppercase",
-                        rarityColors[selectedTier.rarity].bg,
-                        rarityColors[selectedTier.rarity].text
-                      )}
-                    >
-                      {t(`bp_rarity_${selectedTier.rarity}`)}
-                    </span>
-                  </div>
-                  <p className="text-xs text-muted-foreground mt-0.5">
-                    {t("bp_current_level")} {selectedTier.tier} · {selectedTier.xpRequired.toLocaleString()} XP
-                  </p>
-                </div>
-                {selectedTier.tier <= currentTier && !claimedRewards.includes(selectedTier.tier) && (
-                  <button
-                    onClick={() => {
-                      claimReward(selectedTier.tier)
-                      setSelectedTier(null)
-                    }}
-                    className="rounded-lg bg-brand px-4 py-2 text-xs font-semibold text-white transition-colors hover:bg-brand/90"
-                  >
-                    <span className="flex items-center gap-1">
-                      {t("bp_claim")}
-                      <ArrowRight className="h-3 w-3" />
-                    </span>
-                  </button>
-                )}
-                {claimedRewards.includes(selectedTier.tier) && (
-                  <span className="flex items-center gap-1 rounded-full bg-green-500/10 px-2.5 py-1 text-xs font-medium text-green-400">
-                    <Check className="h-3 w-3" />
-                    {t("bp_claimed")}
-                  </span>
-                )}
+            <div className="flex items-start gap-4">
+              <div className={cn("flex h-16 w-16 items-center justify-center rounded-2xl shrink-0", rarityConfig[selectedTier.rarity].bg)}>
+                <span className={cn(rarityConfig[selectedTier.rarity].text)}>{selectedTier.icon}</span>
               </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <h4 className="text-base font-bold text-foreground">{getLocalizedLabel(selectedTier.label)}</h4>
+                  <span className={cn("rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide", rarityConfig[selectedTier.rarity].bg, rarityConfig[selectedTier.rarity].text)}>
+                    {t(`bp_rarity_${selectedTier.rarity}`)}
+                  </span>
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">
+                  {t("bp_current_level")} {selectedTier.tier} · {selectedTier.xpRequired.toLocaleString()} XP
+                </p>
+              </div>
+              <button onClick={() => setSelectedTier(null)} className="flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors">
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+            <div className="mt-4 flex gap-2">
+              {selectedTier.tier <= currentTier && !claimedRewards.includes(selectedTier.tier) && (
+                <button onClick={() => { claimReward(selectedTier.tier); setSelectedTier(null) }}
+                  className="flex-1 flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-brand to-emerald-500 py-3 text-sm font-bold text-white shadow-lg shadow-brand/20 hover:shadow-brand/30 transition-all active:scale-[0.98]"
+                >
+                  {t("bp_claim")} <ArrowRight className="h-4 w-4" />
+                </button>
+              )}
+              {claimedRewards.includes(selectedTier.tier) && (
+                <div className="flex-1 flex items-center justify-center gap-2 rounded-xl bg-green-500/10 border border-green-500/20 py-3 text-sm font-semibold text-green-400">
+                  <Check className="h-4 w-4" /> {t("bp_claimed")}
+                </div>
+              )}
+              {selectedTier.tier > currentTier && (
+                <div className="flex-1 flex items-center justify-center gap-2 rounded-xl bg-muted/30 py-3 text-sm font-medium text-muted-foreground">
+                  <Lock className="h-4 w-4" /> {t("bp_locked")}
+                </div>
+              )}
             </div>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* My Coupons */}
-      <motion.div
-        initial={{ opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.15 }}
-        className="rounded-2xl border border-border bg-card p-4"
+      {/* ═══ HOW TO EARN XP ═══ */}
+      <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}
+        className="rounded-2xl border border-border bg-card/50 p-5"
       >
-        <div className="flex items-center gap-2 mb-3">
-          <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-purple-500/15">
-            <Award className="h-3.5 w-3.5 text-purple-400" />
-          </div>
-          <h3 className="text-sm font-semibold text-foreground">{t("bp_my_coupons")}</h3>
+        <div className="flex items-center gap-2.5 mb-4">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand/15"><Sparkles className="h-4 w-4 text-brand" /></div>
+          <h3 className="text-sm font-bold text-foreground">{t("bp_how_to_earn")}</h3>
         </div>
-        <CouponsList />
-      </motion.div>
-
-      {/* How to earn XP */}
-      <motion.div
-        initial={{ opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.2 }}
-        className="rounded-2xl border border-border bg-card p-4"
-      >
-        <div className="flex items-center gap-2 mb-3">
-          <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-brand/15">
-            <Sparkles className="h-3.5 w-3.5 text-brand" />
-          </div>
-          <h3 className="text-sm font-semibold text-foreground">{t("bp_how_to_earn")}</h3>
-        </div>
-        <div className="grid grid-cols-2 gap-2">
+        <div className="grid grid-cols-2 gap-2.5">
           {[
-            { icon: "ScanLine", label: t("bp_scan_food"), xp: "+10 XP" },
-            { icon: "Dumbbell", label: t("bp_workout"), xp: "+25 XP" },
-            { icon: "Droplets", label: t("bp_track_water"), xp: "+5 XP" },
-            { icon: "Target", label: t("bp_build_habits"), xp: "+15 XP" },
+            { icon: ScanLine, label: t("bp_scan_food"), xp: "+10", color: "text-green-400", bg: "bg-green-500/10" },
+            { icon: Dumbbell, label: t("bp_workout"), xp: "+25", color: "text-blue-400", bg: "bg-blue-500/10" },
+            { icon: Droplets, label: t("bp_track_water"), xp: "+5", color: "text-cyan-400", bg: "bg-cyan-500/10" },
+            { icon: Target, label: t("bp_build_habits"), xp: "+15", color: "text-orange-400", bg: "bg-orange-500/10" },
           ].map((item, i) => (
-            <div key={i} className="flex items-center gap-2 rounded-lg bg-muted/30 p-2.5">
-              <span className="text-[10px] font-bold text-brand">{item.xp}</span>
-              <span className="text-xs text-foreground">{item.label}</span>
+            <div key={i} className="flex items-center gap-3 rounded-xl bg-muted/20 p-3 border border-border/50">
+              <div className={cn("flex h-9 w-9 items-center justify-center rounded-lg shrink-0", item.bg)}>
+                <item.icon className={cn("h-4 w-4", item.color)} />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-semibold text-foreground truncate">{item.label}</p>
+                <p className={cn("text-[10px] font-bold", item.color)}>{item.xp} XP</p>
+              </div>
             </div>
           ))}
         </div>
+      </motion.div>
+
+      {/* ═══ COUPONS ═══ */}
+      <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
+        className="rounded-2xl border border-border bg-card/50 overflow-hidden"
+      >
+        <button onClick={() => setShowCoupons(!showCoupons)}
+          className="flex w-full items-center gap-2.5 p-5 text-left hover:bg-muted/20 transition-colors"
+        >
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-purple-500/15"><Award className="h-4 w-4 text-purple-400" /></div>
+          <span className="flex-1 text-sm font-bold text-foreground">{t("bp_my_coupons")}</span>
+          <ChevronRight className={cn("h-4 w-4 text-muted-foreground transition-transform", showCoupons && "rotate-90")} />
+        </button>
+        <AnimatePresence>
+          {showCoupons && (
+            <motion.div initial={{ height: 0 }} animate={{ height: "auto" }} exit={{ height: 0 }} className="overflow-hidden">
+              <div className="px-5 pb-5"><CouponsList /></div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </motion.div>
     </div>
   )
