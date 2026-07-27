@@ -18,6 +18,7 @@ export interface ProductAnalysis {
   macros?: { calories: number; protein: number; carbs: number; fat: number; fiber?: number; sugar?: number; sodium?: number }
   micros?: { vitamins?: string[]; minerals?: string[] }
   ingredients?: string[]
+  ingredientDetails?: { name: string; estimatedGrams: number; calories: number; protein: number; carbs: number; fat: number; fiber?: number }[]
   allergens?: string[]
   novaClassification?: { group: number; label: string; description: string }
   glycemicIndex?: { value: number | null; category: string | null; note: string | null }
@@ -53,20 +54,42 @@ interface ProductResultProps {
 }
 
 import { useTranslation } from "@/lib/i18n"
-import { usePlanLimits } from "@/hooks/usePlanLimits"
-import { Lock } from "lucide-react"
 
 export function ProductResult({ result, onBack, imageData, onSave, onDiscard, hasPendingSave }: ProductResultProps) {
   const { t } = useTranslation()
-  const { plan } = usePlanLimits()
-  const isPremium = plan === "pro" || plan === "premium"
-  
+
   const defaultGrams = result?.servingSize ? parseInt(result.servingSize.replace(/\D/g, '')) || 100 : 100
   const [grams, setGrams] = useState(defaultGrams)
   const [showIngredients, setShowIngredients] = useState(false)
   const [showAllAllergens, setShowAllAllergens] = useState(false)
   const [isFavorite, setIsFavorite] = useState(false)
   const [isComparing, setIsComparing] = useState(false)
+  const hasIngredientDetails = (result?.ingredientDetails?.length ?? 0) > 0
+
+  const defaultIngredientWeights = useMemo(() => {
+    if (!result?.ingredientDetails) return []
+    return result.ingredientDetails.map(ing => ({
+      name: ing.name,
+      grams: ing.estimatedGrams,
+      calories: ing.calories,
+      protein: ing.protein,
+      carbs: ing.carbs,
+      fat: ing.fat,
+      fiber: ing.fiber ?? 0,
+    }))
+  }, [result?.ingredientDetails])
+
+  const [ingredientWeights, setIngredientWeights] = useState<{name: string; grams: number; calories: number; protein: number; carbs: number; fat: number; fiber: number}[]>([])
+
+  useEffect(() => {
+    if (defaultIngredientWeights.length > 0) {
+      setIngredientWeights(defaultIngredientWeights)
+    }
+  }, [defaultIngredientWeights])
+
+  const totalIngredientGrams = useMemo(() => {
+    return ingredientWeights.reduce((sum, iw) => sum + iw.grams, 0)
+  }, [ingredientWeights])
 
   useEffect(() => {
     if (!result) return
@@ -116,6 +139,38 @@ export function ProductResult({ result, onBack, imageData, onSave, onDiscard, ha
   
   const adjustedMacros = useMemo(() => {
     if (!result?.macros) return null
+
+    if (hasIngredientDetails && ingredientWeights.length > 0) {
+      const totalCalories = ingredientWeights.reduce((sum, iw) => {
+        const ratio = iw.grams / (iw.grams || 1)
+        return sum + iw.calories * ratio
+      }, 0)
+      const totalProtein = ingredientWeights.reduce((sum, iw) => {
+        const ratio = iw.grams / (iw.grams || 1)
+        return sum + iw.protein * ratio
+      }, 0)
+      const totalCarbs = ingredientWeights.reduce((sum, iw) => {
+        const ratio = iw.grams / (iw.grams || 1)
+        return sum + iw.carbs * ratio
+      }, 0)
+      const totalFat = ingredientWeights.reduce((sum, iw) => {
+        const ratio = iw.grams / (iw.grams || 1)
+        return sum + iw.fat * ratio
+      }, 0)
+      const totalFiber = ingredientWeights.reduce((sum, iw) => {
+        const ratio = iw.grams / (iw.grams || 1)
+        return sum + (iw.fiber || 0) * ratio
+      }, 0)
+      return {
+        calories: Math.round(totalCalories),
+        protein: Math.round(totalProtein),
+        carbs: Math.round(totalCarbs),
+        fat: Math.round(totalFat),
+        fiber: Math.round(totalFiber),
+        sugar: Math.round((result.macros.sugar || 0) * (totalIngredientGrams / defaultGrams)),
+      }
+    }
+
     const ratio = grams / defaultGrams
     return {
       calories: Math.round(result.macros.calories * ratio),
@@ -125,7 +180,7 @@ export function ProductResult({ result, onBack, imageData, onSave, onDiscard, ha
       fiber: Math.round((result.macros.fiber || 0) * ratio),
       sugar: Math.round((result.macros.sugar || 0) * ratio),
     }
-  }, [result?.macros, grams, defaultGrams])
+  }, [result?.macros, grams, defaultGrams, ingredientWeights, hasIngredientDetails, defaultIngredientWeights, totalIngredientGrams])
   
   const incrementGrams = () => setGrams(prev => prev + 10)
   const decrementGrams = () => setGrams(prev => Math.max(10, prev - 10))
@@ -312,63 +367,128 @@ export function ProductResult({ result, onBack, imageData, onSave, onDiscard, ha
         </motion.div>
       )}
 
-      {/* Gram Adjustment */}
+      {/* Weight Adjustment - Multi-Ingredient or Single */}
       {result.macros && (
-        isPremium ? (
-          <motion.div 
-            initial={{ y: 20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            className="bg-card border border-border rounded-2xl p-4 md:p-6 flex flex-col items-center gap-4"
-          >
-            <div className="flex items-center gap-3">
-              <Scale className="w-6 h-6 text-primary" />
-              <span className="text-sm font-bold text-muted-foreground uppercase tracking-widest">Peso</span>
-            </div>
-            
-            <div className="flex items-center gap-6">
-              <button onClick={decrementGrams} className="w-12 h-12 rounded-full bg-muted/50 hover:bg-muted/50 flex items-center justify-center transition-colors" aria-label="Diminuir 10g">
-                <Minus className="w-6 h-6" />
-              </button>
-              
-              <div className="text-center min-w-[100px]">
-                <p className="text-4xl font-black text-foreground tracking-tighter">{grams}g</p>
-                <p className="text-xs font-bold text-primary opacity-60 uppercase tracking-widest">
-                  {grams === defaultGrams ? `(padrão ${defaultGrams}g)` : `(original ${defaultGrams}g)`}
-                </p>
-              </div>
-              
-              <button onClick={incrementGrams} className="w-12 h-12 rounded-full bg-muted/50 hover:bg-muted/50 flex items-center justify-center transition-colors" aria-label="Aumentar 10g">
-                <Plus className="w-6 h-6" />
-              </button>
-            </div>
+        <motion.div 
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          className="bg-card border border-border rounded-2xl p-4 md:p-6"
+        >
+          <div className="flex items-center gap-3 mb-4">
+            <Scale className="w-6 h-6 text-primary" />
+            <span className="text-sm font-bold text-muted-foreground uppercase tracking-widest">{t("pr_weight_adjust")}</span>
+          </div>
 
-            <input type="range" min="10" max="500" step="10" value={grams} onChange={(e) => setGrams(parseInt(e.target.value))} className="w-full max-w-xs accent-primary" />
-          </motion.div>
-        ) : (
-          <motion.div 
-            initial={{ y: 20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            className="bg-card border border-border rounded-2xl border-primary/30 p-4 md:p-6 flex flex-col items-center gap-4"
-          >
-            <div className="flex items-center gap-3">
-              <Lock className="w-6 h-6 text-primary" />
-              <span className="text-sm font-bold text-primary uppercase tracking-widest">Ajustar Peso</span>
+          {hasIngredientDetails ? (
+            <div className="space-y-3">
+              <p className="text-xs text-muted-foreground mb-3">{t("pr_ingredients_detected").replace("{count}", String(ingredientWeights.length))}</p>
+              
+              {ingredientWeights.map((iw, i) => {
+                const originalIng = defaultIngredientWeights[i]
+                if (!originalIng) return null
+                const ratio = iw.grams / (originalIng.grams || 1)
+                const ingCal = Math.round(iw.calories * ratio)
+                const ingProt = Math.round(iw.protein * ratio)
+                const ingCarbs = Math.round(iw.carbs * ratio)
+                const ingFat = Math.round(iw.fat * ratio)
+                return (
+                  <div key={i} className="p-3 rounded-xl bg-foreground/5 border border-foreground/10">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-sm font-bold text-foreground">{iw.name}</span>
+                      <div className="flex items-center gap-2">
+                        <button 
+                          onClick={() => {
+                            const next = [...ingredientWeights]
+                            next[i] = { ...next[i], grams: Math.max(5, next[i].grams - 10) }
+                            setIngredientWeights(next)
+                          }} 
+                          className="w-8 h-8 rounded-full bg-muted/50 hover:bg-muted/80 flex items-center justify-center transition-colors"
+                        >
+                          <Minus className="w-4 h-4" />
+                        </button>
+                        <input 
+                          type="number" 
+                          value={iw.grams} 
+                          onChange={(e) => {
+                            const val = Math.max(5, parseInt(e.target.value) || 5)
+                            const next = [...ingredientWeights]
+                            next[i] = { ...next[i], grams: val }
+                            setIngredientWeights(next)
+                          }}
+                          className="w-16 text-center text-sm font-black bg-muted/30 rounded-lg px-2 py-1 border border-border focus:border-primary focus:outline-none"
+                        />
+                        <button 
+                          onClick={() => {
+                            const next = [...ingredientWeights]
+                            next[i] = { ...next[i], grams: next[i].grams + 10 }
+                            setIngredientWeights(next)
+                          }} 
+                          className="w-8 h-8 rounded-full bg-muted/50 hover:bg-muted/80 flex items-center justify-center transition-colors"
+                        >
+                          <Plus className="w-4 h-4" />
+                        </button>
+                        <span className="text-xs font-bold text-muted-foreground ml-1">g</span>
+                      </div>
+                    </div>
+                    <div className="flex gap-3 text-xs text-muted-foreground">
+                      <span><Flame className="w-3 h-3 inline text-[#FF453A]" /> {ingCal}</span>
+                      <span><Dumbbell className="w-3 h-3 inline text-[#0A84FF]" /> {ingProt}g</span>
+                      <span><Wheat className="w-3 h-3 inline text-[#FFD60A]" /> {ingCarbs}g</span>
+                      <span><Droplets className="w-3 h-3 inline text-[#FF375F]" /> {ingFat}g</span>
+                    </div>
+                  </div>
+                )
+              })}
+
+              <div className="flex items-center justify-between pt-3 border-t border-border">
+                <span className="text-xs font-bold text-muted-foreground uppercase">{t("pr_total")}</span>
+                <span className="text-lg font-black text-primary">{totalIngredientGrams}g</span>
+              </div>
+
+              <button 
+                onClick={() => {
+                  setIngredientWeights(defaultIngredientWeights)
+                }}
+                className="w-full text-xs font-bold text-muted-foreground hover:text-foreground py-2 rounded-xl hover:bg-muted/30 transition-colors"
+              >
+                {t("pr_reset_weights")}
+              </button>
             </div>
-            <p className="text-sm text-muted-foreground text-center">Disponível nos planos Pro e Premium</p>
-          </motion.div>
-        )
+          ) : (
+            /* Single weight adjustment (backward compatible) */
+            <div className="flex flex-col items-center gap-4">
+              <div className="flex items-center gap-6">
+                <button onClick={decrementGrams} className="w-12 h-12 rounded-full bg-muted/50 hover:bg-muted/80 flex items-center justify-center transition-colors" aria-label="Diminuir 10g">
+                  <Minus className="w-6 h-6" />
+                </button>
+                
+                <div className="text-center min-w-[100px]">
+                  <p className="text-4xl font-black text-foreground tracking-tighter">{grams}g</p>
+                  <p className="text-xs font-bold text-primary opacity-60 uppercase tracking-widest">
+                    {grams === defaultGrams ? `(padrão ${defaultGrams}g)` : `(original ${defaultGrams}g)`}
+                  </p>
+                </div>
+                
+                <button onClick={incrementGrams} className="w-12 h-12 rounded-full bg-muted/50 hover:bg-muted/80 flex items-center justify-center transition-colors" aria-label="Aumentar 10g">
+                  <Plus className="w-6 h-6" />
+                </button>
+              </div>
+              <input type="range" min="10" max="500" step="10" value={grams} onChange={(e) => setGrams(parseInt(e.target.value))} className="w-full max-w-xs accent-primary" />
+            </div>
+          )}
+        </motion.div>
       )}
 
       {/* Macros */}
       {result.macros && (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
            {[
-             { label: "Calorias", val: (isPremium && adjustedMacros) ? adjustedMacros.calories : result.macros.calories, icon: Flame, color: "text-[#FF453A]", unit: "kcal" },
-             { label: "Proteína", val: ((isPremium && adjustedMacros) ? adjustedMacros.protein : result.macros.protein), icon: Dumbbell, color: "text-[#0A84FF]", unit: "g" },
-             { label: "Carboidratos", val: ((isPremium && adjustedMacros) ? adjustedMacros.carbs : result.macros.carbs), icon: Wheat, color: "text-[#FFD60A]", unit: "g" },
-             { label: "Gordura", val: ((isPremium && adjustedMacros) ? adjustedMacros.fat : result.macros.fat), icon: Droplets, color: "text-[#FF375F]", unit: "g" },
-             ...(result.macros.fiber ? [{ label: "Fibra", val: (isPremium && adjustedMacros) ? adjustedMacros.fiber : (result.macros.fiber || 0), icon: Leaf, color: "text-emerald-400", unit: "g" }] : []),
-             ...(result.macros.sugar ? [{ label: "Açúcar", val: (isPremium && adjustedMacros) ? adjustedMacros.sugar : (result.macros.sugar || 0), icon: Cookie, color: "text-yellow-400", unit: "g" }] : []),
+              { label: "Calorias", val: adjustedMacros ? adjustedMacros.calories : result.macros.calories, icon: Flame, color: "text-[#FF453A]", unit: "kcal" },
+              { label: "Proteína", val: adjustedMacros ? adjustedMacros.protein : result.macros.protein, icon: Dumbbell, color: "text-[#0A84FF]", unit: "g" },
+              { label: "Carboidratos", val: adjustedMacros ? adjustedMacros.carbs : result.macros.carbs, icon: Wheat, color: "text-[#FFD60A]", unit: "g" },
+              { label: "Gordura", val: adjustedMacros ? adjustedMacros.fat : result.macros.fat, icon: Droplets, color: "text-[#FF375F]", unit: "g" },
+              ...(result.macros.fiber ? [{ label: "Fibra", val: adjustedMacros ? adjustedMacros.fiber : (result.macros.fiber || 0), icon: Leaf, color: "text-emerald-400", unit: "g" }] : []),
+              ...(result.macros.sugar ? [{ label: "Açúcar", val: adjustedMacros ? adjustedMacros.sugar : (result.macros.sugar || 0), icon: Cookie, color: "text-yellow-400", unit: "g" }] : []),
            ].map((m, i) => (
              <motion.div 
                key={i}

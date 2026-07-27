@@ -151,6 +151,17 @@ Return STRICT JSON only (no markdown, no explanation, no backticks). Use this ex
     "minerals": ["Iron - 2.5mg (14% DV)", "Calcium - 200mg (15% DV)"]
   },
   "ingredients": ["first ingredient", "second ingredient", "..."],
+  "ingredientDetails": [
+    {
+      "name": "ingredient name",
+      "estimatedGrams": number,
+      "calories": number,
+      "protein": number,
+      "carbs": number,
+      "fat": number,
+      "fiber": number
+    }
+  ],
   "allergens": ["gluten", "dairy", "soy", "nuts", "eggs", "shellfish", "peanuts", "sesame"] or [],
   "novaClassification": {
     "group": number 1-4,
@@ -191,6 +202,7 @@ Return STRICT JSON only (no markdown, no explanation, no backticks). Use this ex
 Guidelines:
 - Read the actual nutrition label if visible. If not visible, estimate based on the product type.
 - For macros, use per serving as shown on label. If no label, estimate per 100g.
+- ingredientDetails: Identify each visible food item/component in the image. For multi-component meals, break down into individual items (e.g., rice, chicken, salad). Estimate grams and macros for each item based on visual portion size. The sum of ingredientDetails should approximate the total macros.
 - NOVA Group 1 = unprocessed, Group 2 = processed culinary, Group 3 = processed, Group 4 = ultra-processed.
 - Glycemic Index: estimate based on ingredients and product type.
 - allergens: detect from ingredients list if visible.
@@ -222,6 +234,17 @@ Retorne APENAS JSON estrito (sem markdown, sem explicação, sem crases). Use es
     "minerals": ["Ferro - 2.5mg (14% VD)", "Cálcio - 200mg (15% VD)"]
   },
   "ingredients": ["primeiro ingrediente", "segundo ingrediente", "..."],
+  "ingredientDetails": [
+    {
+      "name": "nome do ingrediente",
+      "estimatedGrams": número,
+      "calories": número,
+      "protein": número,
+      "carbs": número,
+      "fat": número,
+      "fiber": número
+    }
+  ],
   "allergens": ["glúten", "lacticínios", "soja", "nozes", "ovos", "crustáceos", "amendoim", "gergelim"] ou [],
   "novaClassification": {
     "group": número 1-4,
@@ -262,6 +285,7 @@ Retorne APENAS JSON estrito (sem markdown, sem explicação, sem crases). Use es
 Diretrizes:
 - Leia o rótulo de nutrição real se estiver visível. Se não estiver, estime com base no tipo de produto.
 - Para macros, use por porção conforme o rótulo. Se não houver rótulo, estime por 100g.
+- ingredientDetails: Identifique cada item/componente alimentar visível na imagem. Para refeições com múltiplos componentes, divida em itens individuais (ex: arroz, frango, salada). Estime os gramas e macros de cada item com base no tamanho visual da porção. A soma dos ingredientDetails deve se aproximar dos macros totais.
 - NOVA Grupo 1 = não processado, Grupo 2 = ingredientes culinários, Grupo 3 = processado, Grupo 4 = ultra-processado.
 - Índice Glicêmico: estime com base nos ingredientes e tipo de produto.
 - allergens: detecte da lista de ingredientes se visível.
@@ -351,6 +375,21 @@ async function parseAIResponse(text: string) {
       suitability: f.suitability || 'Neutro',
       justification: f.justification || '',
     }));
+  }
+
+  // Normalize ingredientDetails
+  if (parsed.ingredientDetails && Array.isArray(parsed.ingredientDetails)) {
+    parsed.ingredientDetails = parsed.ingredientDetails.map((ing: Record<string, unknown>) => ({
+      name: String(ing.name || ''),
+      estimatedGrams: Number(ing.estimatedGrams) || 0,
+      calories: Number(ing.calories) || 0,
+      protein: Number(ing.protein) || 0,
+      carbs: Number(ing.carbs) || 0,
+      fat: Number(ing.fat) || 0,
+      fiber: Number(ing.fiber) || 0,
+    }));
+  } else {
+    parsed.ingredientDetails = [];
   }
 
   return parsed;
@@ -503,6 +542,15 @@ export async function POST(req: Request) {
       macros: analysis.macros || { calories: 0, protein: 0, carbs: 0, fat: 0, fiber: 0, sugar: 0, sodium: 0 },
       micros: analysis.micros || { vitamins: [], minerals: [] },
       ingredients: analysis.ingredients || [],
+      ingredientDetails: analysis.ingredientDetails?.map((ing: Record<string, unknown>) => ({
+        name: String(ing.name || ''),
+        estimatedGrams: Number(ing.estimatedGrams) || 0,
+        calories: Number(ing.calories) || 0,
+        protein: Number(ing.protein) || 0,
+        carbs: Number(ing.carbs) || 0,
+        fat: Number(ing.fat) || 0,
+        fiber: Number(ing.fiber) || 0,
+      })) || [],
       allergens: analysis.allergens || [],
       novaClassification: analysis.novaClassification || { group: 4, label: 'Ultra-processado', description: 'Não foi possível classificar' },
       glycemicIndex: analysis.glycemicIndex || { value: null, category: null, note: null },
