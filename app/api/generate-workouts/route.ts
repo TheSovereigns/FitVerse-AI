@@ -3,6 +3,7 @@ import { createGoogleGenerativeAI } from "@ai-sdk/google"
 import { generateObject } from "ai"
 import { z } from "zod"
 import { getSupabaseAdmin } from "@/lib/supabase-server"
+import { requireAuth } from "@/lib/auth-helpers"
 import { PLAN_LIMITS, type Plan } from "@/lib/plan-limits"
 import { getCorsHeaders } from "@/lib/auth-helpers"
 import { checkRateLimit, getRateLimitKey, rateLimitResponse, RATE_LIMITS } from "@/lib/rate-limit"
@@ -86,22 +87,12 @@ export async function POST(req: Request) {
   const headers = getCorsHeaders();
   try {
 
-    const authHeader = req.headers.get('Authorization')
-    if (!authHeader) {
-      return NextResponse.json({ error: 'Não autorizado.' }, { status: 401, headers })
-    }
-
-    const token = authHeader.replace('Bearer ', '')
+    const auth = await requireAuth(req)
+    if (auth instanceof NextResponse) return auth
 
     const supabase = getSupabaseAdmin()
     if (!supabase) {
       return NextResponse.json({ error: 'Configuração do servidor incompleta.' }, { status: 500, headers })
-    }
-
-    const { data: { user }, error: authError } = await supabase.auth.getUser(token)
-
-    if (!user || authError) {
-      return NextResponse.json({ error: 'Token inválido.' }, { status: 401, headers })
     }
 
     const rlKey = getRateLimitKey(req, "generate-workouts")
@@ -111,11 +102,11 @@ export async function POST(req: Request) {
     const { data: profile } = await supabase
       .from('profiles')
       .select('plan')
-      .eq('id', user.id)
+      .eq('id', auth.userId)
       .single()
 
     const userPlan = profile?.plan || 'free'
-    const canProceed = await checkWorkoutLimit(user.id, userPlan)
+    const canProceed = await checkWorkoutLimit(auth.userId, userPlan)
 
     if (!canProceed) {
       return NextResponse.json({ 
@@ -185,7 +176,7 @@ TODA saída em ${lang}. Técnico, específico, focado em resultados.`
     })
 
     await supabase.from('workouts').insert({
-      user_id: user.id,
+      user_id: auth.userId,
       name: object.name || 'Generated Workout',
     })
 

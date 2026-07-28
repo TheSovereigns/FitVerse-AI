@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
-import { authUser, getCorsHeaders } from "@/lib/auth-helpers"
+import { authUser, getCorsHeaders } from "@/lib/supabase-server"
 import { checkRateLimit, getRateLimitKey, rateLimitResponse, RATE_LIMITS } from "@/lib/rate-limit"
 import { fetchGeminiWithFallback } from "@/lib/ai-fallback"
 

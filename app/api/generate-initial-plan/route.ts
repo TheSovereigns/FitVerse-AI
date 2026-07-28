@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 import { GoogleGenerativeAI } from "@google/generative-ai"
 import { getSupabaseAdmin } from "@/lib/supabase-server"
+import { requireAuth } from "@/lib/auth-helpers"
 import { checkRateLimit, getRateLimitKey, RATE_LIMITS } from "@/lib/rate-limit"
 import { getCorsHeaders } from "@/lib/auth-helpers"
 import { generateContentWithFallback } from "@/lib/ai-fallback"
@@ -16,16 +17,10 @@ export async function POST(req: Request) {
   }
 
   try {
-    const authHeader = req.headers.get("Authorization")
-    if (!authHeader) return NextResponse.json({ error: "Unauthorized" }, { status: 401, headers })
-    if (!supabase) return NextResponse.json({ error: "Server config incomplete" }, { status: 500, headers })
+    const auth = await requireAuth(req)
+    if (auth instanceof NextResponse) return auth
 
-    const token = authHeader.replace("Bearer ", "")
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser(token)
-    if (!user || authError) return NextResponse.json({ error: "Invalid token" }, { status: 401, headers })
+    if (!supabase) return NextResponse.json({ error: "Server config incomplete" }, { status: 500, headers })
 
     const apiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_GENERATIVE_AI_API_KEY
     if (!apiKey) return NextResponse.json({ error: "API Key not configured" }, { status: 500, headers })
@@ -151,14 +146,14 @@ RULES: All text in ${lang}. Only JSON keys in English. Macros must sum to calori
 
     if (supabase) {
       await supabase.from("metabolic_plans").insert({
-        user_id: user.id,
+        user_id: auth.userId,
         perfil: { weight, height, age, gender, activityLevel, goal, sleepHours, sleepQuality, stressLevel, injuries, equipment, dietaryRestrictions, experience, workoutsPerWeek },
         macros: data.macros,
         meals: data.diet?.meals || [],
       }).then(() => {})
 
       await supabase.from("workouts").insert({
-        user_id: user.id,
+        user_id: auth.userId,
         name: data.workout?.name || "Plano de Treino",
         exercises: data.workout?.weeklySchedule || [],
         duration_minutes: 45,

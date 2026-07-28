@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@/lib/supabase-server';
+import { requireAuth } from '@/lib/auth-helpers';
 import { checkRateLimit, getRateLimitKey, RATE_LIMITS } from '@/lib/rate-limit';
 import { PLAN_LIMITS, type Plan } from '@/lib/plan-limits';
 import { getCorsHeaders } from "@/lib/auth-helpers";
@@ -404,32 +405,22 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Rate limit exceeded" }, { status: 429, headers })
   }
 
-  const authHeader = req.headers.get('Authorization');
-  if (!authHeader) {
-    return NextResponse.json({ error: 'Não autorizado.' }, { status: 401, headers });
-  }
+  const auth = await requireAuth(req);
+  if (auth instanceof NextResponse) return auth;
 
-  const token = authHeader.replace('Bearer ', '');
-  
   const supabaseAdmin = getSupabaseAdmin();
   if (!supabaseAdmin) {
     return NextResponse.json({ error: 'Configuração do servidor incompleta.' }, { status: 500, headers });
-  }
-  
-  const { data: { user }, error: authError } = await supabaseAdmin.auth.getUser(token);
-
-  if (!user || authError) {
-    return NextResponse.json({ error: 'Token inválido.' }, { status: 401, headers });
   }
 
   const { data: profile } = await supabaseAdmin
     .from('profiles')
     .select('plan')
-    .eq('id', user.id)
+    .eq('id', auth.userId)
     .single();
 
   const userPlan = profile?.plan || 'free';
-  const canProceed = await checkScanLimit(user.id, userPlan);
+  const canProceed = await checkScanLimit(auth.userId, userPlan);
 
   if (!canProceed) {
     return NextResponse.json({ 
@@ -579,7 +570,7 @@ export async function POST(req: Request) {
 
     // Save scan to database (minimal - for limit tracking only)
     const { data: scanRecord } = await supabaseAdmin.from('scans').insert({
-      user_id: user.id,
+      user_id: auth.userId,
       product_name: transformed.productName,
       score: transformed.longevityScore,
     }).select('id, created_at').single();

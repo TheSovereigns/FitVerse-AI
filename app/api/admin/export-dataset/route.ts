@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server'
-import { createClient, type SupabaseClient } from '@supabase/supabase-js'
+import { getSupabaseAdmin } from '@/lib/supabase-server'
+import { requireAdmin } from '@/lib/auth-helpers'
+import { type SupabaseClient } from '@supabase/supabase-js'
 
 type ExportFormat = 'jsonl' | 'alpaca' | 'csv'
 
@@ -15,33 +17,6 @@ interface ExportFilters {
 
 const SYSTEM_PROMPT_PT = 'Você é o FitVerse AI, um assistente especializado em fitness, nutrição, saúde, emagrecimento e academia. Forneça conselhos seguros, motivadores e baseados em evidências.'
 const SYSTEM_PROMPT_EN = 'You are FitVerse AI, an assistant specialized in fitness, nutrition, health, weight loss and gym training. Provide safe, motivating, evidence-based advice.'
-
-function getSupabaseAdmin(): SupabaseClient {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL || ''
-  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_KEY || ''
-
-  return createClient(supabaseUrl, serviceKey, {
-    auth: { autoRefreshToken: false, persistSession: false },
-  })
-}
-
-async function verifyAdmin(req: Request, supabaseAdmin: SupabaseClient): Promise<boolean> {
-
-  const token = req.headers.get('Authorization')?.replace('Bearer ', '')
-  if (!token) return false
-
-  const { data: { user }, error } = await supabaseAdmin.auth.getUser(token)
-  if (error) return false
-  if (!user) return false
-
-  const { data: profile } = await supabaseAdmin
-    .from('profiles')
-    .select('is_admin')
-    .eq('id', user.id)
-    .single()
-
-  return profile?.is_admin === true
-}
 
 function formatJSONL(messages: Array<{ user_message: string; ai_response: string; edited_response: string | null; user_context: Record<string, unknown>; user_message_lang: string }>): string {
   return messages.map((m) => {
@@ -84,11 +59,12 @@ function formatCSV(messages: Array<{ id: string; user_message: string; ai_respon
 }
 
 export async function POST(req: Request) {
-  const supabaseAdmin = getSupabaseAdmin()
+  const admin = await requireAdmin(req)
+  if (admin instanceof NextResponse) return admin
 
-  const isAdmin = await verifyAdmin(req, supabaseAdmin)
-  if (!isAdmin) {
-    return NextResponse.json({ error: 'Unauthorized — admin access required' }, { status: 403 })
+  const supabaseAdmin = getSupabaseAdmin()
+  if (!supabaseAdmin) {
+    return NextResponse.json({ error: 'Server configuration error' }, { status: 500 })
   }
 
   try {

@@ -137,7 +137,7 @@ export interface ScanHistoryItem {
 
 export type View =
   | 'home' | 'dashboard' | 'result' | 'recipes' | 'training'
-  | 'profile' | 'planner' | 'settings' | 'store' | 'chatbot' | 'clans'
+  | 'profile' | 'planner' | 'settings' | 'chatbot' | 'clans'
   | 'sleep' | 'stress' | 'health-checkin' | 'supplements'
   | 'meal-planner' | 'dietary' | 'micronutrients' | 'substitutions'
   | 'periodization' | 'workout-feedback' | 'equipment' | 'mobility'

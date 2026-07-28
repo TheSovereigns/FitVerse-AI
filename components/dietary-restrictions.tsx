@@ -89,7 +89,7 @@ const RESTRICTIONS = [
     label: "dr_paleo",
     description: "dr_paleo_desc",
     icon: Beef,
-    affected: ["meal-planner", "recipes", "store"],
+    affected: ["meal-planner", "recipes"],
   },
   {
     id: "halal",

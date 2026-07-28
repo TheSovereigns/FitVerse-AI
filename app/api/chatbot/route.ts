@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold, Content } from '@google/generative-ai';
 import { getSupabaseAdmin, getCorsHeaders } from '@/lib/supabase-server';
+import { authUser } from '@/lib/supabase-server';
 import { logger } from '@/lib/logger';
 import { checkRateLimit, getRateLimitKey, RATE_LIMITS } from '@/lib/rate-limit';
 import { detectCategory, detectLanguage } from '@/lib/chat-helpers';
@@ -31,22 +32,17 @@ export async function GET(req: Request) {
   const headers = getCorsHeaders();
   const supabaseAdmin = getSupabaseAdmin();
 
-  const token = req.headers.get('Authorization')?.replace('Bearer ', '');
-  if (!token || !supabaseAdmin) {
+  const auth = await authUser(req);
+  if (!auth || !supabaseAdmin) {
     return NextResponse.json({ messages: [] }, { headers });
   }
 
   try {
-    const { data: { user }, error } = await supabaseAdmin.auth.getUser(token);
-    if (error || !user) {
-      return NextResponse.json({ messages: [] }, { headers });
-    }
-
     // Get the latest conversation and its messages
     const { data: conv } = await supabaseAdmin
       .from('ai_conversations')
       .select('id')
-      .eq('user_id', user.id)
+      .eq('user_id', auth.userId)
       .order('created_at', { ascending: false })
       .limit(1)
       .single();
@@ -103,18 +99,11 @@ export async function POST(req: Request) {
     const { message, history, userMetabolicPlan, userContext } = body;
     let authenticatedUserId: string | null = null;
 
-    const token = req.headers.get('Authorization')?.replace('Bearer ', '');
-    if (!token) {
+    const auth = await authUser(req);
+    if (!auth) {
       return NextResponse.json({ error: 'Nao autorizado.' }, { status: 401, headers });
     }
-
-    if (supabaseAdmin) {
-      const { data: { user }, error } = await supabaseAdmin.auth.getUser(token);
-      if (error || !user) {
-        return NextResponse.json({ error: 'Token invalido.' }, { status: 401, headers });
-      }
-      authenticatedUserId = user.id;
-    }
+    authenticatedUserId = auth.userId;
 
     if (!message) {
       return NextResponse.json({ error: 'Mensagem vazia.' }, { status: 400, headers });
