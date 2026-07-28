@@ -8,7 +8,7 @@ import {
   Home, ScanLine, Dumbbell, ChefHat,
   Moon, Brain, Apple, Wind,
   Heart, Timer, Smile, ListChecks,
-  Trophy, Bell,
+  Trophy, Bell, Watch,
   User, Settings, Users, MessageCircle,
   Salad, Pill, ArrowLeftRight, Zap,
   ChevronDown, Utensils, Ruler,
@@ -40,6 +40,7 @@ export function DesktopSidebar({ currentView, onNavigate, isFeatureLocked }: Sid
     {
       key: "health", icon: Heart, label: t("ds_health"),
       items: [
+        { view: "health-integrations", icon: Watch, label: t("hi_title") },
         { view: "sleep", icon: Moon, label: t("nav_sleep"), feature: "sleep" },
         { view: "stress", icon: Brain, label: t("nav_stress"), feature: "stress" },
         { view: "supplements", icon: Apple, label: t("nav_supplements"), feature: "supplements" },

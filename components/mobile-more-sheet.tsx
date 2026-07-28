@@ -9,7 +9,7 @@ import {
   Moon, Brain, Activity, Apple,
   Calculator, Salad, Pill, ArrowLeftRight,
   Timer, Zap, Dumbbell, Wind,
-  Heart, Smile, ListChecks,
+  Heart, Smile, ListChecks, Watch,
   Trophy, Bell,
   X, Utensils, Ruler,
   Calendar, TrendingUp, Flame, BarChart3
@@ -52,6 +52,7 @@ export function MobileMoreSheet({ open, onClose, onNavigate, isFeatureLocked }: 
     {
       title: t("ds_health"),
       items: [
+        { view: "health-integrations", icon: Watch, label: t("hi_title") },
         { view: "sleep", icon: Moon, label: t("nav_sleep"), feature: "sleep" },
         { view: "stress", icon: Brain, label: t("nav_stress"), feature: "stress" },
         { view: "health-checkin", icon: Activity, label: t("nav_health_checkin"), feature: "health-checkin" },

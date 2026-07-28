@@ -64,6 +64,7 @@ const AchievementsPage = lazy(() => import("@/components/achievements-page").the
 const AnalyticsCharts = lazy(() => import("@/components/analytics-charts").then(m => ({ default: m.AnalyticsCharts })))
 const SmartReminders = lazy(() => import("@/components/smart-reminders").then(m => ({ default: m.SmartReminders })))
 const MonthlyReport = lazy(() => import("@/components/monthly-report").then(m => ({ default: m.MonthlyReport })))
+const HealthIntegrations = lazy(() => import("@/components/health-integrations").then(m => ({ default: m.HealthIntegrations })))
 
 import { HomeSkeleton, TrainingSkeleton, RecipesSkeleton, ChatSkeleton, SettingsSkeleton, ProfileSkeleton, PlannerSkeleton } from "@/components/skeleton-loaders-views"
 
@@ -456,6 +457,7 @@ export default function DashboardPage() {
             {currentView === "body" && <BodyTracker />}
             {currentView === "smart-reminders" && <SmartReminders />}
             {currentView === "monthly-report" && <MonthlyReport />}
+            {currentView === "health-integrations" && <HealthIntegrations />}
             </FeatureErrorBoundary>
           </Suspense>
         </main>
