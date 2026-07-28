@@ -55,6 +55,7 @@ export function DesktopSidebar({ currentView, onNavigate, isFeatureLocked }: Sid
       items: [
         { view: "planner", icon: Salad, label: t("nav_diet") },
         { view: "meal-planner", icon: Apple, label: t("nav_meal_plan"), feature: "meal-planner" },
+        { view: "dietary", icon: Pill, label: t("nav_diet") },
         { view: "micronutrients", icon: Pill, label: t("nav_micronutrients"), feature: "micronutrients" },
         { view: "substitutions", icon: ArrowLeftRight, label: t("nav_substitutions"), feature: "substitutions" },
       ]

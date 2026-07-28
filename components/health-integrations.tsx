@@ -104,7 +104,7 @@ export function HealthIntegrations() {
       bgColor: "bg-cyan-500/10 border-cyan-500/20",
       available: true,
       description: t("hi_fitbit_desc"),
-      dataTypes: ["heart_rate", "steps", "sleep", "spo2", "weight", "activity", "呼吸_rate"],
+      dataTypes: ["heart_rate", "steps", "sleep", "spo2", "weight", "activity", "breathing_rate"],
       website: "https://dev.fitbit.com",
     },
     {
@@ -137,7 +137,7 @@ export function HealthIntegrations() {
       bgColor: "bg-purple-500/10 border-purple-500/20",
       available: true,
       description: t("hi_oura_desc"),
-      dataTypes: ["heart_rate", "sleep", "readiness", "activity", "体重"],
+      dataTypes: ["heart_rate", "sleep", "readiness", "activity", "weight"],
       website: "https://cloud.ouraring.com",
     },
   ]
@@ -168,8 +168,7 @@ export function HealthIntegrations() {
     recovery: t("hi_dt_recovery"),
     strain: t("hi_dt_strain"),
     readiness: t("hi_dt_readiness"),
-    "呼吸率": t("hi_dt_breathing"),
-    "体重": t("hi_dt_weight"),
+    "breathing_rate": t("hi_dt_breathing"),
   }
 
   return (

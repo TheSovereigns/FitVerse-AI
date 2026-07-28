@@ -102,7 +102,8 @@ export function HomeDashboard({
     try {
       const dayNames = locale === "pt-BR" ? ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"] : ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
 
-      const scanHistory = JSON.parse(localStorage.getItem("fitverse-scan-history") || "[]") as Array<{ scannedAt: string }>
+      const appStore = JSON.parse(localStorage.getItem("fitverse-app-store") || "{}") as { state?: { scanHistory?: Array<{ scannedAt: string }> } }
+      const scanHistory = appStore?.state?.scanHistory || []
       const hydrationHistory = JSON.parse(localStorage.getItem("fitverse-hydration-history") || "[]") as Array<{ date: string; amount: number }>
       const habitLogs = JSON.parse(localStorage.getItem("habit_logs") || "[]") as Array<{ date: string; completed: string[] }>
       const gamStats = JSON.parse(localStorage.getItem("fitverse-gamification-stats") || "{}") as { totalScans?: number; totalWorkouts?: number; totalWater?: number; totalHabits?: number }

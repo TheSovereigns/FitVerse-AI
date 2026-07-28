@@ -117,10 +117,17 @@ function ThemeSection() {
         const match = ACCENT_COLORS.find((c) => c.id === saved)
         if (match) applyAccentColor(match.color)
       }
-      const html = document.documentElement
-      if (html.classList.contains("dark")) setThemeState("dark")
-      else if (html.classList.contains("light")) setThemeState("light")
-      else setThemeState("system")
+      const savedTheme = localStorage.getItem("fitverse-theme")
+      if (savedTheme) {
+        setThemeState(savedTheme)
+        document.documentElement.classList.toggle("dark", savedTheme === "dark")
+        document.documentElement.classList.toggle("light", savedTheme === "light")
+      } else {
+        const html = document.documentElement
+        if (html.classList.contains("dark")) setThemeState("dark")
+        else if (html.classList.contains("light")) setThemeState("light")
+        else setThemeState("system")
+      }
     } catch (e) {
       logger.error("[SettingsPage] Failed to read theme state:", e)
     }
@@ -131,6 +138,7 @@ function ThemeSection() {
     setThemeState(next)
     document.documentElement.classList.toggle("dark", next === "dark")
     document.documentElement.classList.toggle("light", next === "light")
+    localStorage.setItem("fitverse-theme", next)
   }
 
   const ACCENT_COLORS = [
@@ -433,7 +441,52 @@ export function SettingsPage({ onBack }: { onBack?: () => void }) {
   }
 
   const handleClearCache = () => {
-    localStorage.removeItem("scanHistory")
+    const keys = [
+      "fitverse-app-store",
+      "fitverse-scan-history",
+      "fitverse-sleep",
+      "fitverse-stress",
+      "fitverse-fasting",
+      "fitverse-hydration-history",
+      "fitverse-hydration-today",
+      "fitverse-water-goal",
+      "fitverse-measurements",
+      "fitverse-food-diary",
+      "fitverse-gamification-stats",
+      "fitverse-xp",
+      "fitverse-coins",
+      "fitverse-body-measurements",
+      "fitverse-body-evolution",
+      "fitverse-favorites",
+      "fitverse-compare",
+      "fitverse-food-substitutions",
+      "habit_logs",
+      "habit_list",
+      "mood_entries",
+      "sleepTrackerData",
+      "stressTrackerData",
+      "fastingState",
+      "fastingHistory",
+      "biologicalAgeHistory",
+      "longevityHistory",
+      "meditation_sessions",
+      "healthCheckinData",
+      "health_checkin",
+      "sleep_tracker",
+      "stress_tracker",
+      "wearableIntegrations",
+      "wearableData",
+      "wearableLastSync",
+      "dailyActivity",
+      "generatedWorkouts",
+      "generatedDiets",
+      "seasonProgress",
+      "battlePassState",
+      "equipmentPreferences",
+      "dietarySelections",
+      "notificationsEnabled",
+    ]
+    keys.forEach(k => localStorage.removeItem(k))
     toast.success(t("settings_toast_cleared"))
   }
 

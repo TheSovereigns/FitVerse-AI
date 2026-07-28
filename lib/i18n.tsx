@@ -607,6 +607,11 @@ const translations = {
     hi_dt_strain: "Strain",
     hi_dt_readiness: "Readiness",
     hi_dt_breathing: "Freq. Respiratória",
+    // Feature Error Boundary
+    feb_title: "Algo deu errado",
+    feb_error_loading: "Ocorreu um erro ao carregar {name}.",
+    feb_unexpected: "Ocorreu um erro inesperado.",
+    feb_retry: "Tentar novamente",
     // Health Profile
     hp_my_data: "Meus Dados",
     hp_personal_info: "Informações pessoais",
@@ -1474,6 +1479,11 @@ const translations = {
     hi_dt_strain: "Strain",
     hi_dt_readiness: "Readiness",
     hi_dt_breathing: "Breathing Rate",
+    // Feature Error Boundary
+    feb_title: "Something went wrong",
+    feb_error_loading: "An error occurred while loading {name}.",
+    feb_unexpected: "An unexpected error occurred.",
+    feb_retry: "Try again",
     // Health Profile
     hp_my_data: "My Data",
     hp_personal_info: "Personal information",

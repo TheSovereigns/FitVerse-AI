@@ -35,12 +35,22 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: error.message }, { status: 400 })
     }
 
+    let subscription = "free"
+    if (data.user?.id) {
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("plan")
+        .eq("id", data.user.id)
+        .single()
+      subscription = profile?.plan || "free"
+    }
+
     return NextResponse.json({
       user: {
         id: data.user?.id,
         name: data.user?.user_metadata?.name,
         email: data.user?.email,
-        subscription: "free",
+        subscription,
       },
     })
   } catch (error) {

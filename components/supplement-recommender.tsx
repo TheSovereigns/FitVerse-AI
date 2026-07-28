@@ -48,11 +48,17 @@ export function SupplementRecommender({
     setLoading(true)
     setError("")
     try {
+      const { data: { session } } = await supabase.auth.getSession()
+      const token = session?.access_token
+      if (!token) throw new Error("Not authenticated")
       const res = await fetch("/api/recommend-supplements", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify({
-          goals: userGoals,
+          goal: userGoals,
           dietaryRestrictions,
           age,
           gender,
