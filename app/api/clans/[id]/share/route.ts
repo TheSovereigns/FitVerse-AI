@@ -1,22 +1,25 @@
 import { NextRequest, NextResponse } from "next/server"
-import { getSupabaseAdmin } from "@/lib/supabase-server"
-
-async function authUser(req: NextRequest) {
-  const auth = req.headers.get("authorization")
-  if (!auth?.startsWith("Bearer ")) return null
-  const token = auth.slice(7)
-  const supabase = getSupabaseAdmin()
-  if (!supabase) return null
-  const { data } = await supabase.auth.getUser(token)
-  return data.user ?? null
-}
+import { getSupabaseAdmin, authUser } from "@/lib/supabase-server"
+import { checkRateLimit, getRateLimitKey, rateLimitResponse, RATE_LIMITS } from "@/lib/rate-limit"
 
 export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
-  const user = await authUser(req)
-  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  const auth = await authUser(req)
+  if (!auth) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+
+  const rl = await checkRateLimit(getRateLimitKey(req, "clan-share"), RATE_LIMITS.chatbot)
+  if (!rl.allowed) return rateLimitResponse()
 
   const supabase = getSupabaseAdmin()
   if (!supabase) return NextResponse.json({ error: "Server configuration error" }, { status: 500 })
+
+  const { data: member } = await supabase
+    .from("clan_members")
+    .select("id")
+    .eq("clan_id", params.id)
+    .eq("user_id", auth.userId)
+    .single()
+
+  if (!member) return NextResponse.json({ error: "Not a member" }, { status: 403 })
 
   const body = await req.json()
   const { activityType, activityData } = body
@@ -34,7 +37,7 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
     .from("clan_activities")
     .insert({
       clan_id: params.id,
-      user_id: user.id,
+      user_id: auth.userId,
       activity_type: activityType,
       activity_data: activityData,
     })

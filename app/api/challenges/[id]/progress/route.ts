@@ -1,19 +1,13 @@
 import { NextRequest, NextResponse } from "next/server"
-import { getSupabaseAdmin } from "@/lib/supabase-server"
-
-async function authUser(req: NextRequest) {
-  const auth = req.headers.get("authorization")
-  if (!auth?.startsWith("Bearer ")) return null
-  const token = auth.slice(7)
-  const supabase = getSupabaseAdmin()
-  if (!supabase) return null
-  const { data } = await supabase.auth.getUser(token)
-  return data.user ?? null
-}
+import { getSupabaseAdmin, authUser } from "@/lib/supabase-server"
+import { checkRateLimit, getRateLimitKey, rateLimitResponse, RATE_LIMITS } from "@/lib/rate-limit"
 
 export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
-  const user = await authUser(req)
-  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  const auth = await authUser(req)
+  if (!auth) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+
+  const rl = await checkRateLimit(getRateLimitKey(req, "challenge-progress"), RATE_LIMITS.scan)
+  if (!rl.allowed) return rateLimitResponse()
 
   const supabase = getSupabaseAdmin()
   if (!supabase) return NextResponse.json({ error: "Server configuration error" }, { status: 500 })
@@ -21,11 +15,16 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
   const body = await req.json()
   const { increment } = body
 
+  const inc = Number(increment)
+  if (!inc || inc < 0 || inc > 100 || !Number.isInteger(inc)) {
+    return NextResponse.json({ error: "Invalid increment (must be integer 1-100)" }, { status: 400 })
+  }
+
   const { data: participant } = await supabase
     .from("challenge_participants")
     .select("id, current_value, completed")
     .eq("challenge_id", params.id)
-    .eq("user_id", user.id)
+    .eq("user_id", auth.userId)
     .single()
 
   if (!participant) return NextResponse.json({ error: "Not a participant" }, { status: 400 })
@@ -39,7 +38,7 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
 
   if (!challenge) return NextResponse.json({ error: "Challenge not found" }, { status: 404 })
 
-  const newValue = participant.current_value + (increment || 1)
+  const newValue = participant.current_value + inc
   const isCompleted = newValue >= challenge.target_value
 
   const updateData: any = { current_value: newValue }
@@ -58,7 +57,7 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
   if (isCompleted) {
     await supabase.rpc("log_event", {
       p_type: "challenge_completed",
-      p_user_id: user.id,
+      p_user_id: auth.userId,
       p_metadata: { challenge_id: params.id },
     })
   }

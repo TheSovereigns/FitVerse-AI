@@ -1,19 +1,9 @@
 import { NextRequest, NextResponse } from "next/server"
-import { getSupabaseAdmin } from "@/lib/supabase-server"
-
-async function authUser(req: NextRequest) {
-  const auth = req.headers.get("authorization")
-  if (!auth?.startsWith("Bearer ")) return null
-  const token = auth.slice(7)
-  const supabase = getSupabaseAdmin()
-  if (!supabase) return null
-  const { data } = await supabase.auth.getUser(token)
-  return data.user ?? null
-}
+import { getSupabaseAdmin, authUser } from "@/lib/supabase-server"
 
 export async function GET(req: NextRequest) {
-  const user = await authUser(req)
-  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  const auth = await authUser(req)
+  if (!auth) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
   const supabase = getSupabaseAdmin()
   if (!supabase) return NextResponse.json({ error: "Server configuration error" }, { status: 500 })
@@ -40,8 +30,8 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  const user = await authUser(req)
-  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  const auth = await authUser(req)
+  if (!auth) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
   const supabase = getSupabaseAdmin()
   if (!supabase) return NextResponse.json({ error: "Server configuration error" }, { status: 500 })
@@ -58,7 +48,7 @@ export async function POST(req: NextRequest) {
       .from("clan_members")
       .select("role")
       .eq("clan_id", clanId)
-      .eq("user_id", user.id)
+      .eq("user_id", auth.userId)
       .single()
 
     if (!member) return NextResponse.json({ error: "Not a clan member" }, { status: 403 })
@@ -73,7 +63,7 @@ export async function POST(req: NextRequest) {
       target_value: targetValue,
       unit: unit || "",
       clan_id: clanId || null,
-      created_by: user.id,
+      created_by: auth.userId,
       end_date: endDate,
     })
     .select()
@@ -83,12 +73,12 @@ export async function POST(req: NextRequest) {
 
   await supabase.from("challenge_participants").insert({
     challenge_id: challenge.id,
-    user_id: user.id,
+    user_id: auth.userId,
   })
 
   await supabase.rpc("log_event", {
     p_type: "challenge_created",
-    p_user_id: user.id,
+    p_user_id: auth.userId,
     p_metadata: { challenge_id: challenge.id, title },
   })
 

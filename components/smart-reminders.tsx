@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useMemo } from "react"
+import { useState, useEffect, useMemo, useRef } from "react"
 import { motion } from "framer-motion"
 import { Bell, Droplets, Moon, Dumbbell, Heart, CheckCircle } from "lucide-react"
 import { useTranslation } from "@/lib/i18n"
@@ -94,7 +94,7 @@ function getNextSleepTime(): Date {
   if (isBefore(now, thirtyMinBefore)) return thirtyMinBefore
 
   const tomorrow = addDays(now, 1)
-  return setMinutes(setHours(tomorrow, avgBedtimeHour), avgBedtimeMinute) 
+  return setMinutes(setHours(tomorrow, avgBedtimeHour), avgBedtimeMinute)
 }
 
 function getNextCheckinTime(): Date {
@@ -146,6 +146,14 @@ function formatNextTime(date: Date, isEnglish: boolean): string {
   return isEnglish ? `in ${diffD}d` : `em ${diffD}d`
 }
 
+function sendNotification(title: string, body: string, icon?: string) {
+  if (typeof window === "undefined" || !("Notification" in window)) return
+  if (Notification.permission !== "granted") return
+  try {
+    new Notification(title, { body, icon: icon || "/favicon.ico", tag: "fitverse-" + title })
+  } catch {}
+}
+
 export function SmartReminders() {
   const { t, locale } = useTranslation()
   const isEnglish = locale === "en-US"
@@ -159,6 +167,7 @@ export function SmartReminders() {
   })
 
   const [now, setNow] = useState(new Date())
+  const timersRef = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map())
 
   useEffect(() => {
     const interval = setInterval(() => setNow(new Date()), 60000)
@@ -172,6 +181,40 @@ export function SmartReminders() {
     workout: getNextWorkoutTime(),
     motivation: getNextMotivationTime(),
   }), [now])
+
+  // Schedule real notifications
+  useEffect(() => {
+    const timers = timersRef.current
+    timers.forEach((t) => clearTimeout(t))
+    timers.clear()
+
+    if (typeof window === "undefined" || !("Notification" in window) || Notification.permission !== "granted") return
+
+    const schedule = (key: string, time: Date, title: string, body: string) => {
+      const delay = time.getTime() - Date.now()
+      if (delay > 0 && delay < 86400000) {
+        timers.set(key, setTimeout(() => sendNotification(title, body), delay))
+      }
+    }
+
+    if (settings.water) {
+      schedule("water", nextTimes.water, "💧 FitVerse", isEnglish ? "Time to hydrate! Drink a glass of water." : "Hora de se hidratar! Beba um copo de água.")
+    }
+    if (settings.sleep) {
+      schedule("sleep", nextTimes.sleep, "🌙 FitVerse", isEnglish ? "Bedtime in 30 min. Start winding down." : "Hora de dormir em 30 min. Comece a relaxar.")
+    }
+    if (settings.checkin) {
+      schedule("checkin", nextTimes.checkin, "✅ FitVerse", isEnglish ? "Don't forget your daily check-in!" : "Não esqueça do seu check-in diário!")
+    }
+    if (settings.workout) {
+      schedule("workout", nextTimes.workout, "💪 FitVerse", isEnglish ? "Workout time! Let's crush it." : "Hora do treino! Vamos arrasar.")
+    }
+    if (settings.motivation) {
+      schedule("motivation", nextTimes.motivation, "🔥 FitVerse", isEnglish ? "New day, new opportunity to grow." : "Um novo dia, uma nova oportunidade para crescer.")
+    }
+
+    return () => { timers.forEach((t) => clearTimeout(t)); timers.clear() }
+  }, [settings, nextTimes, isEnglish])
 
   const toggleReminder = (key: keyof ReminderSettings) => {
     setSettings((prev) => ({ ...prev, [key]: !prev[key] }))

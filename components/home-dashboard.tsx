@@ -25,7 +25,7 @@ import { StreakDisplay } from "@/components/streak-display"
 import { HydrationTracker } from "@/components/hydration-tracker"
 import { BeginnerChecklist } from "@/components/beginner-checklist"
 
-type View = "home" | "dashboard" | "result" | "recipes" | "training" | "profile" | "planner" | "settings" | "store" | "chatbot"
+import { View } from "@/lib/types"
 
 export function HomeDashboard({
   userMetabolicPlan,

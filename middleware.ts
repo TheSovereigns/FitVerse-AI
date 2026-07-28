@@ -51,7 +51,6 @@ const protectedRoutes = [
   "/api/generate-weekly-meals",
   "/api/weekly-report",
   "/api/generate-initial-plan",
-  "/api/metabolic-plan",
   "/api/stripe/checkout",
   "/api/stripe/stats",
   "/api/subscription",

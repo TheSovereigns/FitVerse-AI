@@ -119,6 +119,17 @@ export function OnboardingFlow({ onComplete }: { onComplete: () => void }) {
           height: parseFloat(data.height),
           gender: data.gender as any,
           fitness_goal: data.goal as any,
+          activity_level: data.activityLevel,
+          sleep_hours: parseFloat(data.sleepHours),
+          sleep_quality: data.sleepQuality,
+          stress_level: data.stressLevel,
+          injuries: data.injuries,
+          equipment: data.equipment,
+          dietary_restrictions: data.dietaryRestrictions,
+          experience: data.experience,
+          workouts_per_week: parseInt(data.workoutsPerWeek || "3"),
+          smoking_status: data.smokingStatus,
+          water_intake: parseFloat(data.waterIntake || "2"),
           profile_setup_completed: true,
         }).eq("id", user.id)
 

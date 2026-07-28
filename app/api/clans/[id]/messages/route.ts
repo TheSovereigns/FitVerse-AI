@@ -1,22 +1,27 @@
 import { NextRequest, NextResponse } from "next/server"
-import { getSupabaseAdmin } from "@/lib/supabase-server"
+import { getSupabaseAdmin, authUser } from "@/lib/supabase-server"
+import { checkRateLimit, getRateLimitKey, rateLimitResponse, RATE_LIMITS } from "@/lib/rate-limit"
 
-async function authUser(req: NextRequest) {
-  const auth = req.headers.get("authorization")
-  if (!auth?.startsWith("Bearer ")) return null
-  const token = auth.slice(7)
-  const supabase = getSupabaseAdmin()
-  if (!supabase) return null
-  const { data } = await supabase.auth.getUser(token)
-  return data.user ?? null
+async function verifyClanMembership(supabase: any, clanId: string, userId: string) {
+  const { data } = await supabase
+    .from("clan_members")
+    .select("id")
+    .eq("clan_id", clanId)
+    .eq("user_id", userId)
+    .single()
+  return !!data
 }
 
 export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
-  const user = await authUser(req)
-  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  const auth = await authUser(req)
+  if (!auth) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
   const supabase = getSupabaseAdmin()
   if (!supabase) return NextResponse.json({ error: "Server configuration error" }, { status: 500 })
+
+  if (!await verifyClanMembership(supabase, params.id, auth.userId)) {
+    return NextResponse.json({ error: "Not a member" }, { status: 403 })
+  }
 
   const { searchParams } = new URL(req.url)
   const limit = Math.min(parseInt(searchParams.get("limit") || "50"), 100)
@@ -33,11 +38,18 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
 }
 
 export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
-  const user = await authUser(req)
-  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  const auth = await authUser(req)
+  if (!auth) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+
+  const rl = await checkRateLimit(getRateLimitKey(req, "clan-message"), RATE_LIMITS.chatbot)
+  if (!rl.allowed) return rateLimitResponse()
 
   const supabase = getSupabaseAdmin()
   if (!supabase) return NextResponse.json({ error: "Server configuration error" }, { status: 500 })
+
+  if (!await verifyClanMembership(supabase, params.id, auth.userId)) {
+    return NextResponse.json({ error: "Not a member" }, { status: 403 })
+  }
 
   const body = await req.json()
   const { content, messageType, metadata } = body
@@ -54,7 +66,7 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
     .from("clan_messages")
     .insert({
       clan_id: params.id,
-      user_id: user.id,
+      user_id: auth.userId,
       content: content.trim(),
       message_type: messageType || "text",
       metadata: metadata || null,

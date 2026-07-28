@@ -434,7 +434,14 @@ export function SettingsPage({ onBack }: { onBack?: () => void }) {
     }
   }
 
-  const handleNotificationsToggle = (checked: boolean) => {
+  const handleNotificationsToggle = async (checked: boolean) => {
+    if (checked && typeof window !== "undefined" && "Notification" in window) {
+      const permission = await Notification.requestPermission()
+      if (permission !== "granted") {
+        toast.error(locale === "en-US" ? "Notification permission denied" : "Permissão de notificação negada")
+        return
+      }
+    }
     setNotificationsEnabled(checked)
     localStorage.setItem("notificationsEnabled", JSON.stringify(checked))
     toast.success(checked ? t("settings_haptics_on") : t("settings_haptics_off"))
