@@ -1,7 +1,7 @@
 import { logger } from "@/lib/logger"
 import { NextResponse } from "next/server"
 
-export { getSupabaseAdmin, authUser, getTokenFromRequest, getCorsHeaders } from "@/lib/supabase-server"
+export { getSupabaseAdmin, authUser, getCorsHeaders } from "@/lib/supabase-server"
 
 export async function requireAuth(request: Request): Promise<{ userId: string; email?: string } | NextResponse> {
   const { authUser } = await import("@/lib/supabase-server")

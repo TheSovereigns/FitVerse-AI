@@ -1,5 +1,5 @@
 import { getSupabaseClient } from './supabase-client'
-import { createClient, SupabaseClient } from '@supabase/supabase-js'
+import { SupabaseClient } from '@supabase/supabase-js'
 import { logger } from './logger'
 
 // Lazy getter - only creates client on first access
@@ -8,36 +8,10 @@ export function getSupabase() {
 }
 
 // Direct export - avoids Proxy val.bind() pattern that breaks JWT header attachment
-// The Proxy creates a new function reference on every access, which prevents
-// Supabase JS from properly attaching the Authorization header to requests
 export const supabase: SupabaseClient = getSupabaseClient()
 
 // Re-export server utilities from supabase-server.ts
-export { getSupabaseAdmin, authUser, getTokenFromRequest, getCorsHeaders } from './supabase-server'
-
-// Legacy server client - use getSupabaseAdmin() instead
-let _supabaseAdmin: ReturnType<typeof createClient> | null = null
-export function getSupabaseAdminLazy() {
-  if (_supabaseAdmin) return _supabaseAdmin
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY || ''
-  if (!url || !key) return null
-  _supabaseAdmin = createClient(url, key, {
-    auth: { autoRefreshToken: false, persistSession: false },
-  })
-  return _supabaseAdmin
-}
-
-// Legacy alias - use getSupabaseAdminLazy() instead
-export const supabaseAdmin = typeof window !== 'undefined' ? null : getSupabaseAdminLazy()
-
-// Legacy server client factory - use getSupabaseAdmin() instead
-export function getServerClient() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL
-  const key = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY
-  if (!url || !key || url.includes('placeholder') || key.includes('placeholder')) return null
-  return createClient(url, key)
-}
+export { getSupabaseAdmin, authUser, getCorsHeaders } from './supabase-server'
 
 // Type definitions for better TypeScript support
 export type Profile = {
@@ -89,13 +63,6 @@ export type AIUsage = {
   created_at: string
 }
 
-// Helper function to get the current user
-export async function getCurrentUser() {
-  const { data: { user }, error } = await supabase.auth.getUser()
-  if (error || !user) return null
-  return user
-}
-
 // Helper function to get user profile
 export async function getUserProfile(userId: string): Promise<Profile | null> {
   try {
@@ -142,12 +109,6 @@ export async function getUserProfile(userId: string): Promise<Profile | null> {
     logger.error("[getUserProfile] Exception:", e)
     return null
   }
-}
-
-// Helper function to check if user is admin
-export async function isUserAdmin(userId: string): Promise<boolean> {
-  const profile = await getUserProfile(userId)
-  return profile?.is_admin || false
 }
 
 // Shared helper: find profile by user.id, fallback to email

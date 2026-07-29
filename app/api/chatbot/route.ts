@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold, Content } from '@google/generative-ai';
-import { getSupabaseAdmin, getCorsHeaders } from '@/lib/supabase-server';
-import { authUser } from '@/lib/supabase-server';
+import { getSupabaseAdmin, getCorsHeaders, authUser } from '@/lib/supabase-server';
 import { logger } from '@/lib/logger';
 import { checkRateLimit, getRateLimitKey, RATE_LIMITS } from '@/lib/rate-limit';
 import { detectCategory, detectLanguage } from '@/lib/chat-helpers';
