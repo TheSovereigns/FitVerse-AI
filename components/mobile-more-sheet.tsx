@@ -10,7 +10,7 @@ import {
   Calculator, Salad, Pill, ArrowLeftRight,
   Timer, Zap, Dumbbell, Wind,
   Heart, Smile, ListChecks, Watch,
-  Trophy, Bell,
+  Trophy, Bell, Navigation,
   X, Utensils, Ruler,
   Calendar, TrendingUp, Flame, BarChart3
 } from "lucide-react"
@@ -73,6 +73,7 @@ export function MobileMoreSheet({ open, onClose, onNavigate, isFeatureLocked }: 
     {
       title: t("ds_training"),
       items: [
+        { view: "gps-tracker", icon: Navigation, label: isEnglish ? "GPS Tracker" : "Rastreador GPS" },
         { view: "periodization", icon: Timer, label: t("nav_periodization"), feature: "periodization" },
         { view: "workout-feedback", icon: Zap, label: t("nav_workout_feedback"), feature: "workout-feedback" },
         { view: "equipment", icon: Dumbbell, label: t("nav_equipment"), feature: "equipment" },

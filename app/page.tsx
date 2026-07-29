@@ -65,6 +65,7 @@ const AnalyticsCharts = lazy(() => import("@/components/analytics-charts").then(
 const SmartReminders = lazy(() => import("@/components/smart-reminders").then(m => ({ default: m.SmartReminders })))
 const MonthlyReport = lazy(() => import("@/components/monthly-report").then(m => ({ default: m.MonthlyReport })))
 const HealthIntegrations = lazy(() => import("@/components/health-integrations").then(m => ({ default: m.HealthIntegrations })))
+const GpsTracker = lazy(() => import("@/components/gps-tracker").then(m => ({ default: m.GpsTracker })))
 
 import { HomeSkeleton, TrainingSkeleton, RecipesSkeleton, ChatSkeleton, SettingsSkeleton, ProfileSkeleton, PlannerSkeleton } from "@/components/skeleton-loaders-views"
 
@@ -163,6 +164,7 @@ export default function DashboardPage() {
       "analytics-charts": isEnglish ? "Analytics" : "Analises",
       "smart-reminders": isEnglish ? "Reminders" : "Lembretes",
       "monthly-report": isEnglish ? "Monthly Report" : "Rel. Mensal",
+      "gps-tracker": isEnglish ? "GPS Tracker" : "Rastreador GPS",
     }
     return titles[currentView] || t("view_fitverse")
   }
@@ -458,6 +460,7 @@ export default function DashboardPage() {
             {currentView === "smart-reminders" && <SmartReminders />}
             {currentView === "monthly-report" && <MonthlyReport />}
             {currentView === "health-integrations" && <HealthIntegrations />}
+            {currentView === "gps-tracker" && <GpsTracker />}
             </FeatureErrorBoundary>
           </Suspense>
         </main>

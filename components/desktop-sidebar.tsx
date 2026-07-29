@@ -8,7 +8,7 @@ import {
   Home, ScanLine, Dumbbell, ChefHat,
   Moon, Brain, Apple, Wind,
   Heart, Timer, Smile, ListChecks,
-  Trophy, Bell, Watch,
+  Trophy, Bell, Watch, Navigation,
   User, Settings, Users, MessageCircle,
   Salad, Pill, ArrowLeftRight, Zap,
   ChevronDown, Utensils, Ruler,
@@ -33,6 +33,7 @@ export function DesktopSidebar({ currentView, onNavigate, isFeatureLocked }: Sid
       key: "training", icon: Dumbbell, label: t("nav_workouts"),
       items: [
         { view: "training", icon: Dumbbell, label: t("nav_workouts") },
+        { view: "gps-tracker", icon: Navigation, label: isEnglish ? "GPS Tracker" : "Rastreador GPS" },
         { view: "mobility", icon: Wind, label: t("nav_mobility"), feature: "mobility" },
         { view: "workout-feedback", icon: Zap, label: t("nav_workout_feedback"), feature: "workout-feedback" },
       ]
