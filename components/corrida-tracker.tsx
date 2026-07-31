@@ -5,7 +5,8 @@ import { motion, AnimatePresence } from "framer-motion"
 import {
   Play, Pause, Square, MapPin, Clock, Flame, Route,
   Footprints, Bike, Mountain, PersonStanding, Timer,
-  TrendingUp, ChevronDown, Navigation,
+  TrendingUp, ChevronDown, Navigation, Zap, Trophy,
+  ArrowUp, ArrowDown, Map, RotateCcw, X,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useTranslation } from "@/lib/i18n"
@@ -40,14 +41,16 @@ interface ActivityType {
   label: string
   labelEn: string
   met: number
+  gradient: string
   color: string
+  bg: string
 }
 
 const ACTIVITIES: ActivityType[] = [
-  { id: "walking", icon: PersonStanding, label: "Andando", labelEn: "Walking", met: 3.5, color: "text-green-400" },
-  { id: "running", icon: Footprints, label: "Correndo", labelEn: "Running", met: 8.0, color: "text-orange-400" },
-  { id: "cycling", icon: Bike, label: "Bicicleta", labelEn: "Cycling", met: 6.0, color: "text-cyan-400" },
-  { id: "hiking", icon: Mountain, label: "Caminhada", labelEn: "Hiking", met: 5.0, color: "text-emerald-400" },
+  { id: "walking", icon: PersonStanding, label: "Andando", labelEn: "Walking", met: 3.5, gradient: "from-emerald-500 to-green-400", color: "text-emerald-400", bg: "bg-emerald-500/10" },
+  { id: "running", icon: Footprints, label: "Correndo", labelEn: "Running", met: 8.0, gradient: "from-orange-500 to-amber-400", color: "text-orange-400", bg: "bg-orange-500/10" },
+  { id: "cycling", icon: Bike, label: "Bicicleta", labelEn: "Cycling", met: 6.0, gradient: "from-cyan-500 to-blue-400", color: "text-cyan-400", bg: "bg-cyan-500/10" },
+  { id: "hiking", icon: Mountain, label: "Trilha", labelEn: "Hiking", met: 5.0, gradient: "from-violet-500 to-purple-400", color: "text-violet-400", bg: "bg-violet-500/10" },
 ]
 
 function haversineDistance(lat1: number, lng1: number, lat2: number, lng2: number): number {
@@ -55,34 +58,26 @@ function haversineDistance(lat1: number, lng1: number, lat2: number, lng2: numbe
   const dLat = ((lat2 - lat1) * Math.PI) / 180
   const dLng = ((lng2 - lng1) * Math.PI) / 180
   const a =
-    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos((lat1 * Math.PI) / 180) *
-      Math.cos((lat2 * Math.PI) / 180) *
-      Math.sin(dLng / 2) *
-      Math.sin(dLng / 2)
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
-  return R * c
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos((lat1 * Math.PI) / 180) * Math.cos((lat2 * Math.PI) / 180) * Math.sin(dLng / 2) ** 2
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
 }
 
-function calculateCalories(met: number, weightKg: number, durationHours: number): number {
-  return Math.round(met * weightKg * durationHours)
+function calculateCalories(met: number, weightKg: number, hours: number) {
+  return Math.round(met * weightKg * hours)
 }
 
-function formatDuration(seconds: number): string {
-  const h = Math.floor(seconds / 3600)
-  const m = Math.floor((seconds % 3600) / 60)
-  const s = seconds % 60
-  if (h > 0) return `${h}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`
-  return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`
+function fmtDuration(s: number) {
+  const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), sec = s % 60
+  return h > 0 ? `${h}:${String(m).padStart(2, "0")}:${String(sec).padStart(2, "0")}` : `${String(m).padStart(2, "0")}:${String(sec).padStart(2, "0")}`
 }
 
-function formatDistance(km: number): string {
-  if (km < 1) return `${Math.round(km * 1000)}m`
-  return `${km.toFixed(2)}km`
+function fmtDist(km: number) {
+  return km < 1 ? `${Math.round(km * 1000)}m` : `${km.toFixed(2)} km`
 }
 
-function formatSpeed(kmh: number): string {
-  return `${kmh.toFixed(1)}km/h`
+function fmtSpeed(kmh: number) {
+  return `${kmh.toFixed(1)}`
 }
 
 export function CorridaTracker() {
@@ -98,6 +93,7 @@ export function CorridaTracker() {
   const [showHistory, setShowHistory] = useState(false)
   const [showActivityPicker, setShowActivityPicker] = useState(false)
   const [mapReady, setMapReady] = useState(false)
+  const [showMap, setShowMap] = useState(true)
 
   const timerRef = useRef<NodeJS.Timeout | null>(null)
   const startTimeRef = useRef<number>(0)
@@ -113,32 +109,20 @@ export function CorridaTracker() {
 
   const distance = useMemo(() => {
     let d = 0
-    for (let i = 1; i < points.length; i++) {
-      d += haversineDistance(points[i - 1].lat, points[i - 1].lng, points[i].lat, points[i].lng)
-    }
+    for (let i = 1; i < points.length; i++) d += haversineDistance(points[i - 1].lat, points[i - 1].lng, points[i].lat, points[i].lng)
     return d
   }, [points])
 
-  const calories = useMemo(() => {
-    const weight = 70
-    const durationHours = duration / 3600
-    return calculateCalories(activity.met, weight, durationHours)
-  }, [activity.met, duration])
+  const calories = useMemo(() => calculateCalories(activity.met, 70, duration / 3600), [activity.met, duration])
 
-  const avgSpeed = useMemo(() => {
-    if (duration === 0) return 0
-    return (distance / duration) * 3600
-  }, [distance, duration])
+  const avgSpeed = useMemo(() => duration === 0 ? 0 : (distance / duration) * 3600, [distance, duration])
 
   const maxSpeed = useMemo(() => {
     let max = 0
     for (let i = 1; i < points.length; i++) {
       const d = haversineDistance(points[i - 1].lat, points[i - 1].lng, points[i].lat, points[i].lng)
       const dt = (points[i].timestamp - points[i - 1].timestamp) / 1000
-      if (dt > 0) {
-        const spd = (d / dt) * 3600
-        if (spd > max) max = spd
-      }
+      if (dt > 0) max = Math.max(max, (d / dt) * 3600)
     }
     return max
   }, [points])
@@ -146,152 +130,101 @@ export function CorridaTracker() {
   const pace = useMemo(() => {
     if (distance === 0) return "0:00"
     const minPerKm = (duration / 60) / distance
-    const m = Math.floor(minPerKm)
-    const s = Math.round((minPerKm - m) * 60)
-    return `${m}:${String(s).padStart(2, "0")}`
+    return `${Math.floor(minPerKm)}:${String(Math.round((minPerKm % 1) * 60)).padStart(2, "0")}`
   }, [distance, duration])
 
-  // Initialize Leaflet map
+  const speedHistory = useMemo(() => {
+    const speeds: number[] = []
+    for (let i = 1; i < points.length; i++) {
+      const d = haversineDistance(points[i - 1].lat, points[i - 1].lng, points[i].lat, points[i].lng)
+      const dt = (points[i].timestamp - points[i - 1].timestamp) / 1000
+      speeds.push(dt > 0 ? (d / dt) * 3600 : 0)
+    }
+    return speeds
+  }, [points])
+
+  // Leaflet map init
   useEffect(() => {
     if (mapReady || !mapRef.current || typeof window === "undefined") return
-
-    const initMap = async () => {
+    const init = async () => {
       const L = (await import("leaflet")).default
-
-      // Fix default marker icon issue
       delete (L.Icon.Default.prototype as any)._getIconUrl
       L.Icon.Default.mergeOptions({
         iconRetinaUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png",
         iconUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png",
         shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png",
       })
-
-      const map = L.map(mapRef.current!, {
-        zoomControl: false,
-        attributionControl: false,
-      }).setView([-15.78, -47.93], 14)
-
-      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-        maxZoom: 19,
-      }).addTo(map)
-
+      const map = L.map(mapRef.current!, { zoomControl: false, attributionControl: false }).setView([-15.78, -47.93], 14)
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 19 }).addTo(map)
       L.control.zoom({ position: "topright" }).addTo(map)
-
       mapInstanceRef.current = map
       setMapReady(true)
-
-      // Try to get current location
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-          (pos) => {
-            map.setView([pos.coords.latitude, pos.coords.longitude], 15)
-          },
-          () => {},
-          { timeout: 10000 }
-        )
-      }
+      navigator.geolocation?.getCurrentPosition(
+        (pos) => map.setView([pos.coords.latitude, pos.coords.longitude], 15),
+        () => {},
+        { timeout: 10000 }
+      )
     }
-
-    initMap()
-
-    return () => {
-      mapInstanceRef.current?.remove()
-      mapInstanceRef.current = null
-    }
+    init()
+    return () => { mapInstanceRef.current?.remove(); mapInstanceRef.current = null }
   }, [mapReady])
 
-  // Update map when points change
+  // Update map
   useEffect(() => {
     if (!mapReady || !mapInstanceRef.current || typeof window === "undefined") return
-
-    const updateMap = async () => {
+    const update = async () => {
       const L = (await import("leaflet")).default
       const map = mapInstanceRef.current
       if (!map) return
-
-      // Remove old polyline
-      if (polylineRef.current) {
-        map.removeLayer(polylineRef.current)
-      }
-
-      // Remove old markers
+      if (polylineRef.current) map.removeLayer(polylineRef.current)
       if (markerRef.current) map.removeLayer(markerRef.current)
       if (startMarkerRef.current) map.removeLayer(startMarkerRef.current)
-
       if (points.length === 0) return
 
-      // Draw polyline
       const latLngs = points.map((p) => [p.lat, p.lng] as [number, number])
+
+      // Gradient polyline effect — draw multiple semi-transparent polylines
       polylineRef.current = L.polyline(latLngs, {
         color: "#f97316",
-        weight: 4,
-        opacity: 0.9,
+        weight: 5,
+        opacity: 0.85,
         smoothFactor: 1,
+        lineCap: "round",
+        lineJoin: "round",
       }).addTo(map)
 
-      // Start marker (green)
+      // Shadow/glow polyline underneath
+      L.polyline(latLngs, { color: "#f97316", weight: 12, opacity: 0.15, smoothFactor: 1 }).addTo(map)
+
       const startIcon = L.divIcon({
-        html: `<div style="width:16px;height:16px;border-radius:50%;background:#22c55e;border:3px solid white;box-shadow:0 2px 6px rgba(0,0,0,0.3)"></div>`,
-        iconSize: [16, 16],
-        iconAnchor: [8, 8],
-        className: "",
+        html: `<div style="width:18px;height:18px;border-radius:50%;background:linear-gradient(135deg,#22c55e,#16a34a);border:3px solid white;box-shadow:0 2px 8px rgba(34,197,94,0.5)"></div>`,
+        iconSize: [18, 18], iconAnchor: [9, 9], className: "",
       })
       startMarkerRef.current = L.marker(latLngs[0], { icon: startIcon }).addTo(map)
 
-      // Current position marker (red pulse)
-      const currentIcon = L.divIcon({
-        html: `<div style="width:20px;height:20px;border-radius:50%;background:#ef4444;border:3px solid white;box-shadow:0 0 12px rgba(239,68,68,0.6);animation:pulse 1.5s infinite"></div>
-               <style>@keyframes pulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.3);opacity:0.7}}</style>`,
-        iconSize: [20, 20],
-        iconAnchor: [10, 10],
-        className: "",
+      const curIcon = L.divIcon({
+        html: `<div style="width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,#f97316,#ef4444);border:3px solid white;box-shadow:0 0 20px rgba(249,115,22,0.6);animation:gpulse 1.5s infinite"></div>
+               <style>@keyframes gpulse{0%,100%{transform:scale(1);box-shadow:0 0 20px rgba(249,115,22,0.6)}50%{transform:scale(1.2);box-shadow:0 0 30px rgba(249,115,22,0.8)}}</style>`,
+        iconSize: [24, 24], iconAnchor: [12, 12], className: "",
       })
-      markerRef.current = L.marker(latLngs[latLngs.length - 1], { icon: currentIcon }).addTo(map)
+      markerRef.current = L.marker(latLngs[latLngs.length - 1], { icon: curIcon }).addTo(map)
 
-      // Fit bounds
-      if (points.length > 1) {
-        map.fitBounds(polylineRef.current.getBounds(), { padding: [40, 40] })
-      } else {
-        map.setView(latLngs[0], 16)
-      }
+      if (points.length > 1) map.fitBounds(polylineRef.current.getBounds(), { padding: [50, 50] })
+      else map.setView(latLngs[0], 16)
     }
-
-    updateMap()
+    update()
   }, [points, mapReady])
 
   const startTracking = useCallback(() => {
-    if (!navigator.geolocation) {
-      alert(isEnglish ? "Geolocation not supported" : "Geolocalização não suportada")
-      return
-    }
-
-    startTimeRef.current = Date.now()
-    pausedDurationRef.current = 0
-    setDuration(0)
-    setPoints([])
-
-    timerRef.current = setInterval(() => {
-      const elapsed = Math.floor((Date.now() - startTimeRef.current - pausedDurationRef.current) / 1000)
-      setDuration(elapsed)
-    }, 1000)
-
+    if (!navigator.geolocation) { alert(isEnglish ? "Geolocation not supported" : "Geolocalização não suportada"); return }
+    startTimeRef.current = Date.now(); pausedDurationRef.current = 0; setDuration(0); setPoints([])
+    timerRef.current = setInterval(() => setDuration(Math.floor((Date.now() - startTimeRef.current - pausedDurationRef.current) / 1000)), 1000)
     const id = navigator.geolocation.watchPosition(
-      (pos) => {
-        const point: GpsPoint = {
-          lat: pos.coords.latitude,
-          lng: pos.coords.longitude,
-          timestamp: Date.now(),
-          altitude: pos.coords.altitude ?? undefined,
-          speed: pos.coords.speed ?? undefined,
-        }
-        setPoints((prev) => [...prev, point])
-      },
-      (err) => console.error("GPS error:", err),
+      (pos) => setPoints((p) => [...p, { lat: pos.coords.latitude, lng: pos.coords.longitude, timestamp: Date.now(), altitude: pos.coords.altitude ?? undefined, speed: pos.coords.speed ?? undefined }]),
+      (err) => console.error("GPS:", err),
       { enableHighAccuracy: true, maximumAge: 5000, timeout: 15000 }
     )
-
-    setWatchId(id)
-    setStatus("tracking")
+    setWatchId(id); setStatus("tracking")
   }, [isEnglish])
 
   const pauseTracking = useCallback(() => {
@@ -303,295 +236,281 @@ export function CorridaTracker() {
 
   const resumeTracking = useCallback(() => {
     startTimeRef.current = Date.now() - pausedDurationRef.current
-
-    timerRef.current = setInterval(() => {
-      const elapsed = Math.floor((Date.now() - startTimeRef.current) / 1000)
-      setDuration(elapsed)
-    }, 1000)
-
+    timerRef.current = setInterval(() => setDuration(Math.floor((Date.now() - startTimeRef.current) / 1000)), 1000)
     const id = navigator.geolocation.watchPosition(
-      (pos) => {
-        const point: GpsPoint = {
-          lat: pos.coords.latitude,
-          lng: pos.coords.longitude,
-          timestamp: Date.now(),
-          altitude: pos.coords.altitude ?? undefined,
-          speed: pos.coords.speed ?? undefined,
-        }
-        setPoints((prev) => [...prev, point])
-      },
-      (err) => console.error("GPS error:", err),
+      (pos) => setPoints((p) => [...p, { lat: pos.coords.latitude, lng: pos.coords.longitude, timestamp: Date.now(), altitude: pos.coords.altitude ?? undefined, speed: pos.coords.speed ?? undefined }]),
+      (err) => console.error("GPS:", err),
       { enableHighAccuracy: true, maximumAge: 5000, timeout: 15000 }
     )
-
-    setWatchId(id)
-    setStatus("tracking")
+    setWatchId(id); setStatus("tracking")
   }, [])
 
   const stopTracking = useCallback(() => {
     if (timerRef.current) clearInterval(timerRef.current)
     if (watchId !== null) navigator.geolocation.clearWatch(watchId)
-
     if (points.length > 0 && duration > 5) {
-      const session: GpsSession = {
-        id: Date.now().toString(),
-        activityType: selectedActivity,
-        points,
-        duration,
-        distance,
-        calories,
-        avgSpeed,
-        maxSpeed,
-        startedAt: new Date(points[0].timestamp).toISOString(),
-        endedAt: new Date().toISOString(),
-      }
-      setSessions((prev) => [session, ...prev].slice(0, 50))
+      setSessions((prev) => [{ id: Date.now().toString(), activityType: selectedActivity, points, duration, distance, calories, avgSpeed, maxSpeed, startedAt: new Date(points[0].timestamp).toISOString(), endedAt: new Date().toISOString() }, ...prev].slice(0, 50))
     }
-
-    setStatus("idle")
-    setPoints([])
-    setDuration(0)
-    setWatchId(null)
+    setStatus("idle"); setPoints([]); setDuration(0); setWatchId(null)
   }, [watchId, points, duration, distance, calories, avgSpeed, maxSpeed, selectedActivity, setSessions])
 
-  useEffect(() => {
-    return () => {
-      if (timerRef.current) clearInterval(timerRef.current)
-      if (watchId !== null) navigator.geolocation.clearWatch(watchId)
-    }
-  }, [watchId])
+  useEffect(() => () => { if (timerRef.current) clearInterval(timerRef.current); if (watchId !== null) navigator.geolocation.clearWatch(watchId) }, [watchId])
 
-  const recentSessions = sessions.slice(0, 10)
+  const isTracking = status !== "idle"
+  const recentSessions = sessions.slice(0, 20)
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center gap-2 mb-1">
-        <Footprints className="w-5 h-5 text-brand" />
-        <h2 className="text-lg font-semibold text-foreground">
-          {isEnglish ? "Run Tracker" : "Corrida"}
-        </h2>
-      </div>
-      <p className="text-sm text-muted-foreground mb-4">
-        {isEnglish ? "Track your runs with real-time GPS map" : "Rastreie suas corridas com mapa GPS em tempo real"}
-      </p>
+    <div className="min-h-screen -mx-4 -mt-4 md:-mx-8 md:-mt-4 lg:-mx-12 lg:-mt-4">
+      {/* Hero Map Section */}
+      <div className="relative">
+        {/* Map */}
+        <div className="relative h-[45vh] md:h-[55vh] bg-gray-900 overflow-hidden">
+          <div ref={mapRef} className="w-full h-full" style={{ zIndex: 0 }} />
 
-      {/* Activity Selector */}
-      <div className="glass-strong border border-border rounded-2xl p-4">
-        <button
-          onClick={() => setShowActivityPicker(!showActivityPicker)}
-          className="w-full flex items-center justify-between"
-        >
-          <div className="flex items-center gap-3">
-            <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center bg-background/50", activity.color)}>
-              <activity.icon className="w-5 h-5" />
+          {/* Gradient overlay at top */}
+          <div className="absolute top-0 left-0 right-0 h-24 bg-gradient-to-b from-background/90 to-transparent z-[400] pointer-events-none" />
+
+          {/* Gradient overlay at bottom */}
+          <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-background to-transparent z-[400] pointer-events-none" />
+
+          {/* Top bar */}
+          <div className="absolute top-0 left-0 right-0 z-[500] p-4 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className={cn("w-10 h-10 rounded-2xl bg-gradient-to-br flex items-center justify-center text-white shadow-lg", activity.gradient)}>
+                <activity.icon className="w-5 h-5" />
+              </div>
+              <div>
+                <p className="text-sm font-bold text-foreground drop-shadow-lg">
+                  {isEnglish ? activity.labelEn : activity.label}
+                </p>
+                <p className="text-[10px] text-muted-foreground">{isEnglish ? "GPS Active" : "GPS Ativo"}</p>
+              </div>
             </div>
-            <div className="text-left">
-              <p className="text-sm font-semibold text-foreground">
-                {isEnglish ? activity.labelEn : activity.label}
-              </p>
-              <p className="text-xs text-muted-foreground">MET {activity.met}</p>
-            </div>
+            {isTracking && (
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-red-500/90 backdrop-blur-sm text-white text-xs font-bold shadow-lg shadow-red-500/30"
+              >
+                <span className="w-2 h-2 rounded-full bg-white animate-pulse" />
+                REC
+              </motion.div>
+            )}
           </div>
-          <ChevronDown className={cn("w-4 h-4 text-muted-foreground transition-transform", showActivityPicker && "rotate-180")} />
-        </button>
 
-        <AnimatePresence>
-          {showActivityPicker && (
+          {/* Floating big timer */}
+          {isTracking && (
             <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: "auto", opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              className="overflow-hidden"
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              className="absolute bottom-6 left-0 right-0 z-[500] flex justify-center pointer-events-none"
             >
-              <div className="grid grid-cols-2 gap-2 mt-3 pt-3 border-t border-border">
-                {ACTIVITIES.map((a) => (
-                  <button
-                    key={a.id}
-                    onClick={() => { setSelectedActivity(a.id); setShowActivityPicker(false) }}
-                    className={cn(
-                      "flex items-center gap-2 p-3 rounded-xl border text-left transition-all",
-                      selectedActivity === a.id
-                        ? "border-brand bg-brand/10"
-                        : "border-border bg-background/50 hover:bg-accent"
-                    )}
-                  >
-                    <a.icon className={cn("w-4 h-4", a.color)} />
-                    <span className="text-sm font-medium text-foreground">
-                      {isEnglish ? a.labelEn : a.label}
-                    </span>
-                  </button>
-                ))}
+              <div className="px-6 py-3 rounded-2xl bg-black/60 backdrop-blur-xl border border-white/10 shadow-2xl">
+                <p className="text-4xl md:text-5xl font-black text-white tabular-nums tracking-tight">
+                  {fmtDuration(duration)}
+                </p>
+                <p className="text-[10px] text-white/60 text-center uppercase tracking-widest mt-1">
+                  {isEnglish ? "Duration" : "Duração"}
+                </p>
               </div>
             </motion.div>
           )}
-        </AnimatePresence>
+        </div>
       </div>
 
-      {/* Map */}
-      <div className="glass-strong border border-border rounded-2xl overflow-hidden">
-        <div
-          ref={mapRef}
-          className="w-full h-[300px] md:h-[400px] bg-muted"
-          style={{ zIndex: 0 }}
-        />
-        {status === "tracking" && (
-          <div className="absolute top-3 left-3 z-[1000] flex items-center gap-2 px-3 py-1.5 rounded-full bg-red-500 text-white text-xs font-bold shadow-lg">
-            <span className="w-2 h-2 rounded-full bg-white animate-pulse" />
-            REC
-          </div>
-        )}
-      </div>
-
-      {/* Live Stats */}
-      <div className="glass-strong border border-border rounded-2xl p-4">
-        <div className="grid grid-cols-2 gap-3">
-          <div className="text-center p-3 rounded-xl bg-background/50">
-            <Clock className="w-4 h-4 text-brand mx-auto mb-1" />
-            <p className="text-2xl font-black text-foreground tabular-nums">{formatDuration(duration)}</p>
-            <p className="text-[10px] text-muted-foreground uppercase tracking-wider">
-              {isEnglish ? "Duration" : "Duração"}
-            </p>
-          </div>
-          <div className="text-center p-3 rounded-xl bg-background/50">
-            <Route className="w-4 h-4 text-cyan-400 mx-auto mb-1" />
-            <p className="text-2xl font-black text-foreground tabular-nums">{formatDistance(distance)}</p>
-            <p className="text-[10px] text-muted-foreground uppercase tracking-wider">
-              {isEnglish ? "Distance" : "Distância"}
-            </p>
-          </div>
-          <div className="text-center p-3 rounded-xl bg-background/50">
-            <Flame className="w-4 h-4 text-orange-400 mx-auto mb-1" />
-            <p className="text-2xl font-black text-foreground tabular-nums">{calories}</p>
-            <p className="text-[10px] text-muted-foreground uppercase tracking-wider">kcal</p>
-          </div>
-          <div className="text-center p-3 rounded-xl bg-background/50">
-            <TrendingUp className="w-4 h-4 text-emerald-400 mx-auto mb-1" />
-            <p className="text-2xl font-black text-foreground tabular-nums">{pace}</p>
-            <p className="text-[10px] text-muted-foreground uppercase tracking-wider">min/km</p>
-          </div>
+      {/* Content below map */}
+      <div className="space-y-4 px-4 md:px-8 lg:px-12 -mt-8 relative z-10 pb-8">
+        {/* Activity Picker */}
+        <div className="glass-strong border border-border rounded-2xl overflow-hidden">
+          <button onClick={() => setShowActivityPicker(!showActivityPicker)} className="w-full p-4 flex items-center justify-between hover:bg-accent/50 transition-colors">
+            <div className="flex items-center gap-3">
+              <div className={cn("w-10 h-10 rounded-xl bg-gradient-to-br flex items-center justify-center text-white", activity.gradient)}>
+                <activity.icon className="w-5 h-5" />
+              </div>
+              <div className="text-left">
+                <p className="text-sm font-bold text-foreground">{isEnglish ? activity.labelEn : activity.label}</p>
+                <p className="text-[10px] text-muted-foreground">MET {activity.met} · {isEnglish ? "Tap to change" : "Toque para mudar"}</p>
+              </div>
+            </div>
+            <ChevronDown className={cn("w-5 h-5 text-muted-foreground transition-transform duration-300", showActivityPicker && "rotate-180")} />
+          </button>
+          <AnimatePresence>
+            {showActivityPicker && (
+              <motion.div initial={{ height: 0 }} animate={{ height: "auto" }} exit={{ height: 0 }} className="overflow-hidden">
+                <div className="grid grid-cols-4 gap-2 p-4 pt-0">
+                  {ACTIVITIES.map((a) => (
+                    <button key={a.id} onClick={() => { setSelectedActivity(a.id); setShowActivityPicker(false) }}
+                      className={cn("flex flex-col items-center gap-1.5 p-3 rounded-2xl border-2 transition-all duration-200",
+                        selectedActivity === a.id ? "border-brand bg-brand/10 shadow-lg shadow-brand/10" : "border-border hover:border-border/80 hover:bg-accent/50"
+                      )}>
+                      <div className={cn("w-10 h-10 rounded-xl bg-gradient-to-br flex items-center justify-center text-white", a.gradient)}>
+                        <a.icon className="w-5 h-5" />
+                      </div>
+                      <span className="text-[10px] font-semibold text-foreground">{isEnglish ? a.labelEn : a.label}</span>
+                    </button>
+                  ))}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
 
-        {distance > 0 && (
-          <div className="flex justify-around mt-3 pt-3 border-t border-border">
-            <div className="text-center">
-              <p className="text-sm font-bold text-foreground">{formatSpeed(avgSpeed)}</p>
-              <p className="text-[10px] text-muted-foreground">
-                {isEnglish ? "Avg Speed" : "Vel. Média"}
-              </p>
-            </div>
-            <div className="text-center">
-              <p className="text-sm font-bold text-foreground">{formatSpeed(maxSpeed)}</p>
-              <p className="text-[10px] text-muted-foreground">
-                {isEnglish ? "Max Speed" : "Vel. Máx"}
-              </p>
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* Controls */}
-      <div className="flex justify-center gap-3">
-        {status === "idle" && (
-          <Button
-            onClick={startTracking}
-            className="h-16 w-16 rounded-2xl bg-green-500 hover:bg-green-600 text-white shadow-lg shadow-green-500/30"
-          >
-            <Play className="w-7 h-7 ml-0.5" />
-          </Button>
-        )}
-        {status === "tracking" && (
-          <>
-            <Button
-              onClick={pauseTracking}
-              variant="outline"
-              className="h-14 w-14 rounded-2xl border-border"
-            >
-              <Pause className="w-6 h-6" />
-            </Button>
-            <Button
-              onClick={stopTracking}
-              className="h-16 w-16 rounded-2xl bg-red-500 hover:bg-red-600 text-white shadow-lg shadow-red-500/30"
-            >
-              <Square className="w-6 h-6" />
-            </Button>
-          </>
-        )}
-        {status === "paused" && (
-          <>
-            <Button
-              onClick={resumeTracking}
-              className="h-16 w-16 rounded-2xl bg-green-500 hover:bg-green-600 text-white shadow-lg shadow-green-500/30"
-            >
-              <Play className="w-7 h-7 ml-0.5" />
-            </Button>
-            <Button
-              onClick={stopTracking}
-              variant="outline"
-              className="h-14 w-14 rounded-2xl border-red-500 text-red-500 hover:bg-red-500/10"
-            >
-              <Square className="w-5 h-5" />
-            </Button>
-          </>
-        )}
-      </div>
-
-      {/* History */}
-      <div className="glass-strong border border-border rounded-2xl p-4">
-        <button
-          onClick={() => setShowHistory(!showHistory)}
-          className="w-full flex items-center justify-between"
-        >
-          <div className="flex items-center gap-2">
-            <Timer className="w-4 h-4 text-brand" />
-            <p className="text-sm font-medium text-foreground">
-              {isEnglish ? "Recent Sessions" : "Sessões Recentes"}
-            </p>
-            <span className="text-xs text-muted-foreground">({sessions.length})</span>
-          </div>
-          <ChevronDown className={cn("w-4 h-4 text-muted-foreground transition-transform", showHistory && "rotate-180")} />
-        </button>
-
-        <AnimatePresence>
-          {showHistory && (
-            <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: "auto", opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              className="overflow-hidden"
-            >
-              <div className="mt-3 pt-3 border-t border-border space-y-2">
-                {recentSessions.length === 0 ? (
-                  <p className="text-xs text-muted-foreground text-center py-4">
-                    {isEnglish ? "No sessions yet" : "Nenhuma sessão ainda"}
-                  </p>
-                ) : (
-                  recentSessions.map((s) => {
-                    const act = ACTIVITIES.find((a) => a.id === s.activityType) || ACTIVITIES[1]
-                    return (
-                      <div key={s.id} className="flex items-center gap-3 p-3 rounded-xl bg-background/50 border border-border">
-                        <div className={cn("w-8 h-8 rounded-lg flex items-center justify-center bg-background/50", act.color)}>
-                          <act.icon className="w-4 h-4" />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-foreground">
-                            {isEnglish ? act.labelEn : act.label}
-                          </p>
-                          <p className="text-[10px] text-muted-foreground">
-                            {new Date(s.startedAt).toLocaleDateString(isEnglish ? "en-US" : "pt-BR")}
-                          </p>
-                        </div>
-                        <div className="text-right">
-                          <p className="text-sm font-bold text-foreground">{formatDistance(s.distance)}</p>
-                          <p className="text-[10px] text-muted-foreground">{formatDuration(s.duration)} · {s.calories}kcal</p>
-                        </div>
-                      </div>
-                    )
-                  })
-                )}
-              </div>
+        {/* Stats Grid */}
+        <div className="grid grid-cols-4 gap-2">
+          {[
+            { icon: Clock, value: fmtDuration(duration), label: isEnglish ? "Time" : "Tempo", color: "text-brand" },
+            { icon: Route, value: fmtDist(distance), label: isEnglish ? "Distance" : "Distância", color: "text-cyan-400" },
+            { icon: Flame, value: `${calories}`, label: "kcal", color: "text-orange-400" },
+            { icon: TrendingUp, value: pace, label: "min/km", color: "text-emerald-400" },
+          ].map((stat, i) => (
+            <motion.div key={i} initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: i * 0.05 }}
+              className="glass-strong border border-border rounded-2xl p-3 text-center">
+              <stat.icon className={cn("w-4 h-4 mx-auto mb-1.5", stat.color)} />
+              <p className="text-lg font-black text-foreground tabular-nums leading-tight">{stat.value}</p>
+              <p className="text-[9px] text-muted-foreground uppercase tracking-wider mt-0.5">{stat.label}</p>
             </motion.div>
+          ))}
+        </div>
+
+        {/* Speed Stats Row */}
+        {distance > 0 && (
+          <div className="grid grid-cols-2 gap-2">
+            <div className="glass-strong border border-border rounded-2xl p-3 flex items-center gap-3">
+              <div className="w-9 h-9 rounded-xl bg-cyan-500/10 flex items-center justify-center">
+                <Navigation className="w-4 h-4 text-cyan-400" />
+              </div>
+              <div>
+                <p className="text-lg font-black text-foreground tabular-nums">{fmtSpeed(avgSpeed)} <span className="text-xs font-medium text-muted-foreground">km/h</span></p>
+                <p className="text-[9px] text-muted-foreground uppercase tracking-wider">{isEnglish ? "Avg Speed" : "Vel. Média"}</p>
+              </div>
+            </div>
+            <div className="glass-strong border border-border rounded-2xl p-3 flex items-center gap-3">
+              <div className="w-9 h-9 rounded-xl bg-orange-500/10 flex items-center justify-center">
+                <Zap className="w-4 h-4 text-orange-400" />
+              </div>
+              <div>
+                <p className="text-lg font-black text-foreground tabular-nums">{fmtSpeed(maxSpeed)} <span className="text-xs font-medium text-muted-foreground">km/h</span></p>
+                <p className="text-[9px] text-muted-foreground uppercase tracking-wider">{isEnglish ? "Max Speed" : "Vel. Máx"}</p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Speed Graph */}
+        {speedHistory.length > 2 && (
+          <div className="glass-strong border border-border rounded-2xl p-4">
+            <div className="flex items-center gap-2 mb-3">
+              <TrendingUp className="w-4 h-4 text-brand" />
+              <p className="text-xs font-semibold text-foreground">{isEnglish ? "Speed Over Time" : "Velocidade ao Longo do Tempo"}</p>
+            </div>
+            <div className="h-20 flex items-end gap-[2px]">
+              {speedHistory.slice(-60).map((spd, i) => {
+                const max = Math.max(...speedHistory.slice(-60))
+                const h = max > 0 ? (spd / max) * 100 : 0
+                return (
+                  <div key={i} className="flex-1 rounded-t-sm bg-gradient-to-t from-orange-500 to-amber-400 opacity-80"
+                    style={{ height: `${Math.max(h, 4)}%` }} />
+                )
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* Controls */}
+        <div className="flex justify-center items-center gap-4 py-4">
+          {status === "idle" && (
+            <motion.button whileTap={{ scale: 0.9 }} onClick={startTracking}
+              className="relative w-20 h-20 rounded-full bg-gradient-to-br from-green-500 to-emerald-400 text-white shadow-2xl shadow-green-500/40 flex items-center justify-center">
+              <Play className="w-8 h-8 ml-1" />
+              <div className="absolute inset-0 rounded-full bg-gradient-to-br from-green-500 to-emerald-400 animate-ping opacity-20" />
+            </motion.button>
           )}
-        </AnimatePresence>
+          {status === "tracking" && (
+            <>
+              <motion.button whileTap={{ scale: 0.9 }} onClick={pauseTracking}
+                className="w-16 h-16 rounded-full glass-strong border border-border flex items-center justify-center hover:bg-accent transition-colors">
+                <Pause className="w-6 h-6 text-foreground" />
+              </motion.button>
+              <motion.button whileTap={{ scale: 0.9 }} onClick={stopTracking}
+                className="relative w-20 h-20 rounded-full bg-gradient-to-br from-red-500 to-rose-400 text-white shadow-2xl shadow-red-500/40 flex items-center justify-center">
+                <Square className="w-7 h-7" />
+              </motion.button>
+            </>
+          )}
+          {status === "paused" && (
+            <>
+              <motion.button whileTap={{ scale: 0.9 }} onClick={resumeTracking}
+                className="relative w-20 h-20 rounded-full bg-gradient-to-br from-green-500 to-emerald-400 text-white shadow-2xl shadow-green-500/40 flex items-center justify-center">
+                <Play className="w-8 h-8 ml-1" />
+              </motion.button>
+              <motion.button whileTap={{ scale: 0.9 }} onClick={stopTracking}
+                className="w-16 h-16 rounded-full glass-strong border border-red-500/50 flex items-center justify-center hover:bg-red-500/10 transition-colors">
+                <Square className="w-5 h-5 text-red-500" />
+              </motion.button>
+            </>
+          )}
+        </div>
+
+        {/* History */}
+        <div className="glass-strong border border-border rounded-2xl overflow-hidden">
+          <button onClick={() => setShowHistory(!showHistory)} className="w-full p-4 flex items-center justify-between hover:bg-accent/50 transition-colors">
+            <div className="flex items-center gap-2">
+              <Trophy className="w-4 h-4 text-brand" />
+              <p className="text-sm font-bold text-foreground">{isEnglish ? "Activity History" : "Histórico de Atividades"}</p>
+              <span className="px-2 py-0.5 rounded-full bg-brand/10 text-brand text-[10px] font-bold">{sessions.length}</span>
+            </div>
+            <ChevronDown className={cn("w-5 h-5 text-muted-foreground transition-transform duration-300", showHistory && "rotate-180")} />
+          </button>
+          <AnimatePresence>
+            {showHistory && (
+              <motion.div initial={{ height: 0 }} animate={{ height: "auto" }} exit={{ height: 0 }} className="overflow-hidden">
+                <div className="px-4 pb-4 space-y-2">
+                  {recentSessions.length === 0 ? (
+                    <div className="text-center py-8">
+                      <Map className="w-10 h-10 text-muted-foreground/30 mx-auto mb-3" />
+                      <p className="text-sm text-muted-foreground">{isEnglish ? "No activities yet" : "Nenhuma atividade ainda"}</p>
+                      <p className="text-xs text-muted-foreground/60 mt-1">{isEnglish ? "Start your first run!" : "Comece sua primeira corrida!"}</p>
+                    </div>
+                  ) : (
+                    recentSessions.map((s, idx) => {
+                      const act = ACTIVITIES.find((a) => a.id === s.activityType) || ACTIVITIES[1]
+                      return (
+                        <motion.div key={s.id} initial={{ x: -20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ delay: idx * 0.03 }}
+                          className="flex items-center gap-3 p-3 rounded-2xl bg-background/50 border border-border hover:border-brand/30 transition-all">
+                          <div className={cn("w-11 h-11 rounded-xl bg-gradient-to-br flex items-center justify-center text-white shrink-0", act.gradient)}>
+                            <act.icon className="w-5 h-5" />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2">
+                              <p className="text-sm font-bold text-foreground">{isEnglish ? act.labelEn : act.label}</p>
+                              <span className="text-[10px] text-muted-foreground">
+                                {new Date(s.startedAt).toLocaleDateString(isEnglish ? "en-US" : "pt-BR", { day: "2-digit", month: "short" })}
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-3 mt-0.5">
+                              <span className="text-[10px] text-muted-foreground flex items-center gap-1">
+                                <Clock className="w-3 h-3" /> {fmtDuration(s.duration)}
+                              </span>
+                              <span className="text-[10px] text-muted-foreground flex items-center gap-1">
+                                <Flame className="w-3 h-3" /> {s.calories}kcal
+                              </span>
+                            </div>
+                          </div>
+                          <div className="text-right shrink-0">
+                            <p className="text-lg font-black text-foreground tabular-nums">{fmtDist(s.distance)}</p>
+                            <p className="text-[10px] text-muted-foreground">
+                              {s.avgSpeed.toFixed(1)} km/h
+                            </p>
+                          </div>
+                        </motion.div>
+                      )
+                    })
+                  )}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
       </div>
     </div>
   )
