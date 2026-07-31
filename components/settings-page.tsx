@@ -43,7 +43,7 @@ import { useAuth } from "@/hooks/useAuth"
 import { usePlanLimits } from "@/hooks/usePlanLimits"
 
 type SettingRowProps = {
-  icon: React.ElementType
+  icon: React.ComponentType<{ className?: string }>
   title: string
   description: string
   children: React.ReactNode
@@ -75,7 +75,7 @@ function SettingsGroup({
   title,
   children,
 }: {
-  icon: React.ElementType
+  icon: React.ComponentType<{ className?: string }>
   title: string
   children: React.ReactNode
 }) {

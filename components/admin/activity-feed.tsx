@@ -28,7 +28,7 @@ interface ActivityFeedProps {
   isLoading?: boolean
 }
 
-const eventConfig: Record<string, { icon: React.ElementType; color: string; bgColor: string }> = {
+const eventConfig: Record<string, { icon: React.ComponentType<{ className?: string }>; color: string; bgColor: string }> = {
   signup: { icon: UserPlus, color: "text-green-400", bgColor: "bg-green-500/10" },
   login: { icon: LogIn, color: "text-blue-400", bgColor: "bg-blue-500/10" },
   subscription: { icon: CreditCard, color: "text-orange-400", bgColor: "bg-orange-500/10" },

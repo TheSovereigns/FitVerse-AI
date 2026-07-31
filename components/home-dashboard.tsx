@@ -444,7 +444,7 @@ function MacroPill({ label, value, color }: { label: string; value: string; colo
   )
 }
 
-function StatWidget({ icon: Icon, label, value }: { icon: React.ElementType; label: string; value: string | number }) {
+function StatWidget({ icon: Icon, label, value }: { icon: React.ComponentType<{ className?: string }>; label: string; value: string | number }) {
   return (
     <div className="rounded-2xl glass-strong p-4 text-center">
       <Icon className="mx-auto h-4 w-4 text-brand mb-2" />
