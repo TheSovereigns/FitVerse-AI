@@ -5,12 +5,13 @@ import { motion, AnimatePresence } from "framer-motion"
 import {
   Play, Pause, Square, MapPin, Clock, Flame, Route,
   Footprints, Bike, Mountain, PersonStanding, Timer,
-  TrendingUp, ChevronDown, RotateCcw, Save, Navigation,
+  TrendingUp, ChevronDown, Navigation,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useTranslation } from "@/lib/i18n"
 import { useLocalStorage } from "@/hooks/useLocalStorage"
 import { cn } from "@/lib/utils"
+import type { Map as LeafletMap, Marker, Polyline } from "leaflet"
 
 interface GpsPoint {
   lat: number
@@ -84,7 +85,7 @@ function formatSpeed(kmh: number): string {
   return `${kmh.toFixed(1)}km/h`
 }
 
-export function GpsTracker() {
+export function CorridaTracker() {
   const { t, locale } = useTranslation()
   const isEnglish = locale === "en-US"
 
@@ -96,10 +97,17 @@ export function GpsTracker() {
   const [watchId, setWatchId] = useState<number | null>(null)
   const [showHistory, setShowHistory] = useState(false)
   const [showActivityPicker, setShowActivityPicker] = useState(false)
+  const [mapReady, setMapReady] = useState(false)
 
   const timerRef = useRef<NodeJS.Timeout | null>(null)
   const startTimeRef = useRef<number>(0)
   const pausedDurationRef = useRef(0)
+
+  const mapRef = useRef<HTMLDivElement>(null)
+  const mapInstanceRef = useRef<LeafletMap | null>(null)
+  const markerRef = useRef<Marker | null>(null)
+  const startMarkerRef = useRef<Marker | null>(null)
+  const polylineRef = useRef<Polyline | null>(null)
 
   const activity = useMemo(() => ACTIVITIES.find((a) => a.id === selectedActivity) || ACTIVITIES[1], [selectedActivity])
 
@@ -143,6 +151,114 @@ export function GpsTracker() {
     return `${m}:${String(s).padStart(2, "0")}`
   }, [distance, duration])
 
+  // Initialize Leaflet map
+  useEffect(() => {
+    if (mapReady || !mapRef.current || typeof window === "undefined") return
+
+    const initMap = async () => {
+      const L = (await import("leaflet")).default
+
+      // Fix default marker icon issue
+      delete (L.Icon.Default.prototype as any)._getIconUrl
+      L.Icon.Default.mergeOptions({
+        iconRetinaUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png",
+        iconUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png",
+        shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png",
+      })
+
+      const map = L.map(mapRef.current!, {
+        zoomControl: false,
+        attributionControl: false,
+      }).setView([-15.78, -47.93], 14)
+
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        maxZoom: 19,
+      }).addTo(map)
+
+      L.control.zoom({ position: "topright" }).addTo(map)
+
+      mapInstanceRef.current = map
+      setMapReady(true)
+
+      // Try to get current location
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (pos) => {
+            map.setView([pos.coords.latitude, pos.coords.longitude], 15)
+          },
+          () => {},
+          { timeout: 10000 }
+        )
+      }
+    }
+
+    initMap()
+
+    return () => {
+      mapInstanceRef.current?.remove()
+      mapInstanceRef.current = null
+    }
+  }, [mapReady])
+
+  // Update map when points change
+  useEffect(() => {
+    if (!mapReady || !mapInstanceRef.current || typeof window === "undefined") return
+
+    const updateMap = async () => {
+      const L = (await import("leaflet")).default
+      const map = mapInstanceRef.current
+      if (!map) return
+
+      // Remove old polyline
+      if (polylineRef.current) {
+        map.removeLayer(polylineRef.current)
+      }
+
+      // Remove old markers
+      if (markerRef.current) map.removeLayer(markerRef.current)
+      if (startMarkerRef.current) map.removeLayer(startMarkerRef.current)
+
+      if (points.length === 0) return
+
+      // Draw polyline
+      const latLngs = points.map((p) => [p.lat, p.lng] as [number, number])
+      polylineRef.current = L.polyline(latLngs, {
+        color: "#f97316",
+        weight: 4,
+        opacity: 0.9,
+        smoothFactor: 1,
+      }).addTo(map)
+
+      // Start marker (green)
+      const startIcon = L.divIcon({
+        html: `<div style="width:16px;height:16px;border-radius:50%;background:#22c55e;border:3px solid white;box-shadow:0 2px 6px rgba(0,0,0,0.3)"></div>`,
+        iconSize: [16, 16],
+        iconAnchor: [8, 8],
+        className: "",
+      })
+      startMarkerRef.current = L.marker(latLngs[0], { icon: startIcon }).addTo(map)
+
+      // Current position marker (red pulse)
+      const currentIcon = L.divIcon({
+        html: `<div style="width:20px;height:20px;border-radius:50%;background:#ef4444;border:3px solid white;box-shadow:0 0 12px rgba(239,68,68,0.6);animation:pulse 1.5s infinite"></div>
+               <style>@keyframes pulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.3);opacity:0.7}}</style>`,
+        iconSize: [20, 20],
+        iconAnchor: [10, 10],
+        className: "",
+      })
+      markerRef.current = L.marker(latLngs[latLngs.length - 1], { icon: currentIcon }).addTo(map)
+
+      // Fit bounds
+      if (points.length > 1) {
+        map.fitBounds(polylineRef.current.getBounds(), { padding: [40, 40] })
+      } else {
+        map.setView(latLngs[0], 16)
+      }
+    }
+
+    updateMap()
+  }, [points, mapReady])
+
   const startTracking = useCallback(() => {
     if (!navigator.geolocation) {
       alert(isEnglish ? "Geolocation not supported" : "Geolocalização não suportada")
@@ -170,9 +286,7 @@ export function GpsTracker() {
         }
         setPoints((prev) => [...prev, point])
       },
-      (err) => {
-        console.error("GPS error:", err)
-      },
+      (err) => console.error("GPS error:", err),
       { enableHighAccuracy: true, maximumAge: 5000, timeout: 15000 }
     )
 
@@ -252,13 +366,13 @@ export function GpsTracker() {
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-2 mb-1">
-        <Navigation className="w-5 h-5 text-brand" />
+        <Footprints className="w-5 h-5 text-brand" />
         <h2 className="text-lg font-semibold text-foreground">
-          {isEnglish ? "GPS Tracker" : "Rastreador GPS"}
+          {isEnglish ? "Run Tracker" : "Corrida"}
         </h2>
       </div>
       <p className="text-sm text-muted-foreground mb-4">
-        {isEnglish ? "Track your outdoor activities in real-time" : "Rastreie suas atividades ao ar livre em tempo real"}
+        {isEnglish ? "Track your runs with real-time GPS map" : "Rastreie suas corridas com mapa GPS em tempo real"}
       </p>
 
       {/* Activity Selector */}
@@ -275,9 +389,7 @@ export function GpsTracker() {
               <p className="text-sm font-semibold text-foreground">
                 {isEnglish ? activity.labelEn : activity.label}
               </p>
-              <p className="text-xs text-muted-foreground">
-                MET {activity.met}
-              </p>
+              <p className="text-xs text-muted-foreground">MET {activity.met}</p>
             </div>
           </div>
           <ChevronDown className={cn("w-4 h-4 text-muted-foreground transition-transform", showActivityPicker && "rotate-180")} />
@@ -315,6 +427,21 @@ export function GpsTracker() {
         </AnimatePresence>
       </div>
 
+      {/* Map */}
+      <div className="glass-strong border border-border rounded-2xl overflow-hidden">
+        <div
+          ref={mapRef}
+          className="w-full h-[300px] md:h-[400px] bg-muted"
+          style={{ zIndex: 0 }}
+        />
+        {status === "tracking" && (
+          <div className="absolute top-3 left-3 z-[1000] flex items-center gap-2 px-3 py-1.5 rounded-full bg-red-500 text-white text-xs font-bold shadow-lg">
+            <span className="w-2 h-2 rounded-full bg-white animate-pulse" />
+            REC
+          </div>
+        )}
+      </div>
+
       {/* Live Stats */}
       <div className="glass-strong border border-border rounded-2xl p-4">
         <div className="grid grid-cols-2 gap-3">
@@ -340,9 +467,7 @@ export function GpsTracker() {
           <div className="text-center p-3 rounded-xl bg-background/50">
             <TrendingUp className="w-4 h-4 text-emerald-400 mx-auto mb-1" />
             <p className="text-2xl font-black text-foreground tabular-nums">{pace}</p>
-            <p className="text-[10px] text-muted-foreground uppercase tracking-wider">
-              {isEnglish ? "min/km" : "min/km"}
-            </p>
+            <p className="text-[10px] text-muted-foreground uppercase tracking-wider">min/km</p>
           </div>
         </div>
 
@@ -363,68 +488,6 @@ export function GpsTracker() {
           </div>
         )}
       </div>
-
-      {/* GPS Trail Visualization */}
-      {points.length > 1 && (
-        <div className="glass-strong border border-border rounded-2xl p-4">
-          <div className="flex items-center gap-2 mb-3">
-            <MapPin className="w-4 h-4 text-brand" />
-            <p className="text-sm font-medium text-foreground">
-              {isEnglish ? "Live Trail" : "Rastro Ao Vivo"}
-            </p>
-            <span className="ml-auto text-xs text-muted-foreground">{points.length} pts</span>
-          </div>
-          <div className="relative h-40 bg-background/50 rounded-xl overflow-hidden border border-border">
-            <svg viewBox="0 0 400 160" className="w-full h-full">
-              {(() => {
-                if (points.length < 2) return null
-                const lats = points.map((p) => p.lat)
-                const lngs = points.map((p) => p.lng)
-                const minLat = Math.min(...lats)
-                const maxLat = Math.max(...lats)
-                const minLng = Math.min(...lngs)
-                const maxLng = Math.max(...lngs)
-                const latRange = maxLat - minLat || 0.001
-                const lngRange = maxLng - minLng || 0.001
-                const padding = 10
-                const w = 400 - padding * 2
-                const h = 160 - padding * 2
-
-                const pathPoints = points.map((p, i) => {
-                  const x = padding + ((p.lng - minLng) / lngRange) * w
-                  const y = padding + (1 - (p.lat - minLat) / latRange) * h
-                  return `${i === 0 ? "M" : "L"}${x},${y}`
-                }).join(" ")
-
-                const first = points[0]
-                const last = points[points.length - 1]
-                const fx = padding + ((first.lng - minLng) / lngRange) * w
-                const fy = padding + (1 - (first.lat - minLat) / latRange) * h
-                const lx = padding + ((last.lng - minLng) / lngRange) * w
-                const ly = padding + (1 - (last.lat - minLat) / latRange) * h
-
-                return (
-                  <>
-                    <path d={pathPoints} fill="none" stroke="hsl(var(--brand))" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" opacity="0.8" />
-                    <circle cx={fx} cy={fy} r="5" fill="#22c55e" stroke="white" strokeWidth="2" />
-                    <circle cx={lx} cy={ly} r="5" fill="#ef4444" stroke="white" strokeWidth="2" />
-                  </>
-                )
-              })()}
-            </svg>
-          </div>
-          <div className="flex justify-between mt-2 text-[10px] text-muted-foreground">
-            <span className="flex items-center gap-1">
-              <span className="w-2 h-2 rounded-full bg-green-500" />
-              {isEnglish ? "Start" : "Início"}
-            </span>
-            <span className="flex items-center gap-1">
-              <span className="w-2 h-2 rounded-full bg-red-500" />
-              {isEnglish ? "Current" : "Atual"}
-            </span>
-          </div>
-        </div>
-      )}
 
       {/* Controls */}
       <div className="flex justify-center gap-3">

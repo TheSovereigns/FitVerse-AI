@@ -73,7 +73,7 @@ export function MobileMoreSheet({ open, onClose, onNavigate, isFeatureLocked }: 
     {
       title: t("ds_training"),
       items: [
-        { view: "gps-tracker", icon: Navigation, label: isEnglish ? "GPS Tracker" : "Rastreador GPS" },
+        { view: "corrida", icon: Navigation, label: isEnglish ? "Run Tracker" : "Corrida" },
         { view: "periodization", icon: Timer, label: t("nav_periodization"), feature: "periodization" },
         { view: "workout-feedback", icon: Zap, label: t("nav_workout_feedback"), feature: "workout-feedback" },
         { view: "equipment", icon: Dumbbell, label: t("nav_equipment"), feature: "equipment" },

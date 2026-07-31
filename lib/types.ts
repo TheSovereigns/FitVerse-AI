@@ -147,4 +147,4 @@ export type View =
   | 'food-diary' | 'body'
   | 'weekly-report' | 'body-evolution' | 'streak-calendar' | 'achievements-page' | 'analytics-charts'
   | 'smart-reminders' | 'monthly-report'
-  | 'health-integrations' | 'gps-tracker'
+  | 'health-integrations' | 'corrida'

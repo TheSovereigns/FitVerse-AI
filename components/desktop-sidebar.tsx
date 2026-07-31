@@ -33,7 +33,7 @@ export function DesktopSidebar({ currentView, onNavigate, isFeatureLocked }: Sid
       key: "training", icon: Dumbbell, label: t("nav_workouts"),
       items: [
         { view: "training", icon: Dumbbell, label: t("nav_workouts") },
-        { view: "gps-tracker", icon: Navigation, label: isEnglish ? "GPS Tracker" : "Rastreador GPS" },
+        { view: "corrida", icon: Navigation, label: isEnglish ? "Run Tracker" : "Corrida" },
         { view: "mobility", icon: Wind, label: t("nav_mobility"), feature: "mobility" },
         { view: "workout-feedback", icon: Zap, label: t("nav_workout_feedback"), feature: "workout-feedback" },
       ]
