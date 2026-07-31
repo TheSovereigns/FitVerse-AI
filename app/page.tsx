@@ -384,7 +384,25 @@ export default function DashboardPage() {
             <FeatureErrorBoundary featureName="Dashboard">
             {/* Core views */}
             {currentView === "home" && <HomeDashboard userMetabolicPlan={userMetabolicPlan} dailyActivity={dailyActivity} onNavigate={setCurrentView} />}
-            {currentView === "dashboard" && <ScanDashboard onScan={handleScan} isScanning={isAnalyzing} />}
+            {currentView === "dashboard" && (
+              <ScanDashboard
+                onScan={handleScan}
+                onBarcodeProduct={(product) => {
+                  const analysis: ProductAnalysis = {
+                    productName: product.productName,
+                    image: product.image,
+                    longevityScore: product.longevityScore,
+                    macros: product.macros,
+                    healthBenefits: product.healthBenefits,
+                    healthRisks: product.healthRisks,
+                  }
+                  setPendingScan({ analysis, displayImage: product.image || "/placeholder.svg?height=80&width=80" })
+                  setAnalysisResult(analysis)
+                  setCurrentView("result")
+                }}
+                isScanning={isAnalyzing}
+              />
+            )}
             {currentView === "result" && (
               scanError ? (
                 <div className="min-h-[50vh] flex items-center justify-center">

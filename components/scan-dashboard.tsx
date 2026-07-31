@@ -11,10 +11,18 @@ import { BarcodeScanner } from "@/components/barcode-scanner"
 
 interface ScanDashboardProps {
   onScan: (file: File) => void
+  onBarcodeProduct?: (product: {
+    productName: string
+    image: string
+    macros: { calories: number; protein: number; carbs: number; fat: number }
+    longevityScore: number
+    healthBenefits?: string[]
+    healthRisks?: string[]
+  }) => void
   isScanning?: boolean
 }
 
-export function ScanDashboard({ onScan, isScanning = false }: ScanDashboardProps) {
+export function ScanDashboard({ onScan, onBarcodeProduct, isScanning = false }: ScanDashboardProps) {
   const { t } = useTranslation()
   const [isDragging, setIsDragging] = useState(false)
   const [showBarcodeScanner, setShowBarcodeScanner] = useState(false)
@@ -349,7 +357,33 @@ export function ScanDashboard({ onScan, isScanning = false }: ScanDashboardProps
         <BarcodeScanner
           onProductFound={(product) => {
             setShowBarcodeScanner(false)
-            if (product) {
+            if (product && onBarcodeProduct) {
+              const score = (() => {
+                let s = 50
+                const n = product.per100g
+                if (n.protein > 10) s += 10
+                if (n.fiber > 3) s += 10
+                if (n.sugars < 5) s += 10
+                if (n.salt < 1) s += 5
+                if (n.fat < 10) s += 5
+                if (n.sugars > 15) s -= 15
+                if (n.salt > 2) s -= 10
+                if (n.fat > 20) s -= 10
+                const g = product.nutriscore
+                if (g === "a") s += 15
+                else if (g === "b") s += 8
+                else if (g === "d") s -= 10
+                else if (g === "e") s -= 20
+                return Math.max(0, Math.min(100, s))
+              })()
+              onBarcodeProduct({
+                productName: product.name,
+                image: product.image || "",
+                macros: { calories: product.per100g.calories, protein: product.per100g.protein, carbs: product.per100g.carbs, fat: product.per100g.fat },
+                longevityScore: score,
+                healthBenefits: product.ingredients ? [product.ingredients] : [],
+              })
+            } else if (product) {
               onScan(product.image || "")
             }
           }}
