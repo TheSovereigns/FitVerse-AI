@@ -1,9 +1,6 @@
 "use client"
 
 import { useState, useEffect, useRef, useCallback, useMemo } from "react"
-import { Canvas, useFrame } from "@react-three/fiber"
-import { OrbitControls, Line } from "@react-three/drei"
-import * as THREE from "three"
 import { motion, AnimatePresence } from "framer-motion"
 import {
   Play, Pause, Square, Clock, Flame, Route, Navigation, Zap,
@@ -13,7 +10,6 @@ import {
 import { useTranslation } from "@/lib/i18n"
 import { useLocalStorage } from "@/hooks/useLocalStorage"
 import { cn } from "@/lib/utils"
-import dynamic from "next/dynamic"
 
 // ─── Types ───────────────────────────────────────────────────────
 interface GpsPoint {
@@ -32,7 +28,6 @@ interface ActivityType {
   met: number; neon: string; glow: string; ring: string
 }
 
-// ─── Activities with neon colors ─────────────────────────────────
 const ACTIVITIES: ActivityType[] = [
   { id: "walking", icon: PersonStanding, label: "Andando", labelEn: "Walking", met: 3.5, neon: "#22c55e", glow: "rgba(34,197,94,0.4)", ring: "rgba(34,197,94,0.15)" },
   { id: "running", icon: Footprints, label: "Correndo", labelEn: "Running", met: 8.0, neon: "#f97316", glow: "rgba(249,115,22,0.4)", ring: "rgba(249,115,22,0.15)" },
@@ -40,7 +35,7 @@ const ACTIVITIES: ActivityType[] = [
   { id: "hiking", icon: Mountain, label: "Trilha", labelEn: "Hiking", met: 5.0, neon: "#a855f7", glow: "rgba(168,85,247,0.4)", ring: "rgba(168,85,247,0.15)" },
 ]
 
-// ─── GPS Helpers ─────────────────────────────────────────────────
+// ─── Helpers ─────────────────────────────────────────────────────
 function haversineDistance(lat1: number, lng1: number, lat2: number, lng2: number): number {
   const R = 6371
   const dLat = ((lat2 - lat1) * Math.PI) / 180
@@ -62,242 +57,236 @@ function fmtDist(km: number) {
   return km < 1 ? `${Math.round(km * 1000)}m` : `${km.toFixed(2)} km`
 }
 
-function latLngToVector3(lat: number, lng: number, radius: number): THREE.Vector3 {
-  const phi = (90 - lat) * (Math.PI / 180)
-  const theta = (lng + 180) * (Math.PI / 180)
-  return new THREE.Vector3(
-    -(radius * Math.sin(phi) * Math.cos(theta)),
-    radius * Math.cos(phi),
-    radius * Math.sin(phi) * Math.sin(theta)
-  )
+function fmtSpeed(kmh: number) {
+  return `${kmh.toFixed(1)}`
 }
 
-// ─── 3D Globe Scene ──────────────────────────────────────────────
-function GlobeScene({
-  points, activity, status, duration, showGhost, ghostPoints,
+function latLngToXY(lat: number, lng: number, w: number, h: number): [number, number] {
+  const x = ((lng + 180) / 360) * w
+  const y = ((90 - lat) / 180) * h
+  return [x, y]
+}
+
+// ─── 3D Globe Canvas ─────────────────────────────────────────────
+function GlobeCanvas({
+  points, activity, ghostPoints, showGhost,
 }: {
-  points: GpsPoint[]; activity: ActivityType; status: string; duration: number
-  showGhost: boolean; ghostPoints: GpsPoint[]
+  points: GpsPoint[]; activity: ActivityType; ghostPoints: GpsPoint[]; showGhost: boolean
 }) {
-  const globeRef = useRef<THREE.Mesh>(null)
-  const glowRef = useRef<THREE.Mesh>(null)
-  const routeRef = useRef<THREE.Group>(null)
-  const particlesRef = useRef<THREE.Points>(null)
-  const runnerRef = useRef<THREE.Mesh>(null)
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 })
-
-  const RADIUS = 2
-  const NEON_COLOR = new THREE.Color(activity.neon)
-
-  // Convert points to 3D positions
-  const routePositions = useMemo(() => {
-    return points.map((p) => latLngToVector3(p.lat, p.lng, RADIUS + 0.01))
-  }, [points])
-
-  const ghostPositions = useMemo(() => {
-    return ghostPoints.map((p) => latLngToVector3(p.lat, p.lng, RADIUS + 0.008))
-  }, [ghostPoints])
-
-  // Particle system along route
-  const particleData = useMemo(() => {
-    const count = Math.min(points.length * 3, 500)
-    const positions = new Float32Array(count * 3)
-    const colors = new Float32Array(count * 3)
-    const sizes = new Float32Array(count)
-    for (let i = 0; i < count; i++) {
-      const idx = Math.floor((i / count) * points.length)
-      const pos = routePositions[idx] || routePositions[0]
-      if (!pos) continue
-      positions[i * 3] = pos.x + (Math.random() - 0.5) * 0.05
-      positions[i * 3 + 1] = pos.y + (Math.random() - 0.5) * 0.05
-      positions[i * 3 + 2] = pos.z + (Math.random() - 0.5) * 0.05
-      colors[i * 3] = NEON_COLOR.r
-      colors[i * 3 + 1] = NEON_COLOR.g
-      colors[i * 3 + 2] = NEON_COLOR.b
-      sizes[i] = Math.random() * 3 + 1
-    }
-    return { positions, colors, sizes }
-  }, [points, routePositions, NEON_COLOR])
-
-  // Globe wireframe geometry
-  const wireframeGeo = useMemo(() => {
-    const geo = new THREE.SphereGeometry(RADIUS, 48, 48)
-    return geo
-  }, [])
-
-  // Grid lines for globe
-  const gridLines = useMemo(() => {
-    const lines: THREE.Vector3[][] = []
-    // Latitude lines
-    for (let lat = -60; lat <= 60; lat += 30) {
-      const pts: THREE.Vector3[] = []
-      for (let lng = -180; lng <= 180; lng += 5) {
-        pts.push(latLngToVector3(lat, lng, RADIUS + 0.002))
-      }
-      lines.push(pts)
-    }
-    // Longitude lines
-    for (let lng = -180; lng < 180; lng += 30) {
-      const pts: THREE.Vector3[] = []
-      for (let lat = -80; lat <= 80; lat += 5) {
-        pts.push(latLngToVector3(lat, lng, RADIUS + 0.002))
-      }
-      lines.push(pts)
-    }
-    return lines
-  }, [])
-
-  // Animate runner position along route
-  const runnerPos = useMemo(() => {
-    if (routePositions.length === 0) return new THREE.Vector3(0, 0, RADIUS + 0.02)
-    return routePositions[routePositions.length - 1].clone().normalize().multiplyScalar(RADIUS + 0.02)
-  }, [routePositions])
-
-  useFrame((state) => {
-    const t = state.clock.getElapsedTime()
-
-    // Slow auto-rotate
-    if (globeRef.current && status === "idle") {
-      globeRef.current.rotation.y += 0.001
-    }
-
-    // Pulse runner marker
-    if (runnerRef.current) {
-      const scale = 1 + Math.sin(t * 3) * 0.3
-      runnerRef.current.scale.set(scale, scale, scale)
-    }
-
-    // Animate particles floating
-    if (particlesRef.current) {
-      const positions = particlesRef.current.geometry.attributes.position
-      if (positions) {
-        for (let i = 0; i < positions.count; i++) {
-          const y = positions.getY(i)
-          positions.setY(i, y + Math.sin(t * 2 + i * 0.1) * 0.0002)
-        }
-        positions.needsUpdate = true
-      }
-    }
-  })
+  const canvasRef = useRef<HTMLCanvasElement>(null)
+  const animRef = useRef<number>(0)
+  const rotRef = useRef(0)
 
   useEffect(() => {
-    const handleMouse = (e: MouseEvent) => {
-      setMousePos({ x: (e.clientX / window.innerWidth) * 2 - 1, y: -(e.clientY / window.innerHeight) * 2 + 1 })
+    const canvas = canvasRef.current
+    if (!canvas) return
+    const ctx = canvas.getContext("2d")
+    if (!ctx) return
+
+    const resize = () => {
+      const dpr = window.devicePixelRatio || 1
+      const rect = canvas.getBoundingClientRect()
+      canvas.width = rect.width * dpr
+      canvas.height = rect.height * dpr
+      ctx.scale(dpr, dpr)
     }
-    window.addEventListener("mousemove", handleMouse)
-    return () => window.removeEventListener("mousemove", handleMouse)
-  }, [])
+    resize()
+    window.addEventListener("resize", resize)
+
+    const NEON = activity.neon
+    const w = () => canvas.getBoundingClientRect().width
+    const h = () => canvas.getBoundingClientRect().height
+
+    const drawGlobe = (rot: number) => {
+      const cw = w(), ch = h()
+      ctx.clearRect(0, 0, cw, ch)
+
+      const cx = cw / 2, cy = ch / 2
+      const r = Math.min(cw, ch) * 0.35
+
+      // Outer glow
+      const glow = ctx.createRadialGradient(cx, cy, r * 0.8, cx, cy, r * 1.5)
+      glow.addColorStop(0, `${NEON}15`)
+      glow.addColorStop(1, "transparent")
+      ctx.fillStyle = glow
+      ctx.fillRect(0, 0, cw, ch)
+
+      // Globe sphere
+      const grad = ctx.createRadialGradient(cx - r * 0.3, cy - r * 0.3, r * 0.05, cx, cy, r)
+      grad.addColorStop(0, "#1a1a2e")
+      grad.addColorStop(0.7, "#0f0f1a")
+      grad.addColorStop(1, "#050510")
+      ctx.beginPath()
+      ctx.arc(cx, cy, r, 0, Math.PI * 2)
+      ctx.fillStyle = grad
+      ctx.fill()
+
+      // Neon ring
+      ctx.beginPath()
+      ctx.arc(cx, cy, r, 0, Math.PI * 2)
+      ctx.strokeStyle = `${NEON}30`
+      ctx.lineWidth = 1.5
+      ctx.stroke()
+
+      // Grid lines
+      ctx.strokeStyle = `${NEON}10`
+      ctx.lineWidth = 0.5
+      for (let i = -60; i <= 60; i += 30) {
+        ctx.beginPath()
+        const offsetY = (i / 90) * r * 0.8
+        const halfW = Math.sqrt(Math.max(0, r * r - offsetY * offsetY))
+        ctx.ellipse(cx, cy + offsetY, halfW, halfW * 0.15, 0, 0, Math.PI * 2)
+        ctx.stroke()
+      }
+      for (let i = 0; i < 360; i += 30) {
+        const angle = ((i + rot) * Math.PI) / 180
+        ctx.beginPath()
+        ctx.ellipse(cx, cy, Math.abs(Math.cos(angle)) * r, r, 0, 0, Math.PI * 2)
+        ctx.stroke()
+      }
+
+      // Draw route
+      if (points.length > 1) {
+        // Ghost trail
+        if (showGhost && ghostPoints.length > 1) {
+          ctx.beginPath()
+          ghostPoints.forEach((p, i) => {
+            const [px, py] = latLngToXY(p.lat, p.lng, 360, 180)
+            const x = cx + ((px - 180) / 180) * r * Math.cos(rot * Math.PI / 180)
+            const y = cy + ((90 - py) / 90) * r * 0.5
+            if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y)
+          })
+          ctx.strokeStyle = "rgba(255,255,255,0.12)"
+          ctx.lineWidth = 2
+          ctx.setLineDash([4, 4])
+          ctx.stroke()
+          ctx.setLineDash([])
+        }
+
+        // Glow trail
+        ctx.beginPath()
+        points.forEach((p, i) => {
+          const [px, py] = latLngToXY(p.lat, p.lng, 360, 180)
+          const x = cx + ((px - 180) / 180) * r * Math.cos(rot * Math.PI / 180)
+          const y = cy + ((90 - py) / 90) * r * 0.5
+          if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y)
+        })
+        ctx.strokeStyle = `${NEON}30`
+        ctx.lineWidth = 10
+        ctx.lineCap = "round"
+        ctx.lineJoin = "round"
+        ctx.stroke()
+
+        // Main trail
+        ctx.beginPath()
+        points.forEach((p, i) => {
+          const [px, py] = latLngToXY(p.lat, p.lng, 360, 180)
+          const x = cx + ((px - 180) / 180) * r * Math.cos(rot * Math.PI / 180)
+          const y = cy + ((90 - py) / 90) * r * 0.5
+          if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y)
+        })
+        ctx.strokeStyle = NEON
+        ctx.lineWidth = 3
+        ctx.stroke()
+
+        // Start marker
+        const [sx, sy] = latLngToXY(points[0].lat, points[0].lng, 360, 180)
+        const smx = cx + ((sx - 180) / 180) * r * Math.cos(rot * Math.PI / 180)
+        const smy = cy + ((90 - sy) / 90) * r * 0.5
+        ctx.beginPath()
+        ctx.arc(smx, smy, 5, 0, Math.PI * 2)
+        ctx.fillStyle = "#22c55e"
+        ctx.fill()
+        ctx.strokeStyle = "#fff"
+        ctx.lineWidth = 2
+        ctx.stroke()
+
+        // Current marker with pulse
+        const last = points[points.length - 1]
+        const [lx, ly] = latLngToXY(last.lat, last.lng, 360, 180)
+        const lmx = cx + ((lx - 180) / 180) * r * Math.cos(rot * Math.PI / 180)
+        const lmy = cy + ((90 - ly) / 90) * r * 0.5
+
+        const pulse = Math.sin(Date.now() / 300) * 0.3 + 0.7
+        ctx.beginPath()
+        ctx.arc(lmx, lmy, 12 * pulse, 0, Math.PI * 2)
+        ctx.fillStyle = `${NEON}30`
+        ctx.fill()
+
+        ctx.beginPath()
+        ctx.arc(lmx, lmy, 6, 0, Math.PI * 2)
+        ctx.fillStyle = NEON
+        ctx.fill()
+        ctx.strokeStyle = "#fff"
+        ctx.lineWidth = 2
+        ctx.stroke()
+
+        // Particles
+        const t = Date.now() / 1000
+        for (let i = 0; i < Math.min(points.length, 30); i++) {
+          const idx = Math.floor((i / 30) * points.length)
+          const p = points[idx]
+          const [ppx, ppy] = latLngToXY(p.lat, p.lng, 360, 180)
+          const ppx2 = cx + ((ppx - 180) / 180) * r * Math.cos(rot * Math.PI / 180)
+          const ppy2 = cy + ((90 - ppy) / 90) * r * 0.5
+          const ox = Math.sin(t * 2 + i * 0.5) * 8
+          const oy = Math.cos(t * 1.5 + i * 0.7) * 8
+          const alpha = (Math.sin(t * 3 + i) + 1) / 2 * 0.6
+          ctx.beginPath()
+          ctx.arc(ppx2 + ox, ppy2 + oy, 2, 0, Math.PI * 2)
+          ctx.fillStyle = `${NEON}${Math.round(alpha * 255).toString(16).padStart(2, "0")}`
+          ctx.fill()
+        }
+      }
+
+      // Stars background
+      for (let i = 0; i < 40; i++) {
+        const sx = (Math.sin(i * 127.1) * 0.5 + 0.5) * cw
+        const sy = (Math.cos(i * 311.7) * 0.5 + 0.5) * ch
+        const alpha = Math.sin(Date.now() / 2000 + i) * 0.3 + 0.3
+        ctx.beginPath()
+        ctx.arc(sx, sy, 0.8, 0, Math.PI * 2)
+        ctx.fillStyle = `rgba(255,255,255,${alpha})`
+        ctx.fill()
+      }
+    }
+
+    const animate = () => {
+      if (points.length === 0) rotRef.current += 0.15
+      drawGlobe(rotRef.current)
+      animRef.current = requestAnimationFrame(animate)
+    }
+    animRef.current = requestAnimationFrame(animate)
+
+    return () => {
+      cancelAnimationFrame(animRef.current)
+      window.removeEventListener("resize", resize)
+    }
+  }, [points, activity, ghostPoints, showGhost])
+
+  return <canvas ref={canvasRef} className="w-full h-full" style={{ imageRendering: "auto" }} />
+}
+
+// ─── Speed Graph ─────────────────────────────────────────────────
+function NeonSpeedGraph({ speeds, color }: { speeds: number[]; color: string }) {
+  if (speeds.length < 3) return null
+  const recent = speeds.slice(-60)
+  const max = Math.max(...recent, 1)
 
   return (
-    <>
-      {/* Ambient + directional light */}
-      <ambientLight intensity={0.3} />
-      <directionalLight position={[5, 3, 5]} intensity={0.8} />
-      <pointLight position={[-5, -3, -5]} intensity={0.2} color={activity.neon} />
-
-      {/* Globe sphere - solid dark base */}
-      <mesh ref={globeRef}>
-        <sphereGeometry args={[RADIUS, 64, 64]} />
-        <meshStandardMaterial color="#0a0a1a" transparent opacity={0.95} />
-      </mesh>
-
-      {/* Glow atmosphere */}
-      <mesh ref={glowRef} scale={1.02}>
-        <sphereGeometry args={[RADIUS, 64, 64]} />
-        <meshBasicMaterial color={activity.neon} transparent opacity={0.03} side={THREE.BackSide} />
-      </mesh>
-
-      {/* Wireframe overlay */}
-      <mesh>
-        <sphereGeometry args={[RADIUS + 0.001, 32, 32]} />
-        <meshBasicMaterial color={activity.neon} wireframe transparent opacity={0.06} />
-      </mesh>
-
-      {/* Grid lines */}
-      {gridLines.map((line, i) => (
-        <Line
-          key={i}
-          points={line}
-          color={activity.neon}
-          lineWidth={0.5}
-          transparent
-          opacity={0.08}
-        />
-      ))}
-
-      {/* Route trail - main neon line */}
-      {routePositions.length > 1 && (
-        <Line
-          points={routePositions}
-          color={activity.neon}
-          lineWidth={4}
-          transparent
-          opacity={0.9}
-        />
-      )}
-
-      {/* Route glow trail */}
-      {routePositions.length > 1 && (
-        <Line
-          points={routePositions}
-          color={activity.neon}
-          lineWidth={12}
-          transparent
-          opacity={0.15}
-        />
-      )}
-
-      {/* Ghost runner route */}
-      {showGhost && ghostPositions.length > 1 && (
-        <>
-          <Line points={ghostPositions} color="#ffffff" lineWidth={2} transparent opacity={0.2} dashed dashSize={0.02} gapSize={0.02} />
-          <Line points={ghostPositions} color="#ffffff" lineWidth={6} transparent opacity={0.05} />
-        </>
-      )}
-
-      {/* Particles along route */}
-      {points.length > 2 && (
-        <points ref={particlesRef}>
-          <bufferGeometry>
-            <bufferAttribute attach="attributes-position" args={[particleData.positions, 3]} />
-            <bufferAttribute attach="attributes-color" args={[particleData.colors, 3]} />
-          </bufferGeometry>
-          <pointsMaterial size={0.015} vertexColors transparent opacity={0.6} sizeAttenuation />
-        </points>
-      )}
-
-      {/* Runner marker - pulsing orb */}
-      {points.length > 0 && (
-        <mesh ref={runnerRef} position={runnerPos}>
-          <sphereGeometry args={[0.03, 16, 16]} />
-          <meshBasicMaterial color={activity.neon} transparent opacity={0.9} />
-        </mesh>
-      )}
-
-      {/* Start marker */}
-      {routePositions.length > 1 && (
-        <mesh position={routePositions[0]}>
-          <sphereGeometry args={[0.02, 16, 16]} />
-          <meshBasicMaterial color="#22c55e" />
-        </mesh>
-      )}
-
-      {/* Camera controls */}
-      <OrbitControls
-        enablePan={false}
-        minDistance={2.5}
-        maxDistance={8}
-        enableDamping
-        dampingFactor={0.05}
-        rotateSpeed={0.5}
-        autoRotate={status === "idle"}
-        autoRotateSpeed={0.3}
-      />
-    </>
+    <div className="h-12 flex items-end gap-[2px]">
+      {recent.map((spd, i) => {
+        const h = (spd / max) * 100
+        return (
+          <div key={i} className="flex-1 rounded-t-sm opacity-80 transition-all"
+            style={{ height: `${Math.max(h, 4)}%`, background: `linear-gradient(to top, ${color}, ${color}80)` }} />
+        )
+      })}
+    </div>
   )
 }
 
-// ─── HUD Stat Panel ──────────────────────────────────────────────
+// ─── HUD Stat ────────────────────────────────────────────────────
 function HudStat({
   icon: Icon, value, label, color, delay = 0,
 }: {
@@ -324,34 +313,6 @@ function HudStat({
   )
 }
 
-// ─── Circular Progress ───────────────────────────────────────────
-function CircularProgress({
-  value, max, size = 48, strokeWidth = 3, color, children,
-}: {
-  value: number; max: number; size?: number; strokeWidth?: number; color: string; children: React.ReactNode
-}) {
-  const radius = (size - strokeWidth) / 2
-  const circumference = radius * 2 * Math.PI
-  const progress = Math.min(value / max, 1)
-  const offset = circumference - progress * circumference
-
-  return (
-    <div className="relative" style={{ width: size, height: size }}>
-      <svg width={size} height={size} className="rotate-[-90deg]">
-        <circle cx={size / 2} cy={size / 2} r={radius} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth={strokeWidth} />
-        <circle
-          cx={size / 2} cy={size / 2} r={radius} fill="none" stroke={color}
-          strokeWidth={strokeWidth} strokeDasharray={circumference} strokeDashoffset={offset}
-          strokeLinecap="round" style={{ transition: "stroke-dashoffset 0.5s ease" }}
-        />
-      </svg>
-      <div className="absolute inset-0 flex items-center justify-center">
-        {children}
-      </div>
-    </div>
-  )
-}
-
 // ─── Activity Picker ─────────────────────────────────────────────
 function ActivityPicker({
   selected, onSelect, onClose, isEnglish,
@@ -359,20 +320,12 @@ function ActivityPicker({
   selected: string; onSelect: (id: string) => void; onClose: () => void; isEnglish: boolean
 }) {
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      className="fixed inset-0 z-[60] flex items-end md:items-center justify-center"
-    >
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+      className="fixed inset-0 z-[60] flex items-end md:items-center justify-center">
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
-      <motion.div
-        initial={{ y: 100, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        exit={{ y: 100, opacity: 0 }}
+      <motion.div initial={{ y: 100, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 100, opacity: 0 }}
         transition={{ type: "spring", damping: 25 }}
-        className="relative z-10 w-full max-w-md mx-4 glass-strong border border-white/[0.08] rounded-3xl p-6"
-      >
+        className="relative z-10 w-full max-w-md mx-4 glass-strong border border-white/[0.08] rounded-3xl p-6">
         <div className="flex items-center justify-between mb-5">
           <div>
             <h3 className="text-lg font-bold text-white">{isEnglish ? "Choose Activity" : "Escolher Atividade"}</h3>
@@ -384,28 +337,17 @@ function ActivityPicker({
         </div>
         <div className="grid grid-cols-2 gap-3">
           {ACTIVITIES.map((a) => (
-            <button
-              key={a.id}
-              onClick={() => { onSelect(a.id); onClose() }}
-              className={cn(
-                "relative group p-4 rounded-2xl border-2 transition-all duration-300 text-left overflow-hidden",
-                selected === a.id
-                  ? "border-opacity-100"
-                  : "border-white/[0.06] hover:border-white/[0.12]"
+            <button key={a.id} onClick={() => { onSelect(a.id); onClose() }}
+              className={cn("relative group p-4 rounded-2xl border-2 transition-all duration-300 text-left overflow-hidden",
+                selected === a.id ? "border-opacity-100" : "border-white/[0.06] hover:border-white/[0.12]"
               )}
-              style={{
-                borderColor: selected === a.id ? a.neon : undefined,
-                background: selected === a.id ? a.ring : "rgba(255,255,255,0.02)",
-              }}
-            >
+              style={{ borderColor: selected === a.id ? a.neon : undefined, background: selected === a.id ? a.ring : "rgba(255,255,255,0.02)" }}>
               {selected === a.id && (
                 <div className="absolute inset-0 opacity-20" style={{ background: `radial-gradient(circle at 30% 30%, ${a.neon}, transparent 70%)` }} />
               )}
               <div className="relative">
-                <div
-                  className="w-12 h-12 rounded-xl flex items-center justify-center mb-3"
-                  style={{ background: `linear-gradient(135deg, ${a.neon}20, ${a.neon}08)` }}
-                >
+                <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-3"
+                  style={{ background: `linear-gradient(135deg, ${a.neon}20, ${a.neon}08)` }}>
                   <a.icon className="w-6 h-6" style={{ color: a.neon }} />
                 </div>
                 <p className="text-sm font-bold text-white">{isEnglish ? a.labelEn : a.label}</p>
@@ -426,20 +368,12 @@ function HistoryPanel({
   sessions: GpsSession[]; isEnglish: boolean; onClose: () => void; onReplay: (s: GpsSession) => void
 }) {
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      className="fixed inset-0 z-[60] flex items-end md:items-center justify-center"
-    >
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+      className="fixed inset-0 z-[60] flex items-end md:items-center justify-center">
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
-      <motion.div
-        initial={{ y: 100, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        exit={{ y: 100, opacity: 0 }}
+      <motion.div initial={{ y: 100, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 100, opacity: 0 }}
         transition={{ type: "spring", damping: 25 }}
-        className="relative z-10 w-full max-w-lg mx-4 glass-strong border border-white/[0.08] rounded-3xl p-6 max-h-[70vh] overflow-hidden flex flex-col"
-      >
+        className="relative z-10 w-full max-w-lg mx-4 glass-strong border border-white/[0.08] rounded-3xl p-6 max-h-[70vh] overflow-hidden flex flex-col">
         <div className="flex items-center justify-between mb-5 shrink-0">
           <div>
             <h3 className="text-lg font-bold text-white">{isEnglish ? "Orbit History" : "Histórico Orbit"}</h3>
@@ -459,17 +393,11 @@ function HistoryPanel({
             sessions.map((s, idx) => {
               const act = ACTIVITIES.find((a) => a.id === s.activityType) || ACTIVITIES[1]
               return (
-                <motion.div
-                  key={s.id}
-                  initial={{ x: -20, opacity: 0 }}
-                  animate={{ x: 0, opacity: 1 }}
+                <motion.div key={s.id} initial={{ x: -20, opacity: 0 }} animate={{ x: 0, opacity: 1 }}
                   transition={{ delay: idx * 0.03 }}
-                  className="flex items-center gap-3 p-3 rounded-2xl bg-white/[0.03] border border-white/[0.04] hover:border-white/[0.1] transition-all group"
-                >
-                  <div
-                    className="w-11 h-11 rounded-xl flex items-center justify-center shrink-0"
-                    style={{ background: `linear-gradient(135deg, ${act.neon}25, ${act.neon}10)` }}
-                  >
+                  className="flex items-center gap-3 p-3 rounded-2xl bg-white/[0.03] border border-white/[0.04] hover:border-white/[0.1] transition-all group">
+                  <div className="w-11 h-11 rounded-xl flex items-center justify-center shrink-0"
+                    style={{ background: `linear-gradient(135deg, ${act.neon}25, ${act.neon}10)` }}>
                     <act.icon className="w-5 h-5" style={{ color: act.neon }} />
                   </div>
                   <div className="flex-1 min-w-0">
@@ -489,10 +417,8 @@ function HistoryPanel({
                       <p className="text-lg font-black text-white tabular-nums">{fmtDist(s.distance)}</p>
                       <p className="text-[10px] text-white/30">{s.avgSpeed.toFixed(1)} km/h</p>
                     </div>
-                    <button
-                      onClick={() => onReplay(s)}
-                      className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-white/10"
-                    >
+                    <button onClick={() => onReplay(s)}
+                      className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-white/10">
                       <Eye className="w-3.5 h-3.5 text-white/60" />
                     </button>
                   </div>
@@ -506,45 +432,9 @@ function HistoryPanel({
   )
 }
 
-// ─── Speed Graph (neon style) ────────────────────────────────────
-function NeonSpeedGraph({ speeds, color }: { speeds: number[]; color: string }) {
-  if (speeds.length < 3) return null
-  const recent = speeds.slice(-60)
-  const max = Math.max(...recent, 1)
-  const h = 48
-  const w = 200
-
-  const pathD = recent.map((spd, i) => {
-    const x = (i / (recent.length - 1)) * w
-    const y = h - (spd / max) * h
-    return `${i === 0 ? "M" : "L"} ${x} ${y}`
-  }).join(" ")
-
-  const fillD = pathD + ` L ${w} ${h} L 0 ${h} Z`
-
-  return (
-    <div className="relative h-12 w-full overflow-hidden rounded-xl">
-      <svg viewBox={`0 0 ${w} ${h}`} className="w-full h-full" preserveAspectRatio="none">
-        <defs>
-          <linearGradient id="speedGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor={color} stopOpacity="0.3" />
-            <stop offset="100%" stopColor={color} stopOpacity="0.02" />
-          </linearGradient>
-          <filter id="glow">
-            <feGaussianBlur stdDeviation="2" result="blur" />
-            <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
-          </filter>
-        </defs>
-        <path d={fillD} fill="url(#speedGrad)" />
-        <path d={pathD} fill="none" stroke={color} strokeWidth="2" filter="url(#glow)" opacity="0.8" />
-      </svg>
-    </div>
-  )
-}
-
 // ─── Main Component ──────────────────────────────────────────────
-function CorridaTrackerInner() {
-  const { t, locale } = useTranslation()
+export function CorridaTracker() {
+  const { locale } = useTranslation()
   const isEnglish = locale === "en-US"
 
   const [sessions, setSessions] = useLocalStorage<GpsSession[]>("fitverse-orbit-sessions", [])
@@ -564,7 +454,6 @@ function CorridaTrackerInner() {
 
   const activity = useMemo(() => ACTIVITIES.find((a) => a.id === selectedActivity) || ACTIVITIES[1], [selectedActivity])
 
-  // Stats
   const distance = useMemo(() => {
     let d = 0
     for (let i = 1; i < points.length; i++) d += haversineDistance(points[i - 1].lat, points[i - 1].lng, points[i].lat, points[i].lng)
@@ -601,15 +490,13 @@ function CorridaTrackerInner() {
 
   const isTracking = status !== "idle"
 
-  // GPS Tracking
   const startTracking = useCallback(() => {
     if (!navigator.geolocation) return
     startTimeRef.current = Date.now(); pausedDurationRef.current = 0; setDuration(0); setPoints([])
     timerRef.current = setInterval(() => setDuration(Math.floor((Date.now() - startTimeRef.current - pausedDurationRef.current) / 1000)), 1000)
     const id = navigator.geolocation.watchPosition(
       (pos) => setPoints((p) => [...p, { lat: pos.coords.latitude, lng: pos.coords.longitude, timestamp: Date.now(), altitude: pos.coords.altitude ?? undefined, speed: pos.coords.speed ?? undefined }]),
-      (err) => console.error("GPS:", err),
-      { enableHighAccuracy: true, maximumAge: 5000, timeout: 15000 }
+      () => {}, { enableHighAccuracy: true, maximumAge: 5000, timeout: 15000 }
     )
     setWatchId(id); setStatus("tracking")
   }, [])
@@ -626,8 +513,7 @@ function CorridaTrackerInner() {
     timerRef.current = setInterval(() => setDuration(Math.floor((Date.now() - startTimeRef.current) / 1000)), 1000)
     const id = navigator.geolocation.watchPosition(
       (pos) => setPoints((p) => [...p, { lat: pos.coords.latitude, lng: pos.coords.longitude, timestamp: Date.now(), altitude: pos.coords.altitude ?? undefined, speed: pos.coords.speed ?? undefined }]),
-      (err) => console.error("GPS:", err),
-      { enableHighAccuracy: true, maximumAge: 5000, timeout: 15000 }
+      () => {}, { enableHighAccuracy: true, maximumAge: 5000, timeout: 15000 }
     )
     setWatchId(id); setStatus("tracking")
   }, [])
@@ -647,52 +533,30 @@ function CorridaTrackerInner() {
   useEffect(() => () => { if (timerRef.current) clearInterval(timerRef.current); if (watchId !== null) navigator.geolocation.clearWatch(watchId) }, [watchId])
 
   const lastSession = sessions[0]
+  const displayPoints = replaySession?.points || points
+  const displayGhost = showGhost && !!lastSession && !replaySession ? lastSession.points : []
 
   return (
     <div className="min-h-screen -mx-4 -mt-4 md:-mx-8 md:-mt-4 lg:-mx-12 lg:-mt-4 relative overflow-hidden bg-[#050510]">
-      {/* Full-screen 3D Globe */}
+      {/* Full-screen Globe Canvas */}
       <div className="absolute inset-0">
-        <Canvas
-          camera={{ position: [0, 0, 4], fov: 50 }}
-          gl={{ antialias: true, alpha: true }}
-          style={{ background: "transparent" }}
-        >
-          <GlobeScene
-            points={replaySession?.points || points}
-            activity={activity}
-            status={replaySession ? "replay" : status}
-            duration={replaySession?.duration || duration}
-            showGhost={showGhost && !!lastSession && !replaySession}
-            ghostPoints={lastSession?.points || []}
-          />
-        </Canvas>
-
-        {/* Radial gradient overlay */}
+        <GlobeCanvas points={displayPoints} activity={activity} ghostPoints={displayGhost} showGhost={showGhost && !replaySession} />
         <div className="absolute inset-0 pointer-events-none" style={{
           background: `radial-gradient(ellipse at center, transparent 30%, rgba(5,5,16,0.8) 100%)`,
         }} />
-
-        {/* Top ambient glow */}
         <div className="absolute top-0 left-0 right-0 h-40 pointer-events-none" style={{
           background: `radial-gradient(ellipse at 50% -20%, ${activity.neon}15, transparent 70%)`,
         }} />
       </div>
 
-      {/* ── HUD Layer ── */}
+      {/* HUD */}
       <div className="relative z-10 min-h-screen flex flex-col justify-between pointer-events-none p-4 md:p-6">
-
         {/* Top bar */}
         <div className="flex items-start justify-between pointer-events-auto">
-          {/* Activity badge */}
-          <motion.div
-            initial={{ x: -20, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            className="glass-strong border border-white/[0.08] rounded-2xl p-3 flex items-center gap-3 backdrop-blur-2xl"
-          >
-            <div
-              className="w-10 h-10 rounded-xl flex items-center justify-center"
-              style={{ background: `linear-gradient(135deg, ${activity.neon}30, ${activity.neon}10)` }}
-            >
+          <motion.div initial={{ x: -20, opacity: 0 }} animate={{ x: 0, opacity: 1 }}
+            className="glass-strong border border-white/[0.08] rounded-2xl p-3 flex items-center gap-3 backdrop-blur-2xl">
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center"
+              style={{ background: `linear-gradient(135deg, ${activity.neon}30, ${activity.neon}10)` }}>
               <activity.icon className="w-5 h-5" style={{ color: activity.neon }} />
             </div>
             <div>
@@ -706,70 +570,46 @@ function CorridaTrackerInner() {
             </div>
           </motion.div>
 
-          {/* Right controls */}
           <div className="flex flex-col gap-2">
-            <motion.button
-              initial={{ x: 20, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              whileTap={{ scale: 0.9 }}
+            <motion.button initial={{ x: 20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} whileTap={{ scale: 0.9 }}
               onClick={() => setShowActivityPicker(true)}
-              className="w-10 h-10 glass-strong border border-white/[0.08] rounded-xl flex items-center justify-center backdrop-blur-2xl hover:bg-white/[0.05]"
-            >
+              className="w-10 h-10 glass-strong border border-white/[0.08] rounded-xl flex items-center justify-center backdrop-blur-2xl hover:bg-white/[0.05]">
               <Layers className="w-4 h-4 text-white/60" />
             </motion.button>
             {lastSession && !isTracking && (
-              <motion.button
-                initial={{ x: 20, opacity: 0 }}
-                animate={{ x: 0, opacity: 1 }}
-                transition={{ delay: 0.1 }}
-                whileTap={{ scale: 0.9 }}
-                onClick={() => setShowGhost(!showGhost)}
-                className={cn(
-                  "w-10 h-10 glass-strong border rounded-xl flex items-center justify-center backdrop-blur-2xl transition-colors",
-                  showGhost ? "border-white/20 bg-white/[0.08]" : "border-white/[0.08] hover:bg-white/[0.05]"
-                )}
-              >
+              <motion.button initial={{ x: 20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ delay: 0.1 }}
+                whileTap={{ scale: 0.9 }} onClick={() => setShowGhost(!showGhost)}
+                className={cn("w-10 h-10 glass-strong border rounded-xl flex items-center justify-center backdrop-blur-2xl transition-colors",
+                  showGhost ? "border-white/20 bg-white/[0.08]" : "border-white/[0.08] hover:bg-white/[0.05]")}>
                 <Eye className="w-4 h-4 text-white/60" />
               </motion.button>
             )}
-            <motion.button
-              initial={{ x: 20, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              transition={{ delay: 0.15 }}
-              whileTap={{ scale: 0.9 }}
-              onClick={() => setShowHistory(true)}
-              className="w-10 h-10 glass-strong border border-white/[0.08] rounded-xl flex items-center justify-center backdrop-blur-2xl hover:bg-white/[0.05]"
-            >
+            <motion.button initial={{ x: 20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ delay: 0.15 }}
+              whileTap={{ scale: 0.9 }} onClick={() => setShowHistory(true)}
+              className="w-10 h-10 glass-strong border border-white/[0.08] rounded-xl flex items-center justify-center backdrop-blur-2xl hover:bg-white/[0.05]">
               <Trophy className="w-4 h-4 text-white/60" />
             </motion.button>
           </div>
         </div>
 
-        {/* Center - Big timer when tracking */}
+        {/* Center timer */}
         <div className="flex-1 flex items-center justify-center">
           <AnimatePresence>
             {isTracking && (
-              <motion.div
-                initial={{ scale: 0.8, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0.8, opacity: 0 }}
-                className="text-center"
-              >
+              <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.8, opacity: 0 }}
+                className="text-center">
                 <div className="relative">
                   <div className="absolute inset-0 blur-3xl opacity-30" style={{ background: activity.neon }} />
-                  <p className="relative text-6xl md:text-8xl font-black text-white tabular-nums" style={{ textShadow: `0 0 40px ${activity.neon}, 0 0 80px ${activity.neon}50` }}>
+                  <p className="relative text-6xl md:text-8xl font-black text-white tabular-nums"
+                    style={{ textShadow: `0 0 40px ${activity.neon}, 0 0 80px ${activity.neon}50` }}>
                     {fmtDuration(duration)}
                   </p>
                 </div>
                 <p className="text-xs text-white/30 uppercase tracking-[0.3em] mt-2">{isEnglish ? "Duration" : "Duração"}</p>
               </motion.div>
             )}
-            {!isTracking && points.length === 0 && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="text-center"
-              >
+            {!isTracking && displayPoints.length === 0 && (
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center">
                 <Globe className="w-16 h-16 mx-auto mb-4" style={{ color: activity.neon, opacity: 0.3 }} />
                 <p className="text-sm text-white/20">{isEnglish ? "Tap to start orbit" : "Toque para iniciar órbita"}</p>
               </motion.div>
@@ -777,10 +617,9 @@ function CorridaTrackerInner() {
           </AnimatePresence>
         </div>
 
-        {/* Bottom section */}
+        {/* Bottom */}
         <div className="space-y-4 pointer-events-auto">
-          {/* Stats row */}
-          {(isTracking || points.length > 0) && (
+          {(isTracking || displayPoints.length > 0) && (
             <div className="grid grid-cols-4 gap-2">
               <HudStat icon={Clock} value={fmtDuration(duration)} label={isEnglish ? "Time" : "Tempo"} color={activity.neon} delay={0} />
               <HudStat icon={Route} value={fmtDist(distance)} label={isEnglish ? "Dist" : "Dist"} color="#06b6d4" delay={0.05} />
@@ -789,14 +628,9 @@ function CorridaTrackerInner() {
             </div>
           )}
 
-          {/* Speed graph + extras */}
-          {(isTracking || points.length > 0) && (
-            <motion.div
-              initial={{ y: 20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.2 }}
-              className="glass-strong border border-white/[0.08] rounded-2xl p-4 backdrop-blur-2xl"
-            >
+          {(isTracking || displayPoints.length > 0) && (
+            <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.2 }}
+              className="glass-strong border border-white/[0.08] rounded-2xl p-4 backdrop-blur-2xl">
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2">
                   <Activity className="w-3.5 h-3.5" style={{ color: activity.neon }} />
@@ -820,47 +654,40 @@ function CorridaTrackerInner() {
           {/* Controls */}
           <div className="flex justify-center items-center gap-5 py-4">
             {status === "idle" && (
-              <motion.button
-                whileTap={{ scale: 0.9 }}
-                onClick={startTracking}
-                className="relative group"
-              >
+              <motion.button whileTap={{ scale: 0.9 }} onClick={startTracking} className="relative group">
                 <div className="absolute inset-0 rounded-full blur-2xl opacity-40 group-hover:opacity-60 transition-opacity" style={{ background: activity.neon }} />
-                <div
-                  className="relative w-20 h-20 rounded-full flex items-center justify-center text-white shadow-2xl"
-                  style={{ background: `linear-gradient(135deg, ${activity.neon}, ${activity.neon}cc)`, boxShadow: `0 0 40px ${activity.neon}50, 0 0 80px ${activity.neon}30` }}
-                >
+                <div className="relative w-20 h-20 rounded-full flex items-center justify-center text-white shadow-2xl"
+                  style={{ background: `linear-gradient(135deg, ${activity.neon}, ${activity.neon}cc)`, boxShadow: `0 0 40px ${activity.neon}50, 0 0 80px ${activity.neon}30` }}>
                   <Play className="w-8 h-8 ml-1" />
                 </div>
               </motion.button>
             )}
-
             {status === "tracking" && (
               <>
-                <motion.button whileTap={{ scale: 0.9 }} onClick={pauseTracking} className="w-16 h-16 glass-strong border border-white/[0.12] rounded-full flex items-center justify-center backdrop-blur-2xl hover:bg-white/[0.05]">
+                <motion.button whileTap={{ scale: 0.9 }} onClick={pauseTracking}
+                  className="w-16 h-16 glass-strong border border-white/[0.12] rounded-full flex items-center justify-center backdrop-blur-2xl hover:bg-white/[0.05]">
                   <Pause className="w-6 h-6 text-white" />
                 </motion.button>
                 <motion.button whileTap={{ scale: 0.9 }} onClick={stopTracking} className="relative group">
                   <div className="absolute inset-0 rounded-full blur-2xl opacity-40" style={{ background: "#ef4444" }} />
-                  <div className="relative w-20 h-20 rounded-full bg-gradient-to-br from-red-500 to-rose-400 flex items-center justify-center text-white shadow-2xl" style={{ boxShadow: "0 0 40px rgba(239,68,68,0.4)" }}>
+                  <div className="relative w-20 h-20 rounded-full bg-gradient-to-br from-red-500 to-rose-400 flex items-center justify-center text-white shadow-2xl"
+                    style={{ boxShadow: "0 0 40px rgba(239,68,68,0.4)" }}>
                     <Square className="w-7 h-7" />
                   </div>
                 </motion.button>
               </>
             )}
-
             {status === "paused" && (
               <>
                 <motion.button whileTap={{ scale: 0.9 }} onClick={resumeTracking} className="relative group">
                   <div className="absolute inset-0 rounded-full blur-2xl opacity-40 group-hover:opacity-60 transition-opacity" style={{ background: activity.neon }} />
-                  <div
-                    className="relative w-20 h-20 rounded-full flex items-center justify-center text-white shadow-2xl"
-                    style={{ background: `linear-gradient(135deg, ${activity.neon}, ${activity.neon}cc)`, boxShadow: `0 0 40px ${activity.neon}50` }}
-                  >
+                  <div className="relative w-20 h-20 rounded-full flex items-center justify-center text-white shadow-2xl"
+                    style={{ background: `linear-gradient(135deg, ${activity.neon}, ${activity.neon}cc)`, boxShadow: `0 0 40px ${activity.neon}50` }}>
                     <Play className="w-8 h-8 ml-1" />
                   </div>
                 </motion.button>
-                <motion.button whileTap={{ scale: 0.9 }} onClick={stopTracking} className="w-16 h-16 glass-strong border border-red-500/30 rounded-full flex items-center justify-center backdrop-blur-2xl hover:bg-red-500/10">
+                <motion.button whileTap={{ scale: 0.9 }} onClick={stopTracking}
+                  className="w-16 h-16 glass-strong border border-red-500/30 rounded-full flex items-center justify-center backdrop-blur-2xl hover:bg-red-500/10">
                   <Square className="w-5 h-5 text-red-400" />
                 </motion.button>
               </>
@@ -875,33 +702,22 @@ function CorridaTrackerInner() {
           <ActivityPicker selected={selectedActivity} onSelect={setSelectedActivity} onClose={() => setShowActivityPicker(false)} isEnglish={isEnglish} />
         )}
         {showHistory && (
-          <HistoryPanel
-            sessions={sessions}
-            isEnglish={isEnglish}
-            onClose={() => setShowHistory(false)}
-            onReplay={(s) => { setReplaySession(s); setShowHistory(false) }}
-          />
+          <HistoryPanel sessions={sessions} isEnglish={isEnglish} onClose={() => setShowHistory(false)}
+            onReplay={(s) => { setReplaySession(s); setShowHistory(false) }} />
         )}
       </AnimatePresence>
 
-      {/* Replay overlay */}
+      {/* Replay bar */}
       <AnimatePresence>
         {replaySession && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="absolute top-4 left-1/2 -translate-x-1/2 z-50"
-          >
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute top-4 left-1/2 -translate-x-1/2 z-50">
             <div className="glass-strong border border-white/[0.12] rounded-2xl px-5 py-3 flex items-center gap-4 backdrop-blur-2xl">
               <div className="flex items-center gap-2">
                 <Eye className="w-4 h-4" style={{ color: activity.neon }} />
-                <span className="text-sm font-bold text-white">{isEnglish ? "Replaying Session" : "Replay da Sessão"}</span>
+                <span className="text-sm font-bold text-white">{isEnglish ? "Replaying" : "Replay"}</span>
               </div>
-              <button
-                onClick={() => setReplaySession(null)}
-                className="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/15 text-white text-xs font-medium transition-colors"
-              >
+              <button onClick={() => setReplaySession(null)}
+                className="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/15 text-white text-xs font-medium transition-colors">
                 {isEnglish ? "Close" : "Fechar"}
               </button>
             </div>
@@ -909,18 +725,14 @@ function CorridaTrackerInner() {
         )}
       </AnimatePresence>
 
-      {/* Ghost mode indicator */}
+      {/* Ghost indicator */}
       <AnimatePresence>
         {showGhost && lastSession && !replaySession && (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            className="absolute top-4 left-1/2 -translate-x-1/2 z-50"
-          >
+          <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
+            className="absolute top-4 left-1/2 -translate-x-1/2 z-50">
             <div className="glass-strong border border-white/[0.08] rounded-full px-4 py-2 flex items-center gap-2 backdrop-blur-2xl">
               <Eye className="w-3.5 h-3.5 text-white/50" />
-              <span className="text-[11px] text-white/50">{isEnglish ? "Ghost Mode — Previous Route" : "Modo Fantasma — Rota Anterior"}</span>
+              <span className="text-[11px] text-white/50">{isEnglish ? "Ghost Mode" : "Modo Fantasma"}</span>
             </div>
           </motion.div>
         )}
@@ -928,15 +740,3 @@ function CorridaTrackerInner() {
     </div>
   )
 }
-
-// Dynamic import (no SSR for Three.js)
-const CorridaTracker = dynamic(() => Promise.resolve(CorridaTrackerInner), { ssr: false, loading: () => (
-  <div className="min-h-screen -mx-4 -mt-4 md:-mx-8 md:-mt-4 lg:-mx-12 lg:-mt-4 bg-[#050510] flex items-center justify-center">
-    <div className="text-center">
-      <Globe className="w-12 h-12 mx-auto mb-4 text-white/10 animate-spin" style={{ animationDuration: "3s" }} />
-      <p className="text-xs text-white/20 uppercase tracking-[0.2em]">Loading Orbit...</p>
-    </div>
-  </div>
-) })
-
-export { CorridaTracker }
