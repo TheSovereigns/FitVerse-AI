@@ -380,7 +380,7 @@ export function TrainingTab({ userGoal }: TrainingTabProps) {
         )}
 
         {!isGenerating && generationError && (
-          <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} className="rounded-xl bg-destructive/10 p-4">
+          <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} className="rounded-xl bg-destructive/10 p-4 animate-shake">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <p className="text-sm font-medium text-destructive">{locale === "en-US" ? "Could not generate workout" : "Nao foi possivel gerar o treino"}</p>

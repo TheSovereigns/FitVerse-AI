@@ -41,7 +41,13 @@ export function HomeDashboard({
 }) {
   const { t, locale } = useTranslation()
   const [waterCups, setWaterCups] = useState(0)
+  const [isLoading, setIsLoading] = useState(true)
   const { city } = useLocation()
+
+  useEffect(() => {
+    const timer = setTimeout(() => setIsLoading(false), 300)
+    return () => clearTimeout(timer)
+  }, [])
 
   const dailyTotals = useMemo(() => {
     if (!dailyActivity?.scannedProducts || dailyActivity.scannedProducts.length === 0) {
@@ -156,6 +162,55 @@ export function HomeDashboard({
 
   return (
     <div className="mx-auto w-full max-w-4xl space-y-5 pb-safe-nav">
+      {isLoading && (
+        <div className="space-y-5 animate-fade-in">
+          {/* Header skeleton */}
+          <div className="pt-2">
+            <div className="h-3 w-40 bg-muted rounded animate-pulse mb-2" />
+            <div className="h-8 w-32 bg-muted rounded animate-pulse" />
+          </div>
+          {/* Card skeletons */}
+          <div className="grid md:grid-cols-2 gap-4">
+            <div className="glass-strong rounded-2xl p-4 space-y-3">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-lg bg-muted animate-pulse" />
+                <div className="h-4 w-3/4 bg-muted rounded animate-pulse" />
+              </div>
+              <div className="h-12 bg-muted rounded animate-pulse" />
+            </div>
+            <div className="glass-strong rounded-2xl p-4 space-y-3">
+              <div className="h-4 w-1/2 bg-muted rounded animate-pulse" />
+              <div className="h-8 bg-muted rounded animate-pulse" />
+            </div>
+          </div>
+          {/* Nutrition skeleton */}
+          <div className="glass-strong rounded-2xl p-5">
+            <div className="h-4 w-32 bg-muted rounded animate-pulse mb-4" />
+            <div className="flex items-center gap-6">
+              <div className="w-32 h-32 rounded-full bg-muted animate-pulse" />
+              <div className="flex-1 space-y-3">
+                <div className="h-3 bg-muted rounded animate-pulse" />
+                <div className="h-2 bg-muted rounded animate-pulse w-full" />
+                <div className="h-2 bg-muted rounded animate-pulse w-3/4" />
+                <div className="h-2 bg-muted rounded animate-pulse w-1/2" />
+              </div>
+            </div>
+          </div>
+          {/* Stats skeleton */}
+          <div className="grid grid-cols-5 gap-3">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <div key={i} className="glass-strong rounded-2xl p-4 text-center space-y-2">
+                <div className="w-4 h-4 bg-muted rounded animate-pulse mx-auto" />
+                <div className="h-6 w-12 bg-muted rounded animate-pulse mx-auto" />
+                <div className="h-2 w-16 bg-muted rounded animate-pulse mx-auto" />
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {!isLoading && (
+        <>
       {/* Header */}
       <motion.section
         initial={{ opacity: 0, y: 12 }}
@@ -421,6 +476,8 @@ export function HomeDashboard({
           </div>
         )}
       </motion.section>
+        </>
+      )}
     </div>
   )
 }

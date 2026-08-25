@@ -304,24 +304,10 @@
 }
 .card-hover:hover {
   transform: translateY(-1px);
-  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.06);
 }
-
-/* ── Shine effect ── */
-.shine-effect {
-  position: relative;
-  overflow: hidden;
-}
-.shine-effect::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.06) 45%, rgba(255,255,255,0.12) 50%, rgba(255,255,255,0.06) 55%, transparent 60%);
-  animation: shine 4s ease-in-out infinite;
-}
-@keyframes shine {
-  0%, 100% { transform: translateX(-100%); }
-  50% { transform: translateX(100%); }
+.dark .card-hover:hover {
+  box-shadow: 0 4px 16px rgba(0,0,0,0.3);
 }
 
 /* ── iOS safe area helpers ── */
@@ -414,18 +400,6 @@
 /* ═══════════════════════════════════════════════════════════════
    ENHANCED DESIGN SYSTEM — Phase 3
    ═══════════════════════════════════════════════════════════════ */
-
-/* ── Card hover effects ── */
-.card-hover {
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-.card-hover:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
-}
-.dark .card-hover:hover {
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
-}
 
 /* ── Score ring animation ── */
 @keyframes score-fill {
@@ -605,9 +579,10 @@
   inset: 0;
   z-index: 1;
   pointer-events: none;
-  opacity: 0.035;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
-  background-size: 128px 128px;
+  opacity: 0.15;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.5'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 200px 200px;
   animation: grain 8s steps(10) infinite;
   mix-blend-mode: overlay;
 }

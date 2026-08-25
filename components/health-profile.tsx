@@ -510,7 +510,7 @@ export function HealthProfile({ scanHistory, onNavigateToSettings, onNavigateToS
         {/* Streak */}
         <div className="rounded-2xl glass-strong p-4 flex flex-col items-center">
           <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-orange-500/10">
-            <Flame className="h-5 w-5 text-orange-400" />
+            <Flame className="h-5 w-5 text-orange-400 animate-fire-glow" />
           </div>
           <span className="mt-2 text-xl md:text-2xl font-bold text-foreground text-score">{streak}</span>
           <p className="text-[10px] text-muted-foreground font-medium">{t("profile_streak")}</p>
