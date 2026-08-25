@@ -186,17 +186,17 @@ export function HealthIntegrations() {
 
       {/* Stats Bar */}
       <div className="grid grid-cols-3 gap-3">
-        <div className="bg-card border border-border rounded-2xl p-4 text-center">
+        <div className="glass-strong border border-border rounded-2xl p-4 text-center">
           <Wifi className="w-5 h-5 mx-auto mb-2 text-emerald-400" />
           <p className="text-2xl font-black text-foreground">{connectedCount}</p>
           <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider">{t("hi_connected")}</p>
         </div>
-        <div className="bg-card border border-border rounded-2xl p-4 text-center">
+        <div className="glass-strong border border-border rounded-2xl p-4 text-center">
           <Smartphone className="w-5 h-5 mx-auto mb-2 text-blue-400" />
           <p className="text-2xl font-black text-foreground">{platforms.length}</p>
           <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider">{t("hi_platforms")}</p>
         </div>
-        <div className="bg-card border border-border rounded-2xl p-4 text-center">
+        <div className="glass-strong border border-border rounded-2xl p-4 text-center">
           <Clock className="w-5 h-5 mx-auto mb-2 text-yellow-400" />
           <p className="text-2xl font-black text-foreground">
             {Object.keys(lastSync).length > 0
@@ -224,7 +224,7 @@ export function HealthIntegrations() {
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: i * 0.05 }}
               className={cn(
-                "bg-card border rounded-2xl p-5 transition-all",
+                "glass-strong border rounded-2xl p-5 transition-all",
                 isConnected ? "border-emerald-500/30" : "border-border"
               )}
             >
@@ -319,7 +319,7 @@ export function HealthIntegrations() {
       <motion.div
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        className="bg-card border border-border rounded-2xl p-6"
+        className="glass-strong border border-border rounded-2xl p-6"
       >
         <div className="flex items-center gap-3 mb-4">
           <Shield className="w-5 h-5 text-primary" />

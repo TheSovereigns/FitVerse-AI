@@ -272,7 +272,7 @@ export default function AdminUsersPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-black text-white">
+          <h1 className="text-3xl font-black text-foreground">
             {locale === "en-US" ? "Users" : "Usuários"}
           </h1>
           <p className="text-white/40 mt-1">
@@ -281,7 +281,7 @@ export default function AdminUsersPage() {
         </div>
         <Button
           onClick={exportToCSV}
-          className="bg-white/10 text-white hover:bg-white/20 border border-white/10"
+          className="bg-white/10 text-white hover:bg-white/20 border border-border"
         >
           <Download className="w-4 h-4 mr-2" />
           {locale === "en-US" ? "Export CSV" : "Exportar CSV"}
@@ -297,7 +297,7 @@ export default function AdminUsersPage() {
             onChange={(e) => setSearchQuery(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleSearch()}
             placeholder={locale === "en-US" ? "Search by name or email..." : "Buscar por nome ou email..."}
-            className="pl-12 bg-white/5 border-white/10 text-white placeholder:text-white/30"
+            className="pl-12 bg-white/5 border-border text-white placeholder:text-white/30"
           />
         </div>
         <div className="flex gap-2">
@@ -320,11 +320,11 @@ export default function AdminUsersPage() {
       </div>
 
       {/* Users Table */}
-      <div className="glass-strong border border-white/10 rounded-2xl overflow-hidden">
+      <div className="glass-strong border border-border rounded-2xl overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr className="border-b border-white/10">
+              <tr className="border-b border-border">
                 <th className="text-left text-xs font-medium text-white/40 uppercase tracking-wider p-4">
                   {locale === "en-US" ? "User" : "Usuário"}
                 </th>
@@ -364,7 +364,7 @@ export default function AdminUsersPage() {
                     key={user.id}
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
-                    className="border-b border-white/5 hover:bg-white/5"
+                    className="border-b border-border hover:bg-white/5"
                   >
                     <td className="p-4">
                       <div className="flex items-center gap-3">
@@ -372,7 +372,7 @@ export default function AdminUsersPage() {
                           {user.name?.charAt(0).toUpperCase() || user.email.charAt(0).toUpperCase()}
                         </div>
                         <div>
-                          <p className="text-sm font-medium text-white">{user.name || "Unknown"}</p>
+                           <p className="text-sm font-medium text-foreground">{user.name || "Unknown"}</p>
                           <p className="text-xs text-white/40">{user.email}</p>
                         </div>
                       </div>
@@ -392,7 +392,7 @@ export default function AdminUsersPage() {
                         <select
                           value={user.plan}
                           onChange={(e) => handleChangePlan(user.id, e.target.value)}
-                          className="bg-white/5 border border-white/10 text-white text-xs rounded-lg px-2 py-1"
+                          className="bg-white/5 border border-border text-white text-xs rounded-lg px-2 py-1"
                         >
                           <option value="free">Free</option>
                           <option value="pro">Pro</option>
@@ -430,7 +430,7 @@ export default function AdminUsersPage() {
 
         {/* Pagination */}
         {totalPages > 1 && (
-          <div className="flex items-center justify-between p-4 border-t border-white/10">
+          <div className="flex items-center justify-between p-4 border-t border-border">
             <p className="text-sm text-white/40">
               {locale === "en-US" 
                 ? `Page ${currentPage} of ${totalPages}`

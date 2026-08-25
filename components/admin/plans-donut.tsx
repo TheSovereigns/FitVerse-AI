@@ -34,7 +34,7 @@ export function PlansDonut({ freeCount, premiumCount, isLoading = false }: Plans
     return (
       <div className="glass-strong border border-orange-500/10 rounded-2xl p-6">
         <div className="animate-pulse h-64 flex items-center justify-center">
-          <div className="w-48 h-48 rounded-full border-4 border-white/5" />
+          <div className="w-48 h-48 rounded-full border-4 border-border" />
         </div>
       </div>
     )
@@ -42,7 +42,7 @@ export function PlansDonut({ freeCount, premiumCount, isLoading = false }: Plans
 
   return (
     <div className="glass-strong border border-orange-500/10 rounded-2xl p-6">
-      <h3 className="text-lg font-bold text-white mb-4">
+      <h3 className="text-lg font-bold text-foreground mb-4">
         {locale === "en-US" ? "Free vs Premium" : "Free vs Premium"}
       </h3>
 
@@ -63,10 +63,10 @@ export function PlansDonut({ freeCount, premiumCount, isLoading = false }: Plans
             </Pie>
             <Tooltip
               contentStyle={{
-                backgroundColor: "#1f1100",
-                border: "1px solid rgba(245, 158, 11, 0.2)",
+                backgroundColor: "var(--card)",
+                border: "1px solid var(--border)",
                 borderRadius: "8px",
-                color: "#fff",
+                color: "var(--card-foreground)",
               }}
               formatter={(value: number, name: string) => [value, name]}
             />
@@ -75,7 +75,7 @@ export function PlansDonut({ freeCount, premiumCount, isLoading = false }: Plans
 
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
           <div className="text-center">
-            <p className="text-3xl font-bold text-white">{conversionRate}%</p>
+            <p className="text-3xl font-bold text-card-foreground">{conversionRate}%</p>
             <p className="text-xs text-neutral-400">
               {locale === "en-US" ? "Conversion" : "Conversão"}
             </p>

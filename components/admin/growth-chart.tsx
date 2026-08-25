@@ -48,7 +48,7 @@ export function GrowthChart({ data, isLoading = false }: GrowthChartProps) {
 
   return (
     <div className="glass-strong border border-orange-500/10 rounded-2xl p-6">
-      <h3 className="text-lg font-bold text-white mb-4">
+      <h3 className="text-lg font-bold text-foreground mb-4">
         {locale === "en-US" ? "User Growth (Last 30 Days)" : "Crescimento de Usuários (Últimos 30 dias)"}
       </h3>
 
@@ -72,16 +72,16 @@ export function GrowthChart({ data, isLoading = false }: GrowthChartProps) {
                   <stop offset="95%" stopColor="#fbbf24" stopOpacity={0} />
                 </linearGradient>
               </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.08)" />
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
               <XAxis
                 dataKey="date"
-                stroke="#737373"
+                stroke="var(--muted-foreground)"
                 fontSize={12}
                 tickLine={false}
                 axisLine={false}
               />
               <YAxis
-                stroke="#737373"
+                stroke="var(--muted-foreground)"
                 fontSize={12}
                 tickLine={false}
                 axisLine={false}
@@ -89,12 +89,12 @@ export function GrowthChart({ data, isLoading = false }: GrowthChartProps) {
               />
               <Tooltip
                 contentStyle={{
-                  backgroundColor: "#1f1100",
-                  border: "1px solid rgba(245, 158, 11, 0.2)",
+                  backgroundColor: "var(--card)",
+                  border: "1px solid var(--border)",
                   borderRadius: "8px",
-                  color: "#fff",
+                  color: "var(--card-foreground)",
                 }}
-                labelStyle={{ color: "#a3a3a3" }}
+                labelStyle={{ color: "var(--muted-foreground)" }}
                 formatter={(value: number) => [value.toLocaleString(), ""]}
               />
               <Area

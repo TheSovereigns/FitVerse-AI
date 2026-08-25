@@ -199,7 +199,7 @@ export default function AdminAIUsagePage() {
     <div className="space-y-8">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-black text-white">
+        <h1 className="text-3xl font-black text-foreground">
           {locale === "en-US" ? "AI Usage" : "Uso da IA"}
         </h1>
         <p className="text-white/40 mt-1">
@@ -215,20 +215,20 @@ export default function AdminAIUsagePage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.1 }}
-            className="glass-strong border border-white/10 rounded-2xl p-5"
+            className="glass-strong border border-border rounded-2xl p-5"
           >
             <div className={cn("w-12 h-12 rounded-xl flex items-center justify-center mb-4", card.bgColor)}>
               <card.icon className={cn("w-6 h-6", card.color)} />
             </div>
-            <p className="text-2xl font-black text-white">{card.value}</p>
+            <p className="text-2xl font-black text-card-foreground">{card.value}</p>
             <p className="text-sm text-white/40 mt-1">{card.title}</p>
           </motion.div>
         ))}
       </div>
 
       {/* Hourly Heatmap */}
-      <div className="glass-strong border border-white/10 rounded-2xl p-6">
-        <h3 className="text-lg font-black text-white mb-6">
+      <div className="glass-strong border border-border rounded-2xl p-6">
+        <h3 className="text-lg font-black text-foreground mb-6">
           {locale === "en-US" ? "Usage by Hour of Day" : "Uso por Hora do Dia"}
         </h3>
         
@@ -263,8 +263,8 @@ export default function AdminAIUsagePage() {
       </div>
 
       {/* Top Questions */}
-      <div className="glass-strong border border-white/10 rounded-2xl p-6">
-        <h3 className="text-lg font-black text-white mb-6">
+      <div className="glass-strong border border-border rounded-2xl p-6">
+        <h3 className="text-lg font-black text-foreground mb-6">
           {locale === "en-US" ? "Most Asked Questions" : "Perguntas Mais Frequentes"}
         </h3>
         

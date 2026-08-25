@@ -300,7 +300,7 @@ export function ShareCard({
           </div>
         ) : imageUrl ? (
           <>
-            <div className="w-full rounded-3xl overflow-hidden border border-white/10 shadow-2xl">
+            <div className="w-full rounded-3xl overflow-hidden border border-border shadow-2xl">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={imageUrl} alt="Share Card" className="w-full h-auto" />
             </div>
@@ -311,7 +311,7 @@ export function ShareCard({
                   "flex-1 h-12 rounded-2xl font-bold text-sm flex items-center justify-center gap-2 transition-all",
                   shared
                     ? "bg-green-500/20 text-green-400 border border-green-500/30"
-                    : "bg-white/10 text-white border border-white/10 hover:bg-white/15"
+                    : "bg-white/10 text-white border border-border hover:bg-white/15"
                 )}>
                 {shared ? <Check className="w-4 h-4" /> : <Download className="w-4 h-4" />}
                 {shared ? (isEnglish ? "Saved!" : "Salvo!") : (isEnglish ? "Save Image" : "Salvar")}

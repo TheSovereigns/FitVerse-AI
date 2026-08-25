@@ -34,7 +34,7 @@ export function PostScanInsights({ scan, todayScans, plan }: PostScanInsightsPro
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.3 }}
-      className="rounded-2xl border border-white/10 bg-white/[0.03] p-4"
+      className="rounded-2xl border border-border bg-white/[0.03] p-4"
     >
       <div className="flex items-center gap-2 mb-3">
         <Lightbulb className="h-4 w-4 text-amber-400" />

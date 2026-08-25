@@ -212,13 +212,13 @@ export function ExerciseDetailModal({ exercise, topProducts, onClose, onFeedback
         <motion.div 
           initial={{ y: 50, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          className="flex-1 glass-strong border-t border-white/20 rounded-2xl flex flex-col overflow-hidden shadow-2xl"
+          className="flex-1 glass-strong border-t border-border rounded-2xl flex flex-col overflow-hidden shadow-2xl"
         >
           {/* Top Handle Bar */}
           <div className="w-8 h-1 bg-white/20 rounded-full mx-auto mt-3 mb-2 shrink-0" />
 
           {/* Header Action Bar */}
-          <div className="flex items-center justify-between px-4 py-2 shrink-0 border-b border-white/10">
+          <div className="flex items-center justify-between px-4 py-2 shrink-0 border-b border-border">
              <div className="flex items-center gap-2">
                 <Activity className="w-4 h-4 text-primary animate-pulse" />
                  <span className="text-[8px] font-black uppercase tracking-[0.2em] opacity-40">{t("em_exercise")}</span>
@@ -254,18 +254,18 @@ export function ExerciseDetailModal({ exercise, topProducts, onClose, onFeedback
 
               {/* Equipamento e Local */}
               <div className="flex gap-2">
-                 <div className="flex items-center gap-2 glass border-white/10 px-3 py-2 rounded-lg text-xs">
+                 <div className="flex items-center gap-2 glass border-border px-3 py-2 rounded-lg text-xs">
                     <Target className="w-3 h-3 text-primary" />
                     {exercise.equipment === "none" ? t("em_bodyweight") : exercise.equipment}
                  </div>
-                 <div className="flex items-center gap-2 glass border-white/10 px-3 py-2 rounded-lg text-xs">
+                 <div className="flex items-center gap-2 glass border-border px-3 py-2 rounded-lg text-xs">
                     <Award className="w-3 h-3 text-primary" />
                     {exercise.location === "home" ? t("em_home_env") : t("em_bio_gym")}
                  </div>
               </div>
 
               {/* AI Insight */}
-              <div className="p-4 glass border-white/10 rounded-xl">
+              <div className="p-4 glass border-border rounded-xl">
                  <div className="flex items-center gap-2 mb-2">
                     <Sparkles className="w-4 h-4 text-primary" />
                     <span className="text-[8px] font-black uppercase tracking-wider opacity-40">{t("em_ai_insight")}</span>
@@ -281,7 +281,7 @@ export function ExerciseDetailModal({ exercise, topProducts, onClose, onFeedback
                  </h3>
                  <div className="space-y-1">
                     {exercise.safetyTips.map((tip, i) => (
-                      <div key={i} className="p-2 glass border-white/5 rounded-lg flex items-start gap-2">
+                      <div key={i} className="p-2 glass border-border rounded-lg flex items-start gap-2">
                          <div className="w-2 h-2 rounded-full bg-emerald-400 mt-1 shrink-0" />
                          <span className="text-xs font-bold text-foreground/70">{tip}</span>
                       </div>
@@ -306,7 +306,7 @@ export function ExerciseDetailModal({ exercise, topProducts, onClose, onFeedback
               </div>
 
               {/* Tracker Simples */}
-              <div className="p-4 glass-strong border-white/10 rounded-xl">
+              <div className="p-4 glass-strong border-border rounded-xl">
                  <div className="flex items-center justify-between mb-3">
                      <span className="text-xs font-black uppercase tracking-wider">{t("em_tracker_label").replace("{currentSet}", String(currentSet)).replace("{sets}", String(sets))}</span>
                     <div className="flex gap-2">

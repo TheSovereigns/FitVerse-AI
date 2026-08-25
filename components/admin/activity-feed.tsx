@@ -77,14 +77,14 @@ export function ActivityFeed({ events, isLoading = false }: ActivityFeedProps) {
       <div className="glass-strong border border-orange-500/10 rounded-2xl p-6">
         <div className="flex items-center gap-2 mb-6">
           <Sparkles className="w-5 h-5 text-orange-400" />
-          <h3 className="text-lg font-bold text-white">
+          <h3 className="text-lg font-bold text-foreground">
             {locale === "en-US" ? "Recent Activity" : "Atividade Recente"}
           </h3>
         </div>
         <div className="space-y-4">
           {[...Array(5)].map((_, i) => (
             <div key={i} className="animate-pulse flex items-center gap-3 p-3 rounded-xl">
-              <div className="w-8 h-8 rounded-lg bg-white/5" />
+              <div className="w-8 h-8 rounded-lg bg-muted" />
               <div className="flex-1 space-y-2">
                 <div className="h-4 bg-white/5 rounded w-3/4" />
                 <div className="h-3 bg-white/5 rounded w-1/4" />
@@ -100,7 +100,7 @@ export function ActivityFeed({ events, isLoading = false }: ActivityFeedProps) {
     <div className="glass-strong border border-orange-500/10 rounded-2xl p-6">
       <div className="flex items-center gap-2 mb-6">
         <Sparkles className="w-5 h-5 text-orange-400" />
-        <h3 className="text-lg font-bold text-white">
+        <h3 className="text-lg font-bold text-foreground">
           {locale === "en-US" ? "Recent Activity" : "Atividade Recente"}
         </h3>
         <div className="ml-auto flex items-center gap-1.5">

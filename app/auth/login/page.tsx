@@ -80,7 +80,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#1a0f00] via-[#0d0705] to-[#1a0f00] flex">
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-background flex">
       {/* Left side - Visual (desktop only) */}
       <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-primary/30 via-transparent to-purple-500/20" />
@@ -94,14 +94,14 @@ export default function LoginPage() {
             transition={{ duration: 0.6 }}
             className="text-center"
           >
-            <div className="w-24 h-24 rounded-3xl bg-primary/20 border border-primary/30 flex items-center justify-center mb-8 mx-auto shadow-[0_0_60px_rgba(255,140,0,0.3)] overflow-hidden">
+            <div className="w-24 h-24 rounded-3xl bg-primary/20 border border-primary/30 flex items-center justify-center mb-8 mx-auto shadow-[0_0_60px_rgba(52,211,153,0.3)] overflow-hidden">
               <img src="/icon.svg" alt="VyseFit" className="w-14 h-14" />
             </div>
             
-            <h2 className="text-4xl font-black text-white mb-4 tracking-tight">
+            <h2 className="text-4xl font-black text-foreground mb-4 tracking-tight">
               {locale === "en-US" ? "Welcome Back" : "Bem-vindo de volta"}
             </h2>
-            <p className="text-lg text-white/60 max-w-md">
+            <p className="text-lg text-foreground/70 max-w-md">
               {locale === "en-US"
                 ? "Continue your journey to a healthier life with VyseFit AI"
                 : "Continue sua jornada para uma vida mais saudável com VyseFit AI"}
@@ -124,17 +124,17 @@ export default function LoginPage() {
               <div className="w-10 h-10 rounded-xl bg-primary/20 border border-primary/30 flex items-center justify-center overflow-hidden">
                 <img src="/icon.svg" alt="VyseFit" className="w-6 h-6" />
               </div>
-              <span className="text-2xl font-black text-white">VyseFit AI</span>
+              <span className="text-2xl font-black text-foreground">VyseFit AI</span>
             </Link>
           </div>
 
           {/* Form Card */}
-          <div className="glass-strong border border-white/10 rounded-3xl p-6 md:p-8">
+          <div className="glass-strong border border-border rounded-3xl p-6 md:p-8">
             <div className="text-center mb-6">
-              <h1 className="text-2xl font-black text-white mb-2">
+              <h1 className="text-2xl font-black text-foreground mb-2">
                 {locale === "en-US" ? "Sign In" : "Entrar"}
               </h1>
-              <p className="text-sm text-white/40">
+              <p className="text-sm text-foreground/40">
                 {locale === "en-US" ? "Welcome back! Enter your credentials." : "Bem-vindo de volta! Entre com suas credenciais."}
               </p>
             </div>
@@ -148,7 +148,7 @@ export default function LoginPage() {
 
             <form onSubmit={handleSubmit} className="space-y-5">
               <div>
-                <Label htmlFor="email" className="text-white/80 text-sm font-medium mb-2 block">
+                <Label htmlFor="email" className="text-foreground/70 text-sm font-medium mb-2 block">
                   {locale === "en-US" ? "Email" : "Email"}
                 </Label>
                 <Input
@@ -158,7 +158,7 @@ export default function LoginPage() {
                   onChange={(e) => setEmail(e.target.value)}
                   onBlur={() => setFieldErrors(prev => ({ ...prev, ...validate({ email, password }) }))}
                   placeholder={locale === "en-US" ? "you@example.com" : "seu@email.com"}
-                  className={cn("h-12 bg-white/5 border-white/10 text-white placeholder:text-white/30 focus:border-primary focus:ring-primary/20 rounded-xl", fieldErrors.email && "border-red-500 focus:border-red-500 focus:ring-red-500/20")}
+                  className={cn("h-12 bg-muted/50 border-border text-foreground placeholder:text-foreground/30 focus:border-primary focus:ring-primary/20 rounded-xl", fieldErrors.email && "border-red-500 focus:border-red-500 focus:ring-red-500/20")}
                   aria-invalid={!!fieldErrors.email}
                 />
                 {fieldErrors.email && (
@@ -167,7 +167,7 @@ export default function LoginPage() {
               </div>
 
               <div>
-                <Label htmlFor="password" className="text-white/80 text-sm font-medium mb-2 block">
+                <Label htmlFor="password" className="text-foreground/70 text-sm font-medium mb-2 block">
                   {locale === "en-US" ? "Password" : "Senha"}
                 </Label>
                 <div className="relative">
@@ -178,7 +178,7 @@ export default function LoginPage() {
                     onChange={(e) => setPassword(e.target.value)}
                     onBlur={() => setFieldErrors(prev => ({ ...prev, ...validate({ email, password }) }))}
                     placeholder="••••••••"
-                    className={cn("h-12 bg-white/5 border-white/10 text-white placeholder:text-white/30 focus:border-primary focus:ring-primary/20 rounded-xl pr-12", fieldErrors.password && "border-red-500 focus:border-red-500 focus:ring-red-500/20")}
+                    className={cn("h-12 bg-muted/50 border-border text-foreground placeholder:text-foreground/30 focus:border-primary focus:ring-primary/20 rounded-xl pr-12", fieldErrors.password && "border-red-500 focus:border-red-500 focus:ring-red-500/20")}
                     aria-invalid={!!fieldErrors.password}
                   />
                   <Button
@@ -186,7 +186,7 @@ export default function LoginPage() {
                     variant="ghost"
                     size="sm"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-0 top-0 h-full px-3 text-white/40 hover:text-white"
+                    className="absolute right-0 top-0 h-full px-3 text-foreground/40 hover:text-foreground"
                   >
                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </Button>
@@ -208,7 +208,7 @@ export default function LoginPage() {
               <Button
                 type="submit"
                 disabled={isLoading}
-                className="w-full h-12 text-base font-black bg-primary text-white rounded-xl hover:bg-primary/90 transition-all hover:shadow-[0_10px_30px_rgba(255,140,0,0.3)] hover:scale-[1.02] active:scale-[0.98]"
+                className="w-full h-12 text-base font-black bg-brand text-brand-foreground rounded-xl hover:bg-brand/90 transition-all hover:shadow-[0_10px_30px_rgba(52,211,153,0.3)] hover:scale-[1.02] active:scale-[0.98]"
               >
                 {isLoading ? (
                   <>
@@ -226,10 +226,10 @@ export default function LoginPage() {
             {/* Divider */}
             <div className="relative my-6">
               <div className="absolute inset-0 flex items-center">
-                <span className="w-full border-t border-white/10" />
+                <span className="w-full border-t border-border" />
               </div>
               <div className="relative flex justify-center text-xs">
-                <span className="bg-[#0d0705] px-4 text-white/30">
+                <span className="bg-background px-4 text-foreground/30">
                   {locale === "en-US" ? "or continue with" : "ou continue com"}
                 </span>
               </div>
@@ -239,7 +239,7 @@ export default function LoginPage() {
             <Button
               type="button"
               onClick={handleGoogleLogin}
-              className="w-full h-12 bg-white/5 border border-white/10 text-white hover:bg-white/10 rounded-xl transition-all"
+              className="w-full h-12 bg-muted/50 border border-border text-foreground hover:bg-muted rounded-xl transition-all"
             >
               <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
                 <path
@@ -264,7 +264,7 @@ export default function LoginPage() {
 
             {/* Sign Up Link */}
             <div className="mt-6 text-center">
-              <p className="text-sm text-white/40">
+              <p className="text-sm text-foreground/40">
                 {locale === "en-US" ? "No account?" : "Não tem conta?"}{" "}
                 <Link href="/auth/signup" className="text-primary hover:underline font-medium">
                   {locale === "en-US" ? "Create for free" : "Criar grátis"}

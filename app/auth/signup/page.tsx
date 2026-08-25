@@ -235,10 +235,10 @@ export default function SignupPage() {
             >
               <User className="h-10 w-10 text-white" />
             </motion.div>
-            <h2 className="text-2xl font-black text-white mb-2">
+            <h2 className="text-2xl font-black text-foreground mb-2">
               {isEnglish ? "What's your gender?" : "Qual seu gênero?"}
             </h2>
-            <p className="text-sm text-white/40 mb-8">
+            <p className="text-sm text-foreground/40 mb-8">
               {isEnglish ? "This helps us personalize your plan" : "Isso ajuda a personalizar seu plano"}
             </p>
             <div className="grid grid-cols-3 gap-3">
@@ -249,8 +249,8 @@ export default function SignupPage() {
                   className={cn(
                     "flex flex-col items-center gap-2 rounded-2xl border p-5 transition-all",
                     gender === opt.value
-                      ? "border-primary bg-primary/10 text-white"
-                      : "border-white/10 bg-white/5 text-white/50 hover:bg-white/10"
+                      ? "border-primary bg-primary/10 text-foreground"
+                      : "border-border bg-muted/50 text-foreground/50 hover:bg-muted"
                   )}
                 >
                   <span className="text-3xl">{opt.icon}</span>
@@ -272,10 +272,10 @@ export default function SignupPage() {
             >
               <Calendar className="h-10 w-10 text-white" />
             </motion.div>
-            <h2 className="text-2xl font-black text-white mb-2">
+            <h2 className="text-2xl font-black text-foreground mb-2">
               {isEnglish ? "How old are you?" : "Quantos anos você tem?"}
             </h2>
-            <p className="text-sm text-white/40 mb-8">
+            <p className="text-sm text-foreground/40 mb-8">
               {isEnglish ? "For accurate caloric calculations" : "Para cálculos calóricos precisos"}
             </p>
             <Input
@@ -284,7 +284,7 @@ export default function SignupPage() {
               onChange={(e) => setAge(e.target.value)}
               min="10"
               max="120"
-              className="h-16 text-center text-3xl font-black bg-white/5 border-white/10 text-white rounded-2xl"
+              className="h-16 text-center text-3xl font-black bg-muted/50 border-border text-foreground rounded-2xl"
             />
           </div>
         )
@@ -300,10 +300,10 @@ export default function SignupPage() {
             >
               <Scale className="h-10 w-10 text-white" />
             </motion.div>
-            <h2 className="text-2xl font-black text-white mb-2">
+            <h2 className="text-2xl font-black text-foreground mb-2">
               {isEnglish ? "What's your weight?" : "Qual seu peso?"}
             </h2>
-            <p className="text-sm text-white/40 mb-8">
+            <p className="text-sm text-foreground/40 mb-8">
               {isEnglish ? "In kilograms" : "Em quilogramas"}
             </p>
             <Input
@@ -313,7 +313,7 @@ export default function SignupPage() {
               min="30"
               max="300"
               step="0.1"
-              className="h-16 text-center text-3xl font-black bg-white/5 border-white/10 text-white rounded-2xl"
+              className="h-16 text-center text-3xl font-black bg-muted/50 border-border text-foreground rounded-2xl"
             />
           </div>
         )
@@ -329,10 +329,10 @@ export default function SignupPage() {
             >
               <Ruler className="h-10 w-10 text-white" />
             </motion.div>
-            <h2 className="text-2xl font-black text-white mb-2">
+            <h2 className="text-2xl font-black text-foreground mb-2">
               {isEnglish ? "What's your height?" : "Qual sua altura?"}
             </h2>
-            <p className="text-sm text-white/40 mb-8">
+            <p className="text-sm text-foreground/40 mb-8">
               {isEnglish ? "In centimeters" : "Em centímetros"}
             </p>
             <Input
@@ -342,7 +342,7 @@ export default function SignupPage() {
               min="100"
               max="250"
               step="0.1"
-              className="h-16 text-center text-3xl font-black bg-white/5 border-white/10 text-white rounded-2xl"
+              className="h-16 text-center text-3xl font-black bg-muted/50 border-border text-foreground rounded-2xl"
             />
           </div>
         )
@@ -358,10 +358,10 @@ export default function SignupPage() {
             >
               <Target className="h-10 w-10 text-white" />
             </motion.div>
-            <h2 className="text-2xl font-black text-white mb-2">
+            <h2 className="text-2xl font-black text-foreground mb-2">
               {isEnglish ? "What's your goal?" : "Qual seu objetivo?"}
             </h2>
-            <p className="text-sm text-white/40 mb-8">
+            <p className="text-sm text-foreground/40 mb-8">
               {isEnglish ? "We'll build your plan around this" : "Vamos construir seu plano com base nisso"}
             </p>
             <div className="grid grid-cols-2 gap-3">
@@ -374,13 +374,13 @@ export default function SignupPage() {
                     className={cn(
                       "flex flex-col items-center gap-2 rounded-2xl border p-4 transition-all",
                       goal === opt.value
-                        ? "border-primary bg-primary/10 text-white"
-                        : "border-white/10 bg-white/5 text-white/50 hover:bg-white/10"
+                        ? "border-primary bg-primary/10 text-foreground"
+                        : "border-border bg-muted/50 text-foreground/50 hover:bg-muted"
                     )}
                   >
                     <Icon className="w-6 h-6" />
                     <span className="text-sm font-bold">{opt.label}</span>
-                    <span className="text-[10px] text-white/30">{opt.desc}</span>
+                    <span className="text-[10px] text-foreground/30">{opt.desc}</span>
                   </button>
                 )
               })}
@@ -391,7 +391,7 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#1a0f00] via-[#0d0705] to-[#1a0f00] flex">
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-background flex">
       {/* Left side - Visual (desktop only) */}
       <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-primary/30 via-transparent to-purple-500/20" />
@@ -405,13 +405,13 @@ export default function SignupPage() {
             transition={{ duration: 0.6 }}
             className="text-center"
           >
-            <div className="w-24 h-24 rounded-3xl bg-primary/20 border border-primary/30 flex items-center justify-center mb-8 mx-auto shadow-[0_0_60px_rgba(255,140,0,0.3)] overflow-hidden">
+            <div className="w-24 h-24 rounded-3xl bg-primary/20 border border-primary/30 flex items-center justify-center mb-8 mx-auto shadow-[0_0_60px_rgba(52,211,153,0.3)] overflow-hidden">
               <img src="/icon.svg" alt="VyseFit" className="w-14 h-14" />
             </div>
-            <h2 className="text-4xl font-black text-white mb-4 tracking-tight">
+            <h2 className="text-4xl font-black text-foreground mb-4 tracking-tight">
               {isEnglish ? "Start Your Journey" : "Comece Sua Jornada"}
             </h2>
-            <p className="text-lg text-white/60 max-w-md">
+            <p className="text-lg text-foreground/70 max-w-md">
               {isEnglish
                 ? "Join thousands of people transforming their lives with VyseFit AI"
                 : "Junte-se a milhares de pessoas transformando suas vidas com VyseFit AI"}
@@ -434,22 +434,22 @@ export default function SignupPage() {
               <div className="w-10 h-10 rounded-xl bg-primary/20 border border-primary/30 flex items-center justify-center overflow-hidden">
                 <img src="/icon.svg" alt="VyseFit" className="w-6 h-6" />
               </div>
-              <span className="text-2xl font-black text-white">VyseFit AI</span>
+              <span className="text-2xl font-black text-foreground">VyseFit AI</span>
             </Link>
           </div>
 
           {/* Card */}
-          <div className="glass-strong border border-white/10 rounded-3xl p-6 md:p-8">
+          <div className="glass-strong border border-border rounded-3xl p-6 md:p-8">
             <AnimatePresence mode="wait">
 
               {/* ═══════ PHASE: SIGNUP FORM ═══════ */}
               {phase === "form" && (
                 <motion.div key="form" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, x: -30 }}>
                   <div className="text-center mb-6">
-                    <h1 className="text-2xl font-black text-white mb-2">
+                    <h1 className="text-2xl font-black text-foreground mb-2">
                       {isEnglish ? "Create Account" : "Criar Conta"}
                     </h1>
-                    <p className="text-sm text-white/40">
+                    <p className="text-sm text-foreground/40">
                       {isEnglish ? "Start your free account today" : "Comece sua conta grátis hoje"}
                     </p>
                   </div>
@@ -462,7 +462,7 @@ export default function SignupPage() {
 
                   <form onSubmit={handleSubmit} className="space-y-4">
                     <div>
-                      <Label className="text-white/80 text-sm font-medium mb-2 block">
+                      <Label className="text-foreground/70 text-sm font-medium mb-2 block">
                         {isEnglish ? "Full Name" : "Nome Completo"}
                       </Label>
                       <Input
@@ -471,7 +471,7 @@ export default function SignupPage() {
                         onChange={(e) => setName(e.target.value)}
                         onBlur={() => setFieldErrors(prev => ({ ...prev, ...validate({ name, email, password, confirmPassword }) }))}
                         placeholder={isEnglish ? "John Doe" : "João Silva"}
-                        className={cn("h-12 bg-white/5 border-white/10 text-white placeholder:text-white/30 focus:border-primary focus:ring-primary/20 rounded-xl", fieldErrors.name && "border-red-500 focus:border-red-500 focus:ring-red-500/20")}
+                        className={cn("h-12 bg-muted/50 border-border text-foreground placeholder:text-foreground/30 focus:border-primary focus:ring-primary/20 rounded-xl", fieldErrors.name && "border-red-500 focus:border-red-500 focus:ring-red-500/20")}
                         aria-invalid={!!fieldErrors.name}
                       />
                       {fieldErrors.name && (
@@ -479,14 +479,14 @@ export default function SignupPage() {
                       )}
                     </div>
                     <div>
-                      <Label className="text-white/80 text-sm font-medium mb-2 block">Email</Label>
+                      <Label className="text-foreground/70 text-sm font-medium mb-2 block">Email</Label>
                       <Input
                         type="email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         onBlur={() => setFieldErrors(prev => ({ ...prev, ...validate({ name, email, password, confirmPassword }) }))}
                         placeholder={isEnglish ? "you@example.com" : "seu@email.com"}
-                        className={cn("h-12 bg-white/5 border-white/10 text-white placeholder:text-white/30 focus:border-primary focus:ring-primary/20 rounded-xl", fieldErrors.email && "border-red-500 focus:border-red-500 focus:ring-red-500/20")}
+                        className={cn("h-12 bg-muted/50 border-border text-foreground placeholder:text-foreground/30 focus:border-primary focus:ring-primary/20 rounded-xl", fieldErrors.email && "border-red-500 focus:border-red-500 focus:ring-red-500/20")}
                         aria-invalid={!!fieldErrors.email}
                       />
                       {fieldErrors.email && (
@@ -494,7 +494,7 @@ export default function SignupPage() {
                       )}
                     </div>
                     <div>
-                      <Label className="text-white/80 text-sm font-medium mb-2 block">
+                      <Label className="text-foreground/70 text-sm font-medium mb-2 block">
                         {isEnglish ? "Password" : "Senha"}
                       </Label>
                       <div className="relative">
@@ -504,7 +504,7 @@ export default function SignupPage() {
                           onChange={(e) => setPassword(e.target.value)}
                           onBlur={() => setFieldErrors(prev => ({ ...prev, ...validate({ name, email, password, confirmPassword }) }))}
                           placeholder="••••••••"
-                          className={cn("h-12 bg-white/5 border-white/10 text-white placeholder:text-white/30 focus:border-primary focus:ring-primary/20 rounded-xl pr-12", fieldErrors.password && "border-red-500 focus:border-red-500 focus:ring-red-500/20")}
+                          className={cn("h-12 bg-muted/50 border-border text-foreground placeholder:text-foreground/30 focus:border-primary focus:ring-primary/20 rounded-xl pr-12", fieldErrors.password && "border-red-500 focus:border-red-500 focus:ring-red-500/20")}
                           aria-invalid={!!fieldErrors.password}
                         />
                         <Button
@@ -512,7 +512,7 @@ export default function SignupPage() {
                           variant="ghost"
                           size="sm"
                           onClick={() => setShowPassword(!showPassword)}
-                          className="absolute right-0 top-0 h-full px-3 text-white/40 hover:text-white"
+                          className="absolute right-0 top-0 h-full px-3 text-foreground/40 hover:text-foreground"
                         >
                           {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                         </Button>
@@ -522,7 +522,7 @@ export default function SignupPage() {
                       )}
                     </div>
                     <div>
-                      <Label className="text-white/80 text-sm font-medium mb-2 block">
+                      <Label className="text-foreground/70 text-sm font-medium mb-2 block">
                         {isEnglish ? "Confirm Password" : "Confirmar Senha"}
                       </Label>
                       <Input
@@ -531,7 +531,7 @@ export default function SignupPage() {
                         onChange={(e) => setConfirmPassword(e.target.value)}
                         onBlur={() => setFieldErrors(prev => ({ ...prev, ...validate({ name, email, password, confirmPassword }) }))}
                         placeholder="••••••••"
-                        className={cn("h-12 bg-white/5 border-white/10 text-white placeholder:text-white/30 focus:border-primary focus:ring-primary/20 rounded-xl", fieldErrors.confirmPassword && "border-red-500 focus:border-red-500 focus:ring-red-500/20")}
+                        className={cn("h-12 bg-muted/50 border-border text-foreground placeholder:text-foreground/30 focus:border-primary focus:ring-primary/20 rounded-xl", fieldErrors.confirmPassword && "border-red-500 focus:border-red-500 focus:ring-red-500/20")}
                         aria-invalid={!!fieldErrors.confirmPassword}
                       />
                       {fieldErrors.confirmPassword && (
@@ -543,9 +543,9 @@ export default function SignupPage() {
                         type="checkbox"
                         checked={acceptTerms}
                         onChange={(e) => setAcceptTerms(e.target.checked)}
-                        className="mt-1 w-4 h-4 rounded border-white/20 bg-white/5 text-primary focus:ring-primary/20"
+                        className="mt-1 w-4 h-4 rounded border-border bg-muted/50 text-primary focus:ring-primary/20"
                       />
-                      <label className="text-xs text-white/50">
+                      <label className="text-xs text-foreground/50">
                         {isEnglish ? (
                           <>I agree to the <a href="#" className="text-primary hover:underline">Terms of Use</a> and <a href="#" className="text-primary hover:underline">Privacy Policy</a></>
                         ) : (
@@ -556,7 +556,7 @@ export default function SignupPage() {
                     <Button
                       type="submit"
                       disabled={isLoading}
-                      className="w-full h-12 text-base font-black bg-primary text-white rounded-xl hover:bg-primary/90 transition-all hover:shadow-[0_10px_30px_rgba(255,140,0,0.3)] hover:scale-[1.02] active:scale-[0.98]"
+                      className="w-full h-12 text-base font-black bg-brand text-brand-foreground rounded-xl hover:bg-brand/90 transition-all hover:shadow-[0_10px_30px_rgba(52,211,153,0.3)] hover:scale-[1.02] active:scale-[0.98]"
                     >
                       {isLoading ? (
                         <><Loader2 className="w-5 h-5 mr-2 animate-spin" />{isEnglish ? "Creating account..." : "Criando conta..."}</>
@@ -568,17 +568,17 @@ export default function SignupPage() {
 
                   <div className="relative my-6">
                     <div className="absolute inset-0 flex items-center">
-                      <span className="w-full border-t border-white/10" />
+                      <span className="w-full border-t border-border" />
                     </div>
                     <div className="relative flex justify-center text-xs">
-                      <span className="bg-[#0d0705] px-4 text-white/30">{isEnglish ? "or continue with" : "ou continue com"}</span>
+                      <span className="bg-background px-4 text-foreground/30">{isEnglish ? "or continue with" : "ou continue com"}</span>
                     </div>
                   </div>
 
                   <Button
                     type="button"
                     onClick={handleGoogleSignup}
-                    className="w-full h-12 bg-white/5 border border-white/10 text-white hover:bg-white/10 rounded-xl transition-all"
+                    className="w-full h-12 bg-muted/50 border border-border text-foreground hover:bg-muted rounded-xl transition-all"
                   >
                     <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
                       <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
@@ -590,7 +590,7 @@ export default function SignupPage() {
                   </Button>
 
                   <div className="mt-6 text-center">
-                    <p className="text-sm text-white/40">
+                    <p className="text-sm text-foreground/40">
                       {isEnglish ? "Already have an account?" : "Já tem conta?"}{" "}
                       <Link href="/auth/login" className="text-primary hover:underline font-medium">
                         {isEnglish ? "Sign In" : "Entrar"}
@@ -605,17 +605,17 @@ export default function SignupPage() {
                 <motion.div key="profile" initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0 }}>
                   {/* Progress bar */}
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-[10px] font-black uppercase tracking-widest text-white/20">
+                    <span className="text-[10px] font-black uppercase tracking-widest text-foreground/30">
                       {profileIndex + 1}/{profileSteps.length}
                     </span>
                     <button
                       onClick={() => { saveProfileAndGeneratePlan() }}
-                      className="text-[10px] font-black uppercase tracking-widest text-white/30 hover:text-white/50"
+                      className="text-[10px] font-black uppercase tracking-widest text-foreground/30 hover:text-foreground/50"
                     >
                       {isEnglish ? "Skip" : "Pular"}
                     </button>
                   </div>
-                  <div className="h-1 bg-white/15 rounded-full overflow-hidden mb-8">
+                  <div className="h-1 bg-muted rounded-full overflow-hidden mb-8">
                     <motion.div
                       className="h-full bg-gradient-to-r from-primary to-primary/70 rounded-full"
                       animate={{ width: `${profileProgress}%` }}
@@ -643,7 +643,7 @@ export default function SignupPage() {
                         type="button"
                         onClick={handleProfileBack}
                         variant="outline"
-                        className="flex-1 h-12 border-white/10 bg-white/5 text-white hover:bg-white/10 rounded-xl"
+                        className="flex-1 h-12 border-border bg-muted/50 text-foreground hover:bg-muted rounded-xl"
                       >
                         <ChevronLeft className="w-4 h-4 mr-1" />
                         {isEnglish ? "Back" : "Voltar"}
@@ -653,7 +653,7 @@ export default function SignupPage() {
                       type="button"
                       onClick={handleProfileNext}
                       disabled={!canProceedProfile() || isSavingProfile}
-                      className="flex-1 h-12 font-bold bg-primary text-white rounded-xl hover:bg-primary/90 transition-all hover:shadow-[0_10px_30px_rgba(255,140,0,0.3)] disabled:opacity-40"
+                      className="flex-1 h-12 font-bold bg-brand text-brand-foreground rounded-xl hover:bg-brand/90 transition-all hover:shadow-[0_10px_30px_rgba(52,211,153,0.3)] disabled:opacity-40"
                     >
                       {profileIndex === profileSteps.length - 1 ? (
                         isSavingProfile ? (
@@ -680,17 +680,17 @@ export default function SignupPage() {
                   >
                     <Loader2 className="w-10 h-10 text-primary animate-spin" />
                   </motion.div>
-                  <h2 className="text-2xl font-black text-white mb-3">
+                  <h2 className="text-2xl font-black text-foreground mb-3">
                     {isEnglish ? "Generating Your Plan..." : "Gerando Seu Plano..."}
                   </h2>
-                  <p className="text-sm text-white/60 mb-6">
+                  <p className="text-sm text-foreground/70 mb-6">
                     {isEnglish
                       ? "Our AI is building your personalized workout and nutrition plan"
                       : "Nossa IA está construindo seu plano personalizado de treino e nutrição"}
                   </p>
                   <div className="flex items-center justify-center gap-2">
                     <Loader2 className="w-4 h-4 text-primary animate-spin" />
-                    <span className="text-xs text-white/40 uppercase tracking-wider">
+                    <span className="text-xs text-foreground/40 uppercase tracking-wider">
                       {isEnglish ? "This may take a moment" : "Isso pode levar um momento"}
                     </span>
                   </div>
@@ -708,17 +708,17 @@ export default function SignupPage() {
                   >
                     <Check className="w-10 h-10 text-emerald-400" />
                   </motion.div>
-                  <h2 className="text-2xl font-black text-white mb-3">
+                  <h2 className="text-2xl font-black text-foreground mb-3">
                     {isEnglish ? "You're All Set!" : "Tudo Pronto!"}
                   </h2>
-                  <p className="text-sm text-white/60 mb-6">
+                  <p className="text-sm text-foreground/70 mb-6">
                     {isEnglish
                       ? "Redirecting you to your dashboard..."
                       : "Redirecionando para seu painel..."}
                   </p>
                   <div className="flex items-center justify-center gap-2">
                     <Loader2 className="w-4 h-4 text-primary animate-spin" />
-                    <span className="text-xs text-white/40 uppercase tracking-wider">
+                    <span className="text-xs text-foreground/40 uppercase tracking-wider">
                       {isEnglish ? "Loading your dashboard" : "Carregando seu painel"}
                     </span>
                   </div>

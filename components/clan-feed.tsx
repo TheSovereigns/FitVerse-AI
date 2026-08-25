@@ -14,7 +14,7 @@ export function ClanFeed({ clanId }: { clanId: string }) {
 
   const activityIcons: Record<string, any> = { scan: ScanLine, workout: Dumbbell, diet: Wheat, streak: Zap, badge: Trophy }
   const activityIconColors: Record<string, string> = {
-    scan: "text-brand", workout: "text-blue-400", diet: "text-white/40", streak: "text-yellow-400", badge: "text-purple-400",
+    scan: "text-brand", workout: "text-blue-400", diet: "text-foreground/40", streak: "text-yellow-400", badge: "text-purple-400",
   }
 
   const formatActivityText = (activity: any) => {
@@ -43,12 +43,12 @@ export function ClanFeed({ clanId }: { clanId: string }) {
     <div className="space-y-2">
       {isLoading ? (
         <div className="flex items-center justify-center p-8">
-          <div className="h-6 w-6 rounded-full border-2 border-white/20 border-t-transparent animate-spin" />
+          <div className="h-6 w-6 rounded-full border-2 border-foreground/20 border-t-transparent animate-spin" />
         </div>
       ) : activities.length === 0 ? (
-        <div className="rounded-2xl border border-white/5 bg-[#0a0a0a] p-8 text-center">
-          <Activity className="mx-auto mb-3 h-10 w-10 text-white/10" />
-          <p className="text-sm font-bold text-white/30">
+          <div className="rounded-2xl border border-border bg-background p-8 text-center">
+          <Activity className="mx-auto mb-3 h-10 w-10 text-foreground/20" />
+          <p className="text-sm font-bold text-foreground/40">
             {isEnglish ? "No activity yet. Share your first scan!" : "Nenhuma atividade ainda. Compartilhe seu primeiro scan!"}
           </p>
         </div>
@@ -58,16 +58,16 @@ export function ClanFeed({ clanId }: { clanId: string }) {
           return (
             <motion.div key={activity.id} initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }}
               transition={{ delay: i * 0.03 }}
-              className="flex items-start gap-3 rounded-xl border border-white/5 bg-[#0a0a0a] p-4">
-              <div className={cn("flex h-9 w-9 items-center justify-center rounded-xl bg-white/5 shrink-0",
-                activityIconColors[activity.activity_type] || "text-white/40")}>
+              className="flex items-start gap-3 rounded-xl border border-border bg-background p-4">
+              <div className={cn("flex h-9 w-9 items-center justify-center rounded-xl bg-muted/50 shrink-0",
+                activityIconColors[activity.activity_type] || "text-foreground/40")}>
                 <Icon className="h-4 w-4" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-bold text-white/70 leading-relaxed">{formatActivityText(activity)}</p>
+                <p className="text-sm font-bold text-foreground/80 leading-relaxed">{formatActivityText(activity)}</p>
                 <div className="flex items-center gap-1.5 mt-1">
-                  <Clock className="h-3 w-3 text-white/15" />
-                  <span className="text-[9px] font-bold text-white/15">{timeAgo(activity.created_at)}</span>
+                  <Clock className="h-3 w-3 text-foreground/40" />
+                  <span className="text-[9px] font-bold text-foreground/40">{timeAgo(activity.created_at)}</span>
                 </div>
               </div>
             </motion.div>

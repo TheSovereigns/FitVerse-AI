@@ -20,31 +20,31 @@ interface MetricCardProps {
 
 const variantStyles = {
   default: {
-    bg: "bg-[#1f1100]/50",
+    bg: "bg-card/50",
     border: "border-orange-500/10",
     icon: "text-orange-400",
     iconBg: "bg-orange-500/10",
   },
   highlight: {
-    bg: "bg-[#1f1100]/80",
+    bg: "bg-card/80",
     border: "border-orange-500/30",
     icon: "text-orange-400",
     iconBg: "bg-orange-500/20",
   },
   success: {
-    bg: "bg-[#1f1100]/50",
+    bg: "bg-card/50",
     border: "border-green-500/10",
     icon: "text-green-400",
     iconBg: "bg-green-500/10",
   },
   warning: {
-    bg: "bg-[#1f1100]/50",
+    bg: "bg-card/50",
     border: "border-yellow-500/10",
     icon: "text-yellow-400",
     iconBg: "bg-yellow-500/10",
   },
   danger: {
-    bg: "bg-[#1f1100]/50",
+    bg: "bg-card/50",
     border: "border-red-500/10",
     icon: "text-red-400",
     iconBg: "bg-red-500/10",
@@ -67,9 +67,9 @@ export function MetricCard({
     return (
       <div className={cn("glass-strong border rounded-2xl p-5", styles.bg, styles.border)}>
         <div className="animate-pulse space-y-3">
-          <div className="w-10 h-10 rounded-xl bg-white/5" />
-          <div className="h-8 bg-white/5 rounded w-24" />
-          <div className="h-4 bg-white/5 rounded w-32" />
+          <div className="w-10 h-10 rounded-xl bg-muted" />
+          <div className="h-8 bg-muted rounded w-24" />
+          <div className="h-4 bg-muted rounded w-32" />
         </div>
       </div>
     )
@@ -107,10 +107,10 @@ export function MetricCard({
         )}
       </div>
       <div className="space-y-1">
-        <p className="text-3xl font-bold text-white">{value}</p>
-        <p className="text-sm text-neutral-400">{title}</p>
+        <p className="text-3xl font-bold text-card-foreground">{value}</p>
+        <p className="text-sm text-muted-foreground">{title}</p>
         {subtitle && (
-          <p className="text-xs text-neutral-500 mt-2">{subtitle}</p>
+          <p className="text-xs text-muted-foreground/70 mt-2">{subtitle}</p>
         )}
       </div>
     </motion.div>

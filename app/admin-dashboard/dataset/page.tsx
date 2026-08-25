@@ -398,7 +398,7 @@ export default function DatasetPage() {
             <Database className="w-5 h-5 text-primary" />
           </div>
           <div>
-            <h1 className="text-xl font-black text-white tracking-tight">Dataset IA</h1>
+            <h1 className="text-xl font-black text-foreground tracking-tight">Dataset IA</h1>
             <p className="text-xs text-neutral-500">Coleta de dados para fine-tuning</p>
           </div>
         </div>
@@ -413,7 +413,7 @@ export default function DatasetPage() {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
-        <StatCard label="Total" value={totalMessages} icon={Database} color="text-white" bg="bg-white/5" />
+        <StatCard label="Total" value={totalMessages} icon={Database} color="text-card-foreground" bg="bg-card/50" />
         <StatCard label="Aprovadas" value={totalApproved} icon={CheckCircle} color="text-emerald-400" bg="bg-emerald-500/10" />
         <StatCard label="Editadas" value={totalEdited} icon={Edit3} color="text-blue-400" bg="bg-blue-500/10" />
         <StatCard label="Pendentes" value={totalPending} icon={Clock} color="text-yellow-400" bg="bg-yellow-500/10" />
@@ -428,7 +428,7 @@ export default function DatasetPage() {
       </div>
 
       {/* Progress Bar */}
-      <div className="glass-strong border-white/10 rounded-2xl p-4">
+      <div className="glass-strong border-border rounded-2xl p-4">
         <div className="flex items-center justify-between mb-2">
           <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
             Progresso para Fine-Tuning
@@ -450,7 +450,7 @@ export default function DatasetPage() {
       </div>
 
       {/* Filters */}
-      <div className="glass-strong border-white/10 rounded-2xl p-4 space-y-3">
+      <div className="glass-strong border-border rounded-2xl p-4 space-y-3">
         <div className="flex items-center gap-2">
           <Filter className="w-4 h-4 text-primary" />
           <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Filtros</span>
@@ -460,12 +460,12 @@ export default function DatasetPage() {
             placeholder="Buscar..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="h-8 text-xs bg-white/5 border-white/10 rounded-lg"
+            className="h-8 text-xs bg-white/5 border-border rounded-lg"
           />
           <select
             value={filterStatus}
             onChange={(e) => { setFilterStatus(e.target.value); setPage(1) }}
-            className="h-8 text-xs bg-white/5 border border-white/10 rounded-lg px-2 text-white"
+            className="h-8 text-xs bg-white/5 border border-border rounded-lg px-2 text-white"
           >
             <option value="all">Todos Status</option>
             <option value="raw">Pendentes</option>
@@ -476,7 +476,7 @@ export default function DatasetPage() {
           <select
             value={filterCategory}
             onChange={(e) => { setFilterCategory(e.target.value); setPage(1) }}
-            className="h-8 text-xs bg-white/5 border border-white/10 rounded-lg px-2 text-white"
+            className="h-8 text-xs bg-white/5 border border-border rounded-lg px-2 text-white"
           >
             <option value="all">Todas Categorias</option>
             {Object.entries(CATEGORY_LABELS).map(([k, v]) => (
@@ -486,7 +486,7 @@ export default function DatasetPage() {
           <select
             value={filterLang}
             onChange={(e) => { setFilterLang(e.target.value); setPage(1) }}
-            className="h-8 text-xs bg-white/5 border border-white/10 rounded-lg px-2 text-white"
+            className="h-8 text-xs bg-white/5 border border-border rounded-lg px-2 text-white"
           >
             <option value="all">Todos Idiomas</option>
             <option value="pt">Português</option>
@@ -495,7 +495,7 @@ export default function DatasetPage() {
           <select
             value={filterRating}
             onChange={(e) => { setFilterRating(e.target.value); setPage(1) }}
-            className="h-8 text-xs bg-white/5 border border-white/10 rounded-lg px-2 text-white"
+            className="h-8 text-xs bg-white/5 border border-border rounded-lg px-2 text-white"
           >
             <option value="all">Todas Ratings</option>
             <option value="5">5★</option>
@@ -508,7 +508,7 @@ export default function DatasetPage() {
               "h-8 text-xs rounded-lg px-2 border transition-all font-bold",
               filterThumbsUp
                 ? "bg-emerald-500/20 border-emerald-500/30 text-emerald-400"
-                : "bg-white/5 border-white/10 text-muted-foreground"
+                : "bg-white/5 border-border text-muted-foreground"
             )}
           >
             👍 Only
@@ -519,14 +519,14 @@ export default function DatasetPage() {
               "h-8 text-xs rounded-lg px-2 border transition-all font-bold",
               filterFlagged
                 ? "bg-rose-500/20 border-rose-500/30 text-rose-400"
-                : "bg-white/5 border-white/10 text-muted-foreground"
+                : "bg-white/5 border-border text-muted-foreground"
             )}
           >
             🚩 Flagged
           </button>
         </div>
         {selectedMessages.size > 0 && (
-          <div className="flex items-center gap-2 pt-2 border-t border-white/5">
+          <div className="flex items-center gap-2 pt-2 border-t border-border">
             <span className="text-xs text-muted-foreground">{selectedMessages.size} selecionadas</span>
             <Button
               size="sm"
@@ -549,7 +549,7 @@ export default function DatasetPage() {
       {/* Charts */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Growth Chart */}
-        <div className="glass-strong border-white/10 rounded-2xl p-4">
+        <div className="glass-strong border-border rounded-2xl p-4">
           <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-4">
             Crescimento do Dataset
           </h3>
@@ -578,7 +578,7 @@ export default function DatasetPage() {
         </div>
 
         {/* Category Distribution */}
-        <div className="glass-strong border-white/10 rounded-2xl p-4">
+        <div className="glass-strong border-border rounded-2xl p-4">
           <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-4">
             Distribuição por Categoria
           </h3>
@@ -613,7 +613,7 @@ export default function DatasetPage() {
         </div>
 
         {/* Rating Distribution */}
-        <div className="glass-strong border-white/10 rounded-2xl p-4">
+        <div className="glass-strong border-border rounded-2xl p-4">
           <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-4">
             Qualidade das Respostas
           </h3>
@@ -635,7 +635,7 @@ export default function DatasetPage() {
         </div>
 
         {/* Language Distribution */}
-        <div className="glass-strong border-white/10 rounded-2xl p-4">
+        <div className="glass-strong border-border rounded-2xl p-4">
           <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-4">
             PT vs EN
           </h3>
@@ -663,17 +663,17 @@ export default function DatasetPage() {
       </div>
 
       {/* Messages Table */}
-      <div className="glass-strong border-white/10 rounded-2xl overflow-hidden">
+      <div className="glass-strong border-border rounded-2xl overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-white/5">
+              <tr className="border-b border-border">
                 <th className="p-3 text-left">
                   <input
                     type="checkbox"
                     checked={selectedMessages.size === messages.length && messages.length > 0}
                     onChange={toggleSelectAll}
-                    className="rounded border-white/20 bg-white/5"
+                    className="rounded border-border bg-white/5"
                   />
                 </th>
                 <th className="p-3 text-left text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Data</th>
@@ -688,13 +688,13 @@ export default function DatasetPage() {
             </thead>
             <tbody>
               {messages.map((msg) => (
-                <tr key={msg.id} className="border-b border-white/5 hover:bg-white/5 transition-colors">
+                <tr key={msg.id} className="border-b border-border hover:bg-white/5 transition-colors">
                   <td className="p-3">
                     <input
                       type="checkbox"
                       checked={selectedMessages.has(msg.id)}
                       onChange={() => toggleSelect(msg.id)}
-                      className="rounded border-white/20 bg-white/5"
+                      className="rounded border-border bg-white/5"
                     />
                   </td>
                   <td className="p-3 text-xs text-muted-foreground">
@@ -780,7 +780,7 @@ export default function DatasetPage() {
         </div>
 
         {/* Pagination */}
-        <div className="flex items-center justify-between p-4 border-t border-white/5">
+        <div className="flex items-center justify-between p-4 border-t border-border">
           <span className="text-xs text-muted-foreground">
             Mostrando {messages.length} mensagens
           </span>
@@ -814,7 +814,7 @@ export default function DatasetPage() {
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="glass-strong border-white/20 rounded-3xl p-6 max-w-2xl w-full max-h-[80vh] overflow-y-auto"
+            className="glass-strong border-border rounded-3xl p-6 max-w-2xl w-full max-h-[80vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between mb-4">
@@ -856,7 +856,7 @@ export default function DatasetPage() {
             initial={{ x: "100%" }}
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
-            className="glass-strong border-l border-white/10 w-full max-w-lg h-full overflow-y-auto"
+            className="glass-strong border-l border-border w-full max-w-lg h-full overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="p-6 space-y-4">
@@ -891,7 +891,7 @@ export default function DatasetPage() {
                 <textarea
                   value={editText}
                   onChange={(e) => setEditText(e.target.value)}
-                  className="w-full h-48 mt-1 p-3 bg-white/5 border border-white/10 rounded-xl text-sm text-foreground resize-none focus:border-primary/50 focus:outline-none"
+                  className="w-full h-48 mt-1 p-3 bg-white/5 border border-border rounded-xl text-sm text-foreground resize-none focus:border-primary/50 focus:outline-none"
                 />
               </div>
 
@@ -931,7 +931,7 @@ export default function DatasetPage() {
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="glass-strong border-white/20 rounded-3xl p-6 max-w-md w-full"
+            className="glass-strong border-border rounded-3xl p-6 max-w-md w-full"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between mb-4">
@@ -953,7 +953,7 @@ export default function DatasetPage() {
                         "p-2 rounded-xl border text-xs font-bold transition-all",
                         exportFormat === fmt
                           ? "border-primary bg-primary/20 text-primary"
-                          : "border-white/10 text-muted-foreground hover:border-white/30"
+                          : "border-border text-muted-foreground hover:border-border"
                       )}
                     >
                       <FileText className="w-4 h-4 mx-auto mb-1" />
@@ -978,7 +978,7 @@ export default function DatasetPage() {
                         "p-2 rounded-xl border text-xs font-bold transition-all",
                         exportLang === l.value
                           ? "border-primary bg-primary/20 text-primary"
-                          : "border-white/10 text-muted-foreground hover:border-white/30"
+                          : "border-border text-muted-foreground hover:border-border"
                       )}
                     >
                       {l.label}
@@ -1026,7 +1026,7 @@ function StatCard({
   bg: string
 }) {
   return (
-    <div className={cn("rounded-2xl p-4 border border-white/5", bg)}>
+    <div className={cn("rounded-2xl p-4 border border-border", bg)}>
       <div className="flex items-center gap-2 mb-2">
         <Icon className={cn("w-4 h-4", color)} />
         <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">{label}</span>

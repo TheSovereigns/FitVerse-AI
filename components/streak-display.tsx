@@ -25,7 +25,7 @@ export function StreakDisplay({ compact = false, onNavigate }: StreakDisplayProp
       <motion.div
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
-        className="rounded-2xl border border-border bg-card p-4 cursor-pointer hover:bg-muted/30 transition-colors"
+        className="rounded-2xl border border-border glass-strong p-4 cursor-pointer hover:bg-muted/30 transition-colors"
         onClick={() => onNavigate?.("profile")}
       >
         <div className="flex items-center gap-3">
@@ -54,7 +54,7 @@ export function StreakDisplay({ compact = false, onNavigate }: StreakDisplayProp
       <motion.div
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
-        className="rounded-2xl border border-border bg-card"
+        className="rounded-2xl border border-border glass-strong"
       >
         <div className="p-5 md:p-6">
           <div className="flex items-center justify-between mb-4">
@@ -158,7 +158,7 @@ export function StreakDisplay({ compact = false, onNavigate }: StreakDisplayProp
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
-              className="bg-card border border-border rounded-2xl p-6 w-full max-w-md"
+              className="glass-strong border border-border rounded-2xl p-6 w-full max-w-md"
               onClick={(e) => e.stopPropagation()}
             >
               <h3 className="text-lg font-bold mb-4">{isEnglish ? "Streak Details" : "Detalhes da Sequencia"}</h3>

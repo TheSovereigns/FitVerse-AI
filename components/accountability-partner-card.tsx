@@ -65,7 +65,7 @@ export function AccountabilityPartnerCard() {
       <motion.div
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
-        className="relative overflow-hidden rounded-[1.5rem] border border-pink-500/14 bg-[#090704]/70 backdrop-blur-2xl"
+        className="relative overflow-hidden rounded-[1.5rem] border border-pink-500/14 bg-muted/40 backdrop-blur-2xl"
       >
         <div className="absolute inset-0 bg-gradient-to-br from-pink-500/6 via-transparent to-rose-500/4" />
         <div className="relative p-5">
@@ -195,7 +195,7 @@ export function AccountabilityPartnerCard() {
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
-              className="bg-[#0d0a06] border border-pink-500/18 rounded-3xl p-6 w-full max-w-md max-h-[80vh] overflow-y-auto"
+              className="bg-card border border-pink-500/18 rounded-3xl p-6 w-full max-w-md max-h-[80vh] overflow-y-auto"
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex items-center justify-between mb-5">

@@ -222,12 +222,12 @@ export function CorridaTracker({ onBack }: { onBack?: () => void }) {
             <div className="flex items-center gap-2">
               {onBack && (
                 <motion.button whileTap={{ scale: 0.9 }} onClick={onBack}
-                  className="w-10 h-10 bg-black/60 backdrop-blur-xl border border-white/5 rounded-xl flex items-center justify-center text-white/50 hover:text-white transition-colors pointer-events-auto">
+                  className="h-10 w-10 bg-black/60 backdrop-blur-xl border border-border rounded-xl flex items-center justify-center text-white/50 hover:text-white transition-colors pointer-events-auto">
                   <ChevronLeft className="w-5 h-5" />
                 </motion.button>
               )}
               <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}
-                className="flex items-center gap-3 bg-black/60 backdrop-blur-xl rounded-2xl px-4 py-3 border border-white/5">
+                className="flex items-center gap-3 bg-black/60 backdrop-blur-xl rounded-2xl px-4 py-3 border border-border">
               <div className="w-9 h-9 rounded-xl bg-brand/15 flex items-center justify-center">
                 <activity.icon className="w-4.5 h-4.5 text-brand" />
               </div>
@@ -245,12 +245,12 @@ export function CorridaTracker({ onBack }: { onBack?: () => void }) {
 
             <div className="flex flex-col gap-2">
               <motion.button whileTap={{ scale: 0.9 }} onClick={() => setShowActivityPicker(true)}
-                className="w-10 h-10 bg-black/60 backdrop-blur-xl border border-white/5 rounded-xl flex items-center justify-center text-white/40 hover:text-white/70 transition-colors">
+                className="w-10 h-10 bg-black/60 backdrop-blur-xl border border-border rounded-xl flex items-center justify-center text-white/40 hover:text-white/70 transition-colors">
                 <Layers className="w-4 h-4" />
               </motion.button>
               {lastSession && !isTracking && (
                 <motion.button whileTap={{ scale: 0.9 }} onClick={() => setShowHistory(true)}
-                  className="w-10 h-10 bg-black/60 backdrop-blur-xl border border-white/5 rounded-xl flex items-center justify-center text-white/40 hover:text-white/70 transition-colors">
+                  className="w-10 h-10 bg-black/60 backdrop-blur-xl border border-border rounded-xl flex items-center justify-center text-white/40 hover:text-white/70 transition-colors">
                   <Trophy className="w-4 h-4" />
                 </motion.button>
               )}
@@ -269,7 +269,7 @@ export function CorridaTracker({ onBack }: { onBack?: () => void }) {
                 </p>
                 <p className="text-[11px] text-white/40 uppercase tracking-[0.2em] mt-3 font-medium">{isEnglish ? "Duration" : "Duração"}</p>
                 {currentSpeed > 0 && (
-                  <div className="mt-5 inline-flex items-center gap-2.5 bg-black/50 backdrop-blur-xl rounded-full px-5 py-2.5 border border-white/5">
+                  <div className="mt-5 inline-flex items-center gap-2.5 bg-black/50 backdrop-blur-xl rounded-full px-5 py-2.5 border border-border">
                     <Gauge className="w-4 h-4 text-brand" />
                     <span className="text-xl font-bold text-white tabular-nums">{currentSpeed.toFixed(1)}</span>
                     <span className="text-xs text-white/40">km/h</span>
@@ -279,7 +279,7 @@ export function CorridaTracker({ onBack }: { onBack?: () => void }) {
             )}
             {!isTracking && displayPoints.length === 0 && (
               <motion.div key="idle" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="text-center">
-                <div className="w-20 h-20 mx-auto mb-5 rounded-3xl bg-white/5 border border-white/5 flex items-center justify-center">
+                <div className="w-20 h-20 mx-auto mb-5 rounded-3xl bg-white/5 border border-border flex items-center justify-center">
                   <activity.icon className="w-10 h-10 text-white/20" />
                 </div>
                 <p className="text-base font-semibold text-white/80">{isEnglish ? "Tap to start" : "Toque para iniciar"}</p>
@@ -300,7 +300,7 @@ export function CorridaTracker({ onBack }: { onBack?: () => void }) {
                   { icon: Route, value: fmtDist(distance), label: isEnglish ? "Dist" : "Distância" },
                   { icon: Flame, value: `${calories}`, label: "kcal" },
                 ].map((s, i) => (
-                  <div key={i} className="bg-black/50 backdrop-blur-xl border border-white/5 rounded-2xl p-3 text-center">
+                  <div key={i} className="bg-black/50 backdrop-blur-xl border border-border rounded-2xl p-3 text-center">
                     <div className="w-7 h-7 mx-auto rounded-lg bg-white/5 flex items-center justify-center mb-2">
                       <s.icon className="w-3.5 h-3.5 text-brand" />
                     </div>
@@ -315,7 +315,7 @@ export function CorridaTracker({ onBack }: { onBack?: () => void }) {
                   { icon: Footprints, value: steps > 0 ? steps.toLocaleString() : "—", label: isEnglish ? "Steps" : "Passos" },
                   { icon: Heart, value: `${heartRate}`, label: "bpm" },
                 ].map((s, i) => (
-                  <div key={i} className="bg-black/50 backdrop-blur-xl border border-white/5 rounded-2xl p-3 text-center">
+                  <div key={i} className="bg-black/50 backdrop-blur-xl border border-border rounded-2xl p-3 text-center">
                     <div className="w-7 h-7 mx-auto rounded-lg bg-white/5 flex items-center justify-center mb-2">
                       <s.icon className="w-3.5 h-3.5 text-brand" />
                     </div>
@@ -338,7 +338,7 @@ export function CorridaTracker({ onBack }: { onBack?: () => void }) {
             {status === "tracking" && (
               <>
                 <motion.button whileTap={{ scale: 0.95 }} onClick={pauseTracking}
-                  className="h-12 w-12 rounded-full bg-white/10 backdrop-blur-xl border border-white/10 flex items-center justify-center text-white/70 hover:text-white transition-colors focus-visible:ring-2 focus-visible:ring-white/30 focus-visible:ring-offset-2 focus-visible:ring-offset-black">
+                  className="h-12 w-12 rounded-full bg-white/10 backdrop-blur-xl border border-border flex items-center justify-center text-white/70 hover:text-white transition-colors focus-visible:ring-2 focus-visible:ring-white/30 focus-visible:ring-offset-2 focus-visible:ring-offset-black">
                   <Pause className="w-5 h-5" />
                 </motion.button>
                 <motion.button whileTap={{ scale: 0.95 }} onClick={stopTracking}
@@ -350,7 +350,7 @@ export function CorridaTracker({ onBack }: { onBack?: () => void }) {
             {status === "paused" && (
               <>
                 <motion.button whileTap={{ scale: 0.95 }} onClick={stopTracking}
-                  className="h-12 w-12 rounded-full bg-white/10 backdrop-blur-xl border border-white/10 flex items-center justify-center text-white/70 hover:text-white transition-colors">
+                  className="h-12 w-12 rounded-full bg-white/10 backdrop-blur-xl border border-border flex items-center justify-center text-white/70 hover:text-white transition-colors">
                   <Square className="w-4 h-4" />
                 </motion.button>
                 <motion.button whileTap={{ scale: 0.95 }} onClick={resumeTracking}
@@ -371,7 +371,7 @@ export function CorridaTracker({ onBack }: { onBack?: () => void }) {
             <div className="absolute inset-0 bg-black/80 backdrop-blur-md" onClick={() => setShowSummary(false)} />
             <motion.div initial={{ scale: 0.9, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.9, y: 20 }}
               transition={{ type: "spring", damping: 25, stiffness: 300 }}
-              className="relative z-10 w-full max-w-sm mx-4 bg-[#111] border border-white/5 rounded-3xl p-6 text-center">
+              className="relative z-10 w-full max-w-sm mx-4 bg-background border border-border rounded-3xl p-6 text-center">
               <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-brand/10 flex items-center justify-center">
                 <Award className="w-8 h-8 text-brand" />
               </div>
@@ -406,12 +406,12 @@ export function CorridaTracker({ onBack }: { onBack?: () => void }) {
 
               <div className="flex gap-3">
                 <button onClick={() => { setShowSummary(false); setShowShare(true) }}
-                  className="flex-1 h-12 rounded-2xl bg-brand text-white font-bold text-sm flex items-center justify-center gap-2 hover:bg-brand/90 transition-colors shadow-lg shadow-brand/25">
+                  className="flex-1 h-12 rounded-xl bg-brand text-white font-bold text-sm flex items-center justify-center gap-2 hover:bg-brand/90 transition-colors shadow-lg shadow-brand/25">
                   <Share className="w-4 h-4" />
                   {isEnglish ? "Share" : "Compartilhar"}
                 </button>
                 <button onClick={() => setShowSummary(false)}
-                  className="h-12 px-5 rounded-2xl bg-white/5 text-white/60 font-semibold text-sm border border-white/5 hover:bg-white/10 transition-colors">
+                  className="h-12 px-5 rounded-xl bg-white/5 text-white/60 font-semibold text-sm border border-border hover:bg-white/10 transition-colors">
                   {isEnglish ? "Done" : "Fechar"}
                 </button>
               </div>
@@ -454,7 +454,7 @@ export function CorridaTracker({ onBack }: { onBack?: () => void }) {
             <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowActivityPicker(false)} />
             <motion.div initial={{ y: "100%" }} animate={{ y: 0 }} exit={{ y: "100%" }}
               transition={{ type: "spring", damping: 30, stiffness: 300 }}
-              className="relative z-10 w-full max-w-lg mx-4 rounded-t-3xl md:rounded-3xl bg-[#111] border border-white/5 p-6 max-h-[80vh] overflow-y-auto">
+              className="relative z-10 w-full max-w-lg mx-4 rounded-t-3xl md:rounded-3xl bg-background border border-border p-6 max-h-[80vh] overflow-y-auto">
               <div className="flex items-center justify-between mb-6">
                 <div>
                   <h3 className="text-lg font-bold text-white">{isEnglish ? "Choose Activity" : "Escolher Atividade"}</h3>
@@ -470,7 +470,7 @@ export function CorridaTracker({ onBack }: { onBack?: () => void }) {
                     onClick={() => { setSelectedActivity(a.id); setShowActivityPicker(false) }}
                     className={cn(
                       "p-4 rounded-2xl border text-center transition-all",
-                      selectedActivity === a.id ? "border-brand bg-brand/10" : "border-white/5 bg-white/[0.02] hover:bg-white/5"
+                      selectedActivity === a.id ? "border-brand bg-brand/10" : "border-border bg-white/[0.02] hover:bg-white/5"
                     )}>
                     <div className={cn("w-12 h-12 mx-auto rounded-xl flex items-center justify-center mb-3",
                       selectedActivity === a.id ? "bg-brand/15" : "bg-white/5")}>
@@ -493,7 +493,7 @@ export function CorridaTracker({ onBack }: { onBack?: () => void }) {
             <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowHistory(false)} />
             <motion.div initial={{ y: "100%" }} animate={{ y: 0 }} exit={{ y: "100%" }}
               transition={{ type: "spring", damping: 30, stiffness: 300 }}
-              className="relative z-10 w-full max-w-lg mx-4 rounded-t-3xl md:rounded-3xl bg-[#111] border border-white/5 p-6 max-h-[75vh] overflow-hidden flex flex-col">
+              className="relative z-10 w-full max-w-lg mx-4 rounded-t-3xl md:rounded-3xl bg-background border border-border p-6 max-h-[75vh] overflow-hidden flex flex-col">
               <div className="flex items-center justify-between mb-5 shrink-0">
                 <div>
                   <h3 className="text-lg font-bold text-white">{isEnglish ? "History" : "Histórico"}</h3>
@@ -513,7 +513,7 @@ export function CorridaTracker({ onBack }: { onBack?: () => void }) {
                   return (
                     <div key={s.id}
                       onClick={() => { setReplaySession(s); setShowHistory(false) }}
-                      className="flex items-center gap-3 p-4 rounded-2xl bg-white/[0.02] border border-white/5 hover:bg-white/5 transition-all cursor-pointer">
+                      className="flex items-center gap-3 p-4 rounded-2xl bg-white/[0.02] border border-border hover:bg-white/5 transition-all cursor-pointer">
                       <div className="w-11 h-11 rounded-xl bg-brand/10 flex items-center justify-center shrink-0">
                         <act.icon className="w-5 h-5 text-brand" />
                       </div>
@@ -547,7 +547,7 @@ export function CorridaTracker({ onBack }: { onBack?: () => void }) {
         {replaySession && (
           <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
             className="absolute top-4 left-1/2 -translate-x-1/2 z-50">
-            <div className="bg-black/60 backdrop-blur-xl border border-white/5 rounded-full px-5 py-2.5 flex items-center gap-4">
+            <div className="bg-black/60 backdrop-blur-xl border border-border rounded-full px-5 py-2.5 flex items-center gap-4">
               <div className="flex items-center gap-2">
                 <Eye className="w-3.5 h-3.5 text-brand" />
                 <span className="text-xs font-semibold text-white">{isEnglish ? "Replay" : "Replay"}</span>

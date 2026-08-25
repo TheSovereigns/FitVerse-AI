@@ -909,6 +909,11 @@ const translations = {
     hyd_day_mon_en: "Mon", hyd_day_tue_en: "Tue", hyd_day_wed_en: "Wed",
     hyd_day_thu_en: "Thu", hyd_day_fri_en: "Fri", hyd_day_sat_en: "Sat", hyd_day_sun_en: "Sun",
     hyd_intake_en: "Intake",
+    // Empty States
+    empty_achievements_title: "Nenhuma conquista ainda",
+    empty_achievements_desc: "Complete desafios para desbloquear conquistas!",
+    empty_scans_filter_title: "Nenhum resultado",
+    empty_scans_filter_desc: "Nenhum produto encontrado com este filtro",
   },
 
   "en-US": {
@@ -1814,6 +1819,11 @@ const translations = {
     hyd_day_mon_en: "Mon", hyd_day_tue_en: "Tue", hyd_day_wed_en: "Wed",
     hyd_day_thu_en: "Thu", hyd_day_fri_en: "Fri", hyd_day_sat_en: "Sat", hyd_day_sun_en: "Sun",
     hyd_intake_en: "Intake",
+    // Empty States
+    empty_achievements_title: "No achievements yet",
+    empty_achievements_desc: "Complete challenges to unlock achievements!",
+    empty_scans_filter_title: "No results",
+    empty_scans_filter_desc: "No products found with this filter",
   },
 } as const
 

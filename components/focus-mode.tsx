@@ -21,13 +21,13 @@ export function FocusMode({ isActive, type, title, onDeactivate, children }: Foc
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 z-[200] bg-[#050302] flex flex-col"
+          className="fixed inset-0 z-[200] bg-background flex flex-col"
         >
           <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.08),transparent_50%)]" />
 
-          <div className="relative z-10 flex items-center justify-between px-4 py-3 border-b border-white/10">
+          <div className="relative z-10 flex items-center justify-between px-4 py-3 border-b border-border">
             <div className="flex items-center gap-2">
-              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-white/10 border border-white/10">
+              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-white/10 border border-border">
                 <Eye className="h-3.5 w-3.5 text-foreground/50" />
               </div>
               <div>
@@ -43,7 +43,7 @@ export function FocusMode({ isActive, type, title, onDeactivate, children }: Foc
               onClick={onDeactivate}
               variant="ghost"
               size="icon"
-              className="h-8 w-8 rounded-lg border border-white/10 bg-white/8 text-foreground/60 hover:bg-white/16"
+              className="h-8 w-8 rounded-lg border border-border bg-white/8 text-foreground/60 hover:bg-white/16"
             >
               <Minimize2 className="h-3.5 w-3.5" />
             </Button>
@@ -56,11 +56,11 @@ export function FocusMode({ isActive, type, title, onDeactivate, children }: Foc
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="relative z-10 px-4 py-3 border-t border-white/10"
+            className="relative z-10 px-4 py-3 border-t border-border"
           >
             <button
               onClick={onDeactivate}
-              className="w-full h-10 rounded-xl border border-white/10 bg-white/8 text-[10px] font-black uppercase tracking-widest text-foreground/50 hover:bg-white/16 transition-all"
+              className="w-full h-10 rounded-xl border border-border bg-white/8 text-[10px] font-black uppercase tracking-widest text-foreground/50 hover:bg-white/16 transition-all"
             >
               Sair do Modo Foco
             </button>

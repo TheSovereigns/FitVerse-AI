@@ -83,7 +83,7 @@ export default function AdminSettingsPage() {
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         {/* Sidebar */}
         <div className="lg:col-span-1">
-          <div className="glass-strong border border-white/10 rounded-2xl p-4 space-y-1">
+          <div className="glass-strong border border-border rounded-2xl p-4 space-y-1">
             {tabs.map((tab) => (
               <button
                 key={tab.id}
@@ -108,7 +108,7 @@ export default function AdminSettingsPage() {
             key={activeTab}
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="glass-strong border border-white/10 rounded-2xl p-6"
+            className="glass-strong border border-border rounded-2xl p-6"
           >
             {activeTab === "general" && (
               <div className="space-y-6">
@@ -125,14 +125,14 @@ export default function AdminSettingsPage() {
                       <Button
                         variant={locale === "pt-BR" ? "default" : "outline"}
                         onClick={() => setLocale("pt-BR")}
-                        className={locale === "pt-BR" ? "bg-primary text-white" : "bg-white/5 text-white/60 border-white/10"}
+                        className={locale === "pt-BR" ? "bg-primary text-white" : "bg-white/5 text-white/60 border-border"}
                       >
                         🇧🇷 Português
                       </Button>
                       <Button
                         variant={locale === "en-US" ? "default" : "outline"}
                         onClick={() => setLocale("en-US")}
-                        className={locale === "en-US" ? "bg-primary text-white" : "bg-white/5 text-white/60 border-white/10"}
+                        className={locale === "en-US" ? "bg-primary text-white" : "bg-white/5 text-white/60 border-border"}
                       >
                         🇺🇸 English
                       </Button>
@@ -143,7 +143,7 @@ export default function AdminSettingsPage() {
                     <Label className="text-white/80 text-sm mb-2 block">
                       {locale === "en-US" ? "Timezone" : "Fuso Horário"}
                     </Label>
-                    <select className="w-full h-12 px-4 bg-white/5 border border-white/10 rounded-xl text-white">
+                    <select className="w-full h-12 px-4 bg-white/5 border border-border rounded-xl text-white">
                       <option value="America/Sao_Paulo">America/São Paulo (GMT-3)</option>
                       <option value="America/New_York">America/New York (GMT-5)</option>
                       <option value="Europe/London">Europe/London (GMT+0)</option>
@@ -171,7 +171,7 @@ export default function AdminSettingsPage() {
                         <p className="text-sm font-medium text-white">{item.label}</p>
                         <p className="text-xs text-white/40">{item.desc}</p>
                       </div>
-                      <input type="checkbox" defaultChecked className="w-5 h-5 rounded bg-white/10 border-white/20 text-primary focus:ring-primary/20" />
+                      <input type="checkbox" defaultChecked className="w-5 h-5 rounded bg-white/10 border-border text-primary focus:ring-primary/20" />
                     </div>
                   ))}
                 </div>
@@ -188,7 +188,7 @@ export default function AdminSettingsPage() {
                   <div className="p-4 rounded-xl bg-white/5">
                     <p className="text-sm font-medium text-white mb-2">Two-Factor Authentication</p>
                     <p className="text-xs text-white/40 mb-3">Add an extra layer of security to your account</p>
-                    <Button variant="outline" className="bg-white/5 text-white border-white/10 hover:bg-white/10">
+                    <Button variant="outline" className="bg-white/5 text-white border-border hover:bg-white/10">
                       {locale === "en-US" ? "Enable 2FA" : "Ativar 2FA"}
                     </Button>
                   </div>
@@ -196,7 +196,7 @@ export default function AdminSettingsPage() {
                   <div className="p-4 rounded-xl bg-white/5">
                     <p className="text-sm font-medium text-white mb-2">Session Management</p>
                     <p className="text-xs text-white/40 mb-3">Manage active sessions and devices</p>
-                    <Button variant="outline" className="bg-white/5 text-white border-white/10 hover:bg-white/10">
+                    <Button variant="outline" className="bg-white/5 text-white border-border hover:bg-white/10">
                       {locale === "en-US" ? "View Sessions" : "Ver Sessões"}
                     </Button>
                   </div>
@@ -247,7 +247,7 @@ export default function AdminSettingsPage() {
                     <p className="text-sm font-medium text-primary">Dark (Orange)</p>
                     <p className="text-xs text-white/40 mt-1">Current</p>
                   </div>
-                  <div className="p-4 rounded-xl bg-white/5 border border-white/10 text-center cursor-pointer opacity-50">
+                  <div className="p-4 rounded-xl bg-white/5 border border-border text-center cursor-pointer opacity-50">
                     <p className="text-sm font-medium text-white">Light</p>
                     <p className="text-xs text-white/40 mt-1">{locale === "en-US" ? "Coming soon" : "Em breve"}</p>
                   </div>

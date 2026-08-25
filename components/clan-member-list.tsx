@@ -67,7 +67,7 @@ export function ClanMemberList({ clanId, userRole, onKick, onTransfer }: {
 
   const roleIcons: Record<string, any> = { owner: Crown, admin: Shield, member: Users }
   const roleColors: Record<string, string> = {
-    owner: "text-yellow-400", admin: "text-blue-400", member: "text-white/30",
+    owner: "text-yellow-400", admin: "text-blue-400", member: "text-foreground/40",
   }
   const roleLabels: Record<string, string> = {
     owner: isEnglish ? "Owner" : "Dono",
@@ -82,12 +82,12 @@ export function ClanMemberList({ clanId, userRole, onKick, onTransfer }: {
     <div className="space-y-2">
       {isLoading ? (
         <div className="flex items-center justify-center p-8">
-          <Loader2 className="h-6 w-6 text-white/20 animate-spin" />
+          <Loader2 className="h-6 w-6 text-foreground/20 animate-spin" />
         </div>
       ) : members.length === 0 ? (
-        <div className="rounded-2xl border border-white/5 bg-[#0a0a0a] p-8 text-center">
-          <Users className="mx-auto mb-3 h-10 w-10 text-white/10" />
-          <p className="text-sm font-bold text-white/30">{isEnglish ? "No members yet" : "Nenhum membro ainda"}</p>
+        <div className="rounded-2xl border border-border bg-background p-8 text-center">
+          <Users className="mx-auto mb-3 h-10 w-10 text-foreground/20" />
+          <p className="text-sm font-bold text-foreground/40">{isEnglish ? "No members yet" : "Nenhum membro ainda"}</p>
         </div>
       ) : (
         members.map((member, i) => {
@@ -101,16 +101,16 @@ export function ClanMemberList({ clanId, userRole, onKick, onTransfer }: {
             <motion.div key={member.id} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.03 }}
               className={cn(
-                "flex items-center gap-3 rounded-xl border border-white/5 bg-[#0a0a0a] p-4",
-                isMe && "border-white/10 bg-white/[0.03]"
+                "flex items-center gap-3 rounded-xl border border-border bg-background p-4",
+                isMe && "border-border bg-card"
               )}>
-              <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center shrink-0">
-                <span className="text-lg font-black text-white/60">{profile?.name?.charAt(0)?.toUpperCase() || "?"}</span>
+              <div className="w-10 h-10 rounded-xl bg-muted/50 flex items-center justify-center shrink-0">
+                <span className="text-lg font-black text-foreground/60">{profile?.name?.charAt(0)?.toUpperCase() || "?"}</span>
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
-                  <p className="font-bold text-sm text-white truncate">{profile?.name || "Unknown"}</p>
-                  {isMe && <span className="text-[9px] font-bold text-white/30">(voce)</span>}
+                  <p className="font-bold text-sm text-foreground truncate">{profile?.name || "Unknown"}</p>
+                  {isMe && <span className="text-[9px] font-bold text-foreground/40">(voce)</span>}
                 </div>
                 <div className="flex items-center gap-2 mt-0.5">
                   <Icon className={cn("h-3 w-3", roleColors[member.role])} />

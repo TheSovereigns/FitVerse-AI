@@ -302,7 +302,7 @@ export function ProductResult({ result, onBack, imageData, onSave, onDiscard, ha
       <motion.div 
         initial={{ y: 40, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        className="relative bg-card border border-border rounded-3xl md:rounded-2xl p-6 md:p-12 shadow-sm overflow-hidden group"
+        className="relative glass-strong border border-border rounded-3xl md:rounded-2xl p-6 md:p-12 shadow-sm overflow-hidden group"
       >
         <div className="absolute inset-0 mesh-gradient opacity-10 group-hover:opacity-20 transition-opacity" />
         
@@ -378,7 +378,7 @@ export function ProductResult({ result, onBack, imageData, onSave, onDiscard, ha
         <motion.div 
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          className="bg-card border border-border rounded-2xl p-5 md:p-6"
+          className="glass-strong border border-border rounded-2xl p-5 md:p-6"
         >
           <h3 className="text-sm font-black uppercase tracking-[0.4em] opacity-30 mb-5">{t("pr_breakdown")}</h3>
           <div className="space-y-4">
@@ -413,7 +413,7 @@ export function ProductResult({ result, onBack, imageData, onSave, onDiscard, ha
           <motion.div 
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            className="bg-card border border-border rounded-2xl p-4 md:p-6"
+            className="glass-strong border border-border rounded-2xl p-4 md:p-6"
           >
             <div className="flex items-center gap-3 mb-4">
               <Scale className="w-6 h-6 text-primary" />
@@ -521,7 +521,7 @@ export function ProductResult({ result, onBack, imageData, onSave, onDiscard, ha
           <motion.div 
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            className="bg-card border border-border rounded-2xl border-primary/30 p-4 md:p-6 flex flex-col items-center gap-4"
+            className="glass-strong border border-border rounded-2xl border-primary/30 p-4 md:p-6 flex flex-col items-center gap-4"
           >
             <div className="flex items-center gap-3">
               <Lock className="w-6 h-6 text-primary" />
@@ -537,7 +537,7 @@ export function ProductResult({ result, onBack, imageData, onSave, onDiscard, ha
         <motion.div
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          className="bg-card border border-border rounded-2xl p-5 md:p-6 space-y-4"
+          className="glass-strong border border-border rounded-2xl p-5 md:p-6 space-y-4"
         >
           <h3 className="text-sm font-black uppercase tracking-[0.4em] opacity-30">{t("pr_macros")}</h3>
           <div className="space-y-3">
@@ -578,7 +578,7 @@ export function ProductResult({ result, onBack, imageData, onSave, onDiscard, ha
             <motion.div 
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
-              className="bg-card border border-border rounded-2xl p-6"
+              className="glass-strong border border-border rounded-2xl p-6"
             >
               <div className="flex items-center gap-3 mb-4">
                 <div className={cn("w-12 h-12 rounded-2xl flex items-center justify-center", getNOVAColor(result.novaClassification.group))}>
@@ -599,7 +599,7 @@ export function ProductResult({ result, onBack, imageData, onSave, onDiscard, ha
             <motion.div 
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
-              className="bg-card border border-border rounded-2xl p-6"
+              className="glass-strong border border-border rounded-2xl p-6"
             >
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-12 h-12 rounded-2xl bg-purple-500/10 flex items-center justify-center">
@@ -625,7 +625,7 @@ export function ProductResult({ result, onBack, imageData, onSave, onDiscard, ha
         <motion.div 
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          className="bg-card border border-border border-yellow-500/30 rounded-2xl p-6"
+          className="glass-strong border border-border border-yellow-500/30 rounded-2xl p-6"
         >
           <div className="flex items-center gap-3 mb-4">
             <AlertTriangle className="w-6 h-6 text-yellow-500" />
@@ -655,7 +655,7 @@ export function ProductResult({ result, onBack, imageData, onSave, onDiscard, ha
               key={i}
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
-              className="bg-card border border-border rounded-2xl p-6 flex items-start gap-4"
+              className="glass-strong border border-border rounded-2xl p-6 flex items-start gap-4"
             >
               <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary shrink-0">
                 <Target className="w-6 h-6" />
@@ -682,7 +682,7 @@ export function ProductResult({ result, onBack, imageData, onSave, onDiscard, ha
             <motion.div 
               key={i}
               whileHover={{ x: 10 }}
-              className={cn("p-4 md:p-6 rounded-2xl bg-card border flex items-start gap-4", getSeverityColor(a.severity))}
+              className={cn("p-4 md:p-6 rounded-2xl glass-strong border flex items-start gap-4", getSeverityColor(a.severity))}
             >
               {getSeverityIcon(a.severity)}
               <div>
@@ -702,7 +702,7 @@ export function ProductResult({ result, onBack, imageData, onSave, onDiscard, ha
             <motion.div 
               key={i}
               whileHover={{ x: 10 }}
-              className="p-4 md:p-6 rounded-2xl bg-card border border-border border-emerald-500/20 bg-emerald-500/5 flex items-start gap-4"
+              className="p-4 md:p-6 rounded-2xl glass-strong border border-border border-emerald-500/20 bg-emerald-500/5 flex items-start gap-4"
             >
               <Check className="w-6 h-6 text-emerald-500 shrink-0" />
               <div>
@@ -718,7 +718,7 @@ export function ProductResult({ result, onBack, imageData, onSave, onDiscard, ha
         <motion.div 
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          className="bg-card border border-border rounded-2xl p-6"
+          className="glass-strong border border-border rounded-2xl p-6"
         >
           <button 
             onClick={() => setShowIngredients(!showIngredients)}
@@ -759,7 +759,7 @@ export function ProductResult({ result, onBack, imageData, onSave, onDiscard, ha
         <motion.div 
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          className="bg-card border border-border rounded-2xl p-6"
+          className="glass-strong border border-border rounded-2xl p-6"
         >
           <h3 className="text-sm font-black uppercase tracking-[0.4em] opacity-30 mb-4">Recomendações da IA</h3>
           <div className="space-y-4">
@@ -791,7 +791,7 @@ export function ProductResult({ result, onBack, imageData, onSave, onDiscard, ha
           <h3 className="text-sm font-black uppercase tracking-[0.4em] opacity-30">Benefícios para a Saúde</h3>
           
           {result.benefits.vitamins && result.benefits.vitamins.length > 0 && (
-            <div className="bg-card border border-border rounded-2xl p-6">
+            <div className="glass-strong border border-border rounded-2xl p-6">
               <div className="flex items-center gap-3 mb-4">
                 <Sparkles className="w-6 h-6 text-foreground" />
                 <h4 className="text-lg font-black uppercase">Vitaminas</h4>
@@ -811,7 +811,7 @@ export function ProductResult({ result, onBack, imageData, onSave, onDiscard, ha
           )}
 
           {result.benefits.minerals && result.benefits.minerals.length > 0 && (
-            <div className="bg-card border border-border rounded-2xl p-6">
+            <div className="glass-strong border border-border rounded-2xl p-6">
               <div className="flex items-center gap-3 mb-4">
                 <Droplet className="w-6 h-6 text-cyan-400" />
                 <h4 className="text-lg font-black text-cyan-400 uppercase">Minerais</h4>
@@ -846,7 +846,7 @@ export function ProductResult({ result, onBack, imageData, onSave, onDiscard, ha
         <motion.div
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          className="bg-card border border-border rounded-2xl p-6"
+          className="glass-strong border border-border rounded-2xl p-6"
         >
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-sm font-black uppercase tracking-[0.4em] opacity-30">{t("scan_compare")}</h3>

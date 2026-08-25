@@ -269,7 +269,7 @@ export default function AdminDashboardPage() {
     <div className="space-y-8">
       <div className="flex items-center gap-3">
         <Sparkles className="w-6 h-6 text-orange-400" />
-        <h1 className="text-3xl font-black text-white">
+        <h1 className="text-3xl font-black text-foreground">
           {locale === "en-US" ? "Dashboard Overview" : "Visão Geral"}
         </h1>
       </div>
@@ -306,7 +306,7 @@ export default function AdminDashboardPage() {
         <div className="glass-strong border border-orange-500/10 rounded-2xl p-6">
           <div className="flex items-center gap-2 mb-6">
             <Crown className="w-5 h-5 text-orange-400" />
-            <h3 className="text-lg font-bold text-white">
+            <h3 className="text-lg font-bold text-foreground">
               {locale === "en-US" ? "Top Users (This Week)" : "Top Usuários (Esta Semana)"}
             </h3>
           </div>
@@ -343,7 +343,7 @@ export default function AdminDashboardPage() {
                     {user.name?.charAt(0).toUpperCase() || user.email.charAt(0).toUpperCase()}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-white truncate">
+                    <p className="text-sm font-medium text-foreground truncate">
                       {user.name || user.email.split('@')[0]}
                     </p>
                     <p className="text-xs text-neutral-500">

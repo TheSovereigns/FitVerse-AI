@@ -85,7 +85,7 @@ function CouponsList() {
             <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-purple-500/15"><Award className="h-4 w-4 text-purple-400" /></div>
             <div><p className="text-sm font-bold text-foreground font-mono">{c.code}</p><p className="text-[10px] text-muted-foreground">{t("bp_premium_discount")}</p></div>
           </div>
-          <button onClick={() => markUsed(c.id)} className="rounded-lg bg-brand px-4 py-1.5 text-xs font-semibold text-white hover:bg-brand/90 transition-colors">{t("bp_claim")}</button>
+          <button onClick={() => markUsed(c.id)} className="h-9 rounded-xl bg-brand px-4 text-xs font-semibold text-white hover:bg-brand/90 transition-colors">{t("bp_claim")}</button>
         </div>
       ))}
       {used.length > 0 && (
@@ -205,7 +205,7 @@ export function BattlePass({ isLocked = false }: BattlePassProps) {
 
           {/* XP Progress bar */}
           <div className="relative">
-            <div className="h-3.5 overflow-hidden rounded-full bg-black/30 border border-white/5">
+            <div className="h-3.5 overflow-hidden rounded-full bg-black/30 border border-border">
               <motion.div
                 className="h-full rounded-full bg-gradient-to-r from-purple-500 via-indigo-400 to-brand relative"
                 animate={{ width: `${progress}%` }}
@@ -326,7 +326,7 @@ export function BattlePass({ isLocked = false }: BattlePassProps) {
       <AnimatePresence>
         {selectedTier && (
           <motion.div initial={{ opacity: 0, y: 16, scale: 0.97 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 8, scale: 0.97 }}
-            className="rounded-2xl border border-border bg-card p-5"
+            className="rounded-2xl border border-border glass-strong p-5"
           >
             <div className="flex items-start gap-4">
               <div className={cn("flex h-16 w-16 items-center justify-center rounded-2xl shrink-0", rarityConfig[selectedTier.rarity].bg)}>
@@ -403,7 +403,7 @@ export function BattlePass({ isLocked = false }: BattlePassProps) {
         className="rounded-2xl border border-border bg-card/50 overflow-hidden"
       >
         <button onClick={() => setShowCoupons(!showCoupons)}
-          className="flex w-full items-center gap-2.5 p-5 text-left hover:bg-muted/20 transition-colors"
+          className="flex w-full items-center gap-2.5 p-5 text-left hover:bg-muted/20 transition-colors rounded-2xl"
         >
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-purple-500/15"><Award className="h-4 w-4 text-purple-400" /></div>
           <span className="flex-1 text-sm font-bold text-foreground">{t("bp_my_coupons")}</span>

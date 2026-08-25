@@ -9,13 +9,13 @@ interface SkeletonProps {
 
 export function Skeleton({ className, style }: SkeletonProps) {
   return (
-    <div className={cn("animate-pulse rounded-xl bg-white/5", className)} style={style} />
+    <div className={cn("animate-pulse rounded-xl bg-muted", className)} style={style} />
   )
 }
 
 export function CardSkeleton() {
   return (
-    <div className="glass-strong border border-white/10 rounded-[2rem] p-6 space-y-4">
+    <div className="glass-strong border border-border rounded-[2rem] p-6 space-y-4">
       <div className="flex items-center gap-4">
         <Skeleton className="w-12 h-12 rounded-2xl" />
         <div className="space-y-2 flex-1">
@@ -82,7 +82,7 @@ export function TableSkeleton({ rows = 5, cols = 3 }: { rows?: number; cols?: nu
 
 export function ChartSkeleton() {
   return (
-    <div className="glass-strong border border-white/10 rounded-[2rem] p-6">
+    <div className="glass-strong border border-border rounded-[2rem] p-6">
       <div className="flex justify-between items-center mb-6">
         <Skeleton className="h-6 w-32" />
         <Skeleton className="h-8 w-24 rounded-full" />

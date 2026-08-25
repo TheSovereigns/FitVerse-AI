@@ -255,7 +255,7 @@ export default function AdminRevenuePage() {
     <div className="space-y-8">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-black text-white">
+        <h1 className="text-3xl font-black text-foreground">
           {locale === "en-US" ? "Revenue & Subscriptions" : "Receita e Assinaturas"}
         </h1>
         <p className="text-white/40 mt-1">
@@ -271,7 +271,7 @@ export default function AdminRevenuePage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.1 }}
-            className="glass-strong border border-white/10 rounded-2xl p-5"
+            className="glass-strong border border-border rounded-2xl p-5"
           >
             <div className="flex items-start justify-between mb-4">
               <div className={cn("w-12 h-12 rounded-xl flex items-center justify-center", card.bgColor)}>
@@ -284,7 +284,7 @@ export default function AdminRevenuePage() {
                 </div>
               )}
             </div>
-            <p className="text-2xl font-black text-white">{card.value}</p>
+            <p className="text-2xl font-black text-card-foreground">{card.value}</p>
             <p className="text-sm text-white/40 mt-1">{card.title}</p>
           </motion.div>
         ))}
@@ -293,8 +293,8 @@ export default function AdminRevenuePage() {
       {/* Charts Row */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Revenue Chart */}
-        <div className="lg:col-span-2 glass-strong border border-white/10 rounded-2xl p-6">
-          <h3 className="text-lg font-black text-white mb-6">
+        <div className="lg:col-span-2 glass-strong border border-border rounded-2xl p-6">
+          <h3 className="text-lg font-black text-foreground mb-6">
             {locale === "en-US" ? "Revenue & New Subscriptions" : "Receita e Novas Assinaturas"}
           </h3>
           
@@ -334,8 +334,8 @@ export default function AdminRevenuePage() {
         </div>
 
         {/* Plan Distribution */}
-        <div className="glass-strong border border-white/10 rounded-2xl p-6">
-          <h3 className="text-lg font-black text-white mb-6">
+        <div className="glass-strong border border-border rounded-2xl p-6">
+          <h3 className="text-lg font-black text-foreground mb-6">
             {locale === "en-US" ? "Plan Distribution" : "Distribuição de Planos"}
           </h3>
           
@@ -344,7 +344,7 @@ export default function AdminRevenuePage() {
               <div key={plan.name}>
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-sm text-white/60">{plan.name}</span>
-                  <span className="text-sm font-medium text-white">{plan.value}%</span>
+                  <span className="text-sm font-medium text-foreground">{plan.value}%</span>
                 </div>
                 <div className="h-2 bg-white/10 rounded-full overflow-hidden">
                   <div 
@@ -357,26 +357,26 @@ export default function AdminRevenuePage() {
           </div>
 
           {/* Quick Stats */}
-          <div className="mt-8 pt-6 border-t border-white/10 space-y-3">
+          <div className="mt-8 pt-6 border-t border-border space-y-3">
             <div className="flex justify-between text-sm">
               <span className="text-white/40">{locale === "en-US" ? "Active Subs" : "Assinaturas Ativas"}</span>
-              <span className="text-white font-medium">{stats.activeCount}</span>
+              <span className="text-foreground font-medium">{stats.activeCount}</span>
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-white/40">{locale === "en-US" ? "New This Month" : "Novos Este Mês"}</span>
-              <span className="text-white font-medium">{stats.newSubsThisMonth}</span>
+              <span className="text-foreground font-medium">{stats.newSubsThisMonth}</span>
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-white/40">{locale === "en-US" ? "Canceled" : "Cancelados"}</span>
-              <span className="text-white font-medium">{stats.canceledCount}</span>
+              <span className="text-foreground font-medium">{stats.canceledCount}</span>
             </div>
           </div>
         </div>
       </div>
 
       {/* Recent Transactions */}
-      <div className="glass-strong border border-white/10 rounded-2xl p-6">
-        <h3 className="text-lg font-black text-white mb-6">
+      <div className="glass-strong border border-border rounded-2xl p-6">
+        <h3 className="text-lg font-black text-foreground mb-6">
           {locale === "en-US" ? "Recent Subscriptions" : "Assinaturas Recentes"}
         </h3>
         
@@ -394,7 +394,7 @@ export default function AdminRevenuePage() {
                   <CreditCard className={cn("w-5 h-5", sub.status === 'active' ? "text-emerald-400" : "text-red-400")} />
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-white">{sub.plan}</p>
+                  <p className="text-sm font-medium text-foreground">{sub.plan}</p>
                   <p className="text-xs text-white/40">
                     {new Date(sub.created_at).toLocaleDateString(locale === 'en-US' ? 'en-US' : 'pt-BR')}
                   </p>

@@ -239,11 +239,11 @@ export function MonthlyReport() {
           <ResponsiveContainer width="100%" height={180}>
             <LineChart data={data.weightData}>
               <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-              <XAxis dataKey="date" tick={{ fontSize: 10, fill: "#71717A" }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fontSize: 10, fill: "#71717A" }} axisLine={false} tickLine={false} width={35} />
+              <XAxis dataKey="date" tick={{ fontSize: 10, fill: "var(--muted-foreground)" }} axisLine={false} tickLine={false} />
+              <YAxis tick={{ fontSize: 10, fill: "var(--muted-foreground)" }} axisLine={false} tickLine={false} width={35} />
               <Tooltip
-                contentStyle={{ background: "#18181B", border: "1px solid #27272A", borderRadius: 8, fontSize: 12 }}
-                labelStyle={{ color: "#FAFAFA" }}
+                contentStyle={{ background: "hsl(var(--popover))", border: "1px solid var(--border)", borderRadius: 8, fontSize: 12 }}
+                labelStyle={{ color: "var(--foreground)" }}
               />
               <Line
                 type="monotone"
@@ -269,11 +269,11 @@ export function MonthlyReport() {
         </h3>
         <ResponsiveContainer width="100%" height={180}>
           <BarChart data={data.dailyData}>
-            <XAxis dataKey="label" tick={{ fontSize: 9, fill: "#71717A" }} interval={Math.floor(totalDaysInMonth / 6)} />
-            <YAxis tick={{ fontSize: 10, fill: "#71717A" }} />
+            <XAxis dataKey="label" tick={{ fontSize: 9, fill: "var(--muted-foreground)" }} interval={Math.floor(totalDaysInMonth / 6)} />
+            <YAxis tick={{ fontSize: 10, fill: "var(--muted-foreground)" }} />
             <Tooltip
-              contentStyle={{ background: "#18181B", border: "1px solid #27272A", borderRadius: 8, fontSize: 12 }}
-              labelStyle={{ color: "#FAFAFA" }}
+              contentStyle={{ background: "hsl(var(--popover))", border: "1px solid var(--border)", borderRadius: 8, fontSize: 12 }}
+              labelStyle={{ color: "var(--foreground)" }}
             />
             <Bar dataKey="score" fill="hsl(var(--brand))" radius={[4, 4, 0, 0]} />
           </BarChart>

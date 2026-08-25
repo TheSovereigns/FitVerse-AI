@@ -107,11 +107,11 @@ export function WeeklyReport() {
         <h3 className="text-sm font-medium text-foreground mb-3">{isEnglish ? "Daily Activity" : "Atividade Diaria"}</h3>
         <ResponsiveContainer width="100%" height={180}>
           <BarChart data={data.dailyData}>
-            <XAxis dataKey="label" tick={{ fontSize: 10, fill: "#71717A" }} />
-            <YAxis tick={{ fontSize: 10, fill: "#71717A" }} />
+            <XAxis dataKey="label" tick={{ fontSize: 10, fill: "var(--muted-foreground)" }} />
+            <YAxis tick={{ fontSize: 10, fill: "var(--muted-foreground)" }} />
             <Tooltip
-              contentStyle={{ background: "#18181B", border: "1px solid #27272A", borderRadius: 8, fontSize: 12 }}
-              labelStyle={{ color: "#FAFAFA" }}
+              contentStyle={{ background: "hsl(var(--popover))", border: "1px solid var(--border)", borderRadius: 8, fontSize: 12 }}
+              labelStyle={{ color: "var(--foreground)" }}
             />
             <Bar dataKey="score" fill="hsl(var(--brand))" radius={[4, 4, 0, 0]} />
           </BarChart>

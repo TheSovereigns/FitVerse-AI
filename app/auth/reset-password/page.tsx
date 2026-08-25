@@ -73,26 +73,26 @@ export default function ResetPasswordPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#1a0f00] via-[#0d0705] to-[#1a0f00] flex items-center justify-center p-6">
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-background flex items-center justify-center p-6">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <Link href="/" className="inline-flex items-center gap-2">
             <div className="w-10 h-10 rounded-xl bg-primary/20 border border-primary/30 flex items-center justify-center overflow-hidden">
               <img src="/icon.svg" alt="VyseFit" className="w-6 h-6" />
             </div>
-            <span className="text-2xl font-black text-white">VyseFit AI</span>
+            <span className="text-2xl font-black text-foreground">VyseFit AI</span>
           </Link>
         </div>
 
-        <div className="glass-strong border border-white/10 rounded-3xl p-6 md:p-8">
+        <div className="glass-strong border border-border rounded-3xl p-6 md:p-8">
           <div className="text-center mb-6">
             <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
               <Lock className="w-6 h-6 text-primary" />
             </div>
-            <h1 className="text-2xl font-black text-white mb-2">
+            <h1 className="text-2xl font-black text-foreground mb-2">
               {isEnglish ? "Create New Password" : "Criar Nova Senha"}
             </h1>
-            <p className="text-sm text-white/40">
+            <p className="text-sm text-foreground/40">
               {isEnglish ? "Choose a new password for your account." : "Escolha uma nova senha para sua conta."}
             </p>
           </div>
@@ -106,7 +106,7 @@ export default function ResetPasswordPage() {
               <p className="text-emerald-400 font-bold mb-2">
                 {isEnglish ? "Password updated." : "Senha atualizada."}
               </p>
-              <p className="text-sm text-white/50">
+              <p className="text-sm text-foreground/50">
                 {isEnglish ? "Redirecting to login..." : "Redirecionando para o login..."}
               </p>
             </div>
@@ -119,7 +119,7 @@ export default function ResetPasswordPage() {
               )}
 
               <div>
-                <Label htmlFor="password" className="text-white/80 text-sm font-medium mb-2 block">
+                <Label htmlFor="password" className="text-foreground/70 text-sm font-medium mb-2 block">
                   {isEnglish ? "New Password" : "Nova Senha"}
                 </Label>
                 <div className="relative">
@@ -130,14 +130,14 @@ export default function ResetPasswordPage() {
                     onChange={(event) => setPassword(event.target.value)}
                     required
                     minLength={8}
-                    className="h-12 bg-white/5 border-white/10 text-white placeholder:text-white/30 focus:border-primary focus:ring-primary/20 rounded-xl pr-12"
+                    className="h-12 bg-muted/50 border-border text-foreground placeholder:text-foreground/30 focus:border-primary focus:ring-primary/20 rounded-xl pr-12"
                   />
                   <Button
                     type="button"
                     variant="ghost"
                     size="sm"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-0 top-0 h-full px-3 text-white/40 hover:text-white"
+                    className="absolute right-0 top-0 h-full px-3 text-foreground/40 hover:text-foreground"
                   >
                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </Button>
@@ -145,7 +145,7 @@ export default function ResetPasswordPage() {
               </div>
 
               <div>
-                <Label htmlFor="confirmPassword" className="text-white/80 text-sm font-medium mb-2 block">
+                <Label htmlFor="confirmPassword" className="text-foreground/70 text-sm font-medium mb-2 block">
                   {isEnglish ? "Confirm Password" : "Confirmar Senha"}
                 </Label>
                 <Input
@@ -155,14 +155,14 @@ export default function ResetPasswordPage() {
                   onChange={(event) => setConfirmPassword(event.target.value)}
                   required
                   minLength={8}
-                  className="h-12 bg-white/5 border-white/10 text-white placeholder:text-white/30 focus:border-primary focus:ring-primary/20 rounded-xl"
+                  className="h-12 bg-muted/50 border-border text-foreground placeholder:text-foreground/30 focus:border-primary focus:ring-primary/20 rounded-xl"
                 />
               </div>
 
               <Button
                 type="submit"
                 disabled={isLoading || !!error?.includes("link")}
-                className="w-full h-12 text-base font-black bg-primary text-white rounded-xl hover:bg-primary/90 transition-all"
+                className="w-full h-12 text-base font-black bg-brand text-brand-foreground rounded-xl hover:bg-brand/90 transition-all"
               >
                 {isLoading ? (
                   <>

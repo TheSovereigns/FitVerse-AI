@@ -59,7 +59,7 @@ export function ClanRanking({ clanId }: { clanId: string }) {
   }, [clanId, period])
 
   const medalIcons = [Crown, Medal, Trophy]
-  const medalColors = ["text-yellow-400", "text-white/60", "text-white/30"]
+  const medalColors = ["text-yellow-400", "text-foreground/60", "text-foreground/40"]
 
   return (
     <div className="space-y-3">
@@ -67,43 +67,43 @@ export function ClanRanking({ clanId }: { clanId: string }) {
         {([7, 30] as const).map((p) => (
           <button key={p} onClick={() => setPeriod(p)}
             className={cn("rounded-xl px-3 py-2 text-[10px] font-black uppercase tracking-widest transition-all",
-              period === p ? "bg-white/5 text-white border border-white/10" : "text-white/30 border border-transparent"
+              period === p ? "bg-muted/50 text-foreground border border-border" : "text-foreground/40 border border-transparent"
             )}>
             {p === 7 ? (isEnglish ? "7 Days" : "7 Dias") : (isEnglish ? "30 Days" : "30 Dias")}
           </button>
         ))}
       </div>
       {isLoading ? (
-        <div className="flex items-center justify-center p-8"><Loader2 className="h-6 w-6 text-white/20 animate-spin" /></div>
+        <div className="flex items-center justify-center p-8"><Loader2 className="h-6 w-6 text-foreground/20 animate-spin" /></div>
       ) : ranking.length === 0 ? (
-        <div className="rounded-2xl border border-white/5 bg-[#0a0a0a] p-8 text-center">
-          <Trophy className="mx-auto mb-3 h-10 w-10 text-white/10" />
-          <p className="text-sm font-bold text-white/30">{isEnglish ? "No activity this period" : "Nenhuma atividade neste periodo"}</p>
+        <div className="rounded-2xl border border-border bg-background p-8 text-center">
+          <Trophy className="mx-auto mb-3 h-10 w-10 text-foreground/20" />
+          <p className="text-sm font-bold text-foreground/40">{isEnglish ? "No activity this period" : "Nenhuma atividade neste periodo"}</p>
         </div>
       ) : (
         <div className="space-y-2">
           {ranking.map((entry, i) => {
             const MedalIcon = medalIcons[i] || Trophy
-            const medalColor = medalColors[i] || "text-white/30"
+            const medalColor = medalColors[i] || "text-foreground/40"
             return (
               <motion.div key={entry.user_id} initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: i * 0.04 }}
-                className={cn("flex items-center gap-3 rounded-xl border border-white/5 bg-[#0a0a0a] p-4",
+                className={cn("flex items-center gap-3 rounded-xl border border-border bg-background p-4",
                   i === 0 && "border-yellow-500/20 bg-yellow-500/[0.03]")}>
                 <div className={cn("flex h-9 w-9 items-center justify-center rounded-xl shrink-0",
-                  i < 3 ? "bg-white/5" : "bg-white/[0.02]")}>
-                  {i < 3 ? <MedalIcon className={cn("h-5 w-5", medalColor)} /> : <span className="text-sm font-black text-white/30">{i + 1}</span>}
+                  i < 3 ? "bg-muted/50" : "bg-white/[0.02]")}>
+                  {i < 3 ? <MedalIcon className={cn("h-5 w-5", medalColor)} /> : <span className="text-sm font-black text-foreground/40">{i + 1}</span>}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="font-black text-sm text-white truncate">{entry.user_name}</p>
+                  <p className="font-black text-sm text-foreground truncate">{entry.user_name}</p>
                   <div className="flex items-center gap-3 mt-1">
                     <span className="flex items-center gap-1 text-[9px] font-bold text-brand/60"><ScanLine className="h-3 w-3" /> {entry.scan_count}</span>
                     <span className="flex items-center gap-1 text-[9px] font-bold text-blue-400/60"><Dumbbell className="h-3 w-3" /> {entry.workout_count}</span>
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="text-lg font-black text-white">{entry.total_points}</p>
-                  <p className="text-[9px] font-black uppercase tracking-widest text-white/30">pts</p>
+                  <p className="text-lg font-black text-foreground">{entry.total_points}</p>
+                  <p className="text-[9px] font-black uppercase tracking-widest text-foreground/40">pts</p>
                 </div>
               </motion.div>
             )

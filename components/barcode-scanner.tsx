@@ -92,7 +92,7 @@ export function BarcodeScanner({ onProductFound, onClose }: BarcodeScannerProps)
       exit={{ opacity: 0 }}
       className="fixed inset-0 bg-black/90 z-50 flex flex-col"
     >
-      <div className="flex items-center justify-between p-4 border-b border-white/10">
+      <div className="flex items-center justify-between p-4 border-b border-border">
         <div className="flex items-center gap-2">
           <Barcode className="h-5 w-5 text-foreground" />
           <h2 className="text-lg font-black text-foreground">
@@ -112,7 +112,7 @@ export function BarcodeScanner({ onProductFound, onClose }: BarcodeScannerProps)
             className={cn(
               "flex items-center gap-1.5 rounded-xl px-3 py-2 text-[10px] font-black uppercase tracking-widest transition-all",
               mode === m
-                ? "bg-white/8 text-foreground border border-white/10"
+                ? "bg-white/8 text-foreground border border-border"
                 : "text-foreground/50 border border-transparent"
             )}
           >
@@ -127,9 +127,9 @@ export function BarcodeScanner({ onProductFound, onClose }: BarcodeScannerProps)
       <div className="flex-1 overflow-y-auto p-4">
         {mode === "manual" && (
           <div className="space-y-4">
-            <div className="rounded-2xl border border-white/10 bg-black/40 p-6">
+            <div className="rounded-2xl border border-border bg-black/40 p-6">
               <div className="flex items-center gap-3 mb-4">
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/5 border border-white/10">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/5 border border-border">
                   <ScanLine className="h-5 w-5 text-foreground/60" />
                 </div>
                 <div>
@@ -147,7 +147,7 @@ export function BarcodeScanner({ onProductFound, onClose }: BarcodeScannerProps)
                   onChange={(e) => setManualCode(e.target.value.replace(/\D/g, ""))}
                   onKeyDown={(e) => e.key === "Enter" && handleManualSearch()}
                   placeholder="7622210449283"
-                  className="h-12 rounded-xl border-white/10 bg-black/30 text-sm font-mono"
+                  className="h-12 rounded-xl border-border bg-black/30 text-sm font-mono"
                   maxLength={14}
                 />
                 <Button
@@ -171,7 +171,7 @@ export function BarcodeScanner({ onProductFound, onClose }: BarcodeScannerProps)
               </div>
             )}
 
-            <div className="rounded-xl border border-white/10 bg-white/5 p-4">
+            <div className="rounded-xl border border-border bg-white/5 p-4">
               <p className="text-[10px] font-black uppercase tracking-widest text-foreground/50 mb-2">
                 {isEnglish ? "Where to find it" : "Onde encontrar"}
               </p>
@@ -186,7 +186,7 @@ export function BarcodeScanner({ onProductFound, onClose }: BarcodeScannerProps)
 
         {mode === "camera" && (
           <div className="space-y-4">
-            <div className="rounded-2xl overflow-hidden border border-white/10 bg-black aspect-[3/4] relative">
+            <div className="rounded-2xl overflow-hidden border border-border bg-black aspect-[3/4] relative">
               <video
                 ref={videoRef}
                 autoPlay
@@ -218,7 +218,7 @@ export function BarcodeScanner({ onProductFound, onClose }: BarcodeScannerProps)
         {mode === "history" && (
           <div className="space-y-3">
             {scanHistory.length === 0 ? (
-              <div className="rounded-2xl border border-white/10 bg-black/20 p-8 text-center">
+              <div className="rounded-2xl border border-border bg-black/20 p-8 text-center">
                 <History className="mx-auto mb-3 h-10 w-10 text-foreground/50" />
                 <p className="text-sm font-bold text-foreground/50">
                   {isEnglish ? "No scan history yet" : "Nenhum historico de escaneamento ainda"}
@@ -240,7 +240,7 @@ export function BarcodeScanner({ onProductFound, onClose }: BarcodeScannerProps)
                   <button
                     key={item.barcode}
                     onClick={() => handleHistorySelect(item.barcode)}
-                    className="w-full flex items-center gap-3 rounded-xl border border-white/10 bg-black/40 p-3 hover:bg-white/5 transition-all"
+                    className="w-full flex items-center gap-3 rounded-xl border border-border bg-black/40 p-3 hover:bg-white/5 transition-all"
                   >
                     {item.image ? (
                       <img src={item.image} alt={item.name || "Product"} className="h-10 w-10 rounded-lg object-cover" />

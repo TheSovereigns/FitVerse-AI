@@ -80,7 +80,7 @@ export function MetabolicDashboard({ plan, perfil, onBack, planLevel = "full", o
 
       {/* Hero Card - Calories */}
       <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.1 }}
-        className="bg-card border border-border rounded-3xl p-6 md:p-8"
+        className="glass-strong border border-border rounded-3xl p-6 md:p-8"
       >
         <div className="flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="text-center md:text-left">
@@ -116,7 +116,7 @@ export function MetabolicDashboard({ plan, perfil, onBack, planLevel = "full", o
             { key: "carbs", label: t("md_carbs"), icon: Cookie, color: "teal", grams: plan.macros.carbsGrams, pct: plan.macros.carbs },
             { key: "fat", label: t("md_fat"), icon: Droplet, color: "yellow", grams: plan.macros.fatGrams, pct: plan.macros.fat },
           ].map((m) => (
-            <motion.div key={m.key} whileHover={{ scale: 1.02 }} className="bg-card border border-border rounded-2xl p-4 text-center">
+            <motion.div key={m.key} whileHover={{ scale: 1.02 }} className="glass-strong border border-border rounded-2xl p-4 text-center">
               <div className={`w-10 h-10 rounded-xl bg-${m.color}-500/10 flex items-center justify-center mx-auto mb-3`}>
                 <m.icon className={`w-5 h-5 text-${m.color}-500`} />
               </div>
@@ -137,7 +137,7 @@ export function MetabolicDashboard({ plan, perfil, onBack, planLevel = "full", o
       {plan.diet && (
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="space-y-3 relative">
           <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground px-2">{t("md_meal_plan")}</h2>
-          <div className={`bg-card border border-border rounded-2xl p-4 md:p-6 ${isLocked ? "blur-sm pointer-events-none select-none" : ""}`}>
+          <div className={`glass-strong border border-border rounded-2xl p-4 md:p-6 ${isLocked ? "blur-sm pointer-events-none select-none" : ""}`}>
             <div className="flex items-center gap-3 mb-4">
               <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
                 <Utensils className="w-5 h-5 text-primary" />
@@ -173,7 +173,7 @@ export function MetabolicDashboard({ plan, perfil, onBack, planLevel = "full", o
           </div>
           {isLocked && (
             <div className="absolute inset-0 flex flex-col items-center justify-center z-10">
-              <div className="bg-card border border-border rounded-2xl p-6 text-center max-w-xs">
+              <div className="glass-strong border border-border rounded-2xl p-6 text-center max-w-xs">
                 <Lock className="w-8 h-8 text-primary mx-auto mb-3" />
                 <h3 className="font-bold text-foreground mb-2">Plano Completo</h3>
                 <p className="text-xs text-muted-foreground mb-4">Upgrade para ver todas as refeicoes detalhadas</p>
@@ -189,7 +189,7 @@ export function MetabolicDashboard({ plan, perfil, onBack, planLevel = "full", o
       {/* Prediction */}
       {plan.prediction && (
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}
-          className="bg-card border border-primary/20 rounded-2xl p-4 md:p-6"
+          className="glass-strong border border-primary/20 rounded-2xl p-4 md:p-6"
         >
           <div className="flex items-center gap-3 mb-4">
             <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">

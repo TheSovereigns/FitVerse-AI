@@ -128,7 +128,7 @@ export function SeasonSystem() {
 
           {/* Progress bar */}
           <div className="relative">
-            <div className="h-3 overflow-hidden rounded-full bg-black/30 border border-white/5">
+            <div className="h-3 overflow-hidden rounded-full bg-black/30 border border-border">
               <motion.div className="h-full rounded-full bg-gradient-to-r from-brand via-emerald-400 to-cyan-400 relative"
                 animate={{ width: `${progressPercent}%` }} transition={{ duration: 1, ease: "easeOut" }}
               >

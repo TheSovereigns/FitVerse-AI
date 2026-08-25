@@ -30,7 +30,7 @@ export function AdBanner({ position = "bottom", className = "" }: AdBannerProps)
 
   return (
     <div className={`w-full ${position === "top" ? "pt-2" : "pb-2"} ${className}`}>
-      <div className="relative glass-strong border border-white/10 rounded-2xl p-3 mx-4 overflow-hidden">
+      <div className="relative glass-strong border border-border rounded-2xl p-3 mx-4 overflow-hidden">
         <button 
           onClick={handleDismiss}
           className="absolute top-1 right-1 p-1 hover:bg-white/10 rounded-full transition-colors"

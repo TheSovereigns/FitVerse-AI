@@ -146,8 +146,8 @@ export function ClansTab() {
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          className="relative overflow-hidden rounded-2xl border border-white/5"
-          style={{ background: "linear-gradient(135deg, #0a0a0a 0%, #111 50%, #0a0a0a 100%)" }}
+          className="relative overflow-hidden rounded-2xl border border-border"
+          style={{ background: "linear-gradient(135deg, hsl(var(--background)) 0%, hsl(var(--background)) 50%, hsl(var(--background)) 100%)" }}
         >
           <div className="absolute inset-0 opacity-20"
             style={{ background: `radial-gradient(circle at 20% 50%, ${guildLevel.current.color}20, transparent 70%)` }} />
@@ -155,7 +155,7 @@ export function ClansTab() {
           <div className="relative p-5">
             <div className="flex items-start justify-between mb-4">
               <button onClick={() => { setView("list"); setSelectedClan(null) }}
-                className="flex items-center gap-1.5 text-xs text-white/30 hover:text-white/60 transition-colors">
+                className="flex items-center gap-1.5 text-xs text-foreground/40 hover:text-foreground/60 transition-colors">
                 <ArrowRight className="h-3.5 w-3.5 rotate-180" />
                 {isEnglish ? "Back" : "Voltar"}
               </button>
@@ -190,18 +190,18 @@ export function ClansTab() {
               </div>
               <div className="flex-1">
                 <div className="flex items-center gap-2">
-                  <h2 className="text-xl font-black text-white">{selectedClan.name}</h2>
+                  <h2 className="text-xl font-black text-foreground">{selectedClan.name}</h2>
                   {selectedClan.is_public ? (
                     <Globe className="h-4 w-4 text-brand" />
                   ) : (
-                    <Lock className="h-4 w-4 text-white/30" />
+                    <Lock className="h-4 w-4 text-foreground/40" />
                   )}
                 </div>
-                <p className="text-xs text-white/30 mt-0.5">
+                <p className="text-xs text-foreground/40 mt-0.5">
                   {selectedClan.memberCount || 0} {isEnglish ? "members" : "membros"} · {selectedClan.ownerName || "Unknown"}
                 </p>
                 {selectedClan.description && (
-                  <p className="text-xs text-white/40 mt-1 line-clamp-2">{selectedClan.description}</p>
+                  <p className="text-xs text-foreground/40 mt-1 line-clamp-2">{selectedClan.description}</p>
                 )}
               </div>
             </div>
@@ -211,14 +211,14 @@ export function ClansTab() {
               <div className="flex items-center justify-between text-xs">
                 <div className="flex items-center gap-1.5">
                   <Star className="h-3.5 w-3.5" style={{ color: guildLevel.current.color }} />
-                  <span className="font-bold text-white">{isEnglish ? guildLevel.current.titleEn : guildLevel.current.title}</span>
-                  <span className="text-white/30">Lv.{guildLevel.current.level}</span>
+                  <span className="font-bold text-foreground">{isEnglish ? guildLevel.current.titleEn : guildLevel.current.title}</span>
+                  <span className="text-foreground/40">Lv.{guildLevel.current.level}</span>
                 </div>
                 <span className="font-bold" style={{ color: guildLevel.current.color }}>
                   {(selectedClan?.total_xp || 0).toLocaleString()} XP
                 </span>
               </div>
-              <div className="h-2 rounded-full bg-white/5 overflow-hidden">
+              <div className="h-2 rounded-full bg-muted/50 overflow-hidden">
                 <motion.div
                   initial={{ width: 0 }}
                   animate={{ width: `${guildLevel.progress}%` }}
@@ -228,7 +228,7 @@ export function ClansTab() {
                 />
               </div>
               {guildLevel.next && (
-                <p className="text-[10px] text-white/20 text-right">
+                <p className="text-[10px] text-foreground/30 text-right">
                   {(guildLevel.next.xpRequired - (selectedClan?.total_xp || 0)).toLocaleString()} XP {isEnglish ? "to" : "para"} {isEnglish ? guildLevel.next.titleEn : guildLevel.next.title}
                 </p>
               )}
@@ -239,8 +239,8 @@ export function ClansTab() {
         {/* Join Section (non-members) */}
         {!selectedClan.isMember && (
           <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
-            className="rounded-2xl border border-white/5 bg-card p-5">
-            <p className="text-sm font-bold text-white mb-3">
+            className="rounded-2xl border border-border bg-card p-5">
+            <p className="text-sm font-bold text-foreground mb-3">
               {isEnglish ? "Join this clan" : "Entrar neste clã"}
             </p>
             <div className="flex items-center gap-2">
@@ -248,17 +248,17 @@ export function ClansTab() {
                 value={joinCode}
                 onChange={(e) => setJoinCode(e.target.value)}
                 placeholder={isEnglish ? "Invite code..." : "Codigo de convite..."}
-                className="h-10 rounded-xl border-white/5 bg-white/[0.03] text-sm text-white placeholder:text-white/20"
+                className="h-10 rounded-xl border-border bg-card text-sm text-foreground placeholder:text-foreground/20"
               />
               <button onClick={handleJoinWithCode} disabled={isJoining || !joinCode.trim()}
-                className="h-10 px-5 rounded-xl bg-brand text-white text-xs font-bold hover:bg-brand/90 transition-colors disabled:opacity-40">
+                className="h-10 px-5 rounded-xl bg-brand text-foreground text-xs font-bold hover:bg-brand/90 transition-colors disabled:opacity-40">
                 {isJoining ? <Loader2 className="h-4 w-4 animate-spin" /> : isEnglish ? "Join" : "Entrar"}
               </button>
             </div>
             {selectedClan.is_public && (
               <button onClick={async () => { setIsJoining(true); await joinClan(selectedClan.id); await fetchUserClan(); setIsJoining(false) }}
                 disabled={isJoining}
-                className="mt-2 w-full h-10 rounded-xl bg-white/[0.03] border border-white/5 text-white/40 text-xs font-bold hover:bg-white/5 transition-colors">
+                className="mt-2 w-full h-10 rounded-xl bg-card border border-border text-foreground/40 text-xs font-bold hover:bg-muted/50 transition-colors">
                 {isEnglish ? "Join Free" : "Entrar Gratis"}
               </button>
             )}
@@ -267,7 +267,7 @@ export function ClansTab() {
 
         {/* Tabs */}
         {selectedClan.isMember && (
-          <div className="flex gap-1 p-1 bg-card rounded-xl border border-white/5 overflow-x-auto">
+          <div className="flex gap-1 p-1 bg-card rounded-xl border border-border overflow-x-auto">
             {([
               { id: "chat" as const, icon: MessageCircle, label: "Chat" },
               { id: "feed" as const, icon: Activity, label: isEnglish ? "Feed" : "Atividades" },
@@ -279,7 +279,7 @@ export function ClansTab() {
               <button key={v.id} onClick={() => setTab(v.id)}
                 className={cn(
                   "flex items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-bold transition-all whitespace-nowrap flex-1 justify-center",
-                  tab === v.id ? "bg-brand/15 text-brand" : "text-white/30 hover:text-white/50"
+                   tab === v.id ? "bg-brand/15 text-brand" : "text-foreground/40 hover:text-foreground/60"
                 )}>
                 <v.icon className="h-3.5 w-3.5" />
                 <span className="hidden sm:inline">{v.label}</span>
@@ -318,7 +318,7 @@ export function ClansTab() {
         <motion.section
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          className="relative overflow-hidden rounded-2xl border border-white/5 cursor-pointer card-hover transition-colors"
+          className="relative overflow-hidden rounded-2xl border border-border cursor-pointer card-hover transition-colors"
           style={{ background: "linear-gradient(135deg, hsl(var(--card)) 0%, hsl(var(--card)) 50%, hsl(var(--card)) 100%)" }}
           onClick={() => handleSelectClan(userClan)}
         >
@@ -336,13 +336,13 @@ export function ClansTab() {
                   <p className="text-[10px] font-bold uppercase tracking-wider" style={{ color: guildLevel.current.color }}>
                     {isEnglish ? "Your Guild" : "Sua Guild"}
                   </p>
-                  <h3 className="text-lg font-black text-white">{userClan.name}</h3>
-                  <p className="text-xs text-white/30">
+                  <h3 className="text-lg font-black text-foreground">{userClan.name}</h3>
+                  <p className="text-xs text-foreground/40">
                     {userClan.memberCount || 0} {isEnglish ? "members" : "membros"} · {userClan.role === "owner" ? "Owner" : userClan.role === "admin" ? "Admin" : "Member"}
                   </p>
                 </div>
               </div>
-              <ChevronRight className="h-5 w-5 text-white/20" />
+              <ChevronRight className="h-5 w-5 text-foreground/30" />
             </div>
 
             {/* XP Bar */}
@@ -350,14 +350,14 @@ export function ClansTab() {
               <div className="flex items-center justify-between text-xs">
                 <div className="flex items-center gap-1.5">
                   <Star className="h-3.5 w-3.5" style={{ color: guildLevel.current.color }} />
-                  <span className="font-bold text-white">{isEnglish ? guildLevel.current.titleEn : guildLevel.current.title}</span>
-                  <span className="text-white/30">Lv.{guildLevel.current.level}</span>
+                  <span className="font-bold text-foreground">{isEnglish ? guildLevel.current.titleEn : guildLevel.current.title}</span>
+                  <span className="text-foreground/40">Lv.{guildLevel.current.level}</span>
                 </div>
                 <span className="font-bold" style={{ color: guildLevel.current.color }}>
                   {guildXp.toLocaleString()} XP
                 </span>
               </div>
-              <div className="h-2 rounded-full bg-white/5 overflow-hidden">
+              <div className="h-2 rounded-full bg-muted/50 overflow-hidden">
                 <motion.div
                   initial={{ width: 0 }}
                   animate={{ width: `${guildLevel.progress}%` }}
@@ -367,7 +367,7 @@ export function ClansTab() {
                 />
               </div>
               {guildLevel.next && (
-                <p className="text-[10px] text-white/20 text-right">
+                <p className="text-[10px] text-foreground/30 text-right">
                   {(guildLevel.next.xpRequired - guildXp).toLocaleString()} XP {isEnglish ? "to" : "para"} {isEnglish ? guildLevel.next.titleEn : guildLevel.next.title}
                 </p>
               )}
@@ -381,7 +381,7 @@ export function ClansTab() {
         <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
           <div className="flex items-center gap-2 mb-3">
             <Award className="h-4 w-4 text-brand" />
-            <h3 className="text-xs font-bold text-white/40 uppercase tracking-wider">
+            <h3 className="text-xs font-bold text-foreground/40 uppercase tracking-wider">
               {isEnglish ? "Guild Achievements" : "Conquistas da Guild"}
             </h3>
           </div>
@@ -393,16 +393,16 @@ export function ClansTab() {
                   transition={{ delay: i * 0.03 }}
                   className={cn(
                     "relative flex flex-col items-center gap-1.5 rounded-xl p-2.5 border transition-all text-center",
-                    unlocked ? "border-brand/30 bg-brand/10 shadow-[0_0_20px_rgba(52,211,153,0.15)]" : "border-white/5 bg-white/[0.02] opacity-40"
+                    unlocked ? "border-brand/30 bg-brand/10 shadow-[0_0_20px_rgba(52,211,153,0.15)]" : "border-border bg-white/[0.02] opacity-40"
                   )}>
                   <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center",
-                    unlocked ? "bg-brand/15" : "bg-white/5")}>
-                    <ach.icon className={cn("h-5 w-5", unlocked ? "text-brand" : "text-white/20")} />
+                    unlocked ? "bg-brand/15" : "bg-muted/50")}>
+                    <ach.icon className={cn("h-5 w-5", unlocked ? "text-brand" : "text-foreground/30")} />
                   </div>
-                  <p className="text-[9px] font-bold leading-tight text-white/70">{isEnglish ? ach.titleEn : ach.title}</p>
+                  <p className="text-[9px] font-bold leading-tight text-foreground/80">{isEnglish ? ach.titleEn : ach.title}</p>
                   {unlocked && (
                     <div className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-brand flex items-center justify-center">
-                      <Zap className="h-2.5 w-2.5 text-white" />
+                      <Zap className="h-2.5 w-2.5 text-foreground" />
                     </div>
                   )}
                 </motion.div>
@@ -415,27 +415,27 @@ export function ClansTab() {
       {/* Discover Section */}
       <div>
         <div className="flex items-center justify-between mb-3">
-          <h2 className="text-lg font-black text-white">
+          <h2 className="text-lg font-black text-foreground">
             {isEnglish ? "Discover Guilds" : "Descobrir Guilds"}
           </h2>
           <button onClick={() => setShowCreateModal(true)}
-            className="h-9 px-4 rounded-xl bg-brand text-white text-xs font-bold flex items-center gap-1.5 hover:bg-brand/90 transition-colors">
+            className="h-9 px-4 rounded-xl bg-brand text-foreground text-xs font-bold flex items-center gap-1.5 hover:bg-brand/90 transition-colors">
             <Plus className="h-3.5 w-3.5" />
             {isEnglish ? "Create" : "Criar"}
           </button>
         </div>
 
         <div className="relative mb-4">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/20" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-foreground/30" />
           <Input value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}
             placeholder={isEnglish ? "Search guilds..." : "Buscar guilds..."}
-            className="h-11 rounded-xl border-white/5 bg-white/[0.03] pl-10 text-sm text-white placeholder:text-white/20" />
+            className="h-11 rounded-xl border-border bg-card pl-10 text-sm text-foreground placeholder:text-foreground/20" />
         </div>
 
         {filteredDiscover.length === 0 ? (
-          <div className="rounded-2xl border border-white/5 bg-card p-8 text-center">
-            <Swords className="mx-auto mb-3 h-10 w-10 text-white/10" />
-            <p className="text-sm font-bold text-white/30">
+          <div className="rounded-2xl border border-border bg-card p-8 text-center">
+            <Swords className="mx-auto mb-3 h-10 w-10 text-foreground/20" />
+            <p className="text-sm font-bold text-foreground/40">
               {isEnglish ? "No guilds found. Create one!" : "Nenhuma guild encontrada. Crie uma!"}
             </p>
           </div>
@@ -446,7 +446,7 @@ export function ClansTab() {
               return (
                 <motion.div key={clan.id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: i * 0.03 }}
-                  className="flex items-center gap-3 rounded-xl border border-white/5 bg-card p-4 cursor-pointer hover:border-white/10 hover:bg-white/[0.02] transition-all"
+                  className="flex items-center gap-3 rounded-xl border border-border bg-card p-4 cursor-pointer hover:border-border hover:bg-white/[0.02] transition-all"
                   onClick={() => handleSelectClan(clan)}>
                   <div className="w-12 h-12 rounded-xl flex items-center justify-center"
                     style={{ background: `linear-gradient(135deg, ${clanLevel.current.color}20, ${clanLevel.current.color}05)` }}>
@@ -454,25 +454,25 @@ export function ClansTab() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                      <p className="font-bold text-sm text-white truncate">{clan.name}</p>
-                      {clan.is_public ? <Globe className="h-3 w-3 text-brand shrink-0" /> : <Lock className="h-3 w-3 text-white/20 shrink-0" />}
+                      <p className="font-bold text-sm text-foreground truncate">{clan.name}</p>
+                      {clan.is_public ? <Globe className="h-3 w-3 text-brand shrink-0" /> : <Lock className="h-3 w-3 text-foreground/30 shrink-0" />}
                     </div>
-                    <p className="text-xs text-white/30 truncate">
+                    <p className="text-xs text-foreground/40 truncate">
                       {clan.description || (isEnglish ? "No description" : "Sem descricao")}
                     </p>
                     <div className="flex items-center gap-2 mt-1">
                       <span className="text-[10px] font-bold" style={{ color: clanLevel.current.color }}>
                         Lv.{clanLevel.current.level}
                       </span>
-                      <span className="text-[10px] text-white/15">·</span>
-                      <span className="text-[10px] font-bold text-white/30">
+                      <span className="text-[10px] text-foreground/30">·</span>
+                      <span className="text-[10px] font-bold text-foreground/40">
                         {(clan.total_xp || 0).toLocaleString()} XP
                       </span>
                     </div>
                   </div>
                   <div className="text-right shrink-0">
-                    <p className="text-sm font-bold text-white">{clan.memberCount || 0}</p>
-                    <p className="text-[10px] text-white/20">{isEnglish ? "members" : "membros"}</p>
+                    <p className="text-sm font-bold text-foreground">{clan.memberCount || 0}</p>
+                    <p className="text-[10px] text-foreground/30">{isEnglish ? "members" : "membros"}</p>
                   </div>
                 </motion.div>
               )

@@ -39,25 +39,25 @@ export default function ForgotPasswordPage() {
 
   if (sent) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-[#1a0f00] via-[#0d0705] to-[#1a0f00] flex items-center justify-center p-6">
+      <div className="min-h-screen bg-gradient-to-br from-background via-background to-background flex items-center justify-center p-6">
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="text-center glass-strong border border-white/10 rounded-3xl p-8 max-w-md"
+          className="text-center glass-strong border border-border rounded-3xl p-8 max-w-md"
         >
           <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center mx-auto mb-4">
             <Check className="w-8 h-8 text-primary" />
           </div>
-          <h2 className="text-2xl font-black text-white mb-2">
+          <h2 className="text-2xl font-black text-foreground mb-2">
             {locale === "en-US" ? "Check your inbox!" : "Verifique sua caixa de entrada!"}
           </h2>
-          <p className="text-white/60 mb-6">
+          <p className="text-foreground/70 mb-6">
             {locale === "en-US"
               ? `We've sent a password reset link to ${email}. Click the link to create a new password.`
               : `Enviamos um link de recuperação para ${email}. Clique no link para criar uma nova senha.`}
           </p>
           <Link href="/auth/login">
-            <Button className="bg-primary text-white hover:bg-primary/90">
+            <Button className="bg-brand text-brand-foreground hover:bg-brand/90">
               {locale === "en-US" ? "Back to Login" : "Voltar ao Login"}
             </Button>
           </Link>
@@ -67,7 +67,7 @@ export default function ForgotPasswordPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#1a0f00] via-[#0d0705] to-[#1a0f00] flex items-center justify-center p-6">
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-background flex items-center justify-center p-6">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -80,20 +80,20 @@ export default function ForgotPasswordPage() {
             <div className="w-10 h-10 rounded-xl bg-primary/20 border border-primary/30 flex items-center justify-center overflow-hidden">
               <img src="/icon.svg" alt="VyseFit" className="w-6 h-6" />
             </div>
-            <span className="text-2xl font-black text-white">VyseFit AI</span>
+            <span className="text-2xl font-black text-foreground">VyseFit AI</span>
           </Link>
         </div>
 
         {/* Form Card */}
-        <div className="glass-strong border border-white/10 rounded-3xl p-6 md:p-8">
+        <div className="glass-strong border border-border rounded-3xl p-6 md:p-8">
           <div className="text-center mb-6">
             <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
               <Mail className="w-6 h-6 text-primary" />
             </div>
-            <h1 className="text-2xl font-black text-white mb-2">
+            <h1 className="text-2xl font-black text-foreground mb-2">
               {locale === "en-US" ? "Reset Password" : "Recuperar Senha"}
             </h1>
-            <p className="text-sm text-white/40">
+            <p className="text-sm text-foreground/40">
               {locale === "en-US"
                 ? "Enter your email and we'll send you a reset link"
                 : "Digite seu email e enviaremos um link de recuperação"}
@@ -108,7 +108,7 @@ export default function ForgotPasswordPage() {
 
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <Label htmlFor="email" className="text-white/80 text-sm font-medium mb-2 block">
+              <Label htmlFor="email" className="text-foreground/70 text-sm font-medium mb-2 block">
                 Email
               </Label>
               <Input
@@ -118,14 +118,14 @@ export default function ForgotPasswordPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder={locale === "en-US" ? "you@example.com" : "seu@email.com"}
                 required
-                className="h-12 bg-white/5 border-white/10 text-white placeholder:text-white/30 focus:border-primary focus:ring-primary/20 rounded-xl"
+                className="h-12 bg-muted/50 border-border text-foreground placeholder:text-foreground/30 focus:border-primary focus:ring-primary/20 rounded-xl"
               />
             </div>
 
             <Button
               type="submit"
               disabled={isLoading}
-              className="w-full h-12 text-base font-black bg-primary text-white rounded-xl hover:bg-primary/90 transition-all hover:shadow-[0_10px_30px_rgba(255,140,0,0.3)] hover:scale-[1.02] active:scale-[0.98]"
+              className="w-full h-12 text-base font-black bg-brand text-brand-foreground rounded-xl hover:bg-brand/90 transition-all hover:shadow-[0_10px_30px_rgba(52,211,153,0.3)] hover:scale-[1.02] active:scale-[0.98]"
             >
               {isLoading ? (
                 <>
@@ -139,7 +139,7 @@ export default function ForgotPasswordPage() {
           </form>
 
           <div className="mt-6 text-center">
-            <p className="text-sm text-white/40">
+            <p className="text-sm text-foreground/40">
               {locale === "en-US" ? "Remember your password?" : "Lembrou a senha?"}{" "}
               <Link href="/auth/login" className="text-primary hover:underline font-medium">
                 {locale === "en-US" ? "Sign In" : "Entrar"}

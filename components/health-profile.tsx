@@ -645,7 +645,7 @@ export function HealthProfile({ scanHistory, onNavigateToSettings, onNavigateToS
               ? "bg-brand text-white hover:bg-brand/90"
               : userSubscription === "pro"
               ? "bg-amber-500 text-black hover:bg-amber-500/90"
-              : "bg-white/10 text-foreground hover:bg-white/15 border border-white/10"
+              : "bg-white/10 text-foreground hover:bg-white/15 border border-border"
           )}
         >
           {userSubscription === "free"

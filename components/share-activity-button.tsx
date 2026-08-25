@@ -54,8 +54,8 @@ export function ShareActivityButton({ activityType, activityData, variant = "gho
         shared
           ? "bg-emerald-500/15 text-emerald-400 border border-emerald-500/20"
           : showConfirm
-            ? "bg-white/10 text-foreground border border-white/10"
-            : "border border-white/10 bg-white/8 text-foreground/50 hover:bg-white/10",
+            ? "bg-white/10 text-foreground border border-border"
+            : "border border-border bg-white/8 text-foreground/50 hover:bg-white/10",
         className
       )}
     >

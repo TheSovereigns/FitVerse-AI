@@ -149,7 +149,7 @@ export function DailySummary() {
   return (
     <div className="space-y-6">
       {/* Date Selector */}
-      <div className="glass-strong border-white/20 rounded-2xl p-4">
+      <div className="glass-strong border-border rounded-2xl p-4">
         <div className="flex items-center justify-between">
           <input
             type="date"
@@ -169,7 +169,7 @@ export function DailySummary() {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <motion.div 
           whileHover={{ y: -5 }}
-          className="glass-strong border-white/10 rounded-2xl p-4 text-center"
+          className="glass-strong border-border rounded-2xl p-4 text-center"
         >
           <Activity className="w-6 h-6 mx-auto mb-2 text-primary" />
           <p className="text-2xl font-black">{dailyData.scans.length}</p>
@@ -178,7 +178,7 @@ export function DailySummary() {
         
         <motion.div 
           whileHover={{ y: -5 }}
-          className="glass-strong border-white/10 rounded-2xl p-4 text-center"
+          className="glass-strong border-border rounded-2xl p-4 text-center"
         >
           <Flame className="w-6 h-6 mx-auto mb-2 text-[#FF453A]" />
           <p className="text-2xl font-black">{totalMacros.calories}</p>
@@ -187,7 +187,7 @@ export function DailySummary() {
         
         <motion.div 
           whileHover={{ y: -5 }}
-          className="glass-strong border-white/10 rounded-2xl p-4 text-center"
+          className="glass-strong border-border rounded-2xl p-4 text-center"
         >
           <Target className="w-6 h-6 mx-auto mb-2 text-yellow-400" />
           <p className="text-2xl font-black">{averageScore}</p>
@@ -196,7 +196,7 @@ export function DailySummary() {
         
         <motion.div 
           whileHover={{ y: -5 }}
-          className="glass-strong border-white/10 rounded-2xl p-4 text-center"
+          className="glass-strong border-border rounded-2xl p-4 text-center"
         >
           <TrendingUp className="w-6 h-6 mx-auto mb-2 text-emerald-400" />
           <p className="text-2xl font-black">{dailyData.workouts.length + dailyData.diets.length}</p>
@@ -205,7 +205,7 @@ export function DailySummary() {
       </div>
 
       {/* Macros Breakdown */}
-      <div className="glass-strong border-white/20 rounded-2xl p-6">
+      <div className="glass-strong border-border rounded-2xl p-6">
         <h3 className="font-black uppercase tracking-widest opacity-40 mb-4">{t("summary_macros") || "Macros"}</h3>
         <div className="grid grid-cols-4 gap-4">
           <div className="text-center">
@@ -232,7 +232,7 @@ export function DailySummary() {
       </div>
 
       {/* Weekly Chart */}
-      <div className="glass-strong border-white/20 rounded-2xl p-6">
+      <div className="glass-strong border-border rounded-2xl p-6">
         <h3 className="font-black uppercase tracking-widest opacity-40 mb-4">{t("summary_week") || "Últimos 7 dias"}</h3>
         <div className="flex items-end justify-between gap-2 h-32">
           {weekData.map((day, i) => (
@@ -263,7 +263,7 @@ export function DailySummary() {
         <h3 className="font-black uppercase tracking-widest opacity-40">{t("summary_items") || "Itens Escaneados"}</h3>
         
         {dailyData.scans.length === 0 ? (
-          <div className="glass-strong border-white/10 rounded-2xl p-8 text-center">
+          <div className="glass-strong border-border rounded-2xl p-8 text-center">
             <PieChart className="w-12 h-12 mx-auto mb-3 opacity-20" />
             <p className="opacity-40">{t("summary_no_scans") || "Nenhum scan neste dia"}</p>
           </div>
@@ -274,7 +274,7 @@ export function DailySummary() {
                 key={i}
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
-                className="glass-strong border-white/10 rounded-xl p-4 flex items-center justify-between"
+                className="glass-strong border-border rounded-xl p-4 flex items-center justify-between"
               >
                 <div className="flex items-center gap-3">
                   <div className={cn(
@@ -306,7 +306,7 @@ export function DailySummary() {
           
           <div className="space-y-2">
             {dailyData.workouts.map((workout: any, i: number) => (
-              <div key={i} className="glass-strong border-white/10 rounded-xl p-4 flex items-center gap-3">
+              <div key={i} className="glass-strong border-border rounded-xl p-4 flex items-center gap-3">
                 <Dumbbell className="w-6 h-6 text-foreground" />
                 <div>
                   <p className="font-bold">{workout.name || t("ds_workout")}</p>

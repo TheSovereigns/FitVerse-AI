@@ -1,8 +1,10 @@
 "use client"
 
-import { Clock, Filter } from "lucide-react"
+import { Clock, Filter, SearchX } from "lucide-react"
 import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import { EmptyState } from "@/components/ui/empty-state"
+import { useTranslation } from "@/lib/i18n"
 import { useState } from "react"
 
 interface ScanHistoryItem {
@@ -20,6 +22,7 @@ interface ScanHistoryProps {
 
 export function ScanHistory({ items, showAll = false }: ScanHistoryProps) {
   const [filter, setFilter] = useState<"all" | "healthy" | "moderate" | "poor">("all")
+  const { t } = useTranslation()
 
   const getScoreColor = (score: number) => {
     if (score >= 70) return "bg-success/20 text-success border-success/40"
@@ -70,9 +73,11 @@ export function ScanHistory({ items, showAll = false }: ScanHistoryProps) {
       </div>
 
       {filteredItems.length === 0 ? (
-        <Card className="p-6 text-center glass border-primary/20">
-          <p className="text-sm text-muted-foreground">Nenhum produto encontrado com este filtro</p>
-        </Card>
+        <EmptyState
+          icon={<SearchX className="w-8 h-8 text-muted-foreground" />}
+          title={t("empty_scans_filter_title")}
+          description={t("empty_scans_filter_desc")}
+        />
       ) : (
         <div className="space-y-3">
           {filteredItems.map((item) => (

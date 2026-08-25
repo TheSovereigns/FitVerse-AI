@@ -5,6 +5,7 @@ import { motion } from "framer-motion"
 import { ScanLine, Dumbbell, Flame, Heart, Trophy, Star, Lock } from "lucide-react"
 import { useTranslation } from "@/lib/i18n"
 import { cn } from "@/lib/utils"
+import { EmptyState } from "@/components/ui/empty-state"
 
 interface AchievementDef {
   id: string
@@ -50,6 +51,18 @@ export function AchievementsPage() {
 
   const totalXP = ACHIEVEMENTS.filter((a) => unlocked.has(a.id)).reduce((sum, a) => sum + a.xp, 0)
   const unlockedCount = ACHIEVEMENTS.filter((a) => unlocked.has(a.id)).length
+
+  if (ACHIEVEMENTS.length === 0) {
+    return (
+      <div className="glass-strong border border-border rounded-2xl p-6">
+        <EmptyState
+          icon={<Trophy className="w-8 h-8 text-muted-foreground" />}
+          title={t("empty_achievements_title")}
+          description={t("empty_achievements_desc")}
+        />
+      </div>
+    )
+  }
 
   return (
     <div className="glass-strong border border-border rounded-2xl p-6 space-y-6">
