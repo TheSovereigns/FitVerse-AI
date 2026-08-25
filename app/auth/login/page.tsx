@@ -6,7 +6,7 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { motion } from "framer-motion"
 import Link from "next/link"
-import { Eye, EyeOff, Loader2, Sparkles } from "lucide-react"
+import { Eye, EyeOff, Loader2 } from "lucide-react"
 import { z } from "zod"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -94,8 +94,8 @@ export default function LoginPage() {
             transition={{ duration: 0.6 }}
             className="text-center"
           >
-            <div className="w-24 h-24 rounded-3xl bg-primary/20 border border-primary/30 flex items-center justify-center mb-8 mx-auto shadow-[0_0_60px_rgba(255,140,0,0.3)]">
-              <Sparkles className="w-12 h-12 text-primary" />
+            <div className="w-24 h-24 rounded-3xl bg-primary/20 border border-primary/30 flex items-center justify-center mb-8 mx-auto shadow-[0_0_60px_rgba(255,140,0,0.3)] overflow-hidden">
+              <img src="/icon.svg" alt="VyseFit" className="w-14 h-14" />
             </div>
             
             <h2 className="text-4xl font-black text-white mb-4 tracking-tight">
@@ -103,8 +103,8 @@ export default function LoginPage() {
             </h2>
             <p className="text-lg text-white/60 max-w-md">
               {locale === "en-US"
-                ? "Continue your journey to a healthier life with FitVerse AI"
-                : "Continue sua jornada para uma vida mais saudável com FitVerse AI"}
+                ? "Continue your journey to a healthier life with VyseFit AI"
+                : "Continue sua jornada para uma vida mais saudável com VyseFit AI"}
             </p>
           </motion.div>
         </div>
@@ -121,10 +121,10 @@ export default function LoginPage() {
           {/* Logo */}
           <div className="text-center mb-8">
             <Link href="/" className="inline-flex items-center gap-2">
-              <div className="w-10 h-10 rounded-xl bg-primary/20 border border-primary/30 flex items-center justify-center">
-                <Sparkles className="w-5 h-5 text-primary" />
+              <div className="w-10 h-10 rounded-xl bg-primary/20 border border-primary/30 flex items-center justify-center overflow-hidden">
+                <img src="/icon.svg" alt="VyseFit" className="w-6 h-6" />
               </div>
-              <span className="text-2xl font-black text-white">FitVerse AI</span>
+              <span className="text-2xl font-black text-white">VyseFit AI</span>
             </Link>
           </div>
 

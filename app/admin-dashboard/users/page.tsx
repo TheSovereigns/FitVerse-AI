@@ -241,7 +241,7 @@ export default function AdminUsersPage() {
     const url = URL.createObjectURL(blob)
     const a = document.createElement("a")
     a.href = url
-    a.download = "fitverse-users.csv"
+    a.download = "vysefit-users.csv"
     a.click()
   }
 

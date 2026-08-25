@@ -13,11 +13,12 @@ interface StreakDisplayProps {
 }
 
 export function StreakDisplay({ compact = false, onNavigate }: StreakDisplayProps) {
-  const { t } = useTranslation()
+  const { t, locale } = useTranslation()
+  const isEnglish = locale === "en-US"
   const { currentStreak, longestStreak, hasActivityToday, weekActivity } = useStreak()
   const [showDetails, setShowDetails] = useState(false)
 
-  const dayLabels = ["S", "T", "Q", "Q", "S", "S", "D"]
+  const dayLabels = isEnglish ? ["S", "M", "T", "W", "T", "F", "S"] : ["D", "S", "T", "Q", "Q", "S", "S"]
 
   if (compact) {
     return (
@@ -35,11 +36,11 @@ export function StreakDisplay({ compact = false, onNavigate }: StreakDisplayProp
             <div className="flex items-baseline gap-1.5">
               <span className="text-xl font-bold tracking-tight text-foreground">{currentStreak}</span>
               <span className="text-xs text-muted-foreground">
-                {currentStreak === 1 ? "dia" : "dias"}
+                {currentStreak === 1 ? (isEnglish ? "day" : "dia") : (isEnglish ? "days" : "dias")}
               </span>
             </div>
             <p className="text-xs text-muted-foreground">
-              {hasActivityToday ? "Sequencia ativa" : "Faca seu primeiro hoje"}
+              {hasActivityToday ? (isEnglish ? "Active streak" : "Sequencia ativa") : (isEnglish ? "Start your first today" : "Faca seu primeiro hoje")}
             </p>
           </div>
           <ChevronRight className="h-4 w-4 text-muted-foreground/50" />
@@ -102,7 +103,7 @@ export function StreakDisplay({ compact = false, onNavigate }: StreakDisplayProp
               <div className="absolute inset-0 flex flex-col items-center justify-center">
                 <span className="text-3xl font-bold text-foreground">{currentStreak}</span>
                 <span className="text-[9px] font-medium uppercase tracking-wider text-muted-foreground">
-                  {currentStreak === 1 ? "dia" : "dias"}
+                  {currentStreak === 1 ? (isEnglish ? "day" : "dia") : (isEnglish ? "days" : "dias")}
                 </span>
               </div>
             </div>
@@ -160,11 +161,11 @@ export function StreakDisplay({ compact = false, onNavigate }: StreakDisplayProp
               className="bg-card border border-border rounded-2xl p-6 w-full max-w-md"
               onClick={(e) => e.stopPropagation()}
             >
-              <h3 className="text-lg font-bold mb-4">{t("streak_details") || "Detalhes da Sequencia"}</h3>
+              <h3 className="text-lg font-bold mb-4">{isEnglish ? "Streak Details" : "Detalhes da Sequencia"}</h3>
               <div className="space-y-3">
-                <div className="flex justify-between"><span className="text-muted-foreground text-sm">Sequencia atual</span><span className="font-semibold text-sm">{currentStreak} dias</span></div>
-                <div className="flex justify-between"><span className="text-muted-foreground text-sm">Melhor sequencia</span><span className="font-semibold text-sm">{longestStreak} dias</span></div>
-                <div className="flex justify-between"><span className="text-muted-foreground text-sm">Pontos ganhos</span><span className="font-semibold text-sm">+{currentStreak * 5} pts</span></div>
+                <div className="flex justify-between"><span className="text-muted-foreground text-sm">{isEnglish ? "Current streak" : "Sequencia atual"}</span><span className="font-semibold text-sm">{currentStreak} {isEnglish ? "days" : "dias"}</span></div>
+                <div className="flex justify-between"><span className="text-muted-foreground text-sm">{isEnglish ? "Best streak" : "Melhor sequencia"}</span><span className="font-semibold text-sm">{longestStreak} {isEnglish ? "days" : "dias"}</span></div>
+                <div className="flex justify-between"><span className="text-muted-foreground text-sm">{isEnglish ? "Points earned" : "Pontos ganhos"}</span><span className="font-semibold text-sm">+{currentStreak * 5} pts</span></div>
               </div>
             </motion.div>
           </motion.div>

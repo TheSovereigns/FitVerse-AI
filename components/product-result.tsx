@@ -328,23 +328,35 @@ export function ProductResult({ result, onBack, imageData, onSave, onDiscard, ha
              </motion.div>
            )}
 
-           {/* Score Ring */}
-           <div className="relative shrink-0">
-              <div className="absolute inset-0 bg-primary/20 blur-[40px] rounded-full" />
-         <div className="relative w-36 h-36 md:w-48 md:h-48 rounded-full border-8 border-border flex flex-col items-center justify-center bg-background/50 shadow-2xl">
+            {/* Score Ring */}
+            <div className="relative shrink-0">
+               <div className="absolute inset-0 bg-primary/20 blur-[40px] rounded-full" />
+               <div className="relative w-36 h-36 md:w-48 md:h-48 rounded-full border-8 border-border flex flex-col items-center justify-center bg-background/50 shadow-2xl">
                   <span className={cn("text-5xl md:text-7xl font-black tracking-tighter leading-none", getScoreColor(score))}>{score}</span>
                   <span className="text-xs font-black text-primary uppercase tracking-[0.3em] mt-2">{t("pr_score_bio")}</span>
                </div>
                <svg className="absolute inset-0 w-full h-full -rotate-90" viewBox="0 0 144 144">
+                  <defs>
+                    <linearGradient id="scoreGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                      <stop offset="0%" stopColor="hsl(160, 84%, 50%)" />
+                      <stop offset="100%" stopColor="hsl(160, 84%, 40%)" />
+                    </linearGradient>
+                  </defs>
                   <circle 
                     cx="72" cy="72" r="64" 
                     className="fill-none stroke-primary/30 stroke-[8]" 
+                  />
+                  <circle 
+                    cx="72" cy="72" r="64" 
+                    fill="none" 
+                    stroke="url(#scoreGradient)"
+                    strokeWidth="8" 
+                    strokeLinecap="round"
                     strokeDasharray="402" 
                     strokeDashoffset={402 - (402 * score) / 100}
-                   strokeLinecap="round"
-                 />
-              </svg>
-           </div>
+                  />
+               </svg>
+            </div>
 
            <div className="flex-1 text-center md:text-left">
                <Badge className="bg-primary/20 text-primary border-none font-black text-xs tracking-widest px-4 py-2 rounded-full mb-6">
@@ -366,20 +378,29 @@ export function ProductResult({ result, onBack, imageData, onSave, onDiscard, ha
         <motion.div 
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          className="bg-card border border-border rounded-2xl p-6 md:p-8"
+          className="bg-card border border-border rounded-2xl p-5 md:p-6"
         >
-          <h3 className="text-sm font-black uppercase tracking-[0.4em] opacity-30 mb-6">Breakdown da Pontuação</h3>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <h3 className="text-sm font-black uppercase tracking-[0.4em] opacity-30 mb-5">{t("pr_breakdown")}</h3>
+          <div className="space-y-4">
             {[
-              { label: "Geral", value: healthScore.overall, icon: Heart },
-              { label: "Densidade Nutricional", value: healthScore.nutrientDensity, icon: Sparkles },
-              { label: "Nível de Processamento", value: healthScore.processingLevel, icon: Cookie },
-              { label: "Risco de Aditivos", value: healthScore.additiveRisk, icon: Pill },
+              { label: t("pr_overall"), value: healthScore.overall, color: getScoreColor(healthScore.overall).replace("text-", "bg-").replace("400", "500") },
+              { label: t("pr_nutrient_density"), value: healthScore.nutrientDensity, color: "bg-brand" },
+              { label: t("pr_processing"), value: healthScore.processingLevel, color: "bg-amber-400" },
+              { label: t("pr_additive_risk"), value: healthScore.additiveRisk, color: "bg-rose-400" },
             ].map((item, i) => (
-              <div key={i} className="text-center p-4 rounded-2xl bg-foreground/5">
-                <item.icon className={cn("w-6 h-6 mx-auto mb-2", getScoreColor(item.value))} />
-                <p className={cn("text-2xl font-black", getScoreColor(item.value))}>{item.value}</p>
-                <p className="text-xs font-bold text-muted-foreground mt-1">{item.label}</p>
+              <div key={i} className="space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-foreground">{item.label}</span>
+                  <span className={cn("text-sm font-black", getScoreColor(item.value))}>{item.value}</span>
+                </div>
+                <div className="h-2 rounded-full bg-border overflow-hidden">
+                  <motion.div
+                    initial={{ width: 0 }}
+                    animate={{ width: `${item.value}%` }}
+                    transition={{ duration: 0.8, delay: i * 0.1 }}
+                    className={`h-full rounded-full ${item.color}`}
+                  />
+                </div>
               </div>
             ))}
           </div>
@@ -511,32 +532,43 @@ export function ProductResult({ result, onBack, imageData, onSave, onDiscard, ha
         )
       )}
 
-      {/* Macros */}
+      {/* Macros as Progress Bars */}
       {result.macros && (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-           {[
-              { label: "Calorias", val: (isPremium && adjustedMacros) ? adjustedMacros.calories : result.macros.calories, icon: Flame, color: "text-[#FF453A]", unit: "kcal" },
-              { label: "Proteína", val: (isPremium && adjustedMacros) ? adjustedMacros.protein : result.macros.protein, icon: Dumbbell, color: "text-[#0A84FF]", unit: "g" },
-              { label: "Carboidratos", val: (isPremium && adjustedMacros) ? adjustedMacros.carbs : result.macros.carbs, icon: Wheat, color: "text-[#FFD60A]", unit: "g" },
-              { label: "Gordura", val: (isPremium && adjustedMacros) ? adjustedMacros.fat : result.macros.fat, icon: Droplets, color: "text-[#FF375F]", unit: "g" },
-              ...(result.macros.fiber ? [{ label: "Fibra", val: (isPremium && adjustedMacros) ? adjustedMacros.fiber : (result.macros.fiber || 0), icon: Leaf, color: "text-emerald-400", unit: "g" }] : []),
-              ...(result.macros.sugar ? [{ label: "Açúcar", val: (isPremium && adjustedMacros) ? adjustedMacros.sugar : (result.macros.sugar || 0), icon: Cookie, color: "text-yellow-400", unit: "g" }] : []),
-           ].map((m, i) => (
-             <motion.div 
-               key={i}
-               whileHover={{ y: -10 }}
-                 className="bg-card border border-border rounded-2xl p-4 md:p-6 flex flex-col items-center justify-center gap-3 shadow-sm"
-             >
-                 <div className={cn("w-10 h-10 rounded-2xl bg-muted/50 flex items-center justify-center", m.color)}>
-                   <m.icon className="w-6 h-6" />
+        <motion.div
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          className="bg-card border border-border rounded-2xl p-5 md:p-6 space-y-4"
+        >
+          <h3 className="text-sm font-black uppercase tracking-[0.4em] opacity-30">{t("pr_macros")}</h3>
+          <div className="space-y-3">
+            {[
+              { label: t("common_p"), val: (isPremium && adjustedMacros) ? adjustedMacros.protein : result.macros.protein, color: "bg-brand", textColor: "text-brand", max: 50 },
+              { label: t("common_c"), val: (isPremium && adjustedMacros) ? adjustedMacros.carbs : result.macros.carbs, color: "bg-amber-400", textColor: "text-amber-400", max: 80 },
+              { label: t("common_g"), val: (isPremium && adjustedMacros) ? adjustedMacros.fat : result.macros.fat, color: "bg-rose-400", textColor: "text-rose-400", max: 30 },
+              ...(result.macros.fiber ? [{ label: "Fibra", val: (isPremium && adjustedMacros) ? adjustedMacros.fiber : (result.macros.fiber || 0), color: "bg-emerald-400", textColor: "text-emerald-400", max: 15 }] : []),
+              ...(result.macros.sugar ? [{ label: "Açúcar", val: (isPremium && adjustedMacros) ? adjustedMacros.sugar : (result.macros.sugar || 0), color: "bg-yellow-400", textColor: "text-yellow-400", max: 25 }] : []),
+            ].map((m, i) => (
+              <div key={i} className="space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-foreground">{m.label}</span>
+                  <span className={`text-sm font-black ${m.textColor}`}>{Math.round(m.val)}g</span>
                 </div>
-                <div className="text-center">
-                   <p className="text-2xl font-black text-foreground tracking-tighter leading-none">{m.val}{m.unit}</p>
-                   <p className="text-xs font-black opacity-30 mt-1 uppercase tracking-widest">{m.label}</p>
+                <div className="h-2 rounded-full bg-border overflow-hidden">
+                  <motion.div
+                    initial={{ width: 0 }}
+                    animate={{ width: `${Math.min((m.val / m.max) * 100, 100)}%` }}
+                    transition={{ duration: 0.8, delay: i * 0.1 }}
+                    className={`h-full rounded-full ${m.color}`}
+                  />
                 </div>
-             </motion.div>
-           ))}
-        </div>
+              </div>
+            ))}
+          </div>
+          <div className="pt-3 border-t border-border">
+            <p className="text-sm font-black text-foreground">{(isPremium && adjustedMacros ? adjustedMacros.calories : result.macros.calories)} kcal</p>
+            <p className="text-xs text-muted-foreground mt-0.5">{t("pr_total_cal")}</p>
+          </div>
+        </motion.div>
       )}
 
       {/* NOVA Classification & Glycemic Index */}

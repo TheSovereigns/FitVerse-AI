@@ -9,16 +9,17 @@ import { useTranslation } from "@/lib/i18n"
 import { logger } from "@/lib/logger"
 import { toast } from "sonner"
 import { useAuth } from "@/hooks/useAuth"
-import { supabase, findProfile } from "@/lib/supabase"
+import { supabase } from "@/lib/supabase"
 import { usePlanLimits } from "@/hooks/usePlanLimits"
+import { isViewLocked } from "@/lib/plan-limits"
 import { useAppStore } from "@/stores/app-store"
 import { recordAction } from "@/lib/gamification"
 import { DesktopSidebar } from "@/components/desktop-sidebar"
 import { MobileBottomNav } from "@/components/mobile-bottom-nav"
 import { MobileMoreSheet } from "@/components/mobile-more-sheet"
 import { FeatureErrorBoundary } from "@/components/FeatureErrorBoundary"
-import { LandingPage } from "@/components/landing-page"
 import { AdBanner } from "@/components/ad-banner"
+import { PostScanInsights } from "@/components/post-scan-insights"
 import type { View, MetabolicPlan, ProductAnalysis } from "@/lib/types"
 
 // Lazy-loaded views for code splitting
@@ -66,8 +67,6 @@ const SmartReminders = lazy(() => import("@/components/smart-reminders").then(m 
 const MonthlyReport = lazy(() => import("@/components/monthly-report").then(m => ({ default: m.MonthlyReport })))
 const HealthIntegrations = lazy(() => import("@/components/health-integrations").then(m => ({ default: m.HealthIntegrations })))
 const CorridaTracker = lazy(() => import("@/components/corrida-tracker").then(m => ({ default: m.CorridaTracker })))
-
-import { HomeSkeleton, TrainingSkeleton, RecipesSkeleton, ChatSkeleton, SettingsSkeleton, ProfileSkeleton, PlannerSkeleton } from "@/components/skeleton-loaders-views"
 
 function ViewLoader() {
   return (
@@ -121,14 +120,63 @@ export default function DashboardPage() {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
     const view = params.get("view")
-    if (view) setCurrentView(view as View)
-  }, [])
+    const VALID_VIEWS: View[] = ["home","dashboard","result","recipes","training","profile","planner","settings","chatbot","clans","sleep","stress","health-checkin","supplements","meal-planner","dietary","micronutrients","substitutions","periodization","workout-feedback","equipment","mobility","longevity","fasting","biological-age","mood","habits","meditation","seasons","battle-pass","food-diary","body","weekly-report","body-evolution","streak-calendar","achievements-page","analytics-charts","smart-reminders","monthly-report","health-integrations","corrida"]
+    if (view && VALID_VIEWS.includes(view as View)) setCurrentView(view as View)
+
+    // Handle clan invite links
+    const clanInvite = params.get("clan_invite")
+    if (clanInvite && user) {
+      const autoJoinClan = async () => {
+        try {
+          for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i)
+            if (key && key.includes("sb-") && key.includes("-auth-token")) {
+              const stored = localStorage.getItem(key)
+              if (stored) {
+                const parsed = JSON.parse(stored)
+                if (parsed?.access_token) {
+                  // Find clan by invite code
+                  const searchRes = await fetch(`/api/clans?view=discover`, {
+                    headers: { Authorization: `Bearer ${parsed.access_token}` },
+                  })
+                  const searchData = await searchRes.json()
+                  const clans = searchData.clans || []
+
+                  // Try to find and join any clan with this invite
+                  for (const clan of clans) {
+                    const joinRes = await fetch(`/api/clans/${clan.id}/join`, {
+                      method: "POST",
+                      headers: {
+                        Authorization: `Bearer ${parsed.access_token}`,
+                        "Content-Type": "application/json",
+                      },
+                      body: JSON.stringify({ inviteCode: clanInvite }),
+                    })
+                    if (joinRes.ok) {
+                      setCurrentView("clans" as View)
+                      window.history.replaceState({}, "", "/?view=clans")
+                      return
+                    }
+                  }
+                  window.history.replaceState({}, "", "/?view=clans")
+                  setCurrentView("clans" as View)
+                  return
+                }
+              }
+            }
+          }
+        } catch (e) {
+          console.error("Error auto-joining clan:", e)
+        }
+      }
+      autoJoinClan()
+    }
+  }, [user])
 
   useEffect(() => {
     if (user) {
       const userMetaAdmin = user.user_metadata?.is_admin === true
       if (userMetaAdmin) setIsAdmin(true)
-      findProfile(user.id, user.email).then((p) => { if (p?.is_admin) setIsAdmin(true) })
     }
   }, [user])
 
@@ -156,18 +204,17 @@ export default function DashboardPage() {
       mood: t("nav_mood"), habits: t("nav_habits"),
       meditation: t("nav_meditation"),
       seasons: t("nav_seasons"),
-      "battle-pass": isEnglish ? "Battle Pass" : "Passe de Batalha",
-      "weekly-report": isEnglish ? "Weekly Report" : "Relatorio Semanal",
-      "body-evolution": isEnglish ? "Body Evolution" : "Evolucao Corporal",
-      "streak-calendar": isEnglish ? "Streak" : "Sequencia",
-      "achievements-page": isEnglish ? "Achievements" : "Conquistas",
-      "analytics-charts": isEnglish ? "Analytics" : "Analises",
-      "smart-reminders": isEnglish ? "Reminders" : "Lembretes",
-      "monthly-report": isEnglish ? "Monthly Report" : "Rel. Mensal",
-      "gps-tracker": isEnglish ? "Run Tracker" : "Corrida",
-      "corrida": isEnglish ? "Run Tracker" : "Corrida",
+      "battle-pass": t("bp_battle_pass"),
+      "weekly-report": t("weekly_report"),
+      "body-evolution": t("misc_body_evolution"),
+      "streak-calendar": t("streak_title"),
+      "achievements-page": t("misc_achievements"),
+      "analytics-charts": t("misc_analytics"),
+      "smart-reminders": t("misc_reminders"),
+      "monthly-report": t("mr_monthly_report"),
+      "corrida": t("misc_corrida"),
     }
-    return titles[currentView] || t("view_fitverse")
+    return titles[currentView] || t("view_vysefit")
   }
 
   const handleScan = async (fileOrUrl?: File | string): Promise<void> => {
@@ -252,7 +299,7 @@ export default function DashboardPage() {
           }
         }
       } catch (e) { logger.error("[Page] Failed to get auth token:", e) }
-      if (!token) throw new Error(isEnglish ? "Please sign in again before scanning." : "Entre novamente antes de escanear.")
+      if (!token) throw new Error(t("page_sign_in_again"))
 
       const controller = new AbortController()
       const timeoutId = setTimeout(() => controller.abort(), 60000)
@@ -267,8 +314,8 @@ export default function DashboardPage() {
       } catch (fetchError) {
         clearTimeout(timeoutId)
         const message = fetchError instanceof Error && fetchError.name === 'AbortError'
-          ? (isEnglish ? "Scan took too long. Try again." : "Analise demorou. Tente novamente.")
-          : (isEnglish ? "Connection error." : "Erro de conexao.")
+          ? t("page_scan_timeout")
+          : t("page_connection_error")
         toast.error(message)
         setScanError(message)
         setCurrentView("result")
@@ -305,9 +352,9 @@ export default function DashboardPage() {
 
     const result = recordAction("scan")
     if (result.newAchievements.length > 0) {
-      toast.success(isEnglish ? `Achievement unlocked! +${result.newAchievements.length} achievements` : `Conquista desbloqueada! +${result.newAchievements.length} conquistas`)
+      toast.success(`${t("page_achievement_unlocked")} +${result.newAchievements.length}`)
     }
-    toast.success(isEnglish ? "Scan saved!" : "Escaneamento salvo!")
+    toast.success(t("page_scan_saved"))
   }
 
   const handleDiscardScan = () => {
@@ -323,17 +370,7 @@ export default function DashboardPage() {
   }
 
   const isFeatureLocked = (feature: string): boolean => {
-    if (plan === "premium") return false
-    if (plan === "pro") {
-      const proFeatures = ["sleep", "stress", "health-checkin", "meal-planner", "dietary", "smart-substitutions",
-        "periodization", "mobility", "fasting", "mood"]
-      return !proFeatures.includes(feature)
-    }
-    const freeFeatures = ["longevity", "habits", "workout-feedback", "seasons",
-      "battle-pass", "weekly-report", "body-evolution", "streak-calendar",
-      "achievements-page", "analytics-charts", "food-diary", "body",
-      "smart-reminders", "monthly-report"]
-    return !freeFeatures.includes(feature)
+    return isViewLocked(plan, feature)
   }
 
   if (authLoading && !authTimedOut) {
@@ -355,7 +392,7 @@ export default function DashboardPage() {
       <DesktopSidebar currentView={currentView} onNavigate={setCurrentView} isFeatureLocked={isFeatureLocked} />
 
       {/* Main */}
-      <div className="md:ml-16 flex flex-col min-h-screen transition-all duration-300 max-w-[1200px] mx-auto w-full">
+      <div className="md:ml-[72px] flex flex-col min-h-screen transition-all duration-300 max-w-[1200px] mx-auto w-full">
         <header className="sticky top-0 z-40 flex h-14 items-center justify-between px-4 bg-background/80 backdrop-blur-xl border-b border-border md:border-none md:bg-transparent md:backdrop-blur-none">
           <div className="md:hidden flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-xl bg-brand flex items-center justify-center">
@@ -402,7 +439,7 @@ export default function DashboardPage() {
                   const scanId = `local-${Date.now()}`
                   addScanHistory({ id: scanId, name: analysis.productName, scannedAt: new Date().toISOString(), score: analysis.longevityScore, image: product.image || "" })
                   incrementScans()
-                  toast.success(isEnglish ? "Product found!" : "Produto encontrado!")
+                  toast.success(t("page_product_found"))
                 }}
                 isScanning={isAnalyzing}
               />
@@ -415,15 +452,20 @@ export default function DashboardPage() {
                       <ScanLine className="w-6 h-6 text-destructive" />
                     </div>
                     <div>
-                      <h2 className="text-lg font-bold text-foreground">{isEnglish ? "Scan failed" : "Nao foi possivel analisar"}</h2>
+                      <h2 className="text-lg font-bold text-foreground">{t("page_scan_failed")}</h2>
                       <p className="mt-1.5 text-sm text-muted-foreground">{scanError}</p>
                     </div>
                     <Button onClick={() => { setScanError(null); setCurrentView("dashboard") }} className="w-full h-11 rounded-xl bg-brand text-white hover:bg-brand/90">
-                      {isEnglish ? "Try again" : "Tentar novamente"}
+                      {t("page_try_again")}
                     </Button>
                   </div>
                 </div>
-              ) : isAnalyzing || !analysisResult ? <ProductSkeleton /> : <ProductResult result={analysisResult} onBack={() => setCurrentView("dashboard")} imageData={scannedImage || undefined} onSave={handleSaveScan} onDiscard={handleDiscardScan} hasPendingSave={!!pendingScan} />
+              ) : isAnalyzing || !analysisResult ? <ProductSkeleton /> : (
+                <div className="space-y-4">
+                  <ProductResult result={analysisResult} onBack={() => setCurrentView("dashboard")} imageData={scannedImage || undefined} onSave={handleSaveScan} onDiscard={handleDiscardScan} hasPendingSave={!!pendingScan} />
+                  <PostScanInsights scan={analysisResult} todayScans={dailyActivity?.scannedProducts || []} plan={userMetabolicPlan} />
+                </div>
+              )
             )}
             {currentView === "recipes" && <RecipesTab />}
             {currentView === "training" && <TrainingTab />}
@@ -483,7 +525,7 @@ export default function DashboardPage() {
             {currentView === "smart-reminders" && <SmartReminders />}
             {currentView === "monthly-report" && <MonthlyReport />}
             {currentView === "health-integrations" && <HealthIntegrations />}
-            {currentView === "corrida" && <CorridaTracker />}
+            {currentView === "corrida" && <CorridaTracker onBack={() => setCurrentView("home")} />}
             </FeatureErrorBoundary>
           </Suspense>
         </main>
@@ -491,17 +533,23 @@ export default function DashboardPage() {
 
       <input type="file" ref={bottomNavInputRef} className="hidden" accept="image/*" capture="environment" onChange={handleBottomNavFileChange} />
 
-      {/* FAB - Scan */}
-      <button onClick={handleNavScan}
-        className="mobile-fab-safe fixed right-4 z-50 h-14 w-14 rounded-2xl bg-brand text-white shadow-xl shadow-brand/30 flex items-center justify-center transition-all duration-200 hover:scale-105 active:scale-95 md:bottom-8 md:right-8"
-        aria-label={t("home_scan_product")}
-      >
-        <ScanLine className="w-6 h-6" />
-      </button>
+      {/* FAB - Scan - hidden during GPS tracker */}
+      {currentView !== "corrida" && (
+        <button onClick={handleNavScan}
+          className="mobile-fab-safe fixed right-4 z-50 h-14 w-14 rounded-2xl bg-brand text-white shadow-xl shadow-brand/30 flex items-center justify-center transition-all duration-200 hover:scale-105 active:scale-95 md:bottom-8 md:right-8 animate-[pulse-shadow_3s_ease-in-out_infinite]"
+          aria-label={t("home_scan_product")}
+        >
+          <ScanLine className="w-6 h-6" />
+        </button>
+      )}
 
-      {/* Mobile bottom nav */}
-      <AdBanner position="bottom" />
-      <MobileBottomNav currentView={currentView} onNavigate={setCurrentView} onOpenMore={() => setMoreSheetOpen(true)} />
+      {/* Mobile bottom nav - hidden during GPS tracker */}
+      {currentView !== "corrida" && (
+        <>
+          <AdBanner position="bottom" />
+          <MobileBottomNav currentView={currentView} onNavigate={setCurrentView} onOpenMore={() => setMoreSheetOpen(true)} />
+        </>
+      )}
       <MobileMoreSheet open={moreSheetOpen} onClose={() => setMoreSheetOpen(false)} onNavigate={setCurrentView} isFeatureLocked={isFeatureLocked} />
 
       {/* Save/Discard Scan Modal */}
@@ -521,13 +569,13 @@ export default function DashboardPage() {
                 variant="ghost"
                 className="h-10 px-4 rounded-xl border border-border text-muted-foreground hover:text-foreground hover:bg-muted font-semibold text-xs"
               >
-                {isEnglish ? "Discard" : "Descartar"}
+                {t("page_discard")}
               </Button>
               <Button
                 onClick={handleSaveScan}
                 className="h-10 px-4 rounded-xl bg-brand text-white hover:bg-brand/90 font-semibold text-xs"
               >
-                {isEnglish ? "Save" : "Salvar"}
+                {t("page_save")}
               </Button>
             </div>
           </div>

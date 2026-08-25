@@ -12,7 +12,6 @@ import {
   CreditCard, 
   Bot, 
   Settings,
-  Sparkles,
   LogOut,
   ChevronRight,
   ArrowLeft,
@@ -61,10 +60,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </button>
         
         <Link href="/" className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-brand/10 border border-brand/20 flex items-center justify-center">
-            <Sparkles className="w-4 h-4 text-brand" />
+          <div className="w-8 h-8 rounded-lg bg-brand/10 border border-brand/20 flex items-center justify-center overflow-hidden">
+            <img src="/icon.svg" alt="VyseFit" className="w-5 h-5" />
           </div>
-          <span className="text-lg font-black text-foreground">FitVerse</span>
+          <span className="text-lg font-black text-foreground">VyseFit</span>
         </Link>
 
         <button
@@ -96,11 +95,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               {/* Logo */}
               <div className="p-4 border-b border-border flex items-center justify-between">
                 <Link href="/" className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-brand/10 border border-brand/20 flex items-center justify-center">
-                    <Sparkles className="w-5 h-5 text-brand" />
+                  <div className="w-10 h-10 rounded-xl bg-brand/10 border border-brand/20 flex items-center justify-center overflow-hidden">
+                    <img src="/icon.svg" alt="VyseFit" className="w-6 h-6" />
                   </div>
                   <div>
-                    <span className="text-lg font-black text-foreground">FitVerse</span>
+                    <span className="text-lg font-black text-foreground">VyseFit</span>
                     <span className="text-xs text-brand ml-1">AI</span>
                   </div>
                 </Link>
@@ -166,11 +165,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         {/* Logo */}
         <div className="p-6 border-b border-border">
           <Link href="/" className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-brand/10 border border-brand/20 flex items-center justify-center">
-              <Sparkles className="w-5 h-5 text-brand" />
+            <div className="w-10 h-10 rounded-xl bg-brand/10 border border-brand/20 flex items-center justify-center overflow-hidden">
+              <img src="/icon.svg" alt="VyseFit" className="w-6 h-6" />
             </div>
             <div>
-              <span className="text-lg font-black text-foreground">FitVerse</span>
+              <span className="text-lg font-black text-foreground">VyseFit</span>
               <span className="text-xs text-brand ml-1">AI</span>
             </div>
           </Link>

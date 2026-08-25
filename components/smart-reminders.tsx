@@ -108,7 +108,7 @@ function getNextCheckinTime(): Date {
 
 function getNextWorkoutTime(): Date {
   const now = new Date()
-  const workouts = safeGet<string[]>("generatedWorkouts", [])
+  const workouts = safeGet<string[]>("nutritrain-workouts", [])
   if (workouts.length === 0) return addDays(now, 7)
   return setMinutes(setHours(now, 17), 0)
 }
@@ -198,19 +198,19 @@ export function SmartReminders() {
     }
 
     if (settings.water) {
-      schedule("water", nextTimes.water, "💧 FitVerse", isEnglish ? "Time to hydrate! Drink a glass of water." : "Hora de se hidratar! Beba um copo de água.")
+      schedule("water", nextTimes.water, "💧 VyseFit", isEnglish ? "Time to hydrate! Drink a glass of water." : "Hora de se hidratar! Beba um copo de água.")
     }
     if (settings.sleep) {
-      schedule("sleep", nextTimes.sleep, "🌙 FitVerse", isEnglish ? "Bedtime in 30 min. Start winding down." : "Hora de dormir em 30 min. Comece a relaxar.")
+      schedule("sleep", nextTimes.sleep, "🌙 VyseFit", isEnglish ? "Bedtime in 30 min. Start winding down." : "Hora de dormir em 30 min. Comece a relaxar.")
     }
     if (settings.checkin) {
-      schedule("checkin", nextTimes.checkin, "✅ FitVerse", isEnglish ? "Don't forget your daily check-in!" : "Não esqueça do seu check-in diário!")
+      schedule("checkin", nextTimes.checkin, "✅ VyseFit", isEnglish ? "Don't forget your daily check-in!" : "Não esqueça do seu check-in diário!")
     }
     if (settings.workout) {
-      schedule("workout", nextTimes.workout, "💪 FitVerse", isEnglish ? "Workout time! Let's crush it." : "Hora do treino! Vamos arrasar.")
+      schedule("workout", nextTimes.workout, "💪 VyseFit", isEnglish ? "Workout time! Let's crush it." : "Hora do treino! Vamos arrasar.")
     }
     if (settings.motivation) {
-      schedule("motivation", nextTimes.motivation, "🔥 FitVerse", isEnglish ? "New day, new opportunity to grow." : "Um novo dia, uma nova oportunidade para crescer.")
+      schedule("motivation", nextTimes.motivation, "🔥 VyseFit", isEnglish ? "New day, new opportunity to grow." : "Um novo dia, uma nova oportunidade para crescer.")
     }
 
     return () => { timers.forEach((t) => clearTimeout(t)); timers.clear() }

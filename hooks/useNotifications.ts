@@ -54,8 +54,8 @@ export function useNotifications() {
 
     try {
       new Notification(title, {
-        icon: "/icon-192x192.png",
-        badge: "/icon-192x192.png",
+        icon: "/icon-192.svg",
+        badge: "/icon-192.svg",
         ...options,
       } as NotificationOptions)
     } catch (e) {
@@ -78,7 +78,7 @@ export function useNotifications() {
     const delay = scheduled.getTime() - now.getTime()
 
     setTimeout(() => {
-      sendNotification("FitVerse AI - Hora de treinar! 💪", {
+      sendNotification("VyseFit AI - Hora de treinar! 💪", {
         body: "Nao esqueca do seu treino de hoje!",
         tag: "workout-reminder",
       })
@@ -88,7 +88,7 @@ export function useNotifications() {
   const scheduleStreakReminder = useCallback(() => {
     if (!permission.granted) return
 
-    sendNotification("FitVerse AI - Nao quebre sua sequencia! 🔥", {
+    sendNotification("VyseFit AI - Nao quebre sua sequencia! 🔥", {
       body: "Voce esta em uma sequencia! Faca pelo menos um scan hoje.",
       tag: "streak-reminder",
     })

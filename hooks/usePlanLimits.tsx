@@ -27,7 +27,6 @@ export function usePlanLimits() {
         localStorage.setItem('fitverse-plan', p)
         logger.info("[usePlanLimits] Plan synced from profile:", p)
       }
-      setIsLoading(false)
     }
   }, [profile?.plan])
 
@@ -136,7 +135,7 @@ export function usePlanLimits() {
     canGenerateDiet: (count: number) => canGenerateDiet(plan, count),
     incrementScans,
     remainingScans: limits.scansPerDay === 'unlimited'
-      ? 'Ilimitados'
-      : `${Math.max(0, (limits.scansPerDay as number) - scansToday)} de ${limits.scansPerDay}`,
+      ? 'Unlimited'
+      : `${Math.max(0, (limits.scansPerDay as number) - scansToday)} / ${limits.scansPerDay}`,
   }
 }

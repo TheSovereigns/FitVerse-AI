@@ -215,6 +215,35 @@ export function isFeatureLocked(plan: Plan, feature: keyof PlanLimits): boolean 
   return false
 }
 
+const VIEW_TO_PLAN_KEY: Record<string, keyof PlanLimits> = {
+  "sleep": "sleepTracker",
+  "stress": "stressTracker",
+  "health-checkin": "healthCheckin",
+  "supplements": "supplementRecommendations",
+  "meal-planner": "weeklyMealPlanner",
+  "dietary": "dietaryRestrictions",
+  "micronutrients": "micronutrientAnalysis",
+  "substitutions": "smartSubstitutions",
+  "periodization": "periodizedWorkouts",
+  "workout-feedback": "workoutFeedback",
+  "mobility": "mobilityRoutines",
+  "longevity": "longevityScore",
+  "fasting": "fastingTracker",
+  "biological-age": "biologicalAge",
+  "mood": "moodTracker",
+  "habits": "habitBuilder",
+  "meditation": "guidedMeditation",
+  "seasons": "seasons",
+  "battle-pass": "bossBattles",
+  "monthly-report": "monthlyReport",
+}
+
+export function isViewLocked(plan: Plan, view: string): boolean {
+  const key = VIEW_TO_PLAN_KEY[view]
+  if (!key) return false
+  return isFeatureLocked(plan, key)
+}
+
 export function getFilteredHistory(plan: Plan, items: any[]): any[] {
   const limits = PLAN_LIMITS[plan]
   if (limits.historyDays === 365) return items
@@ -230,7 +259,7 @@ export function getFilteredHistory(plan: Plan, items: any[]): any[] {
 
 export function getRemainingScans(plan: Plan, scansToday: number): string {
   const limits = PLAN_LIMITS[plan]
-  if (limits.scansPerDay === 'unlimited') return 'Ilimitados'
+  if (limits.scansPerDay === 'unlimited') return 'Unlimited'
   const remaining = Math.max(0, limits.scansPerDay - scansToday)
-  return `${remaining} de ${limits.scansPerDay}`
+  return `${remaining} / ${limits.scansPerDay}`
 }

@@ -338,7 +338,7 @@ export default function DatasetPage() {
       const url = URL.createObjectURL(blob)
       const a = document.createElement("a")
       a.href = url
-      a.download = `fitverse-dataset.${exportFormat === "jsonl" ? "jsonl" : exportFormat === "csv" ? "csv" : "json"}`
+      a.download = `vysefit-dataset.${exportFormat === "jsonl" ? "jsonl" : exportFormat === "csv" ? "csv" : "json"}`
       a.click()
       URL.revokeObjectURL(url)
       setShowExportModal(false)

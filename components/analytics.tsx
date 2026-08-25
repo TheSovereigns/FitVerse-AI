@@ -40,13 +40,3 @@ declare global {
     plausible?: (event: string, options?: Record<string, unknown>) => void
   }
 }
-
-export function initPlausible(domain: string) {
-  if (typeof window === "undefined") return
-
-  const script = document.createElement("script")
-  script.defer = true
-  script.dataset.domain = domain
-  script.src = "https://plausible.io/js/script.js"
-  document.head.appendChild(script)
-}

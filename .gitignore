@@ -35,3 +35,5 @@ Thumbs.db
 # Embedded repo
 FitVerse-AI-main/
 lib/database.types.ts
+.vercel
+.env*

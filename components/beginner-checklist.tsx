@@ -20,12 +20,28 @@ export function BeginnerChecklist() {
   const [items, setItems] = useState<ChecklistItem[]>([])
 
   useEffect(() => {
+    let storeState: any = null
+    try {
+      const storeRaw = localStorage.getItem("fitverse-app-store")
+      if (storeRaw) { const s = JSON.parse(storeRaw); storeState = s.state || s }
+    } catch {}
+
+    let workouts: any[] = []
+    try {
+      const w = localStorage.getItem("nutritrain-workouts")
+      if (w) workouts = JSON.parse(w)
+    } catch {}
+
+    const hasProfile = !!storeState?.userMetabolicPlan
+    const hasScans = (storeState?.scanHistory?.length || 0) > 0 || (storeState?.dailyActivity?.scannedProducts?.length || 0) > 0
+    const hasWorkouts = workouts.length > 0
+
     const defaults: ChecklistItem[] = [
-      { id: "profile", icon: Target, label: isEnglish ? "Complete Profile" : "Completar Perfil", description: isEnglish ? "Set your goals and body info" : "Defina seus objetivos e dados corporais", completed: !!localStorage.getItem("userMetabolicPlan") },
-      { id: "scan", icon: ScanLine, label: isEnglish ? "First Scan" : "Primeiro Scan", description: isEnglish ? "Scan your first food product" : "Escaneie seu primeiro alimento", completed: !!localStorage.getItem("scanHistory") && JSON.parse(localStorage.getItem("scanHistory") || "[]").length > 0 },
-      { id: "workout", icon: Dumbbell, label: isEnglish ? "Generate Workout" : "Gerar Treino", description: isEnglish ? "Create your first workout plan" : "Crie seu primeiro plano de treino", completed: !!localStorage.getItem("generatedWorkouts") && JSON.parse(localStorage.getItem("generatedWorkouts") || "[]").length > 0 },
-      { id: "diet", icon: Calculator, label: isEnglish ? "Create Diet Plan" : "Criar Plano de Dieta", description: isEnglish ? "Set up your metabolic plan" : "Configure seu plano metabolico", completed: !!localStorage.getItem("userMetabolicPlan") },
-      { id: "streak", icon: Flame, label: isEnglish ? "3-Day Streak" : "Sequencia de 3 Dias", description: isEnglish ? "Stay active for 3 consecutive days" : "Fique ativo por 3 dias consecutivos", completed: (() => { try { return (JSON.parse(localStorage.getItem("streakData") || "{}").currentStreak || 0) >= 3 } catch { return false } })() },
+      { id: "profile", icon: Target, label: t("bc_complete_profile"), description: t("bc_complete_profile_desc"), completed: hasProfile },
+      { id: "scan", icon: ScanLine, label: t("bc_first_scan"), description: t("bc_first_scan_desc"), completed: hasScans },
+      { id: "workout", icon: Dumbbell, label: t("bc_generate_workout"), description: t("bc_generate_workout_desc"), completed: hasWorkouts },
+      { id: "diet", icon: Calculator, label: t("bc_create_diet"), description: t("bc_create_diet_desc"), completed: hasProfile },
+      { id: "streak", icon: Flame, label: t("bc_3day_streak"), description: t("bc_3day_streak_desc"), completed: (() => { try { return (JSON.parse(localStorage.getItem("streakData") || "{}").currentStreak || 0) >= 3 } catch { return false } })() },
     ]
     setItems(defaults)
   }, [])
@@ -44,10 +60,10 @@ export function BeginnerChecklist() {
       <div className="flex items-center justify-between mb-3">
         <div>
           <h3 className="text-sm font-semibold text-foreground">
-            {isEnglish ? "Getting Started" : "Comecando"}
+            {t("bc_getting_started")}
           </h3>
           <p className="text-xs text-muted-foreground">
-            {completedCount}/{items.length} {isEnglish ? "completed" : "completos"}
+            {completedCount}/{items.length} {t("bc_completed")}
           </p>
         </div>
         <span className="text-lg font-bold text-foreground">{Math.round(progress)}%</span>

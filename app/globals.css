@@ -1,6 +1,7 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
+
 @custom-variant dark (&:is(.dark *));
 
 /* ═══════════════════════════════════════════════════════════════
@@ -291,6 +292,38 @@
 }
 .animate-pulse-dot { animation: pulse-dot 2s ease-in-out infinite; }
 
+/* ── Pulse shadow for FAB ── */
+@keyframes pulse-shadow {
+  0%, 100% { box-shadow: 0 10px 15px -3px rgba(52,211,153,0.3), 0 4px 6px -4px rgba(52,211,153,0.2); }
+  50% { box-shadow: 0 10px 25px -3px rgba(52,211,153,0.5), 0 4px 10px -4px rgba(52,211,153,0.35); }
+}
+
+/* ── Card hover ── */
+.card-hover {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.card-hover:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+}
+
+/* ── Shine effect ── */
+.shine-effect {
+  position: relative;
+  overflow: hidden;
+}
+.shine-effect::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.06) 45%, rgba(255,255,255,0.12) 50%, rgba(255,255,255,0.06) 55%, transparent 60%);
+  animation: shine 4s ease-in-out infinite;
+}
+@keyframes shine {
+  0%, 100% { transform: translateX(-100%); }
+  50% { transform: translateX(100%); }
+}
+
 /* ── iOS safe area helpers ── */
 .pt-safe-top { padding-top: calc(env(safe-area-inset-top) + 0.5rem); }
 .pb-safe { padding-bottom: calc(env(safe-area-inset-bottom) + 1rem); }
@@ -543,4 +576,173 @@
 }
 .tooltip:hover::after {
   opacity: 1;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   GTA 6-INSPIRED EFFECTS — Film Grain + Badge Shine
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── Film Grain Overlay ── */
+@keyframes grain {
+  0%, 100% { transform: translate(0, 0); }
+  10% { transform: translate(-5%, -10%); }
+  20% { transform: translate(-15%, 5%); }
+  30% { transform: translate(7%, -25%); }
+  40% { transform: translate(-5%, 25%); }
+  50% { transform: translate(-15%, 10%); }
+  60% { transform: translate(15%, 0%); }
+  70% { transform: translate(0%, 15%); }
+  80% { transform: translate(3%, 35%); }
+  90% { transform: translate(-10%, 10%); }
+}
+
+.grain-overlay {
+  position: relative;
+}
+.grain-overlay::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
+  background-size: 128px 128px;
+  animation: grain 8s steps(10) infinite;
+  mix-blend-mode: overlay;
+}
+
+/* ── Badge Shine (GTA 6 chrome effect) ── */
+@keyframes badge-shine {
+  0% { left: -100%; }
+  50%, 100% { left: 200%; }
+}
+
+.badge-shine {
+  position: relative;
+  overflow: hidden;
+}
+.badge-shine::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 40%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
+  animation: badge-shine 3s ease-in-out infinite;
+  pointer-events: none;
+}
+
+/* ── Bold CTA text ── */
+.text-cta {
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* ── Score display ── */
+.text-score {
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   GPS TRACKER — Map Markers
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── Start Marker ── */
+.gps-start-marker {
+  background: none !important;
+  border: none !important;
+}
+.gps-marker-start {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--brand, #34D399);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  animation: marker-bounce 0.5s ease-out;
+}
+.gps-marker-start-inner {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: white;
+}
+
+/* ── Current Position Marker ── */
+.gps-current-marker {
+  background: none !important;
+  border: none !important;
+  position: relative;
+}
+.gps-marker-current {
+  width: 40px;
+  height: 40px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.gps-marker-pulse {
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--brand, #34D399);
+  opacity: 0.3;
+  animation: gps-pulse 2s ease-out infinite;
+}
+.gps-marker-dot {
+  position: relative;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--brand, #34D399);
+  border: 3px solid white;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  z-index: 1;
+}
+
+@keyframes gps-pulse {
+  0% { transform: scale(1); opacity: 0.4; }
+  100% { transform: scale(2.5); opacity: 0; }
+}
+
+/* ── Marker Bounce ── */
+@keyframes marker-bounce {
+  0% { transform: scale(0) translateY(20px); opacity: 0; }
+  50% { transform: scale(1.2) translateY(-5px); }
+  100% { transform: scale(1) translateY(0); opacity: 1; }
+}
+
+/* ── Leaflet Popup Override ── */
+.gps-popup .leaflet-popup-content-wrapper {
+  background: hsl(var(--popover));
+  backdrop-filter: blur(16px);
+  border: 1px solid hsl(var(--border));
+  border-radius: 12px;
+  color: hsl(var(--foreground));
+  font-size: 12px;
+  font-weight: 600;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+}
+.gps-popup .leaflet-popup-tip {
+  background: hsl(var(--popover));
+}
+
+/* ── Map Container Fix ── */
+.leaflet-container {
+  background: transparent !important;
+  font-family: inherit !important;
 }

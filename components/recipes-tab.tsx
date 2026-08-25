@@ -392,8 +392,8 @@ export function RecipesTab({ metabolicPlan }: RecipesTabProps) {
                 </h2>
                 <p className="mt-2 text-sm text-muted-foreground">
                   {isEnglish
-                    ? "Pick an ingredient and FitVerse returns three recipes with calories, macros, prep time and steps."
-                    : "Escolha um ingrediente e o FitVerse retorna tres receitas com calorias, macros, preparo e passo a passo."}
+                    ? "Pick an ingredient and VyseFit returns three recipes with calories, macros, prep time and steps."
+                    : "Escolha um ingrediente e o VyseFit retorna tres receitas com calorias, macros, preparo e passo a passo."}
                 </p>
                 <div className="mt-4 grid grid-cols-3 gap-2">
                   {[

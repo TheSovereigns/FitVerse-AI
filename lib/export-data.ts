@@ -43,7 +43,7 @@ export function exportActivityCSV(data: ExportData) {
     Score: s.score,
   }))
   const csv = generateCSV(rows, ["Data", "Produto", "Score"])
-  downloadFile(csv, `fitverse-activity-${format(new Date(), "yyyy-MM-dd")}.csv`, "text/csv")
+  downloadFile(csv, `vysefit-activity-${format(new Date(), "yyyy-MM-dd")}.csv`, "text/csv")
 }
 
 export function exportMeasurementsCSV(measurements: ExportData["measurements"]) {
@@ -57,12 +57,12 @@ export function exportMeasurementsCSV(measurements: ExportData["measurements"]) 
     Quadril: m.hips ?? "",
   }))
   const csv = generateCSV(rows, ["Data", "Peso", "Gordura %", "Peito", "Cintura", "Quadril"])
-  downloadFile(csv, `fitverse-measurements-${format(new Date(), "yyyy-MM-dd")}.csv`, "text/csv")
+  downloadFile(csv, `vysefit-measurements-${format(new Date(), "yyyy-MM-dd")}.csv`, "text/csv")
 }
 
 export function exportAllDataJSON(data: ExportData) {
   const json = JSON.stringify(data, null, 2)
-  downloadFile(json, `fitverse-full-export-${format(new Date(), "yyyy-MM-dd")}.json`, "application/json")
+  downloadFile(json, `vysefit-full-export-${format(new Date(), "yyyy-MM-dd")}.json`, "application/json")
 }
 
 export function exportPlanPDF(plan: MetabolicPlan) {
@@ -82,8 +82,8 @@ PLANO DE REFEIÇÕES:
 ${plan.mealPlan.map((m) => `\n${m.name}:\n${m.foods.map((f) => `  - ${f}`).join("\n")}`).join("\n")}` : ""}
 
 ---
-Gerado por FitVerse AI em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}
+Gerado por VyseFit AI em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}
   `.trim()
 
-  downloadFile(content, `fitverse-plan-${format(new Date(), "yyyy-MM-dd")}.txt`, "text/plain")
+  downloadFile(content, `vysefit-plan-${format(new Date(), "yyyy-MM-dd")}.txt`, "text/plain")
 }

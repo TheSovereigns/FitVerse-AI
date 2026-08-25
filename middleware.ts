@@ -29,7 +29,6 @@ const publicRoutes = [
   "/auth/callback",
   "/api/auth/login",
   "/api/auth/signup",
-  "/api/auth/reset-password",
   "/api/stripe/webhook",
 ]
 
@@ -54,6 +53,9 @@ const protectedRoutes = [
   "/api/stripe/checkout",
   "/api/stripe/stats",
   "/api/subscription",
+  "/api/clans",
+  "/api/challenges",
+  "/api/accountability",
 ]
 
 function matchesRoute(path: string, route: string) {
@@ -97,9 +99,7 @@ async function getSession(request: NextRequest) {
 
 async function isAdmin(userId: string): Promise<boolean> {
   if (!supabaseAdmin) {
-    // Service role key not available — can't verify admin status server-side.
-    // Allow the request through; the admin page will verify client-side.
-    return true
+    return false
   }
 
   try {
@@ -132,7 +132,7 @@ export async function middleware(request: NextRequest) {
     default-src 'self';
     script-src 'self'${isDev ? " 'unsafe-eval'" : ""} 'unsafe-inline' https://js.stripe.com;
     style-src 'self' 'unsafe-inline';
-    img-src 'self' blob: data: https://*.stripe.com https://*.google.com;
+    img-src 'self' blob: data: https://*.stripe.com https://*.google.com https://*.tile.openstreetmap.org https://*.basemaps.cartocdn.com https://*.cartocdn.com;
     font-src 'self';
     object-src 'none';
     base-uri 'self';
@@ -153,7 +153,7 @@ export async function middleware(request: NextRequest) {
   }
   response.headers.set(
     "Permissions-Policy",
-    "camera=(), microphone=(), geolocation=(), interest-cohort=()"
+    "camera=(), microphone=(), interest-cohort=()"
   )
 
   // 3. Check if route is public

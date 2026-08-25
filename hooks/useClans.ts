@@ -266,6 +266,64 @@ export function useClans() {
     }
   }, [])
 
+  const kickMember = useCallback(async (clanId: string, userId: string) => {
+    try {
+      const token = await getToken()
+      if (!token) return false
+
+      const res = await fetch(`/api/clans/${clanId}/kick`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+        body: JSON.stringify({ userId }),
+      })
+      if (!res.ok) return false
+
+      await fetchMembers(clanId)
+      return true
+    } catch {
+      return false
+    }
+  }, [fetchMembers])
+
+  const transferOwnership = useCallback(async (clanId: string, userId: string) => {
+    try {
+      const token = await getToken()
+      if (!token) return false
+
+      const res = await fetch(`/api/clans/${clanId}/transfer`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+        body: JSON.stringify({ userId }),
+      })
+      if (!res.ok) return false
+
+      await fetchClanDetail(clanId)
+      await fetchMembers(clanId)
+      return true
+    } catch {
+      return false
+    }
+  }, [fetchClanDetail, fetchMembers])
+
+  const editClan = useCallback(async (clanId: string, updates: { name?: string; description?: string; is_public?: boolean }) => {
+    try {
+      const token = await getToken()
+      if (!token) return false
+
+      const res = await fetch(`/api/clans/${clanId}`, {
+        method: "PATCH",
+        headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+        body: JSON.stringify(updates),
+      })
+      if (!res.ok) return false
+
+      await fetchClanDetail(clanId)
+      return true
+    } catch {
+      return false
+    }
+  }, [fetchClanDetail])
+
   useEffect(() => {
     fetchUserClan()
   }, [fetchUserClan])
@@ -288,6 +346,9 @@ export function useClans() {
     leaveClan,
     createInvite,
     deleteClan,
+    kickMember,
+    transferOwnership,
+    editClan,
     setSelectedClan,
   }
 }

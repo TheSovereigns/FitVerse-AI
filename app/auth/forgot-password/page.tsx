@@ -5,7 +5,7 @@ export const dynamic = 'force-dynamic'
 import { useState } from "react"
 import { motion } from "framer-motion"
 import Link from "next/link"
-import { Loader2, Sparkles, Check, Mail } from "lucide-react"
+import { Loader2, Check, Mail } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -77,10 +77,10 @@ export default function ForgotPasswordPage() {
         {/* Logo */}
         <div className="text-center mb-8">
           <Link href="/" className="inline-flex items-center gap-2">
-            <div className="w-10 h-10 rounded-xl bg-primary/20 border border-primary/30 flex items-center justify-center">
-              <Sparkles className="w-5 h-5 text-primary" />
+            <div className="w-10 h-10 rounded-xl bg-primary/20 border border-primary/30 flex items-center justify-center overflow-hidden">
+              <img src="/icon.svg" alt="VyseFit" className="w-6 h-6" />
             </div>
-            <span className="text-2xl font-black text-white">FitVerse AI</span>
+            <span className="text-2xl font-black text-white">VyseFit AI</span>
           </Link>
         </div>
 

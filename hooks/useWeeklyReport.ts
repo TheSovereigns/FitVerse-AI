@@ -58,11 +58,13 @@ function collectWeeklyData(): WeeklyReportData {
     let workouts = 0
     let diets = 0
 
+    // Read from Zustand store
     try {
-      const activity = localStorage.getItem("dailyActivity")
-      if (activity) {
-        const parsed = JSON.parse(activity)
-        const dayScans = (parsed.scannedProducts || []).filter((s: any) =>
+      const storeRaw = localStorage.getItem("fitverse-app-store")
+      if (storeRaw) {
+        const store = JSON.parse(storeRaw)
+        const state = store.state || store
+        const dayScans = (state.dailyActivity?.scannedProducts || []).filter((s: any) =>
           s.scannedAt?.split("T")[0] === dateKey
         )
         scans = dayScans.length
@@ -76,27 +78,17 @@ function collectWeeklyData(): WeeklyReportData {
         }
       }
     } catch (e) {
-      logger.error("[useWeeklyReport] Failed to parse dailyActivity:", e)
+      logger.error("[useWeeklyReport] Failed to parse fitverse-app-store:", e)
     }
 
     try {
-      const workoutsData = localStorage.getItem("generatedWorkouts")
+      const workoutsData = localStorage.getItem("nutritrain-workouts")
       if (workoutsData) {
         const list = JSON.parse(workoutsData)
         workouts = Array.isArray(list) ? list.filter((w: any) => w.createdAt?.split("T")[0] === dateKey).length : 0
       }
     } catch (e) {
-      logger.error("[useWeeklyReport] Failed to parse generatedWorkouts:", e)
-    }
-
-    try {
-      const dietsData = localStorage.getItem("generatedDiets")
-      if (dietsData) {
-        const list = JSON.parse(dietsData)
-        diets = Array.isArray(list) ? list.filter((d: any) => d.createdAt?.split("T")[0] === dateKey).length : 0
-      }
-    } catch (e) {
-      logger.error("[useWeeklyReport] Failed to parse generatedDiets:", e)
+      logger.error("[useWeeklyReport] Failed to parse nutritrain-workouts:", e)
     }
 
     totalScans += scans

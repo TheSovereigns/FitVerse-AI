@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
-import { Switch } from "./switch"
+import { Switch } from "./ui/switch"
 import { supabase, findProfile } from "@/lib/supabase"
 import {
   ArrowLeft,
@@ -485,8 +485,7 @@ export function SettingsPage({ onBack }: { onBack?: () => void }) {
       "wearableData",
       "wearableLastSync",
       "dailyActivity",
-      "generatedWorkouts",
-      "generatedDiets",
+      "nutritrain-workouts",
       "seasonProgress",
       "battlePassState",
       "equipmentPreferences",
@@ -660,9 +659,10 @@ export function SettingsPage({ onBack }: { onBack?: () => void }) {
           {t("settings_logout")}
           <LogOut className="ml-2 h-4 w-4" />
         </Button>
-        <div className="text-center">
+        <div className="text-center flex flex-col items-center gap-2">
+          <img src="/icon.svg" alt="VyseFit" className="w-6 h-6 opacity-40" />
           <p className="text-[10px] text-muted-foreground">{t("settings_version")}</p>
-          <p className="mt-1 text-[10px] text-muted-foreground">{t("settings_copyright")}</p>
+          <p className="text-[10px] text-muted-foreground">{t("settings_copyright")}</p>
         </div>
       </div>
     </div>

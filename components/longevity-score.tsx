@@ -205,7 +205,7 @@ export function LongevityScore() {
   }
 
   const handleShare = async () => {
-    const text = `${isEnglish ? "My Longevity Score" : "Meu Score de Longevidade"}: ${overallScore}/100 — ${getScoreLabel(overallScore)}\n\nFitVerse AI`
+    const text = `${isEnglish ? "My Longevity Score" : "Meu Score de Longevidade"}: ${overallScore}/100 — ${getScoreLabel(overallScore)}\n\nVyseFit AI`
     try {
       if (navigator.share) {
         await navigator.share({ title: "Longevity Score", text })

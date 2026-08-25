@@ -29,6 +29,7 @@ export function MobileBottomNav({ currentView, onNavigate, onOpenMore }: MobileB
           <button
             key={item.view}
             onClick={() => onNavigate(item.view)}
+            aria-label={item.label}
             className={cn(
               "relative flex h-12 w-12 items-center justify-center rounded-xl transition-all duration-200",
               isActive
@@ -45,6 +46,7 @@ export function MobileBottomNav({ currentView, onNavigate, onOpenMore }: MobileB
       })}
       <button
         onClick={onOpenMore}
+        aria-label="More options"
         className={cn(
           "relative flex h-12 w-12 items-center justify-center rounded-xl transition-all duration-200",
           "text-muted-foreground hover:text-foreground"

@@ -34,8 +34,15 @@ export function ScanDashboard({ onScan, onBarcodeProduct, isScanning = false }: 
 
   useEffect(() => {
     try {
-      const stored = localStorage.getItem("fitverse-scan-history")
-      if (stored) setScanHistory(JSON.parse(stored))
+      const storeRaw = localStorage.getItem("fitverse-app-store")
+      if (storeRaw) {
+        const store = JSON.parse(storeRaw)
+        const state = store.state || store
+        const history = (state.scanHistory || []).map((s: any) => ({
+          id: s.id, name: s.productName || s.name, scannedAt: s.scannedAt, score: s.longevityScore || s.score, image: s.image,
+        }))
+        setScanHistory(history)
+      }
     } catch {}
     try {
       const stored = localStorage.getItem("fitverse-favorites")
@@ -246,7 +253,7 @@ export function ScanDashboard({ onScan, onBarcodeProduct, isScanning = false }: 
             {filteredScans.map((scan, index) => (
               <div key={scan.id || index} className="flex items-center gap-3 rounded-xl bg-muted/50 p-3">
                 {scan.image ? (
-                  <img src={scan.image} alt="" className="h-12 w-12 rounded-xl object-cover" />
+                  <img src={scan.image} alt={scan.name || "Product"} className="h-12 w-12 rounded-xl object-cover" />
                 ) : (
                   <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-muted text-muted-foreground">
                     <Scan className="h-5 w-5" />
@@ -288,7 +295,7 @@ export function ScanDashboard({ onScan, onBarcodeProduct, isScanning = false }: 
             {favoriteScans.map((scan, index) => (
               <div key={scan.id || index} className="flex items-center gap-3 rounded-xl bg-muted/50 p-3">
                 {scan.image ? (
-                  <img src={scan.image} alt="" className="h-12 w-12 rounded-xl object-cover" />
+                  <img src={scan.image} alt={scan.name || "Product"} className="h-12 w-12 rounded-xl object-cover" />
                 ) : (
                   <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-muted text-muted-foreground">
                     <Scan className="h-5 w-5" />
@@ -329,7 +336,7 @@ export function ScanDashboard({ onScan, onBarcodeProduct, isScanning = false }: 
             {recentScans.map((scan, index) => (
               <div key={scan.id || index} className="flex items-center gap-3 rounded-xl bg-muted/50 p-3">
                 {scan.image ? (
-                  <img src={scan.image} alt="" className="h-12 w-12 rounded-xl object-cover" />
+                  <img src={scan.image} alt={scan.name || "Product"} className="h-12 w-12 rounded-xl object-cover" />
                 ) : (
                   <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-muted text-muted-foreground">
                     <Scan className="h-5 w-5" />

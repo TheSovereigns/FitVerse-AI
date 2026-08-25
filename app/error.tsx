@@ -3,7 +3,7 @@
 import { useEffect } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { Home, AlertTriangle } from "lucide-react"
+import { Home } from "lucide-react"
 import { useTranslation } from "@/lib/i18n"
 
 export default function GlobalError({
@@ -23,8 +23,8 @@ export default function GlobalError({
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#1a0f00] via-[#0d0705] to-[#1a0f00] flex items-center justify-center p-6">
       <div className="text-center space-y-6">
-        <div className="w-20 h-20 rounded-3xl bg-red-500/20 border border-red-500/30 flex items-center justify-center mx-auto">
-          <AlertTriangle className="w-10 h-10 text-red-500" />
+        <div className="w-20 h-20 rounded-3xl bg-red-500/20 border border-red-500/30 flex items-center justify-center mx-auto overflow-hidden">
+          <img src="/icon.svg" alt="VyseFit" className="w-12 h-12" />
         </div>
         
         <h1 className="text-3xl md:text-4xl font-black text-white">

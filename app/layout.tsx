@@ -2,11 +2,11 @@ import type React from "react"
 import type { Metadata, Viewport } from "next"
 import { Inter } from "next/font/google"
 import "./globals.css"
-import "leaflet/dist/leaflet.css"
 import { ThemeProvider } from "@/components/theme-provider"
 import { I18nProvider } from "@/lib/i18n"
 import { AuthProvider } from "@/hooks/useAuth"
 import { Analytics } from "@/components/analytics"
+import { Toaster } from "sonner"
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" })
 
@@ -21,29 +21,29 @@ export const viewport: Viewport = {
 }
 
 export const metadata: Metadata = {
-  title: "FitVerse AI",
+  title: "VyseFit AI",
   description: "AI-powered nutrition & fitness intelligence. Scan food, track macros, stay healthy.",
   openGraph: {
-    title: "FitVerse AI",
+    title: "VyseFit AI",
     description: "AI-powered nutrition & fitness intelligence. Scan food, track macros, stay healthy.",
-    url: "https://fitverse.app",
-    siteName: "FitVerse AI",
+    url: "https://vysefit.app",
+    siteName: "VyseFit AI",
     locale: "pt_BR",
     type: "website",
     images: [
       {
-        url: "/og.png",
+        url: "/icon.svg",
         width: 1200,
         height: 630,
-        alt: "FitVerse AI",
+        alt: "VyseFit AI",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "FitVerse AI",
+    title: "VyseFit AI",
     description: "AI-powered nutrition & fitness intelligence. Scan food, track macros, stay healthy.",
-    images: ["/og.png"],
+    images: ["/icon.svg"],
   },
   formatDetection: { telephone: false },
 }
@@ -56,6 +56,7 @@ export default function RootLayout({
       <head>
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
         <link rel="icon" href="/icon.svg" type="image/svg+xml" />
+        <link rel="apple-touch-icon" href="/apple-icon.png" />
         <link rel="preconnect" href="https://*.supabase.co" />
         <link rel="dns-prefetch" href="https://*.supabase.co" />
         <script dangerouslySetInnerHTML={{ __html: `
@@ -95,6 +96,7 @@ export default function RootLayout({
           <I18nProvider>
             <AuthProvider>
               {children}
+              <Toaster position="top-center" richColors closeButton />
             </AuthProvider>
           </I18nProvider>
         </ThemeProvider>

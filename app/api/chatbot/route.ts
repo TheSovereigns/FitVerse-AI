@@ -24,7 +24,23 @@ const safetySettings = [
   { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
 ];
 
-const MAX_HISTORY_LENGTH = 20;
+const MAX_HISTORY_LENGTH = 10;
+
+function buildSystemPrompt(category: string, userPlan: Record<string, unknown> | null): string {
+  const lang = 'Responda na mesma língua da pergunta.'
+  const plan = userPlan ? `\nDados do usuário: ${JSON.stringify(userPlan)}` : ''
+
+  const categoryPrompts: Record<string, string> = {
+    workout: `Coach VyseFit. Treinos: séries, reps, dicas práticas. Markdown. Tom motivador. ${lang}${plan}`,
+    nutrition: `Nutricionista VyseFit. Dietas: refeições com macros. Tabelas Markdown. ${lang}${plan}`,
+    motivation: `Coach VyseFit. Mensagens curtas e motivadoras. Max 5 linhas. ${lang}`,
+    recovery: `Fisioterapeuta VyseFit. Exercícios seguros. Aviso: consulte profissional. ${lang}${plan}`,
+    supplement: `Nutricionista VyseFit. Suplementação: dosagem, timing, eficácia. ${lang}${plan}`,
+    general: `Coach VyseFit. Responda direto. Markdown. Máx 200 palavras. ${lang}${plan}`,
+  }
+
+  return categoryPrompts[category] || categoryPrompts.general
+}
 
 // GET: Load conversation history from Supabase
 export async function GET(req: Request) {
@@ -108,33 +124,10 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Mensagem vazia.' }, { status: 400, headers });
     }
 
-    const systemPrompt = `Você é o motor de inteligência artificial do FitverseAI, um personal trainer e nutritionist digital de elite. Sua tarefa é gerar um plano de saúde altamente personalizado baseado nos dados do usuário.
-
-Diretrizes de Resposta:
-
-Estrutura Visual: Use Markdown rigoroso. Utilize tabelas para dietas e listas numeradas para treinos.
-
-Tom de Voz: Motivador, profissional e técnico, mas acessível.
-
-Seções Obrigatórias:
-
-Resumo do Perfil: Uma análise rápida do IMC ou biotipo com base nos dados fornecidos.
-
-Plano de Treino: Nome do exercício, séries, repetições e um breve 'dica do pro' para a execução.
-
-Plano Alimentar: Dividido por refeições (Café, Almoço, Lanche, Jantar) com macros aproximados (Proteínas, Carbos, Gorduras).
-
-Ajuste de Segurança: Adicite sempre um aviso de que os resultados devem ser validados por profissionais de saúde.
-
-Restrições:
-
-Se o usuário mencionou lesões, adapte os exercícios imediatamente.
-
-Se o usuário for iniciante, foque em exercícios compostos e técnica.
-
-${userMetabolicPlan ? `Contexto do usuário: ${JSON.stringify(userMetabolicPlan, null, 2)}` : ''}
-
-Responda em português ou inglês conforme a pergunta.`;
+    const { category } = detectCategory(message);
+    let userPlan: Record<string, unknown> | null = null;
+    try { userPlan = userMetabolicPlan ? JSON.parse(userMetabolicPlan) : null } catch { userPlan = null }
+    const systemPrompt = buildSystemPrompt(category, userPlan);
 
     const limitedHistory = (history || []).slice(-MAX_HISTORY_LENGTH);
 

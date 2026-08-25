@@ -15,8 +15,8 @@ interface ExportFilters {
   format: ExportFormat
 }
 
-const SYSTEM_PROMPT_PT = 'Você é o FitVerse AI, um assistente especializado em fitness, nutrição, saúde, emagrecimento e academia. Forneça conselhos seguros, motivadores e baseados em evidências.'
-const SYSTEM_PROMPT_EN = 'You are FitVerse AI, an assistant specialized in fitness, nutrition, health, weight loss and gym training. Provide safe, motivating, evidence-based advice.'
+const SYSTEM_PROMPT_PT = 'Você é o VyseFit AI, um assistente especializado em fitness, nutrição, saúde, emagrecimento e academia. Forneça conselhos seguros, motivadores e baseados em evidências.'
+const SYSTEM_PROMPT_EN = 'You are VyseFit AI, an assistant specialized in fitness, nutrition, health, weight loss and gym training. Provide safe, motivating, evidence-based advice.'
 
 function formatJSONL(messages: Array<{ user_message: string; ai_response: string; edited_response: string | null; user_context: Record<string, unknown>; user_message_lang: string }>): string {
   return messages.map((m) => {
@@ -145,7 +145,7 @@ export async function POST(req: Request) {
         filters_applied: filters,
       })
 
-    const filename = `fitverse-dataset-${Date.now()}.${extension}`
+    const filename = `vysefit-dataset-${Date.now()}.${extension}`
 
     return new NextResponse(content, {
       headers: {

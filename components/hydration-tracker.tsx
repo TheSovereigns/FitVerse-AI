@@ -89,9 +89,7 @@ export function HydrationTracker() {
   }, [history])
 
   const weekData = useMemo(() => {
-    const dayLabels = isEnglish
-      ? ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
-      : ["Seg", "Ter", "Qua", "Qui", "Sex", "Sáb", "Dom"]
+    const dayLabels = [t("hyd_day_mon"), t("hyd_day_tue"), t("hyd_day_wed"), t("hyd_day_thu"), t("hyd_day_fri"), t("hyd_day_sat"), t("hyd_day_sun")]
     const days: { name: string; amount: number; goal: number }[] = []
     for (let i = 6; i >= 0; i--) {
       const d = new Date()
@@ -105,7 +103,7 @@ export function HydrationTracker() {
       })
     }
     return days
-  }, [history, goal, isEnglish])
+  }, [history, goal, locale])
 
   return (
     <div className="space-y-4">
@@ -237,18 +235,14 @@ export function HydrationTracker() {
       </AnimatePresence>
 
       <div className="grid grid-cols-2 gap-3">
-        <Card>
-          <CardContent className="p-3 text-center">
-            <p className="text-xs text-muted-foreground mb-1">{t("hyd_avg_7d")}</p>
-            <p className="text-lg font-bold">{averageLast7}{t("hyd_liters_short")}</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-3 text-center">
-            <p className="text-xs text-muted-foreground mb-1">{t("hyd_streak")}</p>
-            <p className="text-lg font-bold">{streakDays}</p>
-          </CardContent>
-        </Card>
+        <div className="rounded-2xl glass-strong p-3 text-center">
+          <p className="text-xs text-muted-foreground mb-1">{t("hyd_avg_7d")}</p>
+          <p className="text-lg font-bold">{averageLast7}{t("hyd_liters_short")}</p>
+        </div>
+        <div className="rounded-2xl glass-strong p-3 text-center">
+          <p className="text-xs text-muted-foreground mb-1">{t("hyd_streak")}</p>
+          <p className="text-lg font-bold">{streakDays}</p>
+        </div>
       </div>
 
       <div>
@@ -260,7 +254,7 @@ export function HydrationTracker() {
               <YAxis domain={[0, "auto"]} tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }} axisLine={false} tickLine={false} width={25} />
               <Tooltip
                 contentStyle={{ fontSize: 11, background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 8 }}
-                formatter={(value: number, name: string) => [`${value.toFixed(1)}${t("hyd_liters_short")}`, isEnglish ? "Intake" : "Ingestão"]}
+                formatter={(value: number, name: string) => [`${value.toFixed(1)}${t("hyd_liters_short")}`, t("hyd_intake")]}
               />
               <Bar dataKey="amount" fill="hsl(var(--brand))" radius={[4, 4, 0, 0]} />
             </BarChart>

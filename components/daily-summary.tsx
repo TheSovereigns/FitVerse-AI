@@ -27,14 +27,20 @@ export function DailySummary() {
 
   const dailyData = useMemo(() => {
     if (!mounted) return { scans: [], workouts: [], diets: [] }
-    const activity = localStorage.getItem("dailyActivity")
-    const scans = activity ? JSON.parse(activity).scannedProducts || [] : []
+
+    let storeState: any = null
+    try {
+      const storeRaw = localStorage.getItem("fitverse-app-store")
+      if (storeRaw) { const s = JSON.parse(storeRaw); storeState = s.state || s }
+    } catch {}
+
+    const scans = storeState?.dailyActivity?.scannedProducts || []
     
-    const savedWorkouts = localStorage.getItem("generatedWorkouts")
-    const workouts = savedWorkouts ? JSON.parse(savedWorkouts) : []
-    
-    const savedDiets = localStorage.getItem("generatedDiets")
-    const diets = savedDiets ? JSON.parse(savedDiets) : []
+    let workouts: any[] = []
+    try {
+      const savedWorkouts = localStorage.getItem("nutritrain-workouts")
+      if (savedWorkouts) workouts = JSON.parse(savedWorkouts)
+    } catch {}
 
     const todayScans = scans.filter((s: any) => {
       if (!s.scannedAt) return false
@@ -46,15 +52,10 @@ export function DailySummary() {
       return w.createdAt.split("T")[0] === selectedDate
     })
 
-    const todayDiets = diets.filter((d: any) => {
-      if (!d.createdAt) return false
-      return d.createdAt.split("T")[0] === selectedDate
-    })
-
     return {
       scans: todayScans,
       workouts: todayWorkouts,
-      diets: todayDiets,
+      diets: [],
     }
   }, [selectedDate])
 
@@ -135,7 +136,7 @@ export function DailySummary() {
     const url = URL.createObjectURL(blob)
     const a = document.createElement("a")
     a.href = url
-    a.download = `fitverse-daily-${selectedDate}.json`
+    a.download = `vysefit-daily-${selectedDate}.json`
     a.click()
     URL.revokeObjectURL(url)
   }

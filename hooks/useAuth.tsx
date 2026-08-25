@@ -4,7 +4,7 @@ import { createContext, useContext, useState, useEffect, useRef, ReactNode } fro
 import { User } from "@supabase/supabase-js"
 import { supabase, getUserProfile, Profile } from "@/lib/supabase"
 import { useRouter } from "next/navigation"
-import { clearFitVerseStorage } from "@/lib/auth-helpers"
+import { clearVyseFitStorage } from "@/lib/auth-helpers"
 import { logger } from "@/lib/logger"
 
 function syncSessionToCookie(accessToken: string | undefined) {
@@ -214,7 +214,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signOut = async () => {
     syncSessionToCookie(undefined)
-    clearFitVerseStorage()
+    clearVyseFitStorage()
     try { supabase.auth.signOut({ scope: 'local' }).catch(() => {}) } catch {}
     window.location.replace("/auth/login")
   }

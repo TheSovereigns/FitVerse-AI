@@ -11,14 +11,12 @@ export function useOnlineStatus() {
 
     const handleOnline = () => {
       setIsOnline(true)
-      if (!navigator.onLine) {
-        setWasOffline(true)
-        setTimeout(() => setWasOffline(false), 3000)
-      }
+      setTimeout(() => setWasOffline(false), 3000)
     }
 
     const handleOffline = () => {
       setIsOnline(false)
+      setWasOffline(true)
     }
 
     window.addEventListener("online", handleOnline)

@@ -8,8 +8,6 @@ import { Progress } from "@/components/ui/progress"
 import { useTranslation } from "@/lib/i18n"
 import {
   ArrowRight,
-  Calculator,
-  ChefHat,
   Droplet,
   Dumbbell,
   Flame,
@@ -20,12 +18,17 @@ import {
   Target,
   Trophy,
   Zap,
+  Utensils,
+  Ruler,
 } from "lucide-react"
 import { StreakDisplay } from "@/components/streak-display"
 import { HydrationTracker } from "@/components/hydration-tracker"
 import { BeginnerChecklist } from "@/components/beginner-checklist"
+import { InsightsWidget } from "@/components/insights-widget"
 
 import { View } from "@/lib/types"
+import { useLocation } from "@/hooks/use-location"
+import { MapPin } from "lucide-react"
 
 export function HomeDashboard({
   userMetabolicPlan,
@@ -38,6 +41,7 @@ export function HomeDashboard({
 }) {
   const { t, locale } = useTranslation()
   const [waterCups, setWaterCups] = useState(0)
+  const { city } = useLocation()
 
   const dailyTotals = useMemo(() => {
     if (!dailyActivity?.scannedProducts || dailyActivity.scannedProducts.length === 0) {
@@ -67,10 +71,8 @@ export function HomeDashboard({
   const dateString = new Date().toLocaleDateString(locale, { weekday: "long", day: "numeric", month: "long" })
 
   const quickActions = [
-    { label: t("dopamine_quick_scan"), icon: ScanLine, view: "dashboard" as View, color: "text-brand" },
-    { label: t("view_training"), icon: Dumbbell, view: "training" as View, color: "text-foreground" },
-    { label: t("view_recipes"), icon: ChefHat, view: "recipes" as View, color: "text-foreground" },
-    { label: t("view_planner"), icon: Calculator, view: "planner" as View, color: "text-foreground" },
+    { label: t("misc_food_diary"), icon: Utensils, view: "food-diary" as View, color: "text-brand" },
+    { label: t("common_body"), icon: Ruler, view: "body" as View, color: "text-foreground" },
   ]
 
   const calorieRingRadius = 54
@@ -122,7 +124,7 @@ export function HomeDashboard({
       }
       setWeeklyData(days)
 
-      const workouts = JSON.parse(localStorage.getItem("generatedWorkouts") || "[]") as any[]
+      const workouts = JSON.parse(localStorage.getItem("nutritrain-workouts") || "[]") as any[]
       if (workouts.length > 0) {
         setTodayWorkout(workouts[0])
       }
@@ -153,97 +155,70 @@ export function HomeDashboard({
   }, [locale])
 
   return (
-    <div className="mx-auto w-full max-w-2xl space-y-6 pb-safe-nav">
+    <div className="mx-auto w-full max-w-4xl space-y-5 pb-safe-nav">
       {/* Header */}
       <motion.section
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         className="pt-2"
       >
-        <p className="text-sm text-muted-foreground capitalize">{dateString}</p>
-        <h1 className="mt-1 text-3xl font-bold tracking-tight text-foreground md:text-4xl">
-          {t("hd_today")}
-        </h1>
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-xs text-muted-foreground capitalize">{dateString}</p>
+            <h1 className="mt-0.5 text-3xl font-bold tracking-tight text-foreground md:text-4xl">
+              {t("hd_today")}
+            </h1>
+          </div>
+          {city && (
+            <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+              <MapPin className="h-3.5 w-3.5" />
+              <span>{city}</span>
+            </div>
+          )}
+        </div>
       </motion.section>
 
-      {/* Motivational Quote */}
-      <motion.section
-        initial={{ opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.02 }}
-        className="rounded-2xl glass-strong p-4"
-      >
-        <div className="flex items-start gap-3">
+      {/* Quote + Insights row */}
+      <div className="grid md:grid-cols-2 gap-4">
+        <motion.section
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.02 }}
+          className="rounded-2xl glass-strong p-4 flex items-start gap-3"
+        >
           <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-brand-muted">
             <Sparkles className="h-4 w-4 text-brand" />
           </div>
           <p className="text-sm text-muted-foreground italic leading-relaxed">{motivationalQuote}</p>
-        </div>
-      </motion.section>
-
-      <StreakDisplay compact onNavigate={onNavigate} />
-      <BeginnerChecklist />
-
-      {/* Weekly Activity Mini Chart */}
-      {weeklyData.length > 0 && (
-        <motion.section
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.04 }}
-          className="rounded-2xl glass-strong p-5"
-        >
-          <h2 className="mb-3 text-sm font-semibold text-muted-foreground">{t("home_weekly_activity")}</h2>
-          <div className="h-28">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={weeklyData} barCategoryGap="20%">
-                <XAxis
-                  dataKey="label"
-                  axisLine={false}
-                  tickLine={false}
-                  tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }}
-                />
-                <YAxis hide domain={[0, 10]} />
-                <Bar dataKey="score" radius={[4, 4, 4, 4]}>
-                  {weeklyData.map((entry, index) => (
-                    <Cell
-                      key={entry.day}
-                      fill={entry.day === new Date().toISOString().split("T")[0] ? "hsl(var(--brand))" : "hsl(var(--brand) / 0.25)"}
-                    />
-                  ))}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
         </motion.section>
-      )}
 
-      {/* Calorie Ring Widget */}
+        <InsightsWidget scans={dailyActivity?.scannedProducts || []} plan={userMetabolicPlan} />
+      </div>
+
+      {/* Streak + Checklist */}
+      <div className="grid md:grid-cols-2 gap-4">
+        <StreakDisplay compact onNavigate={onNavigate} />
+        <BeginnerChecklist />
+      </div>
+
+      {/* Calorie Ring + Macros — Hero Card */}
       <motion.section
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.05 }}
-        className="rounded-2xl glass-strong p-6"
+        className="rounded-2xl glass-strong p-5 md:p-6"
       >
-        <div className="flex items-center gap-6">
+        <div className="flex items-center gap-2 mb-4">
+          <Flame className="h-4 w-4 text-brand" />
+          <h2 className="text-sm font-semibold text-foreground">{locale === "en-US" ? "Today's Nutrition" : "Nutrição de Hoje"}</h2>
+        </div>
+        <div className="flex flex-col sm:flex-row items-center gap-6">
+          {/* Calorie Ring */}
           <div className="relative shrink-0">
             <svg width="128" height="128" className="-rotate-90">
-              <circle
-                cx="64"
-                cy="64"
-                r={calorieRingRadius}
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="8"
-                className="text-border"
-              />
+              <circle cx="64" cy="64" r={calorieRingRadius} fill="none" stroke="currentColor" strokeWidth="8" className="text-border" />
               <motion.circle
-                cx="64"
-                cy="64"
-                r={calorieRingRadius}
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="8"
-                strokeLinecap="round"
+                cx="64" cy="64" r={calorieRingRadius} fill="none" stroke="currentColor" strokeWidth="8" strokeLinecap="round"
                 strokeDasharray={calorieRingCircumference}
                 initial={{ strokeDashoffset: calorieRingCircumference }}
                 animate={{ strokeDashoffset: calorieRingOffset }}
@@ -258,31 +233,31 @@ export function HomeDashboard({
             </div>
           </div>
 
-          <div className="flex-1 min-w-0">
-            <div className="space-y-3">
-              <div>
-                <div className="flex items-center justify-between mb-1">
-                  <span className="text-xs text-muted-foreground">{t("hd_daily_progress")}</span>
-                  <span className="text-xs font-semibold text-foreground">{goals ? `${progressPercent}%` : "--"}</span>
-                </div>
-                <Progress value={goals ? progressPercent : 0} className="h-1.5 bg-border" indicatorClassName="bg-brand" />
+          <div className="flex-1 w-full space-y-4">
+            {/* Progress */}
+            <div>
+              <div className="flex items-center justify-between mb-1.5">
+                <span className="text-xs text-muted-foreground">{t("hd_daily_progress")}</span>
+                <span className="text-xs font-bold text-foreground">{goals ? `${progressPercent}%` : "--"}</span>
               </div>
-
-              <div className="grid grid-cols-3 gap-2">
-                <MacroPill label={t("common_p")} value={`${Math.round(dailyTotals.protein)}g`} color="text-brand" />
-                <MacroPill label={t("common_c")} value={`${Math.round(dailyTotals.carbs)}g`} color="text-warning" />
-                <MacroPill label={t("common_g")} value={`${Math.round(dailyTotals.fat)}g`} color="text-destructive" />
-              </div>
-
-              <Button
-                onClick={() => onNavigate(goals ? "dashboard" : "planner")}
-                variant="ghost"
-                className="h-9 w-full rounded-xl text-xs font-medium"
-              >
-                {goals ? t("home_start_btn") : t("home_new_plan")}
-                <ArrowRight className="ml-1 h-3 w-3" />
-              </Button>
+              <Progress value={goals ? progressPercent : 0} className="h-2 bg-border" indicatorClassName="bg-brand" />
             </div>
+
+            {/* Macro bars */}
+            <div className="space-y-2.5">
+              <MacroBar label={t("common_p")} current={dailyTotals.protein} goal={goals?.protein} color="bg-brand" unit="g" />
+              <MacroBar label={t("common_c")} current={dailyTotals.carbs} goal={goals?.carbs} color="bg-amber-400" unit="g" />
+              <MacroBar label={t("common_g")} current={dailyTotals.fat} goal={goals?.fat} color="bg-red-400" unit="g" />
+            </div>
+
+            <Button
+              onClick={() => onNavigate(goals ? "dashboard" : "planner")}
+              variant="ghost"
+              className="h-9 w-full rounded-xl text-xs font-medium"
+            >
+              {goals ? t("home_start_btn") : t("home_new_plan")}
+              <ArrowRight className="ml-1 h-3 w-3" />
+            </Button>
           </div>
         </div>
       </motion.section>
@@ -291,8 +266,8 @@ export function HomeDashboard({
       <motion.section
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.1 }}
-        className="grid grid-cols-5 gap-3"
+        transition={{ delay: 0.08 }}
+        className="grid grid-cols-3 sm:grid-cols-5 gap-3"
       >
         <StatWidget icon={Trophy} label={t("home_longevity")} value={averageLongevityScore || "-"} />
         <StatWidget icon={Droplet} label={t("home_water")} value={`${waterCups * 250}ml`} />
@@ -303,38 +278,58 @@ export function HomeDashboard({
 
       <HydrationTracker />
 
-      {/* Today's Workout Card */}
-      {todayWorkout && (
-        <motion.section
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.12 }}
-          className="rounded-2xl glass-strong p-5"
-        >
-          <div className="flex items-center justify-between mb-3">
-            <h2 className="text-sm font-semibold text-muted-foreground">{t("home_today_workout")}</h2>
-            <span className="text-[10px] text-muted-foreground">{todayWorkout.muscleGroup || todayWorkout.name || ""}</span>
-          </div>
-          <div className="flex items-center justify-between">
-            <div className="min-w-0 flex-1">
-              <p className="text-base font-bold text-foreground truncate">{todayWorkout.name || t("home_today_workout")}</p>
-              <p className="text-xs text-muted-foreground mt-0.5">
-                {todayWorkout.exercises?.length || 0} {t("home_exercises_count")}
-              </p>
+      {/* Weekly + Workout row */}
+      <div className="grid md:grid-cols-2 gap-4">
+        {/* Weekly Activity Chart */}
+        {weeklyData.length > 0 && (
+          <motion.section
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="rounded-2xl glass-strong p-5"
+          >
+            <h2 className="mb-3 text-sm font-semibold text-muted-foreground">{t("home_weekly_activity")}</h2>
+            <div className="h-28">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={weeklyData} barCategoryGap="20%">
+                  <XAxis dataKey="label" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }} />
+                  <YAxis hide domain={[0, 10]} />
+                  <Bar dataKey="score" radius={[4, 4, 4, 4]}>
+                    {weeklyData.map((entry) => (
+                      <Cell key={entry.day} fill={entry.day === new Date().toISOString().split("T")[0] ? "hsl(var(--brand))" : "hsl(var(--brand) / 0.25)"} />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
             </div>
-            <Button
-              size="sm"
-              className="ml-3 h-9 rounded-xl px-4 text-xs font-medium"
-              onClick={() => onNavigate("training")}
-            >
+          </motion.section>
+        )}
+
+        {/* Today's Workout */}
+        {todayWorkout && (
+          <motion.section
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.12 }}
+            className="rounded-2xl glass-strong p-5"
+          >
+            <div className="flex items-center gap-2 mb-3">
+              <Dumbbell className="h-4 w-4 text-brand" />
+              <h2 className="text-sm font-semibold text-muted-foreground">{t("home_today_workout")}</h2>
+            </div>
+            <p className="text-base font-bold text-foreground truncate">{todayWorkout.name || t("home_today_workout")}</p>
+            <p className="text-xs text-muted-foreground mt-1 mb-3">
+              {todayWorkout.exercises?.length || 0} {t("home_exercises_count")} · {todayWorkout.muscleGroup || ""}
+            </p>
+            <Button size="sm" className="h-9 rounded-xl px-4 text-xs font-medium" onClick={() => onNavigate("training")}>
               <Play className="mr-1 h-3 w-3" />
               {t("home_start_btn")}
             </Button>
-          </div>
-        </motion.section>
-      )}
+          </motion.section>
+        )}
+      </div>
 
-      {/* Recent Achievement */}
+      {/* Achievement */}
       {recentAchievement && (
         <motion.section
           initial={{ opacity: 0, y: 12 }}
@@ -364,13 +359,13 @@ export function HomeDashboard({
         <h2 className="mb-3 text-sm font-semibold text-muted-foreground">
           {t("hd_quick_actions")}
         </h2>
-        <div className="grid grid-cols-4 gap-3">
+        <div className="grid grid-cols-2 gap-3">
           {quickActions.map((action) => (
             <button
               key={action.view}
               type="button"
               onClick={() => onNavigate(action.view)}
-              className="flex flex-col items-center gap-2 rounded-2xl glass-card p-4 transition-all duration-200 hover:bg-brand/5 active:scale-[0.97]"
+              className="flex flex-col items-center gap-2 rounded-2xl glass-card p-4 haptic-press hover:bg-brand/5 transition-colors"
             >
               <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-brand-muted">
                 <action.icon className="h-5 w-5 text-brand" />
@@ -381,7 +376,7 @@ export function HomeDashboard({
         </div>
       </motion.section>
 
-      {/* Bio logs */}
+      {/* Bio Logs */}
       <motion.section
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
@@ -389,7 +384,7 @@ export function HomeDashboard({
         className="rounded-2xl glass-strong p-5"
       >
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-base font-semibold text-foreground">{t("home_bio_logs")}</h2>
+          <h2 className="text-sm font-semibold text-foreground">{t("home_bio_logs")}</h2>
           <Button variant="ghost" onClick={() => onNavigate("profile")} className="h-8 rounded-lg px-3 text-xs">
             {t("home_see_history")}
           </Button>
@@ -403,13 +398,9 @@ export function HomeDashboard({
                 initial={{ opacity: 0, y: 4 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.03 }}
-                className="flex items-center gap-3 rounded-xl bg-muted/50 p-3"
+                className="flex items-center gap-3 rounded-xl glass-strong p-3"
               >
-                <img
-                  src={product.image || "/placeholder.svg?width=100&height=100"}
-                  alt={product.productName}
-                  className="h-10 w-10 rounded-lg object-cover"
-                />
+                <img src={product.image || "/placeholder.svg?width=100&height=100"} alt={product.productName} className="h-10 w-10 rounded-lg object-cover" />
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-sm font-medium text-foreground">{product.productName}</p>
                   <p className="text-xs text-muted-foreground">
@@ -421,16 +412,30 @@ export function HomeDashboard({
             ))}
           </div>
         ) : (
-          <div className="rounded-xl border border-dashed border-border p-6 text-center">
-            <ScanLine className="mx-auto mb-2 h-8 w-8 text-muted-foreground/30" />
-            <h3 className="text-sm font-medium text-foreground">{t("dopamine_empty_title")}</h3>
-            <p className="mt-1 text-xs text-muted-foreground">{t("dopamine_empty_subtitle")}</p>
-            <Button onClick={() => onNavigate("dashboard")} className="mt-4 h-9 rounded-xl px-5 text-xs">
-              {t("dopamine_empty_cta")}
-            </Button>
+          <div className="rounded-2xl glass-strong p-8 text-center animate-fade-in">
+            <div className="w-14 h-14 mx-auto mb-3 rounded-2xl bg-brand/10 flex items-center justify-center">
+              <ScanLine className="h-7 w-7 text-brand" />
+            </div>
+            <h3 className="text-sm font-semibold text-foreground">{t("dopamine_empty_title")}</h3>
+            <p className="mt-1.5 text-xs text-muted-foreground max-w-[240px] mx-auto">{t("dopamine_empty_subtitle")}</p>
           </div>
         )}
       </motion.section>
+    </div>
+  )
+}
+
+function MacroBar({ label, current, goal, color, unit }: { label: string; current: number; goal?: number; color: string; unit: string }) {
+  const pct = goal ? Math.min((current / goal) * 100, 100) : 0
+  return (
+    <div>
+      <div className="flex items-center justify-between mb-1">
+        <span className="text-xs text-muted-foreground">{label}</span>
+        <span className="text-xs font-semibold text-foreground">
+          {Math.round(current)}{unit} {goal ? `/ ${goal}${unit}` : ""}
+        </span>
+      </div>
+      <Progress value={pct} className="h-1.5 bg-border" indicatorClassName={color} />
     </div>
   )
 }
@@ -446,7 +451,7 @@ function MacroPill({ label, value, color }: { label: string; value: string; colo
 
 function StatWidget({ icon: Icon, label, value }: { icon: React.ComponentType<{ className?: string }>; label: string; value: string | number }) {
   return (
-    <div className="rounded-2xl glass-strong p-4 text-center">
+    <div className="rounded-2xl glass-strong p-4 text-center haptic-press hover:bg-brand/5 transition-colors">
       <Icon className="mx-auto h-4 w-4 text-brand mb-2" />
       <p className="text-lg font-bold text-foreground">{value}</p>
       <p className="text-[10px] text-muted-foreground mt-0.5">{label}</p>

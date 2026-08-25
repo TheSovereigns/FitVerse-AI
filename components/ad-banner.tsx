@@ -12,10 +12,13 @@ interface AdBannerProps {
 
 export function AdBanner({ position = "bottom", className = "" }: AdBannerProps) {
   const { user, profile } = useAuth()
-  const [dismissed, setDismissed] = useState(false)
+  const [dismissed, setDismissed] = useState(() => {
+    if (typeof window !== "undefined") return localStorage.getItem("adDismissed") === "true"
+    return false
+  })
 
   const isPaidPlan = profile?.plan === "pro" || profile?.plan === "premium"
-  const adsEnabledForPlan = isPaidPlan ? (profile as any)?.ads_enabled !== false : true
+  const adsEnabledForPlan = isPaidPlan ? profile?.ads_enabled !== false : true
   const showAd = user && adsEnabledForPlan && !dismissed
 
   const handleDismiss = () => {

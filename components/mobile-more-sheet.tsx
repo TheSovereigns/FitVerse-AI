@@ -57,6 +57,9 @@ export function MobileMoreSheet({ open, onClose, onNavigate, isFeatureLocked }: 
         { view: "stress", icon: Brain, label: t("nav_stress"), feature: "stress" },
         { view: "health-checkin", icon: Activity, label: t("nav_health_checkin"), feature: "health-checkin" },
         { view: "supplements", icon: Apple, label: t("nav_supplements"), feature: "supplements" },
+        { view: "fasting", icon: Timer, label: t("nav_fasting"), feature: "fasting" },
+        { view: "longevity", icon: Heart, label: t("nav_longevity") },
+        { view: "biological-age", icon: Smile, label: t("nav_biological_age"), feature: "biological-age" },
         { view: "smart-reminders", icon: Bell, label: t("misc_reminders") },
       ]
     },
@@ -65,7 +68,7 @@ export function MobileMoreSheet({ open, onClose, onNavigate, isFeatureLocked }: 
       items: [
         { view: "planner", icon: Calculator, label: t("nav_diet") },
         { view: "meal-planner", icon: Salad, label: t("nav_meal_plan"), feature: "meal-planner" },
-        { view: "dietary", icon: Pill, label: t("nav_diet") },
+        { view: "dietary", icon: Pill, label: t("nav_restrictions") },
         { view: "micronutrients", icon: Activity, label: t("nav_micronutrients"), feature: "micronutrients" },
         { view: "substitutions", icon: ArrowLeftRight, label: t("nav_substitutions"), feature: "substitutions" },
       ]
@@ -73,19 +76,12 @@ export function MobileMoreSheet({ open, onClose, onNavigate, isFeatureLocked }: 
     {
       title: t("ds_training"),
       items: [
+        { view: "training", icon: Dumbbell, label: t("nav_workouts") },
         { view: "corrida", icon: Navigation, label: isEnglish ? "Run Tracker" : "Corrida" },
         { view: "periodization", icon: Timer, label: t("nav_periodization"), feature: "periodization" },
         { view: "workout-feedback", icon: Zap, label: t("nav_workout_feedback"), feature: "workout-feedback" },
         { view: "equipment", icon: Dumbbell, label: t("nav_equipment"), feature: "equipment" },
         { view: "mobility", icon: Wind, label: t("nav_mobility"), feature: "mobility" },
-      ]
-    },
-    {
-      title: t("common_fitness"),
-      items: [
-        { view: "longevity", icon: Heart, label: t("nav_longevity") },
-        { view: "fasting", icon: Timer, label: t("nav_fasting"), feature: "fasting" },
-        { view: "biological-age", icon: Smile, label: t("nav_biological_age"), feature: "biological-age" },
       ]
     },
     {
@@ -142,8 +138,11 @@ export function MobileMoreSheet({ open, onClose, onNavigate, isFeatureLocked }: 
             className="fixed inset-x-0 bottom-0 z-50 md:hidden max-h-[85vh] overflow-y-auto rounded-t-3xl bg-background border-t border-border"
           >
             <div className="sticky top-0 z-10 flex items-center justify-between px-5 py-4 bg-background/80 backdrop-blur-xl">
-              <h2 className="text-lg font-bold text-foreground">{t("nav_search_placeholder")}</h2>
-              <button onClick={onClose} className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
+              <div className="flex items-center gap-2">
+                <img src="/icon.svg" alt="VyseFit" className="w-5 h-5" />
+                <h2 className="text-lg font-bold text-foreground">{t("nav_search_placeholder")}</h2>
+              </div>
+              <button onClick={onClose} aria-label="Close" className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
                 <X className="w-4 h-4 text-muted-foreground" />
               </button>
             </div>
@@ -161,6 +160,7 @@ export function MobileMoreSheet({ open, onClose, onNavigate, isFeatureLocked }: 
                         <button
                           key={item.view}
                           onClick={() => handleNavigate(item.view, item.feature)}
+                          aria-label={item.label}
                           className={cn(
                             "flex flex-col items-center gap-2 p-3 rounded-2xl transition-all",
                             locked

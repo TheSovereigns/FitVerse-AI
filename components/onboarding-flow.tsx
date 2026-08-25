@@ -245,8 +245,8 @@ export function OnboardingFlow({ onComplete }: { onComplete: () => void }) {
               {step === 0 && (
                 <div className="space-y-6">
                   <div className="text-center mb-8">
-                    <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
-                      <Heart className="h-8 w-8 text-primary" />
+                    <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-4 overflow-hidden">
+                      <img src="/icon.svg" alt="VyseFit" className="w-9 h-9" />
                     </div>
                     <h2 className="text-2xl font-bold text-foreground">
                       {l("Qual seu nome?", "What's your name?")}

@@ -100,7 +100,7 @@ const FITVERSE_KEYS = [
   "adDismissed",
 ]
 
-export function clearFitVerseStorage() {
+export function clearVyseFitStorage() {
   FITVERSE_KEYS.forEach((key) => {
     try { localStorage.removeItem(key) } catch (e) { logger.error("[AuthHelpers] Failed to remove localStorage key:", key, e) }
   })

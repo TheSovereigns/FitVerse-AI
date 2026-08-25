@@ -11,7 +11,7 @@ export type UserContext = {
   age?: number
   level: string
   restrictions?: string[]
-  plan: 'free' | 'premium'
+  plan: 'free' | 'pro' | 'premium'
   country: 'BR' | 'US'
 }
 

@@ -13,7 +13,7 @@ async function captureToSentry(error: unknown) {
 
 export const logger = {
   error: (...args: unknown[]) => {
-    if (isDev) console.error('[FitVerse]', ...args)
+    if (isDev) console.error('[VyseFit]', ...args)
     if (!isDev) {
       const firstArg = args[0]
       if (firstArg instanceof Error) {
@@ -24,12 +24,12 @@ export const logger = {
     }
   },
   warn: (...args: unknown[]) => {
-    if (isDev) console.warn('[FitVerse]', ...args)
+    if (isDev) console.warn('[VyseFit]', ...args)
   },
   info: (...args: unknown[]) => {
-    if (isDev) console.log('[FitVerse]', ...args)
+    if (isDev) console.log('[VyseFit]', ...args)
   },
   debug: (...args: unknown[]) => {
-    if (isDev) console.debug('[FitVerse]', ...args)
+    if (isDev) console.debug('[VyseFit]', ...args)
   },
 }

@@ -2,6 +2,14 @@ import { NextRequest, NextResponse } from "next/server"
 import { getSupabaseAdmin, authUser } from "@/lib/supabase-server"
 import { checkRateLimit, getRateLimitKey, rateLimitResponse, RATE_LIMITS } from "@/lib/rate-limit"
 
+const XP_VALUES: Record<string, number> = {
+  scan: 10,
+  workout: 20,
+  diet: 15,
+  streak: 5,
+  badge: 25,
+}
+
 export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
   const auth = await authUser(req)
   if (!auth) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
@@ -46,5 +54,15 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
-  return NextResponse.json({ activity })
+  // Add XP to the clan
+  const xpAmount = XP_VALUES[activityType] || 10
+  await supabase.rpc("add_clan_xp", {
+    p_clan_id: params.id,
+    p_user_id: auth.userId,
+    p_xp_amount: xpAmount,
+    p_source: activityType,
+    p_metadata: activityData,
+  })
+
+  return NextResponse.json({ activity, xp_added: xpAmount })
 }

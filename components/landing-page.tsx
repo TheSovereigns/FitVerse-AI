@@ -58,10 +58,10 @@ export function LandingPage() {
       <nav className="fixed top-0 w-full z-50 bg-background/80 backdrop-blur-xl border-b border-border">
         <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-xl bg-brand flex items-center justify-center">
-              <ScanLine className="w-5 h-5 text-brand-foreground" />
+            <div className="w-8 h-8 rounded-xl bg-brand flex items-center justify-center overflow-hidden">
+              <img src="/icon.svg" alt="VyseFit" className="w-5 h-5" />
             </div>
-            <span className="text-lg font-black tracking-tight">FitVerse AI</span>
+            <span className="text-lg font-black tracking-tight">VyseFit AI</span>
           </Link>
           
           <div className="hidden md:flex items-center gap-6">
@@ -191,12 +191,12 @@ export function LandingPage() {
       <footer className="border-t border-border py-12 px-4 bg-muted/30">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-xl bg-brand flex items-center justify-center">
-              <ScanLine className="w-5 h-5 text-brand-foreground" />
+            <div className="w-8 h-8 rounded-xl bg-brand flex items-center justify-center overflow-hidden">
+              <img src="/icon.svg" alt="VyseFit" className="w-5 h-5" />
             </div>
-            <span className="font-black">FitVerse AI</span>
+            <span className="font-black">VyseFit AI</span>
           </div>
-          <p className="text-sm text-muted-foreground">© 2026 FitVerse AI. All rights reserved.</p>
+          <p className="text-sm text-muted-foreground">© 2026 VyseFit AI. All rights reserved.</p>
           <div className="flex items-center gap-4 text-sm text-muted-foreground">
             <Link href="/auth/login" className="hover:text-foreground transition-colors">Login</Link>
             <Link href="/auth/signup" className="hover:text-brand transition-colors font-medium">Sign Up</Link>

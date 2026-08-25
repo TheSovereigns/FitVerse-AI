@@ -1,7 +1,7 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import { WifiOff, RefreshCw } from "lucide-react"
+import { RefreshCw } from "lucide-react"
 import { useTranslation } from "@/lib/i18n"
 
 export default function OfflinePage() {
@@ -11,8 +11,8 @@ export default function OfflinePage() {
   return (
     <div className="flex items-center justify-center min-h-[80vh] px-4">
       <div className="w-full max-w-sm rounded-2xl border border-border bg-card p-8 text-center space-y-6">
-        <div className="w-16 h-16 mx-auto rounded-2xl bg-brand/10 flex items-center justify-center">
-          <WifiOff className="w-8 h-8 text-brand" />
+        <div className="w-16 h-16 mx-auto rounded-2xl bg-brand/10 flex items-center justify-center overflow-hidden">
+          <img src="/icon.svg" alt="VyseFit" className="w-9 h-9" />
         </div>
         <div className="space-y-2">
           <h1 className="text-xl font-bold text-foreground">

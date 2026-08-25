@@ -243,7 +243,7 @@ export function BarcodeScanner({ onProductFound, onClose }: BarcodeScannerProps)
                     className="w-full flex items-center gap-3 rounded-xl border border-white/10 bg-black/40 p-3 hover:bg-white/5 transition-all"
                   >
                     {item.image ? (
-                      <img src={item.image} alt="" className="h-10 w-10 rounded-lg object-cover" />
+                      <img src={item.image} alt={item.name || "Product"} className="h-10 w-10 rounded-lg object-cover" />
                     ) : (
                       <div className="h-10 w-10 rounded-lg bg-white/5 flex items-center justify-center">
                         <Barcode className="h-5 w-5 text-foreground/50" />

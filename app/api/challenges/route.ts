@@ -1,86 +1,97 @@
 import { NextRequest, NextResponse } from "next/server"
 import { getSupabaseAdmin, authUser } from "@/lib/supabase-server"
+import { logger } from "@/lib/logger"
 
 export async function GET(req: NextRequest) {
-  const auth = await authUser(req)
-  if (!auth) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  try {
+    const auth = await authUser(req)
+    if (!auth) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
-  const supabase = getSupabaseAdmin()
-  if (!supabase) return NextResponse.json({ error: "Server configuration error" }, { status: 500 })
+    const supabase = getSupabaseAdmin()
+    if (!supabase) return NextResponse.json({ error: "Server configuration error" }, { status: 500 })
 
-  const { searchParams } = new URL(req.url)
-  const clanId = searchParams.get("clanId")
+    const { searchParams } = new URL(req.url)
+    const clanId = searchParams.get("clanId")
 
-  let query = supabase
-    .from("challenges")
-    .select("*, creator:profiles!challenges_created_by_fkey(name, avatar_url), participants:challenge_participants(id, user_id, current_value, completed, profiles:user_id(name, avatar_url))")
-    .eq("is_active", true)
-    .gt("end_date", new Date().toISOString())
-    .order("created_at", { ascending: false })
+    let query = supabase
+      .from("challenges")
+      .select("*, creator:profiles!challenges_created_by_fkey(name, avatar_url), participants:challenge_participants(id, user_id, current_value, completed, profiles:user_id(name, avatar_url))")
+      .eq("is_active", true)
+      .gt("end_date", new Date().toISOString())
+      .order("created_at", { ascending: false })
 
-  if (clanId) {
-    query = query.or(`clan_id.is.null,clan_id.eq.${clanId}`)
-  } else {
-    query = query.is("clan_id", null)
+    if (clanId) {
+      query = query.or(`clan_id.is.null,clan_id.eq.${clanId}`)
+    } else {
+      query = query.is("clan_id", null)
+    }
+
+    const { data: challenges } = await query
+
+    return NextResponse.json({ challenges: challenges || [] })
+  } catch (e) {
+    logger.error("[challenges-get]", e)
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 })
   }
-
-  const { data: challenges } = await query
-
-  return NextResponse.json({ challenges: challenges || [] })
 }
 
 export async function POST(req: NextRequest) {
-  const auth = await authUser(req)
-  if (!auth) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  try {
+    const auth = await authUser(req)
+    if (!auth) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
-  const supabase = getSupabaseAdmin()
-  if (!supabase) return NextResponse.json({ error: "Server configuration error" }, { status: 500 })
+    const supabase = getSupabaseAdmin()
+    if (!supabase) return NextResponse.json({ error: "Server configuration error" }, { status: 500 })
 
-  const body = await req.json()
-  const { title, description, challengeType, targetValue, unit, clanId, endDate } = body
+    const body = await req.json()
+    const { title, description, challengeType, targetValue, unit, clanId, endDate } = body
 
-  if (!title || !challengeType || !targetValue || !endDate) {
-    return NextResponse.json({ error: "title, challengeType, targetValue, endDate required" }, { status: 400 })
-  }
+    if (!title || !challengeType || !targetValue || !endDate) {
+      return NextResponse.json({ error: "title, challengeType, targetValue, endDate required" }, { status: 400 })
+    }
 
-  if (clanId) {
-    const { data: member } = await supabase
-      .from("clan_members")
-      .select("role")
-      .eq("clan_id", clanId)
-      .eq("user_id", auth.userId)
+    if (clanId) {
+      const { data: member } = await supabase
+        .from("clan_members")
+        .select("role")
+        .eq("clan_id", clanId)
+        .eq("user_id", auth.userId)
+        .single()
+
+      if (!member) return NextResponse.json({ error: "Not a clan member" }, { status: 403 })
+    }
+
+    const { data: challenge, error } = await supabase
+      .from("challenges")
+      .insert({
+        title: title.trim(),
+        description: description?.trim() || "",
+        challenge_type: challengeType,
+        target_value: targetValue,
+        unit: unit || "",
+        clan_id: clanId || null,
+        created_by: auth.userId,
+        end_date: endDate,
+      })
+      .select()
       .single()
 
-    if (!member) return NextResponse.json({ error: "Not a clan member" }, { status: 403 })
-  }
+    if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
-  const { data: challenge, error } = await supabase
-    .from("challenges")
-    .insert({
-      title: title.trim(),
-      description: description?.trim() || "",
-      challenge_type: challengeType,
-      target_value: targetValue,
-      unit: unit || "",
-      clan_id: clanId || null,
-      created_by: auth.userId,
-      end_date: endDate,
+    await supabase.from("challenge_participants").insert({
+      challenge_id: challenge.id,
+      user_id: auth.userId,
     })
-    .select()
-    .single()
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+    await supabase.rpc("log_event", {
+      p_type: "challenge_created",
+      p_user_id: auth.userId,
+      p_metadata: { challenge_id: challenge.id, title },
+    })
 
-  await supabase.from("challenge_participants").insert({
-    challenge_id: challenge.id,
-    user_id: auth.userId,
-  })
-
-  await supabase.rpc("log_event", {
-    p_type: "challenge_created",
-    p_user_id: auth.userId,
-    p_metadata: { challenge_id: challenge.id, title },
-  })
-
-  return NextResponse.json({ challenge })
+    return NextResponse.json({ challenge })
+  } catch (e) {
+    logger.error("[challenges-post]", e)
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 })
+  }
 }

@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
     const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
     if (!supabaseUrl || !supabaseKey) {
-      return NextResponse.json({ error: "Supabase nao configurado" }, { status: 500 })
+      return NextResponse.json({ error: "Supabase not configured" }, { status: 500 })
     }
 
     const supabase = createClient(supabaseUrl, supabaseKey)
@@ -55,6 +55,6 @@ export async function POST(request: NextRequest) {
     })
   } catch (error) {
     console.error("Signup error:", error)
-    return NextResponse.json({ error: "Erro no servidor" }, { status: 500 })
+    return NextResponse.json({ error: "Server error" }, { status: 500 })
   }
 }

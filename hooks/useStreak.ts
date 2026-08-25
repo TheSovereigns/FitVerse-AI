@@ -55,22 +55,34 @@ function saveStreakData(data: StreakData) {
 function collectActiveDays(): Set<string> {
   const activeDays = new Set<string>()
 
+  // Read from Zustand store (fitverse-app-store)
   try {
-    const dailyActivity = localStorage.getItem("dailyActivity")
-    if (dailyActivity) {
-      const activity = JSON.parse(dailyActivity)
-      if (activity.scannedProducts) {
-        activity.scannedProducts.forEach((p: any) => {
+    const storeRaw = localStorage.getItem("fitverse-app-store")
+    if (storeRaw) {
+      const store = JSON.parse(storeRaw)
+      const state = store.state || store
+
+      // Daily activity scanned products
+      if (state.dailyActivity?.scannedProducts) {
+        state.dailyActivity.scannedProducts.forEach((p: any) => {
           if (p.scannedAt) activeDays.add(p.scannedAt.split("T")[0])
+        })
+      }
+
+      // Scan history
+      if (Array.isArray(state.scanHistory)) {
+        state.scanHistory.forEach((s: any) => {
+          if (s.scannedAt) activeDays.add(s.scannedAt.split("T")[0])
         })
       }
     }
   } catch (e) {
-    logger.error("[useStreak] Failed to parse dailyActivity:", e)
+    logger.error("[useStreak] Failed to parse fitverse-app-store:", e)
   }
 
+  // Read workouts from nutritrain-workouts
   try {
-    const workouts = localStorage.getItem("generatedWorkouts")
+    const workouts = localStorage.getItem("nutritrain-workouts")
     if (workouts) {
       const list = JSON.parse(workouts)
       if (Array.isArray(list)) {
@@ -80,35 +92,7 @@ function collectActiveDays(): Set<string> {
       }
     }
   } catch (e) {
-    logger.error("[useStreak] Failed to parse generatedWorkouts:", e)
-  }
-
-  try {
-    const diets = localStorage.getItem("generatedDiets")
-    if (diets) {
-      const list = JSON.parse(diets)
-      if (Array.isArray(list)) {
-        list.forEach((d: any) => {
-          if (d.createdAt) activeDays.add(d.createdAt.split("T")[0])
-        })
-      }
-    }
-  } catch (e) {
-    logger.error("[useStreak] Failed to parse generatedDiets:", e)
-  }
-
-  try {
-    const scanHistory = localStorage.getItem("scanHistory")
-    if (scanHistory) {
-      const history = JSON.parse(scanHistory)
-      if (Array.isArray(history)) {
-        history.forEach((s: any) => {
-          if (s.scannedAt) activeDays.add(s.scannedAt.split("T")[0])
-        })
-      }
-    }
-  } catch (e) {
-    logger.error("[useStreak] Failed to parse scanHistory:", e)
+    logger.error("[useStreak] Failed to parse nutritrain-workouts:", e)
   }
 
   return activeDays
@@ -189,52 +173,41 @@ export function useStreak() {
   }, [recalculate])
 
   const weekActivity: DayActivity[] = useMemo(() => {
-    const activeDays = collectActiveDays()
     const days: DayActivity[] = []
-    const dayNames = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sab"]
+
+    // Parse store once outside the loop
+    let storeState: any = null
+    try {
+      const storeRaw = localStorage.getItem("fitverse-app-store")
+      if (storeRaw) {
+        const store = JSON.parse(storeRaw)
+        storeState = store.state || store
+      }
+    } catch (e) { /* ignore */ }
+
+    let workoutList: any[] = []
+    try {
+      const workouts = localStorage.getItem("nutritrain-workouts")
+      if (workouts) workoutList = JSON.parse(workouts)
+    } catch (e) { /* ignore */ }
 
     for (let i = 6; i >= 0; i--) {
       const d = new Date()
       d.setDate(d.getDate() - i)
       const dateKey = getDateKey(d)
-      const dayActivity = localStorage.getItem("dailyActivity")
       let hasScan = false
       let hasWorkout = false
-      let hasDiet = false
 
-      if (dayActivity) {
-        const activity = JSON.parse(dayActivity)
-        if (activity.scannedProducts) {
-          hasScan = activity.scannedProducts.some((p: any) => p.scannedAt?.split("T")[0] === dateKey)
-        }
+      if (storeState?.dailyActivity?.scannedProducts) {
+        hasScan = storeState.dailyActivity.scannedProducts.some((p: any) => p.scannedAt?.split("T")[0] === dateKey)
+      }
+      if (!hasScan && Array.isArray(storeState?.scanHistory)) {
+        hasScan = storeState.scanHistory.some((s: any) => s.scannedAt?.split("T")[0] === dateKey)
       }
 
-      try {
-        const workouts = localStorage.getItem("generatedWorkouts")
-        if (workouts) {
-          const list = JSON.parse(workouts)
-          hasWorkout = Array.isArray(list) && list.some((w: any) => w.createdAt?.split("T")[0] === dateKey)
-        }
-      } catch (e) {
-        logger.error("[useStreak] Failed to parse workouts for week:", e)
-      }
+      hasWorkout = Array.isArray(workoutList) && workoutList.some((w: any) => w.createdAt?.split("T")[0] === dateKey)
 
-      try {
-        const diets = localStorage.getItem("generatedDiets")
-        if (diets) {
-          const list = JSON.parse(diets)
-          hasDiet = Array.isArray(list) && list.some((d: any) => d.createdAt?.split("T")[0] === dateKey)
-        }
-      } catch (e) {
-        logger.error("[useStreak] Failed to parse diets for week:", e)
-      }
-
-      days.push({
-        date: dateKey,
-        hasScan,
-        hasWorkout,
-        hasDiet,
-      })
+      days.push({ date: dateKey, hasScan, hasWorkout, hasDiet: false })
     }
 
     return days
