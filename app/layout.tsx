@@ -1,6 +1,6 @@
 import type React from "react"
 import type { Metadata, Viewport } from "next"
-import { Inter } from "next/font/google"
+import { Inter, Barlow_Condensed } from "next/font/google"
 import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
 import { I18nProvider } from "@/lib/i18n"
@@ -9,6 +9,11 @@ import { Analytics } from "@/components/analytics"
 import { Toaster } from "sonner"
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" })
+const barlow = Barlow_Condensed({ 
+  subsets: ["latin"], 
+  variable: "--font-barlow",
+  weight: ["400", "500", "600", "700", "800", "900"]
+})
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -85,7 +90,7 @@ export default function RootLayout({
         )}
       </head>
       <body
-        className={`${inter.className} antialiased text-foreground min-h-screen bg-background`}
+        className={`${inter.className} ${barlow.variable} antialiased text-foreground min-h-screen bg-background`}
       >
         <ThemeProvider
           attribute="class"

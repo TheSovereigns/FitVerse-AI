@@ -178,10 +178,22 @@
   }
 
   h1, h2, h3, h4, h5, h6 {
-    font-family: var(--font-inter), -apple-system, BlinkMacSystemFont, sans-serif;
+    font-family: var(--font-barlow), var(--font-inter), -apple-system, BlinkMacSystemFont, sans-serif;
     font-weight: 700;
     letter-spacing: -0.025em;
     color: var(--foreground);
+  }
+
+  h1 {
+    font-weight: 900;
+    letter-spacing: -0.03em;
+    text-transform: uppercase;
+  }
+
+  h2 {
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    text-transform: uppercase;
   }
 
   /* ── Scrollbar ── */
@@ -585,6 +597,7 @@
 
 /* ── Bold CTA text ── */
 .text-cta {
+  font-family: var(--font-barlow), var(--font-inter), sans-serif;
   font-weight: 900;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -592,9 +605,31 @@
 
 /* ── Score display ── */
 .text-score {
+  font-family: var(--font-barlow), var(--font-inter), sans-serif;
   font-weight: 900;
   letter-spacing: -0.03em;
   line-height: 1;
+}
+
+/* ── GTA 6 Typography Utilities ── */
+.text-display {
+  font-family: var(--font-barlow), var(--font-inter), sans-serif;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+}
+
+.text-display-sm {
+  font-family: var(--font-barlow), var(--font-inter), sans-serif;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.text-condensed {
+  font-family: var(--font-barlow), var(--font-inter), sans-serif;
+  font-weight: 600;
+  letter-spacing: 0.02em;
 }
 
 /* ═══════════════════════════════════════════════════════════════
