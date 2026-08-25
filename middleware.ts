@@ -139,7 +139,7 @@ export async function middleware(request: NextRequest) {
     form-action 'self';
     frame-ancestors 'none';
     frame-src 'self' https://js.stripe.com https://hooks.stripe.com;
-    connect-src 'self' https://api.stripe.com wss://*.supabase.co https://*.supabase.co;
+    connect-src 'self' https://api.stripe.com wss://*.supabase.co https://*.supabase.co https://nominatim.openstreetmap.org;
     ${isDev ? "" : "upgrade-insecure-requests;"}
   `
   response.headers.set(
