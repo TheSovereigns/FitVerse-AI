@@ -90,8 +90,8 @@ export function LandingPage() {
         )}
       </nav>
 
-      {/* Hero — test grain effect */}
-      <section className="pt-32 pb-20 px-4 relative overflow-hidden grain-overlay">
+      {/* Hero */}
+      <section className="pt-32 pb-20 px-4 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-brand/8 via-transparent to-transparent pointer-events-none" />
         <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-brand/5 rounded-full blur-[120px] pointer-events-none" />
         <div className="max-w-4xl mx-auto text-center relative z-10">
