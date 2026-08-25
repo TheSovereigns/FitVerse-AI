@@ -90,8 +90,8 @@ export function LandingPage() {
         )}
       </nav>
 
-      {/* Hero — GTA 6 style grain + glow */}
-      <section className="pt-32 pb-20 px-4 relative overflow-hidden grain-overlay">
+      {/* Hero */}
+      <section className="pt-32 pb-20 px-4 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-brand/8 via-transparent to-transparent pointer-events-none" />
         <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-brand/5 rounded-full blur-[120px] pointer-events-none" />
         <div className="max-w-4xl mx-auto text-center relative z-10">
@@ -141,8 +141,8 @@ export function LandingPage() {
         </div>
       </section>
 
-      {/* Pricing — GTA 6 chrome badge shine */}
-      <section id="pricing" className="py-20 px-4 relative grain-overlay">
+      {/* Pricing */}
+      <section id="pricing" className="py-20 px-4 relative">
         <div className="max-w-6xl mx-auto relative z-10">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-black tracking-tight mb-4">Simple Pricing</h2>
@@ -202,7 +202,7 @@ export function LandingPage() {
       {/* CTA — GTA 6 style grain + chrome */}
       <section className="py-20 px-4">
         <div className="max-w-4xl mx-auto text-center">
-          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="gradient-brand rounded-3xl p-12 relative overflow-hidden grain-overlay">
+          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="gradient-brand rounded-3xl p-12 relative overflow-hidden">
             <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-black/10 pointer-events-none" />
             <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
             <h2 className="text-4xl font-black tracking-tight mb-4 text-white relative z-10">Ready to Transform?</h2>

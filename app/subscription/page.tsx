@@ -318,7 +318,7 @@ export default function SubscriptionPage() {
       <main className="relative z-10 max-w-7xl mx-auto px-4 md:px-6 py-5 md:py-7">
 
         {/* Hero */}
-        <section className="relative overflow-hidden rounded-[2rem] md:rounded-[2.5rem] border border-white/10 bg-black/55 backdrop-blur-2xl shadow-[inset_0_1px_0_rgba(255,255,255,0.10),0_30px_120px_rgba(0,0,0,0.32)] p-5 md:p-6 mb-5 grain-overlay">
+        <section className="relative overflow-hidden rounded-[2rem] md:rounded-[2.5rem] border border-white/10 bg-black/55 backdrop-blur-2xl shadow-[inset_0_1px_0_rgba(255,255,255,0.10),0_30px_120px_rgba(0,0,0,0.32)] p-5 md:p-6 mb-5 ">
           <div className="absolute left-0 top-0 bottom-0 w-2 bg-gradient-to-b from-white/20 via-white/10 to-white/5" />
           <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
           <div className="absolute inset-0 pointer-events-none bg-[linear-gradient(135deg,rgba(255,255,255,0.04),transparent_34%,rgba(255,255,255,0.03)_64%,rgba(255,255,255,0.03))]" />
@@ -514,7 +514,7 @@ export default function SubscriptionPage() {
           initial={{ opacity: 0, y: 18 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="mt-8 rounded-[2rem] border border-white/10 bg-black/45 backdrop-blur-2xl overflow-hidden shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] grain-overlay"
+          className="mt-8 rounded-[2rem] border border-white/10 bg-black/45 backdrop-blur-2xl overflow-hidden shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] "
         >
           <div className="px-5 py-4 border-b border-white/10">
             <div className="flex items-center gap-2">

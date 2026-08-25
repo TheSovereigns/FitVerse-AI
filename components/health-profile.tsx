@@ -341,7 +341,7 @@ export function HealthProfile({ scanHistory, onNavigateToSettings, onNavigateToS
       <motion.section
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
-        className="relative overflow-hidden rounded-2xl glass-strong grain-overlay"
+        className="relative overflow-hidden rounded-2xl glass-strong"
       >
         {/* Top gradient accent */}
         <div className={cn(
