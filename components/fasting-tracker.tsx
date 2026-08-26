@@ -254,16 +254,11 @@ export function FastingTracker({ isLocked = false }: { isLocked?: boolean }) {
             </p>
           </div>
         </div>
-        <div className="rounded-xl border border-border p-8 text-center">
-          <Lock className="mx-auto mb-3 h-10 w-10 text-orange-500/30" />
-          <p className="text-sm font-medium text-foreground mb-1">
-            {isEnglish ? "Upgrade to unlock" : "Faca upgrade para desbloquear"}
-          </p>
-          <p className="text-xs text-muted-foreground">
-            {isEnglish
-              ? "Unlock intermittent fasting tracking with Pro or Premium"
-              : "Desbloqueie o rastreamento de jejum intermitente com Pro ou Premium"}
-          </p>
+        <div className="paywall-card">
+          <div className="paywall-icon"><Lock className="w-6 h-6" /></div>
+          <h3 className="text-[15px] font-semibold mb-1">{isEnglish ? "Upgrade to unlock" : "Faca upgrade para desbloquear"}</h3>
+          <p className="text-[13px] text-muted-foreground mb-4">{isEnglish ? "Unlock intermittent fasting tracking with Pro or Premium" : "Desbloqueie o rastreamento de jejum intermitente com Pro ou Premium"}</p>
+          <Button className="h-11 rounded-xl bg-brand text-brand-foreground w-full">Unlock with Pro →</Button>
         </div>
       </motion.div>
     )
@@ -289,23 +284,24 @@ export function FastingTracker({ isLocked = false }: { isLocked?: boolean }) {
         </div>
         {isFasting && (
           <div className={cn("px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider",
-            isCompleted ? "bg-emerald-500/10 text-emerald-500" : "bg-orange-500/10 text-orange-500"
+            isCompleted ? "bg-emerald-500/10 text-emerald-500" : "bg-brand/10 text-brand"
           )}>
             {isCompleted ? (isEnglish ? "Complete" : "Completo") : (isEnglish ? "Active" : "Ativo")}
           </div>
         )}
       </div>
 
-      <div className="flex items-center gap-2 mb-4 overflow-x-auto">
+      {/* snap-x snap-mandatory for scroll affordance, alternative: flex-wrap */}
+      <div className="flex items-center gap-2 mb-4 overflow-x-auto snap-x snap-mandatory scrollbar-thin pb-1">
         {PROTOCOLS.map((p) => (
           <button
             key={p.id}
             onClick={() => !isFasting && setState((s) => ({ ...s, protocol: p.id }))}
             disabled={isFasting}
             className={cn(
-              "flex-shrink-0 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all border",
+              "flex-shrink-0 snap-center px-3 py-1.5 rounded-full text-xs font-semibold transition-all border",
               state.protocol === p.id
-                ? "bg-orange-500/10 border-orange-500/30 text-orange-500"
+                ? "bg-brand text-brand-foreground border-brand"
                 : "border-border text-muted-foreground hover:text-foreground",
               isFasting && "opacity-50 cursor-not-allowed"
             )}
@@ -328,7 +324,7 @@ export function FastingTracker({ isLocked = false }: { isLocked?: boolean }) {
               strokeWidth="6"
               strokeLinecap="round"
               className={cn(
-                isCompleted ? "text-emerald-500" : isFasting ? "text-orange-500" : "text-muted-foreground"
+                isCompleted ? "text-emerald-500" : isFasting ? "text-brand" : "text-muted-foreground"
               )}
               initial={{ strokeDasharray: 2 * Math.PI * 80, strokeDashoffset: 2 * Math.PI * 80 }}
               animate={{ strokeDashoffset: 2 * Math.PI * 80 * (1 - progress / 100) }}
@@ -348,7 +344,7 @@ export function FastingTracker({ isLocked = false }: { isLocked?: boolean }) {
               {isEnglish ? "elapsed" : "decorrido"}
             </span>
             {isFasting && remainingHours > 0 && (
-              <span className="text-[10px] text-orange-500 mt-1">
+              <span className="text-[10px] text-brand mt-1">
                 {formatTime(Math.ceil(remainingHours * 3600))} {isEnglish ? "left" : "restante"}
               </span>
             )}
@@ -364,21 +360,21 @@ export function FastingTracker({ isLocked = false }: { isLocked?: boolean }) {
       <div className="mb-4">
         <div className="h-1.5 bg-muted rounded-full overflow-hidden">
           <motion.div
-            className={cn("h-full rounded-full", isCompleted ? "bg-emerald-500" : "bg-orange-500")}
+            className={cn("h-full rounded-full", isCompleted ? "bg-emerald-500" : "bg-brand")}
             animate={{ width: `${progress}%` }}
             transition={{ duration: 0.3 }}
           />
         </div>
         <div className="flex justify-between mt-1">
           <span className="text-[10px] text-muted-foreground">0h</span>
-          <span className="text-[10px] font-medium text-orange-500">{Math.round(progress)}%</span>
+          <span className="text-[10px] font-medium text-brand">{Math.round(progress)}%</span>
           <span className="text-[10px] text-muted-foreground">{protocolHours}h</span>
         </div>
       </div>
 
       <div className="flex items-center justify-center gap-3 mb-4">
         {!isFasting ? (
-          <Button onClick={startFast} className="h-10 px-6 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-semibold text-sm">
+          <Button onClick={startFast} className="h-10 px-6 rounded-xl bg-brand hover:bg-brand/90 text-brand-foreground font-semibold text-sm">
             <Play className="h-4 w-4 mr-1.5" />
             {isEnglish ? "Start" : "Iniciar"}
           </Button>
@@ -387,7 +383,7 @@ export function FastingTracker({ isLocked = false }: { isLocked?: boolean }) {
             <Button onClick={resetFast} variant="ghost" size="icon" className="h-10 w-10 rounded-xl border border-border">
               <RotateCcw className="h-4 w-4" />
             </Button>
-            <Button onClick={resumeFast} className="h-10 px-6 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-semibold text-sm">
+            <Button onClick={resumeFast} className="h-10 px-6 rounded-xl bg-brand hover:bg-brand/90 text-brand-foreground font-semibold text-sm">
               <Play className="h-4 w-4 mr-1.5" />
               {isEnglish ? "Resume" : "Retomar"}
             </Button>
@@ -397,7 +393,7 @@ export function FastingTracker({ isLocked = false }: { isLocked?: boolean }) {
             <Button onClick={resetFast} variant="ghost" size="icon" className="h-10 w-10 rounded-xl border border-border">
               <RotateCcw className="h-4 w-4" />
             </Button>
-            <Button onClick={pauseFast} className="h-10 px-6 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-semibold text-sm">
+            <Button onClick={pauseFast} className="h-10 px-6 rounded-xl bg-brand hover:bg-brand/90 text-brand-foreground font-semibold text-sm">
               <Pause className="h-4 w-4 mr-1.5" />
               {isEnglish ? "Stop" : "Parar"}
             </Button>
@@ -418,7 +414,7 @@ export function FastingTracker({ isLocked = false }: { isLocked?: boolean }) {
         <div className="w-px h-6 bg-border" />
         <div className="text-center">
           <p className="text-[10px] text-muted-foreground uppercase tracking-wider">{isEnglish ? "Stage" : "Estagio"}</p>
-          <p className="text-sm font-bold text-orange-500">{t(`ft_${currentStage!.id}_short`)}</p>
+          <p className="text-sm font-bold text-brand">{t(`ft_${currentStage!.id}_short`)}</p>
         </div>
       </div>
 
@@ -427,7 +423,7 @@ export function FastingTracker({ isLocked = false }: { isLocked?: boolean }) {
         variant="ghost"
         className="w-full h-8 rounded-xl text-xs font-medium text-muted-foreground mb-2"
       >
-        <Flame className="h-3 w-3 mr-1.5 text-orange-500" />
+        <Flame className="h-3 w-3 mr-1.5 text-brand" />
         {isEnglish ? "Fasting Stages" : "Estagios do Jejum"}
         {showStages ? <ChevronUp className="h-3 w-3 ml-1" /> : <ChevronDown className="h-3 w-3 ml-1" />}
       </Button>
@@ -458,7 +454,7 @@ export function FastingTracker({ isLocked = false }: { isLocked?: boolean }) {
                             {stage.start}h — {stage.end}h
                           </span>
                           {isActive && (
-                            <span className="px-1.5 py-0.5 rounded-full bg-orange-500/10 text-[8px] font-bold text-orange-500 uppercase">
+                            <span className="px-1.5 py-0.5 rounded-full bg-brand/10 text-[8px] font-bold text-brand uppercase">
                               NOW
                             </span>
                           )}
@@ -506,7 +502,7 @@ export function FastingTracker({ isLocked = false }: { isLocked?: boolean }) {
                   </div>
                   <div className="rounded-xl border border-border p-2 text-center">
                     <p className="text-[9px] text-muted-foreground uppercase">{isEnglish ? "Streak" : "Sequencia"}</p>
-                    <p className="text-sm font-bold text-orange-500">{stats.currentStreak}</p>
+                    <p className="text-sm font-bold text-brand">{stats.currentStreak}</p>
                   </div>
                   <div className="rounded-xl border border-border p-2 text-center">
                     <p className="text-[9px] text-muted-foreground uppercase">{isEnglish ? "Total" : "Total"}</p>
@@ -518,7 +514,7 @@ export function FastingTracker({ isLocked = false }: { isLocked?: boolean }) {
                   {history.slice(0, 20).map((entry, i) => (
                     <div key={i} className="flex items-center justify-between rounded-xl border border-border p-2.5">
                       <div className="flex items-center gap-2">
-                        <span className={cn("w-2 h-2 rounded-full", entry.completed ? "bg-emerald-500" : "bg-orange-500")} />
+                        <span className={cn("w-2 h-2 rounded-full", entry.completed ? "bg-emerald-500" : "bg-brand")} />
                         <div>
                           <span className="text-xs font-medium text-foreground">{entry.protocol}</span>
                           <p className="text-[10px] text-muted-foreground">
@@ -545,7 +541,7 @@ export function FastingTracker({ isLocked = false }: { isLocked?: boolean }) {
 
       <div className="rounded-xl border border-border p-3">
         <div className="flex items-center gap-2 mb-1">
-          <Info className="h-3.5 w-3.5 text-orange-500" />
+          <Info className="h-3.5 w-3.5 text-brand" />
           <span className="text-xs font-semibold text-foreground">{t(`ft_${currentStage!.id}_name`)}</span>
         </div>
         <p className="text-[11px] text-muted-foreground">{t(`ft_${currentStage!.id}_tip`)}</p>

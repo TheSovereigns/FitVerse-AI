@@ -419,13 +419,11 @@ export function TrainingTab({ userGoal }: TrainingTabProps) {
                 ))}
               </div>
             ) : (
-              <div className="rounded-2xl glass-strong p-8 text-center">
-                <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-muted">
-                  <Swords className="h-7 w-7 text-muted-foreground" />
-                </div>
-                <h3 className="text-lg font-bold text-foreground">{t("training_empty_title")}</h3>
-                <p className="mx-auto mt-2 max-w-sm text-sm text-muted-foreground">{t("training_empty_body")}</p>
-                <Button onClick={() => setShowGeneratorModal(true)} className="mt-5 h-11 rounded-xl bg-foreground px-6 text-sm font-medium text-background hover:bg-foreground/90">
+              <div className="flex flex-col items-center justify-center py-12 text-center">
+                <div className="empty-state-icon"><Swords className="w-8 h-8" /></div>
+                <h3 className="text-base font-semibold mb-1">{t("training_empty_title")}</h3>
+                <p className="text-[13px] leading-relaxed text-muted-foreground max-w-[280px] mb-4">{t("training_empty_body")}</p>
+                <Button onClick={() => setShowGeneratorModal(true)} className="h-11 rounded-xl bg-brand text-brand-foreground">
                   {t("training_sync_btn")}
                 </Button>
               </div>
@@ -455,12 +453,11 @@ export function TrainingTab({ userGoal }: TrainingTabProps) {
                 ))}
               </div>
             ) : (
-              <div className="rounded-2xl glass-strong p-8 text-center">
-                <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-muted">
-                  <Bookmark className="h-7 w-7 text-muted-foreground" />
-                </div>
-                <h3 className="text-lg font-bold text-foreground">{t("training_saved_title")}</h3>
-                <p className="mx-auto mt-2 max-w-sm text-sm text-muted-foreground">{t("training_saved_empty")}</p>
+              <div className="flex flex-col items-center justify-center py-12 text-center">
+                <div className="empty-state-icon"><Bookmark className="w-8 h-8" /></div>
+                <h3 className="text-base font-semibold mb-1">{t("training_saved_title")}</h3>
+                <p className="text-[13px] leading-relaxed text-muted-foreground max-w-[280px] mb-4">{t("training_saved_empty")}</p>
+                <Button onClick={() => setActiveSubTab("generated")} className="h-11 rounded-xl bg-brand text-brand-foreground">Explorar treinos</Button>
               </div>
             )}
           </motion.div>
@@ -480,12 +477,11 @@ export function TrainingTab({ userGoal }: TrainingTabProps) {
                 ))}
               </div>
             ) : (
-              <div className="rounded-2xl glass-strong p-8 text-center">
-                <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-muted">
-                  <History className="h-7 w-7 text-muted-foreground" />
-                </div>
-                <h3 className="text-lg font-bold text-foreground">{t("training_history_title")}</h3>
-                <p className="mx-auto mt-2 max-w-sm text-sm text-muted-foreground">{t("training_history_empty")}</p>
+              <div className="flex flex-col items-center justify-center py-12 text-center">
+                <div className="empty-state-icon"><History className="w-8 h-8" /></div>
+                <h3 className="text-base font-semibold mb-1">{t("training_history_title")}</h3>
+                <p className="text-[13px] leading-relaxed text-muted-foreground max-w-[280px] mb-4">{t("training_history_empty")}</p>
+                <Button onClick={() => setActiveSubTab("generated")} className="h-11 rounded-xl bg-brand text-brand-foreground">Começar treino</Button>
               </div>
             )}
           </motion.div>

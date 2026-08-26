@@ -110,22 +110,12 @@ export function MoodTracker({ isLocked = false }: MoodTrackerProps) {
   if (isLocked) {
     return (
       <div className="glass-strong border border-border rounded-2xl p-6 relative overflow-hidden">
-        <div className="absolute inset-0 bg-muted/50 backdrop-blur-sm flex items-center justify-center z-10">
-          <div className="text-center">
-            <Lock className="w-10 h-10 mx-auto mb-2 text-muted-foreground" />
-            <p className="text-foreground font-medium">{t("mt_pro_feature")}</p>
-            <p className="text-sm text-muted-foreground">{t("mt_unlock")}</p>
-          </div>
-        </div>
-        <div className="opacity-30 pointer-events-none">
-          <h2 className="text-lg font-semibold text-foreground mb-4">{t("mt_title")}</h2>
-          <div className="flex gap-2">
-            {moodOptions.map((m) => (
-              <button key={m.value} className="text-2xl p-2 rounded-xl bg-muted">
-                {m.emoji}
-              </button>
-            ))}
-          </div>
+        <h2 className="text-lg font-semibold text-foreground mb-4">{t("mt_title")}</h2>
+        <div className="paywall-card">
+          <div className="paywall-icon"><Lock className="w-6 h-6" /></div>
+          <h3 className="text-[15px] font-semibold mb-1">{t("mt_pro_feature")}</h3>
+          <p className="text-[13px] text-muted-foreground mb-4">{t("mt_unlock")}</p>
+          <button className="h-11 rounded-xl bg-brand text-brand-foreground w-full font-medium">Unlock with Pro →</button>
         </div>
       </div>
     );
@@ -143,13 +133,13 @@ export function MoodTracker({ isLocked = false }: MoodTrackerProps) {
               key={m.value}
               whileTap={{ scale: 0.9 }}
               onClick={() => setSelectedMood(m.value)}
-              className={`text-2xl p-2 rounded-xl border transition-colors ${
+              className={`w-14 h-14 flex items-center justify-center rounded-xl border transition-all ${
                 selectedMood === m.value
-                  ? "border-foreground bg-muted"
-                  : "border-border bg-card hover:bg-muted"
+                  ? "bg-brand/15 border-brand/30 scale-105 shadow-lg shadow-brand/15"
+                  : "bg-muted/40 border-transparent hover:bg-muted"
               }`}
             >
-              {m.emoji}
+              <span className="text-2xl">{m.emoji}</span>
             </motion.button>
           ))}
         </div>
@@ -197,11 +187,7 @@ export function MoodTracker({ isLocked = false }: MoodTrackerProps) {
                 <XAxis dataKey="date" tick={{ fontSize: 12, fill: "var(--muted-foreground)" }} />
                 <YAxis domain={[1, 5]} tick={{ fontSize: 12, fill: "var(--muted-foreground)" }} />
                 <Tooltip
-                  contentStyle={{
-                    backgroundColor: "var(--card)",
-                    border: "1px solid var(--border)",
-                    borderRadius: "12px",
-                  }}
+                  contentStyle={{ background: 'hsl(0 0% 6%)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 12, color: '#fff', fontSize: 12 }}
                 />
                 <Line
                   type="monotone"

@@ -1,5 +1,6 @@
 "use client"
 
+import { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { cn } from "@/lib/utils"
 import { useTranslation } from "@/lib/i18n"
@@ -12,7 +13,8 @@ import {
   Heart, Smile, ListChecks, Watch,
   Trophy, Bell, Navigation,
   X, Utensils, Ruler,
-  Calendar, TrendingUp, Flame, BarChart3
+  Calendar, TrendingUp, Flame, BarChart3,
+  Search, ChevronRight
 } from "lucide-react"
 
 interface MobileMoreSheetProps {
@@ -32,6 +34,7 @@ interface FeatureItem {
 export function MobileMoreSheet({ open, onClose, onNavigate, isFeatureLocked }: MobileMoreSheetProps) {
   const { t, locale } = useTranslation()
   const isEnglish = locale === "en-US"
+  const [query, setQuery] = useState("")
 
   const handleNavigate = (view: View, feature?: string) => {
     if (feature && isFeatureLocked(feature)) return
@@ -119,6 +122,21 @@ export function MobileMoreSheet({ open, onClose, onNavigate, isFeatureLocked }: 
     },
   ]
 
+  const filteredSections = sections
+    .map((section) => ({
+      ...section,
+      items: section.items.filter((item) =>
+        query.trim() === "" ? true : item.label.toLowerCase().includes(query.toLowerCase())
+      ),
+    }))
+    .filter((section) => section.items.length > 0)
+
+  const exploreTitle = (() => {
+    const v = (t as any)("nav_explore")
+    if (v && v !== "nav_explore") return v
+    return isEnglish ? "Explore" : "Explorar"
+  })()
+
   return (
     <AnimatePresence>
       {open && (
@@ -140,49 +158,89 @@ export function MobileMoreSheet({ open, onClose, onNavigate, isFeatureLocked }: 
             <div className="sticky top-0 z-10 flex items-center justify-between px-5 py-4 bg-background/80 backdrop-blur-xl">
               <div className="flex items-center gap-2">
                 <img src="/icon.svg" alt="VyseFit" className="w-5 h-5" />
-                <h2 className="text-lg font-bold text-foreground">{t("nav_search_placeholder")}</h2>
+                <h2 className="text-lg font-bold text-foreground">{exploreTitle}</h2>
               </div>
               <button onClick={onClose} aria-label="Close" className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
                 <X className="w-4 h-4 text-muted-foreground" />
               </button>
             </div>
 
+            <div className="px-5 pb-3">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <input
+                  type="text"
+                  placeholder={isEnglish ? "Search..." : "Buscar..."}
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  className="w-full h-10 pl-9 pr-3 rounded-xl bg-muted border border-transparent focus:border-border focus:bg-background text-sm placeholder:text-muted-foreground outline-none transition-colors"
+                />
+              </div>
+            </div>
+
             <div className="px-5 pb-8 space-y-6">
-              {sections.map((section) => (
-                <div key={section.title}>
-                  <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3">
-                    {section.title}
-                  </h3>
-                  <div className="grid grid-cols-4 gap-3">
-                    {section.items.map((item) => {
-                      const locked = item.feature && isFeatureLocked(item.feature)
-                      return (
-                        <button
-                          key={item.view}
-                          onClick={() => handleNavigate(item.view, item.feature)}
-                          aria-label={item.label}
-                          className={cn(
-                            "flex flex-col items-center gap-2 p-3 rounded-2xl transition-all",
-                            locked
-                              ? "opacity-40 cursor-not-allowed"
-                              : "active:scale-95 hover:bg-muted/50"
-                          )}
-                        >
-                          <div className={cn(
-                            "w-12 h-12 rounded-2xl flex items-center justify-center",
-                            "bg-muted/50 text-muted-foreground"
-                          )}>
-                            <item.icon className="w-5 h-5" />
-                          </div>
-                          <span className="text-[10px] font-medium text-center leading-tight text-muted-foreground">
-                            {item.label}
-                          </span>
-                        </button>
-                      )
-                    })}
+              {filteredSections.length === 0 ? (
+                <p className="text-sm text-muted-foreground text-center py-8">
+                  {isEnglish ? "No results found" : "Nenhum resultado encontrado"}
+                </p>
+              ) : (
+                filteredSections.map((section) => (
+                  <div key={section.title}>
+                    <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3">
+                      {section.title}
+                    </h3>
+                    <div className={section.items.length <= 2 ? "grid grid-cols-2 gap-1" : "flex flex-col gap-1"}>
+                      {section.items.map((item) => {
+                        const locked = item.feature && isFeatureLocked(item.feature)
+                        // For 2-column grid small sections, use compact vertical style but keep list pattern for larger
+                        const isCompactGrid = section.items.length <= 2
+                        if (isCompactGrid) {
+                          return (
+                            <button
+                              key={item.view}
+                              onClick={() => handleNavigate(item.view, item.feature)}
+                              aria-label={item.label}
+                              className={cn(
+                                "flex items-center gap-3 p-2.5 rounded-xl text-left transition-all border border-transparent",
+                                locked
+                                  ? "opacity-40 cursor-not-allowed"
+                                  : "hover:bg-muted active:scale-[0.98] hover:border-border/50"
+                              )}
+                            >
+                              <div className="w-9 h-9 rounded-xl bg-muted flex items-center justify-center shrink-0">
+                                <item.icon className="w-4 h-4 text-muted-foreground" />
+                              </div>
+                              <span className="text-[14px] font-medium text-foreground truncate flex-1">{item.label}</span>
+                              <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />
+                            </button>
+                          )
+                        }
+                        return (
+                          <button
+                            key={item.view}
+                            onClick={() => handleNavigate(item.view, item.feature)}
+                            aria-label={item.label}
+                            className={cn(
+                              "flex items-center justify-between w-full px-2 py-2 rounded-xl text-left transition-all",
+                              locked
+                                ? "opacity-40 cursor-not-allowed"
+                                : "hover:bg-muted active:scale-[0.98]"
+                            )}
+                          >
+                            <div className="flex items-center gap-3 min-w-0 flex-1">
+                              <div className="w-9 h-9 rounded-xl bg-muted flex items-center justify-center shrink-0">
+                                <item.icon className="w-4 h-4 text-muted-foreground" />
+                              </div>
+                              <span className="text-[14px] font-medium text-foreground truncate">{item.label}</span>
+                            </div>
+                            <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0 ml-2" />
+                          </button>
+                        )
+                      })}
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))
+              )}
             </div>
           </motion.div>
         </>

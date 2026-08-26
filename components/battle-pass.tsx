@@ -80,9 +80,9 @@ function CouponsList() {
   return (
     <div className="space-y-2">
       {active.map(c => (
-        <div key={c.id} className="flex items-center justify-between rounded-xl border border-purple-500/20 bg-purple-500/5 p-3">
+        <div key={c.id} className="flex items-center justify-between rounded-xl border border-brand/20 bg-brand/5 p-3">
           <div className="flex items-center gap-3">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-purple-500/15"><Award className="h-4 w-4 text-purple-400" /></div>
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand/15"><Award className="h-4 w-4 text-brand" /></div>
             <div><p className="text-sm font-bold text-foreground font-mono">{c.code}</p><p className="text-[10px] text-muted-foreground">{t("bp_premium_discount")}</p></div>
           </div>
           <button onClick={() => markUsed(c.id)} className="h-9 rounded-xl bg-brand px-4 text-xs font-semibold text-white hover:bg-brand/90 transition-colors">{t("bp_claim")}</button>
@@ -175,28 +175,28 @@ export function BattlePass({ isLocked = false }: BattlePassProps) {
     <div className="relative mx-auto w-full max-w-2xl space-y-4 pb-safe-nav">
       {/* ═══ EPIC HEADER ═══ */}
       <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
-        className="relative overflow-hidden rounded-3xl border border-purple-500/20"
+        className="relative overflow-hidden rounded-3xl border border-brand/20"
       >
         {/* Animated background */}
-        <div className="absolute inset-0 bg-gradient-to-br from-purple-600/15 via-indigo-500/8 to-brand/10" />
-        <div className="absolute -right-12 -top-12 h-40 w-40 rounded-full bg-purple-500/15 blur-3xl" />
+        <div className="absolute inset-0 bg-gradient-to-br from-brand/15 via-emerald-600/8 to-brand/10" />
+        <div className="absolute -right-12 -top-12 h-40 w-40 rounded-full bg-brand/15 blur-3xl" />
         <div className="absolute -left-8 -bottom-8 h-32 w-32 rounded-full bg-brand/10 blur-3xl" />
-        <div className="absolute right-1/4 top-0 h-20 w-20 rounded-full bg-yellow-500/8 blur-2xl" />
+        <div className="absolute right-1/4 top-0 h-20 w-20 rounded-full bg-emerald-600/8 blur-2xl" />
 
         <div className="relative p-6">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2.5">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-purple-500/25 to-brand/15">
-                <Trophy className="h-5 w-5 text-purple-400" />
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-brand/25 to-emerald-600/15">
+                <Trophy className="h-5 w-5 text-brand" />
               </div>
               <div>
-                <span className="text-[10px] font-black uppercase tracking-widest text-purple-400">{t("bp_battle_pass")}</span>
+                <span className="text-[10px] font-black uppercase tracking-widest text-brand">{t("bp_battle_pass")}</span>
                 <p className="text-[10px] text-muted-foreground">{totalXp.toLocaleString()} XP {t("bp_total_xp")}</p>
               </div>
             </div>
             <div className="text-right">
               <div className="flex items-baseline gap-1">
-                <span className="text-4xl font-black bg-gradient-to-r from-purple-400 to-brand bg-clip-text text-transparent">{currentTier}</span>
+                <span className="text-4xl font-black bg-gradient-to-r from-brand to-emerald-500 bg-clip-text text-transparent">{currentTier}</span>
                 <span className="text-sm text-muted-foreground font-medium">/ 30</span>
               </div>
               <p className="text-[10px] text-muted-foreground">{t("bp_to_next_level")}</p>
@@ -207,7 +207,7 @@ export function BattlePass({ isLocked = false }: BattlePassProps) {
           <div className="relative">
             <div className="h-3.5 overflow-hidden rounded-full bg-black/30 border border-border">
               <motion.div
-                className="h-full rounded-full bg-gradient-to-r from-purple-500 via-indigo-400 to-brand relative"
+                className="h-full rounded-full bg-gradient-to-r from-brand via-emerald-400 to-emerald-500 relative"
                 animate={{ width: `${progress}%` }}
                 transition={{ duration: 0.8, ease: "easeOut" }}
               >
@@ -216,7 +216,7 @@ export function BattlePass({ isLocked = false }: BattlePassProps) {
             </div>
             <div className="flex justify-between mt-1.5">
               <span className="text-[10px] text-muted-foreground">{xpInCurrentTier} / {XP_PER_TIER} XP</span>
-              <span className="text-[10px] font-semibold text-purple-400">{Math.round(progress)}%</span>
+              <span className="text-[10px] font-semibold text-brand">{Math.round(progress)}%</span>
             </div>
           </div>
         </div>
@@ -226,7 +226,7 @@ export function BattlePass({ isLocked = false }: BattlePassProps) {
       <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
         className="relative rounded-3xl border border-border bg-card/50 p-4"
       >
-        <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center justify-between mb-2">
           <h3 className="text-sm font-bold text-foreground">{t("bp_rewards_track")}</h3>
           <div className="flex gap-1.5">
             <button onClick={() => scrollTo("left")} className="flex h-8 w-8 items-center justify-center rounded-xl border border-border bg-background/50 text-muted-foreground hover:text-foreground hover:bg-muted transition-all active:scale-95">
@@ -237,13 +237,14 @@ export function BattlePass({ isLocked = false }: BattlePassProps) {
             </button>
           </div>
         </div>
+        <p className="text-[10px] text-muted-foreground/50 text-center tracking-widest mb-1 select-none">← swipe →</p>
 
         {/* Tier track with connecting line */}
         <div className="relative">
           {/* Connection line */}
-          <div className="absolute top-1/2 left-0 right-0 h-0.5 -translate-y-1/2 bg-border/50 z-0" />
+          <div className="absolute top-1/2 left-0 right-0 h-0.5 -translate-y-1/2 bg-brand/10 z-0" />
 
-          <div ref={scrollRef} className="flex gap-3 overflow-x-auto pb-3 pt-2 px-1 scrollbar-hide relative z-10"
+          <div ref={scrollRef} className="flex gap-3 overflow-x-auto pb-3 pt-2 px-1 scrollbar-thin scrollbar-hide relative z-10"
             style={{ scrollSnapType: "x mandatory", WebkitOverflowScrolling: "touch" }}
           >
             {tiers.map((tier) => {
@@ -253,6 +254,7 @@ export function BattlePass({ isLocked = false }: BattlePassProps) {
               const colors = rarityConfig[tier.rarity]
               const isMilestone = tier.tier % 5 === 0
               const isLast = tier.tier === 30
+              const isPremiumPulse = tier.rarity === "legendary" && unlocked
 
               return (
                 <motion.button key={tier.tier}
@@ -261,7 +263,7 @@ export function BattlePass({ isLocked = false }: BattlePassProps) {
                     "relative flex shrink-0 flex-col items-center rounded-2xl border-2 p-2.5 transition-all",
                     "w-[88px] min-h-[140px]",
                     unlocked
-                      ? cn(colors.border, colors.bg, colors.glow, selectedTier?.tier === tier.tier && "ring-2 ring-brand/60 scale-105")
+                      ? cn(colors.border, colors.bg, colors.glow, selectedTier?.tier === tier.tier && "ring-2 ring-brand/60 scale-105", isPremiumPulse && "animate-[pulse_2.2s_ease-in-out_infinite]")
                       : "border-border/30 bg-muted/10 opacity-40",
                     isLast && "w-[96px] min-h-[155px]"
                   )}
@@ -303,9 +305,9 @@ export function BattlePass({ isLocked = false }: BattlePassProps) {
                         <Check className="h-3 w-3 text-green-400" />
                       </div>
                     ) : available ? (
-                      <motion.div animate={{ scale: [1, 1.2, 1], boxShadow: ["0 0 0 0 rgba(168,85,247,0)", "0 0 0 6px rgba(168,85,247,0.15)", "0 0 0 0 rgba(168,85,247,0)"] }}
+                      <motion.div animate={{ scale: [1, 1.2, 1], boxShadow: ["0 0 0 0 rgba(52,211,153,0)", "0 0 0 6px rgba(52,211,153,0.15)", "0 0 0 0 rgba(52,211,153,0)"] }}
                         transition={{ repeat: Infinity, duration: 2 }}
-                        className="flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-br from-purple-500/30 to-brand/30 border border-brand/40"
+                        className="flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-br from-brand/30 to-emerald-500/30 border border-brand/40"
                       >
                         <Gift className="h-3 w-3 text-brand" />
                       </motion.div>
@@ -405,7 +407,7 @@ export function BattlePass({ isLocked = false }: BattlePassProps) {
         <button onClick={() => setShowCoupons(!showCoupons)}
           className="flex w-full items-center gap-2.5 p-5 text-left hover:bg-muted/20 transition-colors rounded-2xl"
         >
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-purple-500/15"><Award className="h-4 w-4 text-purple-400" /></div>
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand/15"><Award className="h-4 w-4 text-brand" /></div>
           <span className="flex-1 text-sm font-bold text-foreground">{t("bp_my_coupons")}</span>
           <ChevronRight className={cn("h-4 w-4 text-muted-foreground transition-transform", showCoupons && "rotate-90")} />
         </button>

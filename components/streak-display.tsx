@@ -21,6 +21,8 @@ export function StreakDisplay({ compact = false, onNavigate }: StreakDisplayProp
   const dayLabels = isEnglish ? ["S", "M", "T", "W", "T", "F", "S"] : ["D", "S", "T", "Q", "Q", "S", "S"]
 
   if (compact) {
+    const compactPct = Math.min(currentStreak / 30, 1)
+    const compactCirc = 2 * Math.PI * 20
     return (
       <motion.div
         initial={{ opacity: 0, y: 8 }}
@@ -29,8 +31,23 @@ export function StreakDisplay({ compact = false, onNavigate }: StreakDisplayProp
         onClick={() => onNavigate?.("profile")}
       >
         <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
-            <Zap className="h-5 w-5 text-primary" />
+          <div className="relative w-12 h-12 shrink-0">
+            <svg width="48" height="48" viewBox="0 0 48 48" className="rotate-[-90deg]">
+              <circle cx="24" cy="24" r="20" fill="none" stroke="currentColor" strokeWidth="3" className="text-border" />
+              {currentStreak > 0 && (
+                <motion.circle
+                  cx="24" cy="24" r="20" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round"
+                  className="text-brand"
+                  strokeDasharray={`${compactPct * compactCirc} ${compactCirc}`}
+                  initial={{ strokeDasharray: `0 ${compactCirc}` }}
+                  animate={{ strokeDasharray: `${compactPct * compactCirc} ${compactCirc}` }}
+                  transition={{ duration: 1, ease: "easeOut" }}
+                />
+              )}
+            </svg>
+            <div className="absolute inset-0 flex items-center justify-center">
+              <span className="text-sm font-bold text-brand">{currentStreak}</span>
+            </div>
           </div>
           <div className="flex-1 min-w-0">
             <div className="flex items-baseline gap-1.5">
@@ -43,7 +60,7 @@ export function StreakDisplay({ compact = false, onNavigate }: StreakDisplayProp
               {hasActivityToday ? (isEnglish ? "Active streak" : "Sequencia ativa") : (isEnglish ? "Start your first today" : "Faca seu primeiro hoje")}
             </p>
           </div>
-          <ChevronRight className="h-4 w-4 text-muted-foreground/50" />
+          <ChevronRight className="h-4 w-4 text-brand/50" />
         </div>
       </motion.div>
     )
@@ -66,7 +83,7 @@ export function StreakDisplay({ compact = false, onNavigate }: StreakDisplayProp
                 {t("streak_subtitle") || "Mantenha o ritmo"}
               </p>
             </div>
-            <div className="flex items-center gap-1.5 text-muted-foreground">
+            <div className="flex items-center gap-1.5 text-brand">
               <TrendingUp className="h-4 w-4" />
               <span className="text-xs font-medium">
                 {longestStreak} {t("streak_best") || "recorde"}
@@ -81,7 +98,7 @@ export function StreakDisplay({ compact = false, onNavigate }: StreakDisplayProp
                 {currentStreak > 0 && (
                   <motion.circle
                     cx="50" cy="50" r="42" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round"
-                    className="text-foreground"
+                    className="text-brand"
                     strokeDasharray={`${Math.min(currentStreak / 30, 1) * 264} 264`}
                     transform="rotate(-90 50 50)"
                     initial={{ strokeDasharray: "0 264" }}
@@ -96,12 +113,12 @@ export function StreakDisplay({ compact = false, onNavigate }: StreakDisplayProp
                   const y = 50 + 35 * Math.sin(rad)
                   const isActive = weekActivity[i]?.hasScan || weekActivity[i]?.hasWorkout || weekActivity[i]?.hasDiet
                   return (
-                    <circle key={i} cx={x} cy={y} r="3" fill={isActive ? "currentColor" : "currentColor"} className={isActive ? "text-foreground" : "text-border"} opacity={isActive ? 1 : 0.4} />
+                    <circle key={i} cx={x} cy={y} r="3" fill={isActive ? "currentColor" : "currentColor"} className={isActive ? "text-brand" : "text-border"} opacity={isActive ? 1 : 0.4} />
                   )
                 })}
               </svg>
               <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <span className="text-3xl font-bold text-foreground">{currentStreak}</span>
+                <span className="text-3xl font-bold text-brand">{currentStreak}</span>
                 <span className="text-[9px] font-medium uppercase tracking-wider text-muted-foreground">
                   {currentStreak === 1 ? (isEnglish ? "day" : "dia") : (isEnglish ? "days" : "dias")}
                 </span>
@@ -110,7 +127,7 @@ export function StreakDisplay({ compact = false, onNavigate }: StreakDisplayProp
 
             <div className="flex-1 space-y-3">
               <div className="flex items-center gap-2">
-                <div className={cn("h-2 w-2 rounded-full", hasActivityToday ? "bg-success" : "bg-border")} />
+                <div className={cn("h-2 w-2 rounded-full", hasActivityToday ? "bg-brand" : "bg-border")} />
                 <span className="text-xs text-muted-foreground">
                   {hasActivityToday
                     ? (t("streak_active_today") || "Atividade registrada hoje")
@@ -119,8 +136,8 @@ export function StreakDisplay({ compact = false, onNavigate }: StreakDisplayProp
               </div>
 
               <div className="flex items-center gap-2">
-                <div className="flex h-5 w-5 items-center justify-center rounded-md bg-muted">
-                  <Award className="h-3 w-3 text-muted-foreground" />
+                <div className="flex h-5 w-5 items-center justify-center rounded-md bg-brand-muted">
+                  <Award className="h-3 w-3 text-brand" />
                 </div>
                 <span className="text-xs text-muted-foreground">
                   {longestStreak} {t("streak_record") || "recorde"}
@@ -135,7 +152,7 @@ export function StreakDisplay({ compact = false, onNavigate }: StreakDisplayProp
                   return (
                     <div key={i} className="flex flex-col items-center gap-1">
                       <span className={cn("text-[9px] font-medium", isToday ? "text-foreground" : "text-muted-foreground")}>{label}</span>
-                      <div className={cn("h-2.5 w-2.5 rounded-full", isActive ? "bg-foreground" : "bg-border", isToday && !isActive && "ring-1 ring-foreground/30")} />
+                      <div className={cn("h-2.5 w-2.5 rounded-full", isActive ? "bg-brand" : "bg-border", isToday && !isActive && "ring-1 ring-brand/30")} />
                     </div>
                   )
                 })}

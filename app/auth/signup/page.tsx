@@ -284,7 +284,7 @@ export default function SignupPage() {
               onChange={(e) => setAge(e.target.value)}
               min="10"
               max="120"
-              className="h-16 text-center text-3xl font-black bg-muted/50 border-border text-foreground rounded-2xl"
+              className="h-16 text-center text-3xl font-black bg-white/[0.06] border-white/10 text-foreground rounded-2xl focus:border-brand/30 focus:bg-white/[0.08]"
             />
           </div>
         )
@@ -313,7 +313,7 @@ export default function SignupPage() {
               min="30"
               max="300"
               step="0.1"
-              className="h-16 text-center text-3xl font-black bg-muted/50 border-border text-foreground rounded-2xl"
+              className="h-16 text-center text-3xl font-black bg-white/[0.06] border-white/10 text-foreground rounded-2xl focus:border-brand/30 focus:bg-white/[0.08]"
             />
           </div>
         )
@@ -325,7 +325,7 @@ export default function SignupPage() {
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ type: "spring", stiffness: 200, damping: 15, delay: 0.1 }}
-              className="w-20 h-20 rounded-3xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center mx-auto mb-6"
+              className="w-20 h-20 rounded-3xl bg-gradient-to-br from-brand to-emerald-600 flex items-center justify-center mx-auto mb-6"
             >
               <Ruler className="h-10 w-10 text-white" />
             </motion.div>
@@ -342,7 +342,7 @@ export default function SignupPage() {
               min="100"
               max="250"
               step="0.1"
-              className="h-16 text-center text-3xl font-black bg-muted/50 border-border text-foreground rounded-2xl"
+              className="h-16 text-center text-3xl font-black bg-white/[0.06] border-white/10 text-foreground rounded-2xl focus:border-brand/30 focus:bg-white/[0.08]"
             />
           </div>
         )
@@ -394,9 +394,9 @@ export default function SignupPage() {
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-background flex">
       {/* Left side - Visual (desktop only) */}
       <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/30 via-transparent to-purple-500/20" />
-        <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-primary/20 rounded-full blur-[100px]" />
-        <div className="absolute bottom-1/4 right-1/4 w-48 h-48 bg-purple-500/20 rounded-full blur-[80px]" />
+        <div className="absolute inset-0 bg-gradient-to-br from-brand/18 via-brand/6 to-emerald-600/14" />
+        <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-brand/20 rounded-full blur-[100px]" />
+        <div className="absolute bottom-1/4 right-1/4 w-48 h-48 bg-emerald-500/16 rounded-full blur-[80px]" />
 
         <div className="relative z-10 flex flex-col items-center justify-center w-full p-12">
           <motion.div
@@ -471,7 +471,7 @@ export default function SignupPage() {
                         onChange={(e) => setName(e.target.value)}
                         onBlur={() => setFieldErrors(prev => ({ ...prev, ...validate({ name, email, password, confirmPassword }) }))}
                         placeholder={isEnglish ? "John Doe" : "João Silva"}
-                        className={cn("h-12 bg-muted/50 border-border text-foreground placeholder:text-foreground/30 focus:border-primary focus:ring-primary/20 rounded-xl", fieldErrors.name && "border-red-500 focus:border-red-500 focus:ring-red-500/20")}
+                        className={cn("h-12 bg-white/[0.06] border-white/10 text-foreground placeholder:text-foreground/30 focus:border-brand/30 focus:bg-white/[0.08] focus:ring-brand/20 rounded-xl", fieldErrors.name && "border-red-500 focus:border-red-500 focus:ring-red-500/20")}
                         aria-invalid={!!fieldErrors.name}
                       />
                       {fieldErrors.name && (
@@ -486,7 +486,7 @@ export default function SignupPage() {
                         onChange={(e) => setEmail(e.target.value)}
                         onBlur={() => setFieldErrors(prev => ({ ...prev, ...validate({ name, email, password, confirmPassword }) }))}
                         placeholder={isEnglish ? "you@example.com" : "seu@email.com"}
-                        className={cn("h-12 bg-muted/50 border-border text-foreground placeholder:text-foreground/30 focus:border-primary focus:ring-primary/20 rounded-xl", fieldErrors.email && "border-red-500 focus:border-red-500 focus:ring-red-500/20")}
+                        className={cn("h-12 bg-white/[0.06] border-white/10 text-foreground placeholder:text-foreground/30 focus:border-brand/30 focus:bg-white/[0.08] focus:ring-brand/20 rounded-xl", fieldErrors.email && "border-red-500 focus:border-red-500 focus:ring-red-500/20")}
                         aria-invalid={!!fieldErrors.email}
                       />
                       {fieldErrors.email && (
@@ -504,7 +504,7 @@ export default function SignupPage() {
                           onChange={(e) => setPassword(e.target.value)}
                           onBlur={() => setFieldErrors(prev => ({ ...prev, ...validate({ name, email, password, confirmPassword }) }))}
                           placeholder="••••••••"
-                          className={cn("h-12 bg-muted/50 border-border text-foreground placeholder:text-foreground/30 focus:border-primary focus:ring-primary/20 rounded-xl pr-12", fieldErrors.password && "border-red-500 focus:border-red-500 focus:ring-red-500/20")}
+                          className={cn("h-12 bg-white/[0.06] border-white/10 text-foreground placeholder:text-foreground/30 focus:border-brand/30 focus:bg-white/[0.08] focus:ring-brand/20 rounded-xl pr-12", fieldErrors.password && "border-red-500 focus:border-red-500 focus:ring-red-500/20")}
                           aria-invalid={!!fieldErrors.password}
                         />
                         <Button
@@ -531,7 +531,7 @@ export default function SignupPage() {
                         onChange={(e) => setConfirmPassword(e.target.value)}
                         onBlur={() => setFieldErrors(prev => ({ ...prev, ...validate({ name, email, password, confirmPassword }) }))}
                         placeholder="••••••••"
-                        className={cn("h-12 bg-muted/50 border-border text-foreground placeholder:text-foreground/30 focus:border-primary focus:ring-primary/20 rounded-xl", fieldErrors.confirmPassword && "border-red-500 focus:border-red-500 focus:ring-red-500/20")}
+                        className={cn("h-12 bg-white/[0.06] border-white/10 text-foreground placeholder:text-foreground/30 focus:border-brand/30 focus:bg-white/[0.08] focus:ring-brand/20 rounded-xl", fieldErrors.confirmPassword && "border-red-500 focus:border-red-500 focus:ring-red-500/20")}
                         aria-invalid={!!fieldErrors.confirmPassword}
                       />
                       {fieldErrors.confirmPassword && (
@@ -556,7 +556,7 @@ export default function SignupPage() {
                     <Button
                       type="submit"
                       disabled={isLoading}
-                      className="w-full h-12 text-base font-black bg-brand text-brand-foreground rounded-xl hover:bg-brand/90 transition-all hover:shadow-[0_10px_30px_rgba(52,211,153,0.3)] hover:scale-[1.02] active:scale-[0.98]"
+                      className="w-full h-12 text-base font-black bg-brand text-brand-foreground rounded-xl hover:bg-brand/90 transition-all shadow-lg shadow-brand/25 hover:shadow-[0_10px_30px_rgba(52,211,153,0.3)] hover:scale-[1.02] active:scale-[0.98]"
                     >
                       {isLoading ? (
                         <><Loader2 className="w-5 h-5 mr-2 animate-spin" />{isEnglish ? "Creating account..." : "Criando conta..."}</>
@@ -578,7 +578,7 @@ export default function SignupPage() {
                   <Button
                     type="button"
                     onClick={handleGoogleSignup}
-                    className="w-full h-12 bg-muted/50 border border-border text-foreground hover:bg-muted rounded-xl transition-all"
+                    className="w-full h-12 bg-card border border-border text-foreground hover:bg-muted rounded-xl transition-all"
                   >
                     <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
                       <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
@@ -653,7 +653,7 @@ export default function SignupPage() {
                       type="button"
                       onClick={handleProfileNext}
                       disabled={!canProceedProfile() || isSavingProfile}
-                      className="flex-1 h-12 font-bold bg-brand text-brand-foreground rounded-xl hover:bg-brand/90 transition-all hover:shadow-[0_10px_30px_rgba(52,211,153,0.3)] disabled:opacity-40"
+                      className="flex-1 h-12 font-bold bg-brand text-brand-foreground rounded-xl hover:bg-brand/90 transition-all shadow-lg shadow-brand/25 hover:shadow-[0_10px_30px_rgba(52,211,153,0.3)] disabled:opacity-40"
                     >
                       {profileIndex === profileSteps.length - 1 ? (
                         isSavingProfile ? (

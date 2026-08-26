@@ -392,7 +392,7 @@ export default function DashboardPage() {
       <DesktopSidebar currentView={currentView} onNavigate={setCurrentView} isFeatureLocked={isFeatureLocked} />
 
       {/* Main */}
-      <div className="md:ml-[72px] flex flex-col min-h-screen transition-all duration-300 max-w-[1200px] mx-auto w-full">
+      <div className="md:ml-[88px] flex flex-col min-h-screen transition-all duration-300 max-w-[1200px] mx-auto w-full">
         <header className="sticky top-0 z-40 flex h-14 items-center justify-between px-4 bg-background/80 backdrop-blur-xl border-b border-border md:border-none md:bg-transparent md:backdrop-blur-none">
           <div className="md:hidden flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-xl bg-brand flex items-center justify-center">
@@ -416,7 +416,7 @@ export default function DashboardPage() {
           </div>
         </header>
 
-        <main className="flex-1 overflow-y-auto px-4 pb-safe-nav pt-4 md:px-8 md:pb-8 lg:px-12 lg:pb-8">
+        <main className="flex-1 overflow-y-auto px-4 pb-nav pt-4 md:px-8 md:pb-8 lg:px-12 lg:pb-8">
           <Suspense fallback={<ViewLoader />}>
             <FeatureErrorBoundary featureName="Dashboard">
             {/* Core views */}
@@ -536,7 +536,7 @@ export default function DashboardPage() {
       {/* FAB - Scan - hidden during GPS tracker */}
       {currentView !== "corrida" && (
         <button onClick={handleNavScan}
-          className="mobile-fab-safe fixed right-4 z-50 h-14 w-14 rounded-2xl bg-brand text-white shadow-xl shadow-brand/30 flex items-center justify-center transition-all duration-200 hover:scale-105 active:scale-95 md:bottom-8 md:right-8 animate-[pulse-shadow_3s_ease-in-out_infinite]"
+          className="mobile-fab-safe fixed right-4 z-50 h-14 w-14 rounded-2xl bg-brand text-white shadow-lg shadow-brand/20 flex items-center justify-center transition-all duration-200 hover:scale-105 active:scale-95 md:bottom-6 md:right-8"
           aria-label={t("home_scan_product")}
         >
           <ScanLine className="w-6 h-6" />

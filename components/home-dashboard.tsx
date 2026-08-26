@@ -81,7 +81,7 @@ export function HomeDashboard({
     { label: t("common_body"), icon: Ruler, view: "body" as View, color: "text-foreground" },
   ]
 
-  const calorieRingRadius = 54
+  const calorieRingRadius = 68
   const calorieRingCircumference = 2 * Math.PI * calorieRingRadius
   const calorieRingOffset = calorieRingCircumference - (progressPercent / 100) * calorieRingCircumference
 
@@ -161,16 +161,16 @@ export function HomeDashboard({
   }, [locale])
 
   return (
-    <div className="mx-auto w-full max-w-4xl space-y-5 pb-safe-nav">
+    <div className="mx-auto w-full max-w-4xl space-y-6 pb-safe-nav">
       {isLoading && (
-        <div className="space-y-5 animate-fade-in">
+        <div className="space-y-6 animate-fade-in">
           {/* Header skeleton */}
           <div className="pt-2">
             <div className="h-3 w-40 bg-muted rounded animate-pulse mb-2" />
             <div className="h-8 w-32 bg-muted rounded animate-pulse" />
           </div>
           {/* Card skeletons */}
-          <div className="grid md:grid-cols-2 gap-4">
+          <div className="grid md:grid-cols-2 gap-6">
             <div className="glass-strong rounded-2xl p-4 space-y-3">
               <div className="flex items-center gap-3">
                 <div className="w-8 h-8 rounded-lg bg-muted animate-pulse" />
@@ -197,9 +197,9 @@ export function HomeDashboard({
             </div>
           </div>
           {/* Stats skeleton */}
-          <div className="grid grid-cols-5 gap-3">
+          <div className="grid grid-cols-5 gap-4">
             {Array.from({ length: 5 }).map((_, i) => (
-              <div key={i} className="glass-strong rounded-2xl p-4 text-center space-y-2">
+              <div key={i} className="glass-strong rounded-2xl p-5 text-center space-y-2">
                 <div className="w-4 h-4 bg-muted rounded animate-pulse mx-auto" />
                 <div className="h-6 w-12 bg-muted rounded animate-pulse mx-auto" />
                 <div className="h-2 w-16 bg-muted rounded animate-pulse mx-auto" />
@@ -234,12 +234,12 @@ export function HomeDashboard({
       </motion.section>
 
       {/* Quote + Insights row */}
-      <div className="grid md:grid-cols-2 gap-4">
+      <div className="grid md:grid-cols-2 gap-6">
         <motion.section
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.02 }}
-          className="rounded-2xl glass-strong p-4 flex items-start gap-3"
+          className="rounded-2xl glass-strong p-4 flex items-start gap-4"
         >
           <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-brand-muted">
             <Sparkles className="h-4 w-4 text-brand" />
@@ -251,7 +251,7 @@ export function HomeDashboard({
       </div>
 
       {/* Streak + Checklist */}
-      <div className="grid md:grid-cols-2 gap-4">
+      <div className="grid md:grid-cols-2 gap-6">
         <StreakDisplay compact onNavigate={onNavigate} />
         <BeginnerChecklist />
       </div>
@@ -261,19 +261,19 @@ export function HomeDashboard({
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.05 }}
-        className="rounded-2xl glass-strong p-5 md:p-6"
+        className="rounded-2xl glass-strong p-8 md:p-8"
       >
         <div className="flex items-center gap-2 mb-4">
           <Flame className="h-4 w-4 text-brand" />
-          <h2 className="text-sm font-semibold text-foreground">{locale === "en-US" ? "Today's Nutrition" : "Nutrição de Hoje"}</h2>
+          <h2 className="section-label">{locale === "en-US" ? "Today's Nutrition" : "Nutrição de Hoje"}</h2>
         </div>
-        <div className="flex flex-col sm:flex-row items-center gap-6">
+        <div className="flex flex-col sm:flex-row items-center gap-4">
           {/* Calorie Ring */}
           <div className="relative shrink-0">
-            <svg width="128" height="128" className="-rotate-90">
-              <circle cx="64" cy="64" r={calorieRingRadius} fill="none" stroke="currentColor" strokeWidth="8" className="text-border" />
+            <svg width="160" height="160" className="-rotate-90">
+              <circle cx="80" cy="80" r={calorieRingRadius} fill="none" stroke="currentColor" strokeWidth="10" className="text-border" />
               <motion.circle
-                cx="64" cy="64" r={calorieRingRadius} fill="none" stroke="currentColor" strokeWidth="8" strokeLinecap="round"
+                cx="80" cy="80" r={calorieRingRadius} fill="none" stroke="currentColor" strokeWidth="10" strokeLinecap="round"
                 strokeDasharray={calorieRingCircumference}
                 initial={{ strokeDashoffset: calorieRingCircumference }}
                 animate={{ strokeDashoffset: calorieRingOffset }}
@@ -282,9 +282,8 @@ export function HomeDashboard({
               />
             </svg>
             <div className="absolute inset-0 flex flex-col items-center justify-center">
-              <Flame className="h-4 w-4 text-brand mb-0.5" />
-              <span className="text-2xl font-bold text-foreground">{goals ? remainingCalories : "--"}</span>
-              <span className="text-[10px] text-muted-foreground">{t("hd_kcal_left")}</span>
+              <span className="text-3xl font-bold text-score">{goals ? remainingCalories : "--"}</span>
+              <span className="text-[11px] uppercase tracking-widest text-brand">{t("hd_kcal_left")}</span>
             </div>
           </div>
 
@@ -308,10 +307,10 @@ export function HomeDashboard({
             <Button
               onClick={() => onNavigate(goals ? "dashboard" : "planner")}
               variant="ghost"
-              className="h-9 w-full rounded-xl text-xs font-medium"
+              className="group h-9 w-full rounded-xl text-xs font-medium"
             >
               {goals ? t("home_start_btn") : t("home_new_plan")}
-              <ArrowRight className="ml-1 h-3 w-3" />
+              <ArrowRight className="ml-1 h-3 w-3 group-arrow" />
             </Button>
           </div>
         </div>
@@ -322,7 +321,7 @@ export function HomeDashboard({
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.08 }}
-        className="grid grid-cols-3 sm:grid-cols-5 gap-3"
+        className="grid grid-cols-3 sm:grid-cols-5 gap-4"
       >
         <StatWidget icon={Trophy} label={t("home_longevity")} value={averageLongevityScore || "-"} />
         <StatWidget icon={Droplet} label={t("home_water")} value={`${waterCups * 250}ml`} />
@@ -334,16 +333,16 @@ export function HomeDashboard({
       <HydrationTracker />
 
       {/* Weekly + Workout row */}
-      <div className="grid md:grid-cols-2 gap-4">
+      <div className="grid md:grid-cols-2 gap-6">
         {/* Weekly Activity Chart */}
         {weeklyData.length > 0 && (
           <motion.section
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="rounded-2xl glass-strong p-5"
+            className="rounded-2xl glass-strong p-4"
           >
-            <h2 className="mb-3 text-sm font-semibold text-muted-foreground">{t("home_weekly_activity")}</h2>
+            <h2 className="mb-3 text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">{t("home_weekly_activity")}</h2>
             <div className="h-28">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={weeklyData} barCategoryGap="20%">
@@ -411,7 +410,7 @@ export function HomeDashboard({
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.15 }}
       >
-        <h2 className="mb-3 text-sm font-semibold text-muted-foreground">
+        <h2 className="mb-3 section-label">
           {t("hd_quick_actions")}
         </h2>
         <div className="grid grid-cols-2 gap-3">
@@ -420,12 +419,12 @@ export function HomeDashboard({
               key={action.view}
               type="button"
               onClick={() => onNavigate(action.view)}
-              className="flex flex-col items-center gap-2 rounded-2xl glass-card p-4 haptic-press hover:bg-brand/5 transition-colors"
+              className="group flex flex-col items-center gap-3 rounded-2xl glass-card p-5 haptic-press border border-transparent hover:bg-brand/[0.06] hover:border-brand/10 transition-colors"
             >
-              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-brand-muted">
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-brand-muted">
                 <action.icon className="h-5 w-5 text-brand" />
               </div>
-              <span className="text-[11px] font-medium text-foreground text-center leading-tight">{action.label}</span>
+              <span className="text-[13px] font-medium text-foreground text-center leading-tight">{action.label}</span>
             </button>
           ))}
         </div>
@@ -446,14 +445,14 @@ export function HomeDashboard({
         </div>
 
         {dailyActivity?.scannedProducts?.length > 0 ? (
-          <div className="space-y-2">
+          <div className="space-y-4">
             {dailyActivity.scannedProducts.slice(0, 3).map((product: any, index: number) => (
               <motion.div
                 key={`${product.productName}-${index}`}
                 initial={{ opacity: 0, y: 4 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.03 }}
-                className="flex items-center gap-3 rounded-xl glass-strong p-3"
+                className="group flex items-center gap-4 rounded-xl glass-strong p-4 list-interactive"
               >
                 <img src={product.image || "/placeholder.svg?width=100&height=100"} alt={product.productName} className="h-10 w-10 rounded-lg object-cover" />
                 <div className="min-w-0 flex-1">
@@ -462,7 +461,7 @@ export function HomeDashboard({
                     {product.longevityScore} {t("scan_score_label")}
                   </p>
                 </div>
-                <ArrowRight className="h-4 w-4 text-muted-foreground/40" />
+                <ArrowRight className="h-4 w-4 text-muted-foreground/40 group-arrow" />
               </motion.div>
             ))}
           </div>
@@ -508,10 +507,12 @@ function MacroPill({ label, value, color }: { label: string; value: string; colo
 
 function StatWidget({ icon: Icon, label, value }: { icon: React.ComponentType<{ className?: string }>; label: string; value: string | number }) {
   return (
-    <div className="rounded-2xl glass-strong p-4 text-center haptic-press hover:bg-brand/5 transition-colors">
-      <Icon className="mx-auto h-4 w-4 text-brand mb-2" />
+    <div className="rounded-2xl glass-strong p-5 text-center haptic-press hover:bg-brand/5 transition-colors">
+      <div className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-xl bg-brand-muted">
+        <Icon className="h-5 w-5 text-brand" />
+      </div>
       <p className="text-lg font-bold text-foreground">{value}</p>
-      <p className="text-[10px] text-muted-foreground mt-0.5">{label}</p>
+      <p className="text-[11px] tracking-widest text-muted-foreground mt-0.5">{label}</p>
     </div>
   )
 }

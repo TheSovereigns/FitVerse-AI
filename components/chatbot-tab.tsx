@@ -236,6 +236,8 @@ export function ChatbotTab() {
     )
   }
 
+  const suggestionChips = ["Create a meal plan", "Analyze my sleep", "What should I eat?"]
+
   return (
     <div className="mx-auto flex h-[calc(100vh-12rem)] max-w-4xl flex-col">
       <div className="flex-1 overflow-y-auto px-4 py-6 space-y-4">
@@ -246,52 +248,66 @@ export function ChatbotTab() {
             <p className="text-sm text-muted-foreground mt-2 max-w-md">
               {t("chatbot_welcome_desc") || "Pergunte sobre treinos, nutrição, suplementos ou qualquer coisa sobre fitness."}
             </p>
+            <div className="flex flex-wrap items-center justify-center gap-2 mt-5 max-w-md">
+              {suggestionChips.map((chip) => (
+                <button
+                  key={chip}
+                  onClick={() => setInput(chip)}
+                  className="rounded-full border border-border px-3 py-1.5 text-sm hover:bg-muted transition-colors text-foreground"
+                >
+                  {chip}
+                </button>
+              ))}
+            </div>
           </div>
         )}
         {messages.map((msg) => (
-          <div key={msg.id} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
-            <div className={`flex max-w-[80%] gap-2 ${msg.role === "user" ? "flex-row-reverse" : ""}`}>
-              <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-xl ${
-                msg.role === "user" ? "bg-brand/20 text-brand" : "bg-muted text-muted-foreground"
-              }`}>
-                {msg.role === "user" ? <User className="h-4 w-4" /> : <Bot className="h-4 w-4" />}
-              </div>
-              <div className={`rounded-2xl px-4 py-3 ${
-                msg.role === "user"
-                  ? "bg-brand text-white"
-                  : "bg-muted text-foreground"
-              }`}>
-                <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
-                {msg.role === "assistant" && msg.content && (
-                  <div className="flex items-center gap-1 mt-2">
-                    {[1, 2, 3, 4, 5].map((score) => (
-                      <button
-                        key={score}
-                        onClick={() => rateMessage(msg.id, score)}
-                        className="p-0.5"
-                      >
-                        <Star
-                          className={`h-3 w-3 ${
-                            (rating[msg.id] || 0) >= score
-                              ? "fill-yellow-400 text-yellow-400"
-                              : "text-muted-foreground/50"
-                          }`}
-                        />
-                      </button>
-                    ))}
-                  </div>
-                )}
+          msg.role === "user" ? (
+            <div key={msg.id} className="flex justify-end">
+              <div className="bg-brand rounded-2xl rounded-br-md px-4 py-3 max-w-[84%] ml-auto">
+                <p className="text-sm whitespace-pre-wrap text-white">{msg.content}</p>
               </div>
             </div>
-          </div>
+          ) : (
+            <div key={msg.id} className="flex justify-start">
+              <div className="flex items-start gap-2.5 max-w-[84%]">
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-brand text-white">
+                  <Bot className="h-4 w-4" />
+                </div>
+                <div className="bg-card border border-border rounded-2xl rounded-bl-md p-4">
+                  <p className="text-sm whitespace-pre-wrap text-foreground">{msg.content}</p>
+                  {msg.content && (
+                    <div className="flex items-center gap-1.5 mt-3">
+                      {[1, 2, 3, 4, 5].map((score) => (
+                        <button
+                          key={score}
+                          onClick={() => rateMessage(msg.id, score)}
+                          className="p-1 rounded-md hover:bg-muted transition-colors"
+                          aria-label={`Rate ${score}`}
+                        >
+                          <Star
+                            className={`h-4 w-4 transition-colors ${
+                              (rating[msg.id] || 0) >= score
+                                ? "fill-yellow-400 text-yellow-400 drop-shadow-sm"
+                                : "text-muted-foreground/60 hover:text-yellow-400/60"
+                            }`}
+                          />
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          )
         ))}
         {isLoading && messages[messages.length - 1]?.content === "" && (
           <div className="flex justify-start">
-            <div className="flex gap-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-muted text-muted-foreground">
+            <div className="flex items-start gap-2.5 max-w-[84%]">
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-brand text-white">
                 <Bot className="h-4 w-4" />
               </div>
-              <div className="rounded-2xl bg-muted px-4 py-3">
+              <div className="bg-card border border-border rounded-2xl rounded-bl-md p-4">
                 <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
               </div>
             </div>

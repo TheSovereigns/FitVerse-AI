@@ -44,7 +44,6 @@ export function DesktopSidebar({ currentView, onNavigate, isFeatureLocked }: Sid
   const isEnglish = locale === "en-US"
   const [expandedGroup, setExpandedGroup] = useState<string | null>(null)
   const [isCollapsed, setIsCollapsed] = useState(false)
-  const sidebarWidth = isCollapsed ? 56 : 72
 
   const toggle = (key: string) => setExpandedGroup(prev => prev === key ? null : key)
 
@@ -142,22 +141,15 @@ export function DesktopSidebar({ currentView, onNavigate, isFeatureLocked }: Sid
         onClick={() => onNavigate(item.view)}
         title={item.label}
         className={cn(
-          "relative flex flex-col items-center gap-1 w-full rounded-xl py-2 transition-all duration-200",
+          "relative flex flex-col items-center gap-1.5 w-full rounded-xl py-3 transition-all duration-200 border-l-2",
           active
-            ? "bg-brand/10 text-brand"
-            : "text-muted-foreground hover:text-foreground hover:bg-white/[0.04]"
+            ? "bg-brand/10 text-brand border-brand"
+            : "text-muted-foreground hover:text-foreground hover:bg-white/[0.04] border-transparent"
         )}
       >
-        {active && (
-          <motion.div
-            layoutId="sidebar-active"
-            className="absolute top-0 left-1/2 -translate-x-1/2 w-5 h-[3px] rounded-b-full bg-brand"
-            transition={{ type: "spring", stiffness: 400, damping: 30 }}
-          />
-        )}
         <item.icon className={cn("w-5 h-5 transition-all duration-200", active && "stroke-[2.5]")} />
         {!isCollapsed && (
-          <span className="text-[10px] font-medium leading-none truncate w-full text-center px-1">{item.label}</span>
+          <span className="text-[11px] font-[550] tracking-[-0.01em] leading-none truncate w-full text-center px-1">{item.label}</span>
         )}
       </motion.button>
     )
@@ -176,19 +168,12 @@ export function DesktopSidebar({ currentView, onNavigate, isFeatureLocked }: Sid
           onClick={() => toggle(group.key)}
           title={group.label}
           className={cn(
-            "relative flex flex-col items-center gap-1 w-full rounded-xl py-2 transition-all duration-200",
+            "relative flex flex-col items-center gap-1.5 w-full rounded-xl py-3 transition-all duration-200 border-l-2",
             groupActive && !isOpen
-              ? "bg-brand/10 text-brand"
-              : "text-muted-foreground hover:text-foreground hover:bg-white/[0.04]"
+              ? "bg-brand/10 text-brand border-brand"
+              : "text-muted-foreground hover:text-foreground hover:bg-white/[0.04] border-transparent"
           )}
         >
-          {groupActive && !isOpen && (
-            <motion.div
-              layoutId="sidebar-active"
-              className="absolute top-0 left-1/2 -translate-x-1/2 w-5 h-[3px] rounded-b-full bg-brand"
-              transition={{ type: "spring", stiffness: 400, damping: 30 }}
-            />
-          )}
           <div className="relative">
             <group.icon className={cn("w-5 h-5 transition-all duration-200")} />
             <ChevronRight className={cn(
@@ -197,7 +182,7 @@ export function DesktopSidebar({ currentView, onNavigate, isFeatureLocked }: Sid
             )} />
           </div>
           {!isCollapsed && (
-            <span className="text-[10px] font-medium leading-none truncate w-full text-center px-1">{group.label}</span>
+            <span className="text-[11px] font-[550] tracking-[-0.01em] leading-none truncate w-full text-center px-1">{group.label}</span>
           )}
         </motion.button>
       </div>
@@ -207,8 +192,7 @@ export function DesktopSidebar({ currentView, onNavigate, isFeatureLocked }: Sid
   return (
     <>
       <aside
-        className="hidden md:flex flex-col fixed top-0 left-0 h-full z-50 transition-all duration-300"
-        style={{ width: sidebarWidth }}
+        className="hidden md:flex flex-col fixed top-0 left-0 h-full z-50 w-[88px] transition-all duration-300"
       >
         {/* Background */}
         <div className="absolute inset-0 bg-card/80 backdrop-blur-2xl border-r border-border/50" />
@@ -249,7 +233,7 @@ export function DesktopSidebar({ currentView, onNavigate, isFeatureLocked }: Sid
             <div className="!mt-1 pt-1 border-t border-border/30">
               <button
                 onClick={() => setIsCollapsed(!isCollapsed)}
-                className="flex flex-col items-center gap-1 w-full rounded-xl py-2 text-muted-foreground hover:text-foreground hover:bg-white/[0.04] transition-all duration-200"
+                className="flex flex-col items-center gap-1.5 w-full rounded-xl py-3 text-muted-foreground hover:text-foreground hover:bg-white/[0.04] transition-all duration-200"
                 title={isCollapsed ? t("nav_expand") : t("nav_collapse")}
               >
                 {isCollapsed ? (
@@ -258,7 +242,7 @@ export function DesktopSidebar({ currentView, onNavigate, isFeatureLocked }: Sid
                   <PanelLeftClose className="w-5 h-5" />
                 )}
                 {!isCollapsed && (
-                  <span className="text-[10px] font-medium leading-none">{isEnglish ? "Collapse" : "Recolher"}</span>
+                  <span className="text-[11px] font-[550] tracking-[-0.01em] leading-none">{isEnglish ? "Collapse" : "Recolher"}</span>
                 )}
               </button>
             </div>
@@ -274,17 +258,16 @@ export function DesktopSidebar({ currentView, onNavigate, isFeatureLocked }: Sid
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -8 }}
             transition={{ duration: 0.15 }}
-            className="hidden md:flex fixed top-0 h-full z-40 w-[200px] flex-col"
-            style={{ left: sidebarWidth }}
+            className="hidden md:flex fixed top-0 h-full z-40 w-[240px] flex-col left-[88px]"
           >
-            <div className="absolute inset-0 bg-card/95 backdrop-blur-2xl border-r border-border/50" />
+            <div className="absolute inset-0 bg-popover/95 backdrop-blur-2xl border-r border-border/50" />
             <div className="relative flex flex-col h-full">
               {/* Header */}
               <div className="flex items-center gap-2.5 px-4 py-3.5 border-b border-border/30">
                 <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ backgroundColor: `${activeGroup.accent}15` }}>
                   <activeGroup.icon className="w-4 h-4" style={{ color: activeGroup.accent }} />
                 </div>
-                <span className="text-sm font-bold text-foreground">{activeGroup.label}</span>
+                <span className="text-[12px] font-semibold uppercase tracking-wider text-muted-foreground">{activeGroup.label}</span>
               </div>
 
               {/* Items */}
@@ -299,15 +282,15 @@ export function DesktopSidebar({ currentView, onNavigate, isFeatureLocked }: Sid
                       transition={{ delay: i * 0.03 }}
                       onClick={() => { onNavigate(sub.view); setExpandedGroup(null) }}
                       className={cn(
-                        "flex items-center gap-2.5 w-full px-3 py-2.5 rounded-xl text-left transition-all duration-150",
+                        "flex items-center gap-2.5 w-full px-3 py-2.5 rounded-lg text-left transition-all duration-150",
                         subActive
-                          ? "text-foreground font-semibold"
+                          ? "text-foreground font-semibold bg-white/[0.04]"
                           : "text-muted-foreground hover:text-foreground hover:bg-white/[0.04]"
                       )}
                       style={subActive ? { backgroundColor: `${activeGroup.accent}10` } : undefined}
                     >
                       <sub.icon className={cn("w-4 h-4 shrink-0")} style={subActive ? { color: activeGroup.accent } : undefined} />
-                      <span className="text-[13px] truncate">{sub.label}</span>
+                      <span className="text-[14px] truncate">{sub.label}</span>
                     </motion.button>
                   )
                 })}

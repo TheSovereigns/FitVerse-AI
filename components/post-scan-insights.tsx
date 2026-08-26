@@ -2,7 +2,7 @@
 
 import { useMemo } from "react"
 import { motion } from "framer-motion"
-import { Lightbulb } from "lucide-react"
+import { Lightbulb, TrendingUp, AlertTriangle, Info } from "lucide-react"
 import { generatePostScanInsight, type Insight } from "@/lib/insights-engine"
 import { useTranslation } from "@/lib/i18n"
 import { cn } from "@/lib/utils"
@@ -13,11 +13,11 @@ interface PostScanInsightsProps {
   plan: any
 }
 
-const typeStyles: Record<Insight["type"], { bg: string; border: string }> = {
-  positive: { bg: "bg-emerald-500/8", border: "border-emerald-500/20" },
-  warning: { bg: "bg-amber-500/8", border: "border-amber-500/20" },
-  info: { bg: "bg-blue-500/8", border: "border-blue-500/20" },
-  tip: { bg: "bg-purple-500/8", border: "border-purple-500/20" },
+const typeStyles: Record<Insight["type"], { bg: string; border: string; iconBg: string; iconColor: string; Icon: React.ElementType }> = {
+  positive: { bg: "bg-emerald-500/8", border: "border-emerald-500/20", iconBg: "bg-emerald-500/15", iconColor: "text-emerald-400", Icon: TrendingUp },
+  warning: { bg: "bg-amber-500/8", border: "border-amber-500/20", iconBg: "bg-amber-500/15", iconColor: "text-amber-400", Icon: AlertTriangle },
+  info: { bg: "bg-blue-500/8", border: "border-blue-500/20", iconBg: "bg-blue-500/15", iconColor: "text-blue-400", Icon: Info },
+  tip: { bg: "bg-purple-500/8", border: "border-purple-500/20", iconBg: "bg-purple-500/15", iconColor: "text-purple-400", Icon: Lightbulb },
 }
 
 export function PostScanInsights({ scan, todayScans, plan }: PostScanInsightsProps) {
@@ -46,6 +46,7 @@ export function PostScanInsights({ scan, todayScans, plan }: PostScanInsightsPro
       <div className="space-y-2">
         {insights.map((insight, i) => {
           const styles = typeStyles[insight.type]
+          const Icon = styles.Icon
           return (
             <motion.div
               key={insight.id}
@@ -58,8 +59,10 @@ export function PostScanInsights({ scan, todayScans, plan }: PostScanInsightsPro
                 styles.border
               )}
             >
-              <span className="text-sm mt-0.5 shrink-0">{insight.icon}</span>
-              <p className="text-[12px] leading-relaxed text-white/70">{insight.text}</p>
+              <div className={cn("w-8 h-8 rounded-lg flex items-center justify-center shrink-0", styles.iconBg)}>
+                <Icon className={cn("w-4 h-4", styles.iconColor)} />
+              </div>
+              <p className="text-[12px] leading-relaxed text-white/70 flex-1">{insight.text}</p>
             </motion.div>
           )
         })}

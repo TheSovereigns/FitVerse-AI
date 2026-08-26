@@ -139,12 +139,12 @@ export function MonthlyReport() {
   }, [])
 
   const stats = [
-    { icon: ScanLine, label: t("mr_scans"), value: data.monthScans, color: "text-blue-400" },
-    { icon: Dumbbell, label: isEnglish ? "Workouts" : "Treinos", value: data.monthWorkouts, color: "text-green-400" },
-    { icon: Droplets, label: t("mr_water"), value: data.monthWater.toFixed(1), color: "text-cyan-400" },
-    { icon: Heart, label: isEnglish ? "Habits" : "Habitos", value: data.monthHabits, color: "text-red-400" },
-    { icon: Zap, label: "XP", value: data.xp.toLocaleString(), color: "text-yellow-400" },
-    { icon: Star, label: isEnglish ? "Coins" : "Moedas", value: data.coins.toLocaleString(), color: "text-orange-400" },
+    { icon: ScanLine, label: t("mr_scans"), value: data.monthScans },
+    { icon: Dumbbell, label: isEnglish ? "Workouts" : "Treinos", value: data.monthWorkouts },
+    { icon: Droplets, label: t("mr_water"), value: data.monthWater.toFixed(1) },
+    { icon: Heart, label: isEnglish ? "Habits" : "Habitos", value: data.monthHabits },
+    { icon: Zap, label: "XP", value: data.xp.toLocaleString() },
+    { icon: Star, label: isEnglish ? "Coins" : "Moedas", value: data.coins.toLocaleString() },
   ]
 
   const weightLatest = data.weightData[data.weightData.length - 1]?.weight
@@ -170,9 +170,11 @@ export function MonthlyReport() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.05 }}
-            className="p-3 rounded-xl border border-border bg-card"
+            className="p-3 rounded-2xl border border-border bg-card"
           >
-            <stat.icon className={cn("w-4 h-4 mb-1", stat.color)} />
+            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-brand-muted mb-1.5">
+              <stat.icon className="w-4 h-4 text-brand" />
+            </div>
             <p className="text-lg font-bold text-foreground">{stat.value}</p>
             <p className="text-[10px] text-muted-foreground">{stat.label}</p>
           </motion.div>
@@ -183,7 +185,7 @@ export function MonthlyReport() {
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3 }}
-        className="mb-4 p-4 rounded-xl border border-border bg-card"
+        className="mb-4 p-4 rounded-2xl border border-border bg-card"
       >
         <div className="flex items-center justify-between">
           <div>
@@ -214,7 +216,7 @@ export function MonthlyReport() {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
-          className="mb-4 p-4 rounded-xl border border-border bg-card"
+          className="mb-4 p-4 rounded-2xl border border-border bg-card"
         >
           <div className="flex items-center justify-between mb-2">
             <h3 className="text-sm font-medium text-foreground">
@@ -262,20 +264,20 @@ export function MonthlyReport() {
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.5 }}
-        className="mb-4 p-4 rounded-xl border border-border bg-card"
+        className="mb-4 p-4 rounded-2xl border border-border bg-card"
       >
         <h3 className="text-sm font-medium text-foreground mb-3">
           {isEnglish ? "Daily Activity" : "Atividade Diaria"}
         </h3>
         <ResponsiveContainer width="100%" height={180}>
-          <BarChart data={data.dailyData}>
+          <BarChart data={data.dailyData} barCategoryGap="32%" barSize={10}>
             <XAxis dataKey="label" tick={{ fontSize: 9, fill: "var(--muted-foreground)" }} interval={Math.floor(totalDaysInMonth / 6)} />
             <YAxis tick={{ fontSize: 10, fill: "var(--muted-foreground)" }} />
             <Tooltip
-              contentStyle={{ background: "hsl(var(--popover))", border: "1px solid var(--border)", borderRadius: 8, fontSize: 12 }}
+              contentStyle={{ background: "hsl(var(--popover))", border: "1px solid var(--border)", borderRadius: 12, fontSize: 12 }}
               labelStyle={{ color: "var(--foreground)" }}
             />
-            <Bar dataKey="score" fill="hsl(var(--brand))" radius={[4, 4, 0, 0]} />
+            <Bar dataKey="score" fill="hsl(var(--brand))" radius={[8, 8, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
       </motion.div>
@@ -285,7 +287,7 @@ export function MonthlyReport() {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.6 }}
-          className="rounded-xl border border-border bg-card p-4"
+          className="rounded-2xl border border-border bg-card p-4"
         >
           <div className="flex items-center gap-2 mb-3">
             <Trophy className="w-4 h-4 text-yellow-400" />

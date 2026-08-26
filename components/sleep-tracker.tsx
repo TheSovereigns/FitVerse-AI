@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useMemo } from "react"
 import { motion } from "framer-motion"
-import { Moon, Star, Lock, TrendingUp, TrendingDown, AlertTriangle, Lightbulb } from "lucide-react"
+import { Moon, Star, Lock, TrendingUp, TrendingDown, AlertTriangle, Lightbulb, Clock } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts"
 import { useTranslation } from "@/lib/i18n"
@@ -129,10 +129,11 @@ export function SleepTracker({ isLocked = false }: { isLocked?: boolean }) {
             <p className="text-xs text-muted-foreground">{isEnglish ? "Track & optimize your sleep" : "Rastreie e otimize seu sono"}</p>
           </div>
         </div>
-        <div className="flex flex-col items-center justify-center py-8 text-center">
-          <Lock className="h-8 w-8 text-muted-foreground mb-3" />
-          <p className="text-sm font-medium text-foreground mb-1">{isEnglish ? "Pro Feature" : "Recurso Pro"}</p>
-          <p className="text-xs text-muted-foreground">{isEnglish ? "Upgrade to Pro to track your sleep" : "Atualize para Pro para rastrear seu sono"}</p>
+        <div className="paywall-card">
+          <div className="paywall-icon"><Lock className="w-6 h-6" /></div>
+          <h3 className="text-[15px] font-semibold mb-1">{isEnglish ? "Pro Feature" : "Recurso Pro"}</h3>
+          <p className="text-[13px] text-muted-foreground mb-4">{isEnglish ? "Upgrade to Pro to track your sleep" : "Atualize para Pro para rastrear seu sono"}</p>
+          <Button className="h-11 rounded-xl bg-brand text-brand-foreground w-full">Unlock with Pro →</Button>
         </div>
       </motion.div>
     )
@@ -155,23 +156,23 @@ export function SleepTracker({ isLocked = false }: { isLocked?: boolean }) {
           </div>
         </div>
         {todayEntry && (
-          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-indigo-500/10">
-            <span className="text-xs font-semibold text-indigo-500">{isEnglish ? "Today" : "Hoje"}</span>
+          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-brand/10">
+            <span className="text-xs font-semibold text-brand">{isEnglish ? "Today" : "Hoje"}</span>
           </div>
         )}
       </div>
 
       <div className="grid grid-cols-3 gap-2 mb-4">
-        <div className="text-center p-2 rounded-xl bg-brand-muted">
+        <div className="text-center p-2 rounded-xl bg-brand-muted card-hover">
           <p className="text-lg font-bold text-foreground">{todayEntry?.duration || duration}h</p>
           <p className="text-[10px] text-muted-foreground">{isEnglish ? "Duration" : "Duracao"}</p>
         </div>
-        <div className="text-center p-2 rounded-xl bg-brand-muted">
+        <div className="text-center p-2 rounded-xl bg-brand-muted card-hover">
           <p className="text-lg font-bold text-foreground">{score}</p>
           <p className="text-[10px] text-muted-foreground">{isEnglish ? "Sleep Score" : "Score Sono"}</p>
         </div>
-        <div className="text-center p-2 rounded-xl bg-brand-muted">
-          <p className={cn("text-lg font-bold", sleepDebt > 0 ? "text-red-500" : "text-green-500")}>
+        <div className="text-center p-2 rounded-xl bg-brand-muted card-hover">
+          <p className={cn("text-lg font-bold", sleepDebt > 0 ? "text-red-500" : "text-brand")}>
             {sleepDebt > 0 ? `-${sleepDebt}h` : "0h"}
           </p>
           <p className="text-[10px] text-muted-foreground">{isEnglish ? "Sleep Debt" : "Divida Sono"}</p>
@@ -181,21 +182,27 @@ export function SleepTracker({ isLocked = false }: { isLocked?: boolean }) {
       <div className="mb-4">
         <div className="flex items-center justify-between mb-2">
           <span className="text-xs text-muted-foreground">{isEnglish ? "Bedtime" : "Hora de dormir"}</span>
-          <input
-            type="time"
-            value={bedtime}
-            onChange={(e) => setBedtime(e.target.value)}
-            className="text-xs font-mono bg-muted border border-border rounded-lg px-2 py-1 text-foreground"
-          />
+          <div className="relative flex items-center">
+            <Clock className="pointer-events-none absolute left-3 h-3.5 w-3.5 text-muted-foreground" />
+            <input
+              type="time"
+              value={bedtime}
+              onChange={(e) => setBedtime(e.target.value)}
+              className="h-9 pl-9 pr-3 rounded-xl bg-white/[0.06] border border-white/10 text-sm font-medium text-foreground focus:outline-none focus:ring-1 focus:ring-white/10"
+            />
+          </div>
         </div>
         <div className="flex items-center justify-between mb-2">
           <span className="text-xs text-muted-foreground">{isEnglish ? "Wake time" : "Hora de acordar"}</span>
-          <input
-            type="time"
-            value={wakeTime}
-            onChange={(e) => setWakeTime(e.target.value)}
-            className="text-xs font-mono bg-muted border border-border rounded-lg px-2 py-1 text-foreground"
-          />
+          <div className="relative flex items-center">
+            <Clock className="pointer-events-none absolute left-3 h-3.5 w-3.5 text-muted-foreground" />
+            <input
+              type="time"
+              value={wakeTime}
+              onChange={(e) => setWakeTime(e.target.value)}
+              className="h-9 pl-9 pr-3 rounded-xl bg-white/[0.06] border border-white/10 text-sm font-medium text-foreground focus:outline-none focus:ring-1 focus:ring-white/10"
+            />
+          </div>
         </div>
         <div className="mb-3">
           <span className="text-xs text-muted-foreground block mb-1.5">{isEnglish ? "Sleep quality" : "Qualidade do sono"}</span>
@@ -207,7 +214,7 @@ export function SleepTracker({ isLocked = false }: { isLocked?: boolean }) {
             ))}
           </div>
         </div>
-        <Button onClick={handleLog} className="w-full h-9 rounded-xl text-xs font-medium bg-indigo-500 hover:bg-indigo-600 text-white">
+        <Button onClick={handleLog} className="w-full h-9 rounded-xl text-xs font-medium bg-brand text-brand-foreground hover:bg-brand/90">
           {todayEntry ? (isEnglish ? "Update Log" : "Atualizar Registro") : (isEnglish ? "Log Sleep" : "Registrar Sono")}
         </Button>
       </div>
@@ -222,16 +229,16 @@ export function SleepTracker({ isLocked = false }: { isLocked?: boolean }) {
               <XAxis dataKey="name" tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }} axisLine={false} tickLine={false} />
               <YAxis domain={[0, 12]} tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }} axisLine={false} tickLine={false} width={25} />
               <Tooltip
-                contentStyle={{ fontSize: 11, background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 8 }}
+                contentStyle={{ background: 'hsl(0 0% 6%)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 12, color: '#fff', fontSize: 12 }}
                 formatter={(value: number) => [`${value}h`, isEnglish ? "Sleep" : "Sono"]}
               />
-              <Line type="monotone" dataKey="hours" stroke="#6366f1" strokeWidth={2} dot={{ r: 3, fill: "#6366f1" }} />
+              <Line type="monotone" dataKey="hours" stroke="#34D399" strokeWidth={2} dot={{ r: 3, fill: "#34D399" }} />
             </LineChart>
           </ResponsiveContainer>
         </div>
       </div>
 
-      <div className="flex items-start gap-2 p-3 rounded-xl bg-brand-muted">
+      <div className="flex items-start gap-2 p-3 rounded-xl bg-brand-muted card-hover">
         <Lightbulb className="h-4 w-4 text-yellow-500 mt-0.5 shrink-0" />
         <div>
           <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider mb-0.5">
@@ -240,6 +247,24 @@ export function SleepTracker({ isLocked = false }: { isLocked?: boolean }) {
           <p className="text-xs text-foreground">{tip}</p>
         </div>
       </div>
+
+      {entries.length > 0 && (
+        <div className="mt-4 space-y-2 max-h-40 overflow-y-auto">
+          {entries.slice(-5).reverse().map((entry) => (
+            <div key={entry.date} className="flex items-center justify-between rounded-xl border border-border p-3 card-hover">
+              <div>
+                <p className="text-xs font-medium text-foreground">{new Date(entry.date).toLocaleDateString(isEnglish ? "en-US" : "pt-BR", { month: "short", day: "numeric" })} • {entry.duration}h</p>
+                <p className="text-[10px] text-muted-foreground">{entry.bedtime} — {entry.wakeTime}</p>
+              </div>
+              <div className="flex items-center gap-1">
+                {[...Array(5)].map((_, i) => (
+                  <Star key={i} className={cn("h-3 w-3", i < entry.quality ? "fill-yellow-500 text-yellow-500" : "text-muted-foreground/30")} />
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </motion.div>
   )
 }

@@ -83,9 +83,9 @@ export default function LoginPage() {
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-background flex">
       {/* Left side - Visual (desktop only) */}
       <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/30 via-transparent to-purple-500/20" />
-        <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-primary/20 rounded-full blur-[100px]" />
-        <div className="absolute bottom-1/4 right-1/4 w-48 h-48 bg-purple-500/20 rounded-full blur-[80px]" />
+        <div className="absolute inset-0 bg-gradient-to-br from-brand/18 via-brand/6 to-emerald-600/14" />
+        <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-brand/20 rounded-full blur-[100px]" />
+        <div className="absolute bottom-1/4 right-1/4 w-48 h-48 bg-emerald-500/16 rounded-full blur-[80px]" />
         
         <div className="relative z-10 flex flex-col items-center justify-center w-full p-12">
           <motion.div
@@ -158,7 +158,7 @@ export default function LoginPage() {
                   onChange={(e) => setEmail(e.target.value)}
                   onBlur={() => setFieldErrors(prev => ({ ...prev, ...validate({ email, password }) }))}
                   placeholder={locale === "en-US" ? "you@example.com" : "seu@email.com"}
-                  className={cn("h-12 bg-muted/50 border-border text-foreground placeholder:text-foreground/30 focus:border-primary focus:ring-primary/20 rounded-xl", fieldErrors.email && "border-red-500 focus:border-red-500 focus:ring-red-500/20")}
+                  className={cn("h-12 bg-white/[0.06] border-white/10 text-foreground placeholder:text-foreground/30 focus:border-brand/30 focus:bg-white/[0.08] focus:ring-brand/20 rounded-xl", fieldErrors.email && "border-red-500 focus:border-red-500 focus:ring-red-500/20")}
                   aria-invalid={!!fieldErrors.email}
                 />
                 {fieldErrors.email && (
@@ -178,7 +178,7 @@ export default function LoginPage() {
                     onChange={(e) => setPassword(e.target.value)}
                     onBlur={() => setFieldErrors(prev => ({ ...prev, ...validate({ email, password }) }))}
                     placeholder="••••••••"
-                    className={cn("h-12 bg-muted/50 border-border text-foreground placeholder:text-foreground/30 focus:border-primary focus:ring-primary/20 rounded-xl pr-12", fieldErrors.password && "border-red-500 focus:border-red-500 focus:ring-red-500/20")}
+                    className={cn("h-12 bg-white/[0.06] border-white/10 text-foreground placeholder:text-foreground/30 focus:border-brand/30 focus:bg-white/[0.08] focus:ring-brand/20 rounded-xl pr-12", fieldErrors.password && "border-red-500 focus:border-red-500 focus:ring-red-500/20")}
                     aria-invalid={!!fieldErrors.password}
                   />
                   <Button
@@ -208,7 +208,7 @@ export default function LoginPage() {
               <Button
                 type="submit"
                 disabled={isLoading}
-                className="w-full h-12 text-base font-black bg-brand text-brand-foreground rounded-xl hover:bg-brand/90 transition-all hover:shadow-[0_10px_30px_rgba(52,211,153,0.3)] hover:scale-[1.02] active:scale-[0.98]"
+                className="w-full h-12 text-base font-black bg-brand text-brand-foreground rounded-xl hover:bg-brand/90 transition-all shadow-lg shadow-brand/25 hover:shadow-[0_10px_30px_rgba(52,211,153,0.3)] hover:scale-[1.02] active:scale-[0.98]"
               >
                 {isLoading ? (
                   <>
@@ -239,7 +239,7 @@ export default function LoginPage() {
             <Button
               type="button"
               onClick={handleGoogleLogin}
-              className="w-full h-12 bg-muted/50 border border-border text-foreground hover:bg-muted rounded-xl transition-all"
+              className="w-full h-12 bg-card border border-border text-foreground hover:bg-muted rounded-xl transition-all"
             >
               <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
                 <path

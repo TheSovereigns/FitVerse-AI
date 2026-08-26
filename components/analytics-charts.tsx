@@ -23,6 +23,7 @@ import {
 import { format, subDays, startOfWeek, endOfWeek, eachWeekOfInterval } from "date-fns"
 import { ptBR } from "date-fns/locale"
 import { TrendingUp, BarChart3, PieChart as PieChartIcon, Activity } from "lucide-react"
+import { Button } from "@/components/ui/button"
 
 interface BodyMeasurement {
   date: string
@@ -167,9 +168,10 @@ export function AnalyticsCharts() {
   const hasAnyData = weightChartData.length > 0 || macrosChartData.length > 0 || workoutsPerWeekData.length > 0 || xpOverTimeData.length > 0
 
   const renderEmptyState = (title: string) => (
-    <div className="flex flex-col items-center justify-center h-48 text-center">
-      <p className="text-sm text-muted-foreground">{t("analytics_no_data") || "Nenhum dado ainda"}</p>
-      <p className="text-xs text-muted-foreground/60 mt-1">{title}</p>
+    <div className="flex flex-col items-center justify-center py-8 text-center">
+      <div className="empty-state-icon"><BarChart3 className="w-8 h-8" /></div>
+      <h3 className="text-base font-semibold mb-1">{t("analytics_no_data") || "Nenhum dado ainda"}</h3>
+      <p className="text-[13px] leading-relaxed text-muted-foreground max-w-[280px] mb-4">{title}</p>
     </div>
   )
 
@@ -192,14 +194,13 @@ export function AnalyticsCharts() {
 
       {!hasAnyData ? (
         <div className="flex flex-col items-center justify-center py-12 text-center">
-          <BarChart3 className="w-12 h-12 text-muted-foreground/30 mb-4" />
-          <p className="text-sm font-medium text-foreground">{t("analytics_empty_title") || "Comece a registrar seus dados"}</p>
-          <p className="text-xs text-muted-foreground mt-1">
-            {t("analytics_empty_subtitle") || "Registre medidas corporais, escaneie alimentos e complete treinos para ver suas análises."}
-          </p>
+          <div className="empty-state-icon"><BarChart3 className="w-8 h-8" /></div>
+          <h3 className="text-base font-semibold mb-1">{t("analytics_empty_title") || "Comece a registrar seus dados"}</h3>
+          <p className="text-[13px] leading-relaxed text-muted-foreground max-w-[280px] mb-4">{t("analytics_empty_subtitle") || "Registre medidas corporais, escaneie alimentos e complete treinos para ver suas análises."}</p>
+          <Button className="h-11 rounded-xl bg-brand text-brand-foreground">Começar agora</Button>
         </div>
       ) : (
-        <div className="space-y-6">
+        <div className="grid md:grid-cols-2 gap-6">
           {/* Weight Over Time */}
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
@@ -208,7 +209,7 @@ export function AnalyticsCharts() {
             className="glass border border-border rounded-2xl p-4"
           >
             <div className="flex items-center gap-2 mb-4">
-              <TrendingUp className="w-4 h-4 text-primary" />
+              <TrendingUp className="w-4 h-4 text-brand" />
               <h3 className="text-sm font-semibold text-foreground">{t("analytics_weight") || "Peso ao Longo do Tempo"}</h3>
             </div>
             {weightChartData.length > 0 ? (
@@ -228,9 +229,9 @@ export function AnalyticsCharts() {
                     <Line
                       type="monotone"
                       dataKey="weight"
-                      stroke="var(--primary)"
+                      stroke="hsl(var(--brand))"
                       strokeWidth={2}
-                      dot={{ fill: "var(--primary)", r: 3 }}
+                      dot={{ fill: "hsl(var(--brand))", r: 3 }}
                       activeDot={{ r: 5 }}
                     />
                   </LineChart>
@@ -249,7 +250,7 @@ export function AnalyticsCharts() {
             className="glass border border-border rounded-2xl p-4"
           >
             <div className="flex items-center gap-2 mb-4">
-              <PieChartIcon className="w-4 h-4 text-primary" />
+              <PieChartIcon className="w-4 h-4 text-brand" />
               <h3 className="text-sm font-semibold text-foreground">{t("analytics_macros") || "Distribuição de Macros"}</h3>
             </div>
             {macrosChartData.length > 0 ? (
@@ -297,13 +298,13 @@ export function AnalyticsCharts() {
             className="glass border border-border rounded-2xl p-4"
           >
             <div className="flex items-center gap-2 mb-4">
-              <BarChart3 className="w-4 h-4 text-primary" />
+              <BarChart3 className="w-4 h-4 text-brand" />
               <h3 className="text-sm font-semibold text-foreground">{t("analytics_workouts") || "Treinos por Semana"}</h3>
             </div>
             {workoutsPerWeekData.length > 0 ? (
               <div className="h-48">
                 <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={workoutsPerWeekData}>
+                  <BarChart data={workoutsPerWeekData} barCategoryGap="32%" barSize={10}>
                     <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
                     <XAxis dataKey="week" tick={{ fontSize: 10, fill: "var(--muted-foreground)" }} />
                     <YAxis tick={{ fontSize: 10, fill: "var(--muted-foreground)" }} />
@@ -314,7 +315,7 @@ export function AnalyticsCharts() {
                         borderRadius: "12px",
                       }}
                     />
-                    <Bar dataKey="workouts" fill="var(--primary)" radius={[4, 4, 0, 0]} />
+                    <Bar dataKey="workouts" fill="hsl(var(--brand))" radius={[8, 8, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
               </div>
@@ -331,7 +332,7 @@ export function AnalyticsCharts() {
             className="glass border border-border rounded-2xl p-4"
           >
             <div className="flex items-center gap-2 mb-4">
-              <Activity className="w-4 h-4 text-primary" />
+              <Activity className="w-4 h-4 text-brand" />
               <h3 className="text-sm font-semibold text-foreground">{t("analytics_xp") || "XP Acumulado"}</h3>
             </div>
             {xpOverTimeData.length > 0 ? (
@@ -351,9 +352,9 @@ export function AnalyticsCharts() {
                     <Line
                       type="monotone"
                       dataKey="xp"
-                      stroke="#f59e0b"
+                      stroke="hsl(var(--brand))"
                       strokeWidth={2}
-                      dot={{ fill: "#f59e0b", r: 3 }}
+                      dot={{ fill: "hsl(var(--brand))", r: 3 }}
                       activeDot={{ r: 5 }}
                     />
                   </LineChart>

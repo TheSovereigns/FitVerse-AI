@@ -318,7 +318,7 @@ export default function SubscriptionPage() {
       <main className="relative z-10 max-w-7xl mx-auto px-4 md:px-6 py-5 md:py-7">
 
         {/* Hero */}
-        <section className="relative overflow-hidden rounded-[2rem] md:rounded-[2.5rem] border border-border bg-black/55 backdrop-blur-2xl shadow-[inset_0_1px_0_rgba(255,255,255,0.10),0_30px_120px_rgba(0,0,0,0.32)] p-5 md:p-6 mb-5 ">
+        <section className="relative overflow-hidden rounded-2xl border border-border bg-black/55 backdrop-blur-2xl shadow-[inset_0_1px_0_rgba(255,255,255,0.10),0_30px_120px_rgba(0,0,0,0.32)] p-5 md:p-6 mb-5 ">
           <div className="absolute left-0 top-0 bottom-0 w-2 bg-gradient-to-b from-white/20 via-white/10 to-white/5" />
           <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
           <div className="absolute inset-0 pointer-events-none bg-[linear-gradient(135deg,rgba(255,255,255,0.04),transparent_34%,rgba(255,255,255,0.03)_64%,rgba(255,255,255,0.03))]" />
@@ -358,25 +358,20 @@ export default function SubscriptionPage() {
 
         {/* Billing Toggle */}
         <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} className="flex items-center justify-center gap-3 mb-6">
-          <span className={cn("text-sm font-semibold transition-colors", !isAnnual ? "text-foreground" : "text-foreground/40")}>
-            {isEnglish ? "Monthly" : "Mensal"}
-          </span>
-          <button
-            onClick={() => setIsAnnual(!isAnnual)}
-            className={cn(
-              "relative h-7 w-12 rounded-full transition-colors duration-200",
-              isAnnual ? "bg-brand" : "bg-white/15"
-            )}
-          >
-            <motion.div
-              className="absolute top-1 h-5 w-5 rounded-full bg-white shadow-md"
-              animate={{ left: isAnnual ? "26px" : "4px" }}
-              transition={{ type: "spring", stiffness: 500, damping: 30 }}
-            />
-          </button>
-          <span className={cn("text-sm font-semibold transition-colors", isAnnual ? "text-foreground" : "text-foreground/40")}>
-            {isEnglish ? "Annual" : "Anual"}
-          </span>
+          <div className="flex gap-1 p-1 rounded-full bg-muted">
+            <button
+              onClick={() => setIsAnnual(false)}
+              className={cn("flex-1 py-2 px-4 rounded-full text-sm font-medium transition-colors", !isAnnual ? "bg-brand text-brand-foreground shadow" : "text-muted-foreground")}
+            >
+              {isEnglish ? "Monthly" : "Mensal"}
+            </button>
+            <button
+              onClick={() => setIsAnnual(true)}
+              className={cn("flex-1 py-2 px-4 rounded-full text-sm font-medium transition-colors", isAnnual ? "bg-brand text-brand-foreground shadow" : "text-muted-foreground")}
+            >
+              {isEnglish ? "Annual" : "Anual"}
+            </button>
+          </div>
           {isAnnual && (
             <motion.span initial={{ scale: 0 }} animate={{ scale: 1 }}
               className="rounded-full bg-brand/20 px-2 py-0.5 text-[10px] font-bold text-brand border border-brand/30">
@@ -432,10 +427,11 @@ export default function SubscriptionPage() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.06 }}
                 className={cn(
-                  "relative overflow-hidden rounded-[2rem] border backdrop-blur-2xl p-5 min-h-[480px] flex flex-col transition-transform duration-300 hover:-translate-y-1",
+                  "relative overflow-hidden rounded-2xl border backdrop-blur-2xl p-5 min-h-[480px] flex flex-col transition-all duration-300 hover:-translate-y-1",
                   styles.shell, styles.ring,
                   isCurrentPlan && "ring-2 ring-brand/40",
-                  planItem.popular && "md:min-h-[500px]"
+                  planItem.popular && "md:min-h-[500px] hover:border-brand/40 hover:shadow-[0_12px_32px_rgba(52,211,153,0.12)]",
+                  !planItem.popular && "hover:border-brand/10"
                 )}
               >
                 <div className={cn("absolute inset-x-0 top-0 h-2", styles.topBar)} />
@@ -514,7 +510,7 @@ export default function SubscriptionPage() {
           initial={{ opacity: 0, y: 18 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="mt-8 rounded-[2rem] border border-border bg-black/45 backdrop-blur-2xl overflow-hidden shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] "
+          className="mt-8 rounded-2xl border border-border bg-black/45 backdrop-blur-2xl overflow-hidden shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] "
         >
           <div className="px-5 py-4 border-b border-border">
             <div className="flex items-center gap-2">
@@ -574,7 +570,7 @@ export default function SubscriptionPage() {
         </motion.section>
 
         {/* Trust badges */}
-        <section className="mt-6 rounded-[2rem] border border-border bg-black/45 backdrop-blur-2xl p-4 md:p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]">
+        <section className="mt-6 rounded-2xl border border-border bg-black/45 backdrop-blur-2xl p-4 md:p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]">
           <div className="grid md:grid-cols-3 gap-3">
             {[
               { icon: Lock, title: isEnglish ? "Stripe payment" : "Pagamento Stripe", desc: isEnglish ? "Card checkout handled by Stripe." : "Checkout de cartao processado pela Stripe." },

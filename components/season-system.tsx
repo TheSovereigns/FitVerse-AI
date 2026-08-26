@@ -98,10 +98,10 @@ export function SeasonSystem() {
       <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
         className="relative overflow-hidden rounded-3xl border border-brand/20"
       >
-        <div className="absolute inset-0 bg-gradient-to-br from-brand/15 via-emerald-500/8 to-cyan-500/10" />
+        <div className="absolute inset-0 bg-gradient-to-br from-brand/15 via-emerald-600/8 to-brand/10" />
         <div className="absolute -right-12 -top-12 h-40 w-40 rounded-full bg-brand/15 blur-3xl" />
-        <div className="absolute -left-8 -bottom-8 h-32 w-32 rounded-full bg-cyan-500/10 blur-3xl" />
-        <div className="absolute left-1/2 top-0 h-24 w-24 rounded-full bg-yellow-500/8 blur-2xl" />
+        <div className="absolute -left-8 -bottom-8 h-32 w-32 rounded-full bg-brand/10 blur-3xl" />
+        <div className="absolute left-1/2 top-0 h-24 w-24 rounded-full bg-emerald-600/8 blur-2xl" />
 
         <div className="relative p-6">
           <div className="flex items-center justify-between mb-3">
@@ -129,7 +129,7 @@ export function SeasonSystem() {
           {/* Progress bar */}
           <div className="relative">
             <div className="h-3 overflow-hidden rounded-full bg-black/30 border border-border">
-              <motion.div className="h-full rounded-full bg-gradient-to-r from-brand via-emerald-400 to-cyan-400 relative"
+              <motion.div className="h-full rounded-full bg-gradient-to-r from-brand via-emerald-400 to-emerald-500 relative"
                 animate={{ width: `${progressPercent}%` }} transition={{ duration: 1, ease: "easeOut" }}
               >
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent" />

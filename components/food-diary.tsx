@@ -120,7 +120,12 @@ export function FoodDiary({ onBack }: { onBack: () => void }) {
               </button>
             </div>
             {mealEntries.length === 0 ? (
-              <p className="text-xs text-muted-foreground/50 text-center py-2">{isEnglish ? "No entries" : "Nenhum registro"}</p>
+              <div className="flex flex-col items-center justify-center py-6 text-center">
+                <div className="empty-state-icon"><Cookie className="w-8 h-8" /></div>
+                <h3 className="text-base font-semibold mb-1">{isEnglish ? "No entries" : "Nenhum registro"}</h3>
+                <p className="text-[13px] leading-relaxed text-muted-foreground max-w-[280px] mb-4">{isEnglish ? "Add your first food for this meal" : "Adicione seu primeiro alimento nesta refeição"}</p>
+                <Button onClick={() => { setSelectedMeal(meal.key); setShowAdd(true) }} className="h-11 rounded-xl bg-brand text-brand-foreground">{isEnglish ? "Add Food" : "Adicionar"}</Button>
+              </div>
             ) : (
               <div className="space-y-1.5">
                 {mealEntries.map(entry => (

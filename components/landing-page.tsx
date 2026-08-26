@@ -129,7 +129,7 @@ export function LandingPage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {features.map((f, i) => (
               <motion.div key={i} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }}
-                className="group glass-strong border border-border rounded-2xl p-6 hover:border-brand/30 transition-all duration-300 hover:shadow-[0_0_40px_rgba(52,211,153,0.08)]">
+                className="group glass-strong border border-border rounded-2xl p-6 card-hover hover:border-brand/10 transition-all duration-300 hover:shadow-[0_0_40px_rgba(52,211,153,0.08)]">
                 <div className="w-12 h-12 rounded-2xl bg-brand-muted flex items-center justify-center mb-4 group-hover:shadow-[0_0_20px_rgba(52,211,153,0.2)] transition-shadow">
                   <f.icon className="w-6 h-6 text-brand" />
                 </div>
@@ -181,8 +181,8 @@ export function LandingPage() {
       </section>
 
       {/* Stats Bar */}
-      <section className="py-12 px-4 border-y border-border bg-muted/20">
-        <div className="max-w-4xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8">
+      <section className="px-4">
+        <div className="rounded-2xl glass-strong mx-auto max-w-4xl -mt-8 relative z-10 p-8 grid grid-cols-2 md:grid-cols-4 gap-8 border border-border">
           {[
             { icon: ScanLine, value: "10K+", label: "Scans Daily" },
             { icon: Dumbbell, value: "50K+", label: "Workouts Generated" },
@@ -192,8 +192,8 @@ export function LandingPage() {
             <motion.div key={i} initial={{ opacity: 0, y: 12 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }}
               className="text-center">
               <stat.icon className="w-5 h-5 text-brand mx-auto mb-2" />
-              <p className="text-2xl font-black text-score">{stat.value}</p>
-              <p className="text-xs text-muted-foreground mt-1">{stat.label}</p>
+              <p className="text-3xl font-black text-score">{stat.value}</p>
+              <p className="text-[11px] uppercase tracking-widest text-muted-foreground mt-1">{stat.label}</p>
             </motion.div>
           ))}
         </div>

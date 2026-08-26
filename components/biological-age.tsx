@@ -79,16 +79,16 @@ function calculateBiologicalAge(
 }
 
 function getAgeColor(diff: number): string {
-  if (diff <= -5) return "text-emerald-500"
-  if (diff <= -1) return "text-green-500"
+  if (diff <= -5) return "text-brand"
+  if (diff <= -1) return "text-brand"
   if (diff <= 1) return "text-foreground"
   if (diff <= 5) return "text-orange-500"
   return "text-red-500"
 }
 
 function getAgeBg(diff: number): string {
-  if (diff <= -5) return "bg-emerald-500"
-  if (diff <= -1) return "bg-green-500"
+  if (diff <= -5) return "bg-brand"
+  if (diff <= -1) return "bg-brand"
   if (diff <= 1) return "bg-foreground"
   if (diff <= 5) return "bg-orange-500"
   return "bg-red-500"
@@ -184,16 +184,11 @@ export function BiologicalAge({ isLocked = false }: { isLocked?: boolean }) {
             </p>
           </div>
         </div>
-        <div className="rounded-xl border border-border p-8 text-center">
-          <Lock className="mx-auto mb-3 h-10 w-10 text-brand/30" />
-          <p className="text-sm font-medium text-foreground mb-1">
-            {isEnglish ? "Upgrade to Premium" : "Faca upgrade para Premium"}
-          </p>
-          <p className="text-xs text-muted-foreground">
-            {isEnglish
-              ? "Unlock biological age estimation with Premium"
-              : "Desbloqueie a estimativa de idade biologica com Premium"}
-          </p>
+        <div className="paywall-card">
+          <div className="paywall-icon"><Lock className="w-6 h-6" /></div>
+          <h3 className="text-[15px] font-semibold mb-1">{isEnglish ? "Upgrade to Premium" : "Faca upgrade para Premium"}</h3>
+          <p className="text-[13px] text-muted-foreground mb-4">{isEnglish ? "Unlock biological age estimation with Premium" : "Desbloqueie a estimativa de idade biologica com Premium"}</p>
+          <Button className="h-11 rounded-xl bg-brand text-brand-foreground w-full">Unlock with Pro →</Button>
         </div>
       </motion.div>
     )
@@ -222,10 +217,10 @@ export function BiologicalAge({ isLocked = false }: { isLocked?: boolean }) {
       </div>
 
       <div className="space-y-3 mb-4">
-        <div className="rounded-xl border border-border p-3">
+        <div className="rounded-xl bg-card border border-border p-3">
           <label className="flex items-center justify-between mb-1">
-            <span className="text-xs font-medium text-foreground">{isEnglish ? "Chronological Age" : "Idade Cronologica"}</span>
-            <span className="text-xs font-bold text-foreground">{chronologicalAge} {isEnglish ? "yrs" : "anos"}</span>
+            <span className="flex items-center gap-1.5 text-xs font-medium text-foreground"><Clock className="h-3.5 w-3.5 text-brand" />{isEnglish ? "Chronological Age" : "Idade Cronologica"}</span>
+            <span className="text-xs font-bold bg-brand/10 text-brand px-2 py-0.5 rounded-full">{chronologicalAge} {isEnglish ? "yrs" : "anos"}</span>
           </label>
           <input
             type="range"
@@ -233,14 +228,18 @@ export function BiologicalAge({ isLocked = false }: { isLocked?: boolean }) {
             max={100}
             value={chronologicalAge}
             onChange={(e) => setChronologicalAge(parseInt(e.target.value))}
-            className="w-full h-1.5 bg-muted rounded-full appearance-none cursor-pointer accent-primary"
+            className="w-full h-1.5 bg-muted rounded-full appearance-none cursor-pointer accent-brand"
           />
+          <div className="flex items-center gap-1.5 mt-2">
+            <span className="w-2 h-2 rounded-full bg-brand" />
+            <span className="text-[10px] text-muted-foreground">{chronologicalAge < 35 ? "Optimal" : chronologicalAge < 55 ? "Medium" : "Mature"}</span>
+          </div>
         </div>
 
-        <div className="rounded-xl border border-border p-3">
+        <div className="rounded-xl bg-card border border-border p-3">
           <label className="flex items-center justify-between mb-1">
-            <span className="text-xs font-medium text-foreground">BMI</span>
-            <span className="text-xs font-bold text-foreground">{bmi.toFixed(1)}</span>
+            <span className="flex items-center gap-1.5 text-xs font-medium text-foreground"><Activity className="h-3.5 w-3.5 text-brand" />BMI</span>
+            <span className="text-xs font-bold bg-brand/10 text-brand px-2 py-0.5 rounded-full">{bmi.toFixed(1)}</span>
           </label>
           <input
             type="range"
@@ -249,14 +248,18 @@ export function BiologicalAge({ isLocked = false }: { isLocked?: boolean }) {
             step={0.1}
             value={bmi}
             onChange={(e) => setBmi(parseFloat(e.target.value))}
-            className="w-full h-1.5 bg-muted rounded-full appearance-none cursor-pointer accent-primary"
+            className="w-full h-1.5 bg-muted rounded-full appearance-none cursor-pointer accent-brand"
           />
+          <div className="flex items-center gap-1.5 mt-2">
+            <span className={cn("w-2 h-2 rounded-full", bmi >= 18.5 && bmi <= 24.9 ? "bg-brand" : bmi >= 25 && bmi <= 29.9 ? "bg-amber-500" : "bg-red-500")} />
+            <span className="text-[10px] text-muted-foreground">{bmi >= 18.5 && bmi <= 24.9 ? "Optimal" : bmi >= 25 && bmi <= 29.9 ? "Medium" : "High"}</span>
+          </div>
         </div>
 
-        <div className="rounded-xl border border-border p-3">
+        <div className="rounded-xl bg-card border border-border p-3">
           <label className="flex items-center justify-between mb-1">
-            <span className="text-xs font-medium text-foreground">{isEnglish ? "Sleep Quality" : "Qualidade do Sono"}</span>
-            <span className="text-xs font-bold text-foreground">{sleepQuality}/10</span>
+            <span className="flex items-center gap-1.5 text-xs font-medium text-foreground"><Moon className="h-3.5 w-3.5 text-brand" />{isEnglish ? "Sleep Quality" : "Qualidade do Sono"}</span>
+            <span className="text-xs font-bold bg-brand/10 text-brand px-2 py-0.5 rounded-full">{sleepQuality}/10</span>
           </label>
           <input
             type="range"
@@ -264,14 +267,18 @@ export function BiologicalAge({ isLocked = false }: { isLocked?: boolean }) {
             max={10}
             value={sleepQuality}
             onChange={(e) => setSleepQuality(parseInt(e.target.value))}
-            className="w-full h-1.5 bg-muted rounded-full appearance-none cursor-pointer accent-primary"
+            className="w-full h-1.5 bg-muted rounded-full appearance-none cursor-pointer accent-brand"
           />
+          <div className="flex items-center gap-1.5 mt-2">
+            <span className={cn("w-2 h-2 rounded-full", sleepQuality >= 8 ? "bg-brand" : sleepQuality >= 6 ? "bg-brand" : sleepQuality >= 4 ? "bg-amber-500" : "bg-red-500")} />
+            <span className="text-[10px] text-muted-foreground">{sleepQuality >= 8 ? "Optimal" : sleepQuality >= 6 ? "Good" : sleepQuality >= 4 ? "Medium" : "Poor"}</span>
+          </div>
         </div>
 
-        <div className="rounded-xl border border-border p-3">
+        <div className="rounded-xl bg-card border border-border p-3">
           <label className="flex items-center justify-between mb-1">
-            <span className="text-xs font-medium text-foreground">{isEnglish ? "Stress Level" : "Nivel de Estresse"}</span>
-            <span className="text-xs font-bold text-foreground">{stressLevel}/10</span>
+            <span className="flex items-center gap-1.5 text-xs font-medium text-foreground"><Brain className="h-3.5 w-3.5 text-brand" />{isEnglish ? "Stress Level" : "Nivel de Estresse"}</span>
+            <span className="text-xs font-bold bg-brand/10 text-brand px-2 py-0.5 rounded-full">{stressLevel}/10</span>
           </label>
           <input
             type="range"
@@ -279,14 +286,18 @@ export function BiologicalAge({ isLocked = false }: { isLocked?: boolean }) {
             max={10}
             value={stressLevel}
             onChange={(e) => setStressLevel(parseInt(e.target.value))}
-            className="w-full h-1.5 bg-muted rounded-full appearance-none cursor-pointer accent-primary"
+            className="w-full h-1.5 bg-muted rounded-full appearance-none cursor-pointer accent-brand"
           />
+          <div className="flex items-center gap-1.5 mt-2">
+            <span className={cn("w-2 h-2 rounded-full", stressLevel <= 3 ? "bg-brand" : stressLevel <= 5 ? "bg-amber-500" : "bg-red-500")} />
+            <span className="text-[10px] text-muted-foreground">{stressLevel <= 3 ? "Optimal" : stressLevel <= 5 ? "Medium" : "High"}</span>
+          </div>
         </div>
 
-        <div className="rounded-xl border border-border p-3">
+        <div className="rounded-xl bg-card border border-border p-3">
           <label className="flex items-center justify-between mb-1">
-            <span className="text-xs font-medium text-foreground">{isEnglish ? "Activity Level" : "Nivel de Atividade"}</span>
-            <span className="text-xs font-bold text-foreground">{activityLevel}/10</span>
+            <span className="flex items-center gap-1.5 text-xs font-medium text-foreground"><Zap className="h-3.5 w-3.5 text-brand" />{isEnglish ? "Activity Level" : "Nivel de Atividade"}</span>
+            <span className="text-xs font-bold bg-brand/10 text-brand px-2 py-0.5 rounded-full">{activityLevel}/10</span>
           </label>
           <input
             type="range"
@@ -294,14 +305,18 @@ export function BiologicalAge({ isLocked = false }: { isLocked?: boolean }) {
             max={10}
             value={activityLevel}
             onChange={(e) => setActivityLevel(parseInt(e.target.value))}
-            className="w-full h-1.5 bg-muted rounded-full appearance-none cursor-pointer accent-primary"
+            className="w-full h-1.5 bg-muted rounded-full appearance-none cursor-pointer accent-brand"
           />
+          <div className="flex items-center gap-1.5 mt-2">
+            <span className={cn("w-2 h-2 rounded-full", activityLevel >= 8 ? "bg-brand" : activityLevel >= 6 ? "bg-brand" : activityLevel >= 4 ? "bg-amber-500" : "bg-red-500")} />
+            <span className="text-[10px] text-muted-foreground">{activityLevel >= 8 ? "Optimal" : activityLevel >= 6 ? "Good" : activityLevel >= 4 ? "Medium" : "Poor"}</span>
+          </div>
         </div>
 
         <button
           onClick={() => setIsSmoker(!isSmoker)}
           className={cn(
-            "w-full rounded-xl border p-3 flex items-center justify-between transition-all",
+            "w-full rounded-xl bg-card border p-3 flex items-center justify-between transition-all",
             isSmoker ? "border-red-500/30 bg-red-500/5" : "border-border"
           )}
         >
@@ -309,7 +324,7 @@ export function BiologicalAge({ isLocked = false }: { isLocked?: boolean }) {
             <Cigarette className={cn("h-4 w-4", isSmoker ? "text-red-500" : "text-muted-foreground")} />
             <span className="text-xs font-medium text-foreground">{isEnglish ? "Smoking Status" : "Status de Tabagismo"}</span>
           </div>
-          <span className={cn("text-xs font-bold", isSmoker ? "text-red-500" : "text-emerald-500")}>
+          <span className={cn("text-xs font-bold", isSmoker ? "text-red-500" : "text-brand")}>
             {isSmoker ? (isEnglish ? "Yes" : "Sim") : (isEnglish ? "No" : "Nao")}
           </span>
         </button>
@@ -362,7 +377,7 @@ export function BiologicalAge({ isLocked = false }: { isLocked?: boolean }) {
                 <div className="flex items-center gap-2">
                   <span className={cn(
                     "w-2 h-2 rounded-full",
-                    factor.impact <= -1 ? "bg-emerald-500" : factor.impact <= 1 ? "bg-foreground" : "bg-red-500"
+                    factor.impact <= -1 ? "bg-brand" : factor.impact <= 1 ? "bg-foreground" : "bg-red-500"
                   )} />
                   <span className="text-xs font-medium text-foreground">{factor.name}</span>
                 </div>
@@ -370,7 +385,7 @@ export function BiologicalAge({ isLocked = false }: { isLocked?: boolean }) {
                   <span className="text-[10px] text-muted-foreground">{factor.label}</span>
                   <span className={cn(
                     "flex items-center text-xs font-bold",
-                    factor.impact <= -1 ? "text-emerald-500" : factor.impact <= 1 ? "text-foreground" : "text-red-500"
+                    factor.impact <= -1 ? "text-brand" : factor.impact <= 1 ? "text-foreground" : "text-red-500"
                   )}>
                     {factor.impact > 0 ? "+" : ""}{factor.impact}
                     {factor.impact !== 0 && (
@@ -417,7 +432,7 @@ export function BiologicalAge({ isLocked = false }: { isLocked?: boolean }) {
                     </div>
                   ))}
                   {factors.filter((f) => f.impact > 0).length === 0 && (
-                    <p className="text-xs text-emerald-500 text-center py-2">
+                    <p className="text-xs text-brand text-center py-2">
                       {isEnglish ? "All factors look great! Keep it up." : "Todos os fatores estao otimos! Continue assim."}
                     </p>
                   )}

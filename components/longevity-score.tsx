@@ -57,8 +57,8 @@ const SLIDER_TIPS: Record<string, string[]> = {
 }
 
 function getScoreColor(score: number): string {
-  if (score >= 85) return "text-emerald-500"
-  if (score >= 70) return "text-green-500"
+  if (score >= 85) return "text-brand"
+  if (score >= 70) return "text-brand"
   if (score >= 50) return "text-yellow-500"
   if (score >= 30) return "text-orange-500"
   return "text-red-500"
@@ -73,15 +73,15 @@ function getScoreLabel(score: number): string {
 }
 
 function getScoreBg(score: number): string {
-  if (score >= 85) return "bg-emerald-500"
-  if (score >= 70) return "bg-green-500"
+  if (score >= 85) return "bg-brand"
+  if (score >= 70) return "bg-brand"
   if (score >= 50) return "bg-yellow-500"
   if (score >= 30) return "bg-orange-500"
   return "bg-red-500"
 }
 
 function getFactorColor(value: number): string {
-  if (value >= 80) return "bg-emerald-500"
+  if (value >= 80) return "bg-brand"
   if (value >= 50) return "bg-yellow-500"
   return "bg-red-500"
 }
@@ -327,7 +327,7 @@ export function LongevityScore() {
                     step={factor.id === "bmi" ? 0.1 : 1}
                     value={factor.value}
                     onChange={(e) => updateFactor(factor.id, parseFloat(e.target.value))}
-                    className="w-full h-1.5 bg-muted rounded-full appearance-none cursor-pointer accent-primary"
+                    className="w-full h-1.5 bg-muted rounded-full appearance-none cursor-pointer accent-brand"
                   />
                   <div className="h-1 mt-1 bg-muted rounded-full overflow-hidden">
                     <motion.div
@@ -413,7 +413,7 @@ export function LongevityScore() {
                         <div className="flex items-center gap-2">
                           <span className="text-xs font-bold text-foreground">{entry.score}</span>
                           {diff !== 0 && (
-                            <span className={cn("flex items-center text-[10px] font-medium", diff > 0 ? "text-emerald-500" : "text-red-500")}>
+                            <span className={cn("flex items-center text-[10px] font-medium", diff > 0 ? "text-brand" : "text-red-500")}>
                               {diff > 0 ? <TrendingUp className="h-3 w-3 mr-0.5" /> : <TrendingDown className="h-3 w-3 mr-0.5" />}
                               {diff > 0 ? "+" : ""}{diff}
                             </span>

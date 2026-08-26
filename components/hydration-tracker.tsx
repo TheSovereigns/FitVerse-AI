@@ -109,11 +109,11 @@ export function HydrationTracker() {
     <div className="space-y-4">
       <div className="text-center">
         <div className="relative w-40 h-40 mx-auto mb-4">
-          <svg className="w-full h-full -rotate-90">
+          <svg className="w-full h-full -rotate-90" viewBox="0 0 160 160">
             <circle
               cx="80"
               cy="80"
-              r="70"
+              r="64"
               fill="none"
               stroke="currentColor"
               strokeWidth="8"
@@ -122,14 +122,14 @@ export function HydrationTracker() {
             <motion.circle
               cx="80"
               cy="80"
-              r="70"
+              r="64"
               fill="none"
               stroke="currentColor"
               strokeWidth="8"
               strokeLinecap="round"
-              strokeDasharray={440}
-              initial={{ strokeDashoffset: 440 }}
-              animate={{ strokeDashoffset: 440 - (percentage / 100) * 440 }}
+              strokeDasharray={402}
+              initial={{ strokeDashoffset: 402 }}
+              animate={{ strokeDashoffset: 402 - (percentage / 100) * 402 }}
               transition={{ duration: 0.8, ease: "easeOut" }}
               className="text-brand"
             />
@@ -138,7 +138,7 @@ export function HydrationTracker() {
             <Droplets className="w-6 h-6 text-brand mb-1" />
             <span className="text-2xl font-bold">{currentAmount.toFixed(1)}</span>
             <span className="text-xs text-muted-foreground">{t("hyd_goal_of")} {goal}{t("hyd_liters_short")}</span>
-            <span className="text-xs font-semibold text-brand mt-0.5">{Math.round(percentage)}%</span>
+            <span className={cn("text-xs font-semibold text-brand mt-0.5", isGoalMet && "animate-bounce-in")}>{Math.round(percentage)}%</span>
           </div>
         </div>
 
@@ -220,7 +220,7 @@ export function HydrationTracker() {
                 value={goalInput}
                 onChange={(e) => setGoalInput(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && saveGoal()}
-                className="flex-1 h-8 text-sm bg-muted border border-border rounded-lg px-2 text-foreground"
+                className="flex-1 h-11 text-sm bg-muted border border-border rounded-xl px-3 text-foreground"
                 autoFocus
               />
               <Button size="sm" onClick={saveGoal} className="h-8 px-3 rounded-lg text-xs">
@@ -234,12 +234,12 @@ export function HydrationTracker() {
         )}
       </AnimatePresence>
 
-      <div className="grid grid-cols-2 gap-3">
-        <div className="rounded-2xl glass-strong p-3 text-center">
+      <div className="grid grid-cols-2 gap-4">
+        <div className="rounded-2xl glass-strong p-4 text-center">
           <p className="text-xs text-muted-foreground mb-1">{t("hyd_avg_7d")}</p>
           <p className="text-lg font-bold">{averageLast7}{t("hyd_liters_short")}</p>
         </div>
-        <div className="rounded-2xl glass-strong p-3 text-center">
+        <div className="rounded-2xl glass-strong p-4 text-center">
           <p className="text-xs text-muted-foreground mb-1">{t("hyd_streak")}</p>
           <p className="text-lg font-bold">{streakDays}</p>
         </div>

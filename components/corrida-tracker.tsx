@@ -309,13 +309,12 @@ export function CorridaTracker({ onBack }: { onBack?: () => void }) {
                   </div>
                 ))}
               </div>
-              <div className="grid grid-cols-3 gap-2">
+              <div className="flex gap-2 overflow-x-auto scrollbar-hide snap-x opacity-80 pb-1" style={{ WebkitOverflowScrolling: "touch" }}>
                 {[
                   { icon: Navigation, value: pace, label: "min/km" },
                   { icon: Footprints, value: steps > 0 ? steps.toLocaleString() : "—", label: isEnglish ? "Steps" : "Passos" },
-                  { icon: Heart, value: `${heartRate}`, label: "bpm" },
                 ].map((s, i) => (
-                  <div key={i} className="bg-black/50 backdrop-blur-xl border border-border rounded-2xl p-3 text-center">
+                  <div key={i} className="min-w-[120px] flex-1 snap-center bg-black/50 backdrop-blur-xl border border-border rounded-2xl p-3 text-center">
                     <div className="w-7 h-7 mx-auto rounded-lg bg-white/5 flex items-center justify-center mb-2">
                       <s.icon className="w-3.5 h-3.5 text-brand" />
                     </div>
