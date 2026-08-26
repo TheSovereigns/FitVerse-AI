@@ -150,7 +150,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         // Always redirect - don't wait for profile
         if (!hasRedirectedRef.current) {
           hasRedirectedRef.current = true
-          router.push("/")
+          router.push("/app")
         }
       }
 

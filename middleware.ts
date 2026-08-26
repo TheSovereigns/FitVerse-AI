@@ -156,19 +156,29 @@ export async function middleware(request: NextRequest) {
     "camera=(), microphone=(), interest-cohort=()"
   )
 
-  // 3. Check if route is public
+  // 3b. Landing → App redirect for authed users
+  if (path === "/") {
+    const user = await getSession(request)
+    if (user) {
+      return NextResponse.redirect(new URL("/app", request.url))
+    }
+    return response
+  }
+
+  // 3c. Check if route is public
   const isPublicRoute = publicRoutes.some((route) => matchesRoute(path, route))
   if (isPublicRoute) {
     return response
   }
 
   // 4. Check authentication for protected routes
+  const isAppRoute = path === "/app" || path.startsWith("/app/")
   const isProtectedRoute = protectedRoutes.some((route) =>
     matchesRoute(path, route)
   )
   const isAdminRoute = adminRoutes.some((route) => matchesRoute(path, route))
 
-  if (isProtectedRoute || isAdminRoute) {
+  if (isAppRoute || isProtectedRoute || isAdminRoute) {
     const user = await getSession(request)
 
     // Not authenticated
@@ -189,7 +199,7 @@ export async function middleware(request: NextRequest) {
         if (path.startsWith("/api/")) {
           return NextResponse.json({ error: "Forbidden" }, { status: 403 })
         }
-        return NextResponse.redirect(new URL("/", request.url))
+        return NextResponse.redirect(new URL("/app", request.url))
       }
     }
 

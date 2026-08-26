@@ -44,7 +44,7 @@ export default function AuthCallbackPage() {
       
       if (session) {
         await ensureProfileExists(session.user.id, session.user.email || '')
-        router.replace("/")
+        router.replace("/app")
       } else {
         router.replace("/auth/login")
       }
@@ -56,7 +56,7 @@ export default function AuthCallbackPage() {
       if (event === "SIGNED_IN" || event === "INITIAL_SESSION") {
         if (session) {
           ensureProfileExists(session.user.id, session.user.email || '').then(() => {
-            router.replace("/")
+            router.replace("/app")
           })
         }
       }
@@ -66,7 +66,7 @@ export default function AuthCallbackPage() {
       supabase.auth.getSession().then(({ data: { session } }: { data: { session: { user: { id: string; email?: string } } | null } }) => {
         if (session) {
           ensureProfileExists(session.user.id, session.user.email || '').then(() => {
-            router.replace("/")
+            router.replace("/app")
           })
         } else {
           router.replace("/auth/login")

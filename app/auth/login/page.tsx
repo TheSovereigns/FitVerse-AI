@@ -66,7 +66,7 @@ export default function LoginPage() {
     // If no error but still loading after 5s, force redirect
     setTimeout(() => {
       if (isLoading) {
-        router.push("/")
+        router.push("/app")
       }
     }, 5000)
   }

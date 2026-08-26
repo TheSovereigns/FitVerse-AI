@@ -199,11 +199,11 @@ export default function SignupPage() {
       }
 
       setPhase("done")
-      setTimeout(() => router.push("/"), 2000)
+      setTimeout(() => router.push("/app"), 2000)
     } catch (e) {
       console.error("Error saving profile:", e)
       setPhase("done")
-      setTimeout(() => router.push("/"), 1500)
+      setTimeout(() => router.push("/app"), 1500)
     } finally {
       setIsSavingProfile(false)
     }
