@@ -144,7 +144,7 @@ export function DesktopSidebar({ currentView, onNavigate, isFeatureLocked }: Sid
         className={cn(
           "relative flex flex-col items-center gap-1.5 w-full rounded-xl py-3 transition-all duration-200 border-l-2",
           active
-            ? "bg-brand/10 text-brand border-brand"
+            ? "text-brand border-brand"
             : "text-muted-foreground hover:text-foreground hover:bg-muted/50 border-transparent"
         )}
       >
@@ -172,7 +172,7 @@ export function DesktopSidebar({ currentView, onNavigate, isFeatureLocked }: Sid
           className={cn(
             "relative flex flex-col items-center gap-1.5 w-full rounded-xl py-3 transition-all duration-200 border-l-2",
             groupActive && !isOpen
-              ? "bg-brand/10 text-brand border-brand"
+              ? "text-brand border-brand"
               : "text-muted-foreground hover:text-foreground hover:bg-muted/50 border-transparent"
           )}
         >
@@ -288,10 +288,10 @@ export function DesktopSidebar({ currentView, onNavigate, isFeatureLocked }: Sid
                       className={cn(
                         "flex items-center gap-2.5 w-full px-3 py-2.5 rounded-lg text-left transition-all duration-150",
                         subActive
-                          ? "text-foreground font-semibold bg-brand/10"
+                          ? "font-semibold"
                           : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
                       )}
-                      style={subActive ? { backgroundColor: `${activeGroup.accent}10` } : undefined}
+                      style={subActive ? { color: activeGroup.accent } : undefined}
                     >
                       <sub.icon className={cn("w-4 h-4 shrink-0")} style={subActive ? { color: activeGroup.accent } : undefined} />
                       <span className="text-[14px] truncate">{sub.label}</span>
