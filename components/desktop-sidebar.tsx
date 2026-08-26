@@ -204,7 +204,7 @@ export function DesktopSidebar({ currentView, onNavigate, isFeatureLocked }: Sid
           <div className="flex flex-col items-center shrink-0 py-3 border-b border-border/30">
             <div className="relative">
               <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand to-emerald-600 flex items-center justify-center shadow-lg shadow-brand/20 overflow-hidden">
-                <img src="/icon.svg" alt="VyseFit" className="w-6 h-6" />
+                <img src="/vf.svg" alt="VyseFit" className="w-6 h-6" />
               </div>
               <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-green-400 border-2 border-card" />
             </div>

@@ -61,7 +61,7 @@ export function LandingPage() {
         <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-brand to-emerald-600 flex items-center justify-center overflow-hidden shadow-lg shadow-brand/20">
-              <img src="/icon.svg" alt="VyseFit" className="w-5 h-5" />
+              <img src="/vf.svg" alt="VyseFit" className="w-5 h-5" />
             </div>
             <span className="text-lg font-black tracking-tight">VyseFit AI</span>
           </Link>
@@ -222,7 +222,7 @@ export function LandingPage() {
             <div>
               <div className="flex items-center gap-2 mb-4">
                 <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-brand to-emerald-600 flex items-center justify-center overflow-hidden">
-                  <img src="/icon.svg" alt="VyseFit" className="w-5 h-5" />
+                  <img src="/vf.svg" alt="VyseFit" className="w-5 h-5" />
                 </div>
                 <span className="font-black">VyseFit AI</span>
               </div>
