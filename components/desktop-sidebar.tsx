@@ -144,7 +144,7 @@ export function DesktopSidebar({ currentView, onNavigate, isFeatureLocked }: Sid
         className={cn(
           "relative flex flex-col items-center gap-1.5 w-full rounded-xl py-3 transition-all duration-200 border-l-2",
           active
-            ? "text-brand border-brand"
+            ? "bg-brand/10 text-brand border-brand"
             : "text-muted-foreground hover:text-foreground hover:bg-muted/50 border-transparent"
         )}
       >
@@ -172,7 +172,7 @@ export function DesktopSidebar({ currentView, onNavigate, isFeatureLocked }: Sid
           className={cn(
             "relative flex flex-col items-center gap-1.5 w-full rounded-xl py-3 transition-all duration-200 border-l-2",
             groupActive && !isOpen
-              ? "text-brand border-brand"
+              ? "bg-brand/10 text-brand border-brand"
               : "text-muted-foreground hover:text-foreground hover:bg-muted/50 border-transparent"
           )}
         >
@@ -203,7 +203,7 @@ export function DesktopSidebar({ currentView, onNavigate, isFeatureLocked }: Sid
           {/* Logo */}
           <div className="flex flex-col items-center shrink-0 py-3 border-b border-border/30">
             <div className="relative">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand to-emerald-600 flex items-center justify-center shadow-lg shadow-brand/20 overflow-hidden">
+              <div className="w-10 h-10 rounded-xl bg-card border border-border flex items-center justify-center shadow-sm overflow-hidden text-foreground">
                 <img src="/vf.svg" alt="VyseFit" className="w-6 h-6" />
               </div>
               <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-green-400 border-2 border-card" />
@@ -288,10 +288,10 @@ export function DesktopSidebar({ currentView, onNavigate, isFeatureLocked }: Sid
                       className={cn(
                         "flex items-center gap-2.5 w-full px-3 py-2.5 rounded-lg text-left transition-all duration-150",
                         subActive
-                          ? "font-semibold"
+                          ? "text-foreground font-semibold bg-brand/10"
                           : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
                       )}
-                      style={subActive ? { color: activeGroup.accent } : undefined}
+                      style={subActive ? { backgroundColor: `${activeGroup.accent}10` } : undefined}
                     >
                       <sub.icon className={cn("w-4 h-4 shrink-0")} style={subActive ? { color: activeGroup.accent } : undefined} />
                       <span className="text-[14px] truncate">{sub.label}</span>
