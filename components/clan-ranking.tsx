@@ -91,19 +91,19 @@ export function ClanRanking({ clanId }: { clanId: string }) {
                 className={cn("flex items-center gap-3 rounded-xl border border-border bg-background p-4",
                   i === 0 && "border-yellow-500/20 bg-yellow-500/[0.03]")}>
                 <div className={cn("flex h-9 w-9 items-center justify-center rounded-xl shrink-0",
-                  i < 3 ? "bg-muted/50" : "bg-white/[0.02]")}>
+                  i < 3 ? "bg-muted/50" : "bg-muted/30")}>
                   {i < 3 ? <MedalIcon className={cn("h-5 w-5", medalColor)} /> : <span className="text-sm font-black text-foreground/40">{i + 1}</span>}
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="font-black text-sm text-foreground truncate">{entry.user_name}</p>
                   <div className="flex items-center gap-3 mt-1">
-                    <span className="flex items-center gap-1 text-[9px] font-bold text-brand/60"><ScanLine className="h-3 w-3" /> {entry.scan_count}</span>
-                    <span className="flex items-center gap-1 text-[9px] font-bold text-blue-400/60"><Dumbbell className="h-3 w-3" /> {entry.workout_count}</span>
+                    <span className="flex items-center gap-1 text-[10px] font-bold text-brand/60"><ScanLine className="h-3 w-3" /> {entry.scan_count}</span>
+                    <span className="flex items-center gap-1 text-[10px] font-bold text-blue-400/60"><Dumbbell className="h-3 w-3" /> {entry.workout_count}</span>
                   </div>
                 </div>
                 <div className="text-right">
                   <p className="text-lg font-black text-foreground">{entry.total_points}</p>
-                  <p className="text-[9px] font-black uppercase tracking-widest text-foreground/40">pts</p>
+                  <p className="text-[10px] font-black uppercase tracking-widest text-foreground/40">pts</p>
                 </div>
               </motion.div>
             )

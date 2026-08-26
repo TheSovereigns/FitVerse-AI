@@ -158,7 +158,7 @@ export default function LoginPage() {
                   onChange={(e) => setEmail(e.target.value)}
                   onBlur={() => setFieldErrors(prev => ({ ...prev, ...validate({ email, password }) }))}
                   placeholder={locale === "en-US" ? "you@example.com" : "seu@email.com"}
-                  className={cn("h-12 bg-white/[0.06] border-white/10 text-foreground placeholder:text-foreground/30 focus:border-brand/30 focus:bg-white/[0.08] focus:ring-brand/20 rounded-xl", fieldErrors.email && "border-red-500 focus:border-red-500 focus:ring-red-500/20")}
+                  className={cn("h-12 bg-muted/50 border-border text-foreground placeholder:text-foreground/30 focus:border-brand/30 focus:ring-brand/20 rounded-xl", fieldErrors.email && "border-red-500 focus:border-red-500 focus:ring-red-500/20")}
                   aria-invalid={!!fieldErrors.email}
                 />
                 {fieldErrors.email && (
@@ -178,7 +178,7 @@ export default function LoginPage() {
                     onChange={(e) => setPassword(e.target.value)}
                     onBlur={() => setFieldErrors(prev => ({ ...prev, ...validate({ email, password }) }))}
                     placeholder="••••••••"
-                    className={cn("h-12 bg-white/[0.06] border-white/10 text-foreground placeholder:text-foreground/30 focus:border-brand/30 focus:bg-white/[0.08] focus:ring-brand/20 rounded-xl pr-12", fieldErrors.password && "border-red-500 focus:border-red-500 focus:ring-red-500/20")}
+                    className={cn("h-12 bg-muted/50 border-border text-foreground placeholder:text-foreground/30 focus:border-brand/30 focus:ring-brand/20 rounded-xl pr-12", fieldErrors.password && "border-red-500 focus:border-red-500 focus:ring-red-500/20")}
                     aria-invalid={!!fieldErrors.password}
                   />
                   <Button

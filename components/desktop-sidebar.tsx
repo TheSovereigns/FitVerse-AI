@@ -140,11 +140,12 @@ export function DesktopSidebar({ currentView, onNavigate, isFeatureLocked }: Sid
         transition={{ delay: index * 0.015 }}
         onClick={() => onNavigate(item.view)}
         title={item.label}
+        aria-label={item.label}
         className={cn(
           "relative flex flex-col items-center gap-1.5 w-full rounded-xl py-3 transition-all duration-200 border-l-2",
           active
             ? "bg-brand/10 text-brand border-brand"
-            : "text-muted-foreground hover:text-foreground hover:bg-white/[0.04] border-transparent"
+            : "text-muted-foreground hover:text-foreground hover:bg-muted/50 border-transparent"
         )}
       >
         <item.icon className={cn("w-5 h-5 transition-all duration-200", active && "stroke-[2.5]")} />
@@ -167,11 +168,12 @@ export function DesktopSidebar({ currentView, onNavigate, isFeatureLocked }: Sid
           transition={{ delay: (singleItems.length + index) * 0.015 }}
           onClick={() => toggle(group.key)}
           title={group.label}
+          aria-label={group.label}
           className={cn(
             "relative flex flex-col items-center gap-1.5 w-full rounded-xl py-3 transition-all duration-200 border-l-2",
             groupActive && !isOpen
               ? "bg-brand/10 text-brand border-brand"
-              : "text-muted-foreground hover:text-foreground hover:bg-white/[0.04] border-transparent"
+              : "text-muted-foreground hover:text-foreground hover:bg-muted/50 border-transparent"
           )}
         >
           <div className="relative">
@@ -233,7 +235,8 @@ export function DesktopSidebar({ currentView, onNavigate, isFeatureLocked }: Sid
             <div className="!mt-1 pt-1 border-t border-border/30">
               <button
                 onClick={() => setIsCollapsed(!isCollapsed)}
-                className="flex flex-col items-center gap-1.5 w-full rounded-xl py-3 text-muted-foreground hover:text-foreground hover:bg-white/[0.04] transition-all duration-200"
+                aria-label={isCollapsed ? t("nav_expand") : t("nav_collapse")}
+                className="flex flex-col items-center gap-1.5 w-full rounded-xl py-3 text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all duration-200"
                 title={isCollapsed ? t("nav_expand") : t("nav_collapse")}
               >
                 {isCollapsed ? (
@@ -281,11 +284,12 @@ export function DesktopSidebar({ currentView, onNavigate, isFeatureLocked }: Sid
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: i * 0.03 }}
                       onClick={() => { onNavigate(sub.view); setExpandedGroup(null) }}
+                      aria-label={sub.label}
                       className={cn(
                         "flex items-center gap-2.5 w-full px-3 py-2.5 rounded-lg text-left transition-all duration-150",
                         subActive
-                          ? "text-foreground font-semibold bg-white/[0.04]"
-                          : "text-muted-foreground hover:text-foreground hover:bg-white/[0.04]"
+                          ? "text-foreground font-semibold bg-brand/10"
+                          : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
                       )}
                       style={subActive ? { backgroundColor: `${activeGroup.accent}10` } : undefined}
                     >

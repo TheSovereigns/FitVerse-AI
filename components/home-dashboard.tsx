@@ -467,7 +467,7 @@ export function HomeDashboard({
           </div>
         ) : (
           <div className="rounded-2xl glass-strong p-8 text-center animate-fade-in">
-            <div className="w-14 h-14 mx-auto mb-3 rounded-2xl bg-brand/10 flex items-center justify-center">
+            <div className="empty-state-icon">
               <ScanLine className="h-7 w-7 text-brand" />
             </div>
             <h3 className="text-sm font-semibold text-foreground">{t("dopamine_empty_title")}</h3>

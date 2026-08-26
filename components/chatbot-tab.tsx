@@ -218,7 +218,7 @@ export function ChatbotTab() {
   if (plan === "free") {
     return (
       <div className="relative mx-auto flex min-h-[70vh] w-full max-w-4xl items-center justify-center p-4">
-        <section className="relative w-full overflow-hidden rounded-[2rem] border border-border bg-black/50 p-6 text-center shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_28px_90px_rgba(0,0,0,0.32)] backdrop-blur-2xl md:rounded-[2.5rem] md:p-10">
+        <section className="paywall-card relative w-full overflow-hidden">
           <div className="relative mx-auto max-w-xl">
             <div className="mx-auto mb-5 flex h-20 w-20 items-center justify-center rounded-[1.75rem] border border-border bg-white/10 text-foreground/80 shadow-xl">
               <Bot className="h-10 w-10" />

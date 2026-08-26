@@ -284,7 +284,7 @@ export default function SignupPage() {
               onChange={(e) => setAge(e.target.value)}
               min="10"
               max="120"
-              className="h-16 text-center text-3xl font-black bg-white/[0.06] border-white/10 text-foreground rounded-2xl focus:border-brand/30 focus:bg-white/[0.08]"
+              className="h-16 text-center text-3xl font-black bg-muted/50 border-border text-foreground rounded-2xl focus:border-brand/30"
             />
           </div>
         )
@@ -313,7 +313,7 @@ export default function SignupPage() {
               min="30"
               max="300"
               step="0.1"
-              className="h-16 text-center text-3xl font-black bg-white/[0.06] border-white/10 text-foreground rounded-2xl focus:border-brand/30 focus:bg-white/[0.08]"
+              className="h-16 text-center text-3xl font-black bg-muted/50 border-border text-foreground rounded-2xl focus:border-brand/30"
             />
           </div>
         )
@@ -342,7 +342,7 @@ export default function SignupPage() {
               min="100"
               max="250"
               step="0.1"
-              className="h-16 text-center text-3xl font-black bg-white/[0.06] border-white/10 text-foreground rounded-2xl focus:border-brand/30 focus:bg-white/[0.08]"
+              className="h-16 text-center text-3xl font-black bg-muted/50 border-border text-foreground rounded-2xl focus:border-brand/30"
             />
           </div>
         )
@@ -471,7 +471,7 @@ export default function SignupPage() {
                         onChange={(e) => setName(e.target.value)}
                         onBlur={() => setFieldErrors(prev => ({ ...prev, ...validate({ name, email, password, confirmPassword }) }))}
                         placeholder={isEnglish ? "John Doe" : "João Silva"}
-                        className={cn("h-12 bg-white/[0.06] border-white/10 text-foreground placeholder:text-foreground/30 focus:border-brand/30 focus:bg-white/[0.08] focus:ring-brand/20 rounded-xl", fieldErrors.name && "border-red-500 focus:border-red-500 focus:ring-red-500/20")}
+                        className={cn("h-12 bg-muted/50 border-border text-foreground placeholder:text-foreground/30 focus:border-brand/30 focus:ring-brand/20 rounded-xl", fieldErrors.name && "border-red-500 focus:border-red-500 focus:ring-red-500/20")}
                         aria-invalid={!!fieldErrors.name}
                       />
                       {fieldErrors.name && (
@@ -486,7 +486,7 @@ export default function SignupPage() {
                         onChange={(e) => setEmail(e.target.value)}
                         onBlur={() => setFieldErrors(prev => ({ ...prev, ...validate({ name, email, password, confirmPassword }) }))}
                         placeholder={isEnglish ? "you@example.com" : "seu@email.com"}
-                        className={cn("h-12 bg-white/[0.06] border-white/10 text-foreground placeholder:text-foreground/30 focus:border-brand/30 focus:bg-white/[0.08] focus:ring-brand/20 rounded-xl", fieldErrors.email && "border-red-500 focus:border-red-500 focus:ring-red-500/20")}
+                        className={cn("h-12 bg-muted/50 border-border text-foreground placeholder:text-foreground/30 focus:border-brand/30 focus:ring-brand/20 rounded-xl", fieldErrors.email && "border-red-500 focus:border-red-500 focus:ring-red-500/20")}
                         aria-invalid={!!fieldErrors.email}
                       />
                       {fieldErrors.email && (
@@ -504,7 +504,7 @@ export default function SignupPage() {
                           onChange={(e) => setPassword(e.target.value)}
                           onBlur={() => setFieldErrors(prev => ({ ...prev, ...validate({ name, email, password, confirmPassword }) }))}
                           placeholder="••••••••"
-                          className={cn("h-12 bg-white/[0.06] border-white/10 text-foreground placeholder:text-foreground/30 focus:border-brand/30 focus:bg-white/[0.08] focus:ring-brand/20 rounded-xl pr-12", fieldErrors.password && "border-red-500 focus:border-red-500 focus:ring-red-500/20")}
+                          className={cn("h-12 bg-muted/50 border-border text-foreground placeholder:text-foreground/30 focus:border-brand/30 focus:ring-brand/20 rounded-xl pr-12", fieldErrors.password && "border-red-500 focus:border-red-500 focus:ring-red-500/20")}
                           aria-invalid={!!fieldErrors.password}
                         />
                         <Button
@@ -531,7 +531,7 @@ export default function SignupPage() {
                         onChange={(e) => setConfirmPassword(e.target.value)}
                         onBlur={() => setFieldErrors(prev => ({ ...prev, ...validate({ name, email, password, confirmPassword }) }))}
                         placeholder="••••••••"
-                        className={cn("h-12 bg-white/[0.06] border-white/10 text-foreground placeholder:text-foreground/30 focus:border-brand/30 focus:bg-white/[0.08] focus:ring-brand/20 rounded-xl", fieldErrors.confirmPassword && "border-red-500 focus:border-red-500 focus:ring-red-500/20")}
+                        className={cn("h-12 bg-muted/50 border-border text-foreground placeholder:text-foreground/30 focus:border-brand/30 focus:ring-brand/20 rounded-xl", fieldErrors.confirmPassword && "border-red-500 focus:border-red-500 focus:ring-red-500/20")}
                         aria-invalid={!!fieldErrors.confirmPassword}
                       />
                       {fieldErrors.confirmPassword && (

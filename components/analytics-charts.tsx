@@ -206,7 +206,7 @@ export function AnalyticsCharts() {
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.1 }}
-            className="glass border border-border rounded-2xl p-4"
+            className="glass-strong border border-border rounded-2xl p-4"
           >
             <div className="flex items-center gap-2 mb-4">
               <TrendingUp className="w-4 h-4 text-brand" />
@@ -221,9 +221,9 @@ export function AnalyticsCharts() {
                     <YAxis tick={{ fontSize: 10, fill: "var(--muted-foreground)" }} />
                     <Tooltip
                       contentStyle={{
-                        backgroundColor: "var(--card)",
-                        border: "1px solid var(--border)",
-                        borderRadius: "12px",
+                        background: "hsl(0 0% 6%)",
+                        border: "1px solid rgba(255,255,255,0.08)",
+                        borderRadius: 12, color: "#fff", fontSize: 12,
                       }}
                     />
                     <Line
@@ -247,7 +247,7 @@ export function AnalyticsCharts() {
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.2 }}
-            className="glass border border-border rounded-2xl p-4"
+            className="glass-strong border border-border rounded-2xl p-4"
           >
             <div className="flex items-center gap-2 mb-4">
               <PieChartIcon className="w-4 h-4 text-brand" />
@@ -272,9 +272,9 @@ export function AnalyticsCharts() {
                     </Pie>
                     <Tooltip
                       contentStyle={{
-                        backgroundColor: "var(--card)",
-                        border: "1px solid var(--border)",
-                        borderRadius: "12px",
+                        background: "hsl(0 0% 6%)",
+                        border: "1px solid rgba(255,255,255,0.08)",
+                        borderRadius: 12, color: "#fff", fontSize: 12,
                       }}
                     />
                     <Legend
@@ -295,7 +295,7 @@ export function AnalyticsCharts() {
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.3 }}
-            className="glass border border-border rounded-2xl p-4"
+            className="glass-strong border border-border rounded-2xl p-4"
           >
             <div className="flex items-center gap-2 mb-4">
               <BarChart3 className="w-4 h-4 text-brand" />
@@ -310,9 +310,9 @@ export function AnalyticsCharts() {
                     <YAxis tick={{ fontSize: 10, fill: "var(--muted-foreground)" }} />
                     <Tooltip
                       contentStyle={{
-                        backgroundColor: "var(--card)",
-                        border: "1px solid var(--border)",
-                        borderRadius: "12px",
+                        background: "hsl(0 0% 6%)",
+                        border: "1px solid rgba(255,255,255,0.08)",
+                        borderRadius: 12, color: "#fff", fontSize: 12,
                       }}
                     />
                     <Bar dataKey="workouts" fill="hsl(var(--brand))" radius={[8, 8, 0, 0]} />
@@ -329,7 +329,7 @@ export function AnalyticsCharts() {
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.4 }}
-            className="glass border border-border rounded-2xl p-4"
+            className="glass-strong border border-border rounded-2xl p-4"
           >
             <div className="flex items-center gap-2 mb-4">
               <Activity className="w-4 h-4 text-brand" />
@@ -344,9 +344,9 @@ export function AnalyticsCharts() {
                     <YAxis tick={{ fontSize: 10, fill: "var(--muted-foreground)" }} />
                     <Tooltip
                       contentStyle={{
-                        backgroundColor: "var(--card)",
-                        border: "1px solid var(--border)",
-                        borderRadius: "12px",
+                        background: "hsl(0 0% 6%)",
+                        border: "1px solid rgba(255,255,255,0.08)",
+                        borderRadius: 12, color: "#fff", fontSize: 12,
                       }}
                     />
                     <Line

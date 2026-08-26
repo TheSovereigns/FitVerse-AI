@@ -189,7 +189,7 @@ export function ScanDashboard({ onScan, onBarcodeProduct, isScanning = false }: 
                 className="flex w-full max-w-sm flex-col items-center gap-6"
               >
                 <button type="button" onClick={() => fileInputRef.current?.click()} className="group relative">
-                  <div className="flex h-28 w-28 items-center justify-center rounded-3xl bg-muted/50 transition group-hover:bg-brand/5 md:h-32 md:w-32">
+                  <div className="flex h-28 w-28 items-center justify-center rounded-3xl glass-strong transition group-hover:bg-brand/5 md:h-32 md:w-32">
                     <Scan className="h-14 w-14 text-brand md:h-16 md:w-16" />
                   </div>
                   <div className="absolute -bottom-1 -right-1 flex h-10 w-10 items-center justify-center rounded-xl bg-brand text-white shadow-lg shadow-brand/25">
@@ -204,7 +204,7 @@ export function ScanDashboard({ onScan, onBarcodeProduct, isScanning = false }: 
 
                 <div className="grid w-full grid-cols-3 gap-3">
                   <Button
-                    className="h-14 rounded-2xl bg-brand text-sm font-semibold text-white shadow-lg shadow-brand/25 hover:bg-brand/90"
+                    className="h-14 rounded-xl bg-brand text-sm font-semibold text-white shadow-lg shadow-brand/25 hover:bg-brand/90"
                     onClick={() => cameraInputRef.current?.click()}
                   >
                     <Camera className="mr-2 h-4 w-4" />
@@ -212,15 +212,15 @@ export function ScanDashboard({ onScan, onBarcodeProduct, isScanning = false }: 
                   </Button>
                   <Button
                     variant="outline"
-                    className="h-14 rounded-2xl border-border bg-transparent text-sm font-medium text-foreground hover:bg-muted/50"
-                    onClick={() => fileInputRef.current?.click()}
+                    className="h-14 rounded-xl border-border bg-transparent text-sm font-medium text-foreground hover:bg-muted/50"
+                     onClick={() => fileInputRef.current?.click()}
                   >
                     <Upload className="mr-2 h-4 w-4" />
                     Upload
                   </Button>
                   <Button
                     variant="outline"
-                    className="h-14 rounded-2xl border-border bg-transparent text-sm font-medium text-foreground hover:bg-muted/50"
+                    className="h-14 rounded-xl border-border bg-transparent text-sm font-medium text-foreground hover:bg-muted/50"
                     onClick={() => setShowBarcodeScanner(true)}
                   >
                     <Barcode className="mr-2 h-4 w-4" />

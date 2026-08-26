@@ -118,7 +118,7 @@ export default function ForgotPasswordPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder={locale === "en-US" ? "you@example.com" : "seu@email.com"}
                 required
-                className="h-12 bg-white/[0.06] border-white/10 text-foreground placeholder:text-foreground/30 focus:border-brand/30 focus:bg-white/[0.08] focus:ring-brand/20 rounded-xl"
+                className="h-12 bg-muted/50 border-border text-foreground placeholder:text-foreground/30 focus:border-brand/30 focus:ring-brand/20 rounded-xl"
               />
             </div>
 

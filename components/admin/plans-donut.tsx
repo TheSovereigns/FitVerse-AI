@@ -63,10 +63,11 @@ export function PlansDonut({ freeCount, premiumCount, isLoading = false }: Plans
             </Pie>
             <Tooltip
               contentStyle={{
-                backgroundColor: "var(--card)",
-                border: "1px solid var(--border)",
-                borderRadius: "8px",
-                color: "var(--card-foreground)",
+                background: "hsl(0 0% 6%)",
+                border: "1px solid rgba(255,255,255,0.08)",
+                borderRadius: 12,
+                color: "#fff",
+                fontSize: 12,
               }}
               formatter={(value: number, name: string) => [value, name]}
             />

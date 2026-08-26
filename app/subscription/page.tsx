@@ -303,7 +303,7 @@ export default function SubscriptionPage() {
           </Button>
           <div className="text-center min-w-0 flex items-center gap-2 justify-center">
             <img src="/icon.svg" alt="VyseFit" className="w-5 h-5" />
-            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-foreground/60">VyseFit AI</p>
+            <p className="text-[10px] font-black uppercase tracking-[0.08em] text-foreground/60">VyseFit AI</p>
             <h1 className="text-base md:text-xl font-black tracking-tight truncate">
               {isEnglish ? "Subscription Plans" : "Planos de Assinatura"}
             </h1>
@@ -462,7 +462,7 @@ export default function SubscriptionPage() {
                 </div>
 
                 <div className="relative">
-                  <h3 className={cn("text-3xl md:text-4xl font-black tracking-tight text-cta", styles.title)}>{planItem.name}</h3>
+                  <h3 className={cn("text-xl md:text-2xl font-black tracking-tight text-cta", styles.title)}>{planItem.name}</h3>
                   <p className="text-sm text-foreground/50 mt-1 min-h-5">
                     {isEnglish ? planItem.subtitleEn : planItem.subtitle}
                   </p>
@@ -487,7 +487,7 @@ export default function SubscriptionPage() {
                   onClick={() => handleSwitchPlan(planItem.id)}
                   disabled={isCurrentPlan || Boolean(loading)}
                   className={cn(
-                    "relative mt-5 h-12 rounded-2xl border font-black tracking-[0.16em] uppercase text-sm shadow-[inset_0_1px_0_rgba(255,255,255,0.15)]",
+                    "relative mt-5 h-11 rounded-xl border font-black tracking-[0.08em] uppercase text-sm shadow-[inset_0_1px_0_rgba(255,255,255,0.15)] text-cta",
                     isCurrentPlan ? "bg-white/5 text-foreground/40 border-border" : styles.button
                   )}
                 >
@@ -530,7 +530,7 @@ export default function SubscriptionPage() {
                   {plans.map((p) => (
                     <th key={p.id} className="px-4 py-3 text-center">
                       <span className={cn(
-                        "text-[11px] font-black uppercase tracking-wider",
+                        "section-label",
                         p.id === currentPlan ? "text-brand" : "text-foreground/40"
                       )}>
                         {p.name}
@@ -541,7 +541,7 @@ export default function SubscriptionPage() {
               </thead>
               <tbody>
                 {compareFeatures.map((feature, i) => (
-                  <tr key={feature.key} className={cn("border-b border-border", i % 2 === 0 && "bg-white/[0.02]")}>
+                  <tr key={feature.key} className={cn("border-b border-border", i % 2 === 0 && "bg-muted/30")}>
                     <td className="px-5 py-3 text-foreground/60 font-medium">
                       {isEnglish ? feature.label.en : feature.label.pt}
                     </td>

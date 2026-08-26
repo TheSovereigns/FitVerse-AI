@@ -393,13 +393,13 @@ export function ClansTab() {
                   transition={{ delay: i * 0.03 }}
                   className={cn(
                     "relative flex flex-col items-center gap-1.5 rounded-xl p-2.5 border transition-all text-center",
-                    unlocked ? "border-brand/30 bg-brand/10 shadow-[0_0_20px_rgba(52,211,153,0.15)]" : "border-border bg-white/[0.02] opacity-40"
+                    unlocked ? "border-brand/30 bg-brand/10 shadow-[0_0_20px_rgba(52,211,153,0.15)]" : "border-border bg-muted/30 opacity-40"
                   )}>
                   <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center",
                     unlocked ? "bg-brand/15" : "bg-muted/50")}>
                     <ach.icon className={cn("h-5 w-5", unlocked ? "text-brand" : "text-foreground/30")} />
                   </div>
-                  <p className="text-[9px] font-bold leading-tight text-foreground/80">{isEnglish ? ach.titleEn : ach.title}</p>
+                  <p className="text-[10px] font-bold leading-tight text-foreground/80">{isEnglish ? ach.titleEn : ach.title}</p>
                   {unlocked && (
                     <div className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-brand flex items-center justify-center">
                       <Zap className="h-2.5 w-2.5 text-foreground" />
@@ -446,7 +446,7 @@ export function ClansTab() {
               return (
                 <motion.div key={clan.id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: i * 0.03 }}
-                  className="flex items-center gap-3 rounded-xl border border-border bg-card p-4 cursor-pointer hover:border-border hover:bg-white/[0.02] transition-all"
+                  className="flex items-center gap-3 rounded-xl border border-border bg-card p-4 cursor-pointer hover:border-border hover:bg-muted/30 transition-all"
                   onClick={() => handleSelectClan(clan)}>
                   <div className="w-12 h-12 rounded-xl flex items-center justify-center"
                     style={{ background: `linear-gradient(135deg, ${clanLevel.current.color}20, ${clanLevel.current.color}05)` }}>

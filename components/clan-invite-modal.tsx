@@ -43,12 +43,12 @@ export function ClanInviteModal({ isOpen, onClose, clanId, clanName }: {
               <div className="space-y-2 mb-4">
                 <p className="text-[10px] font-bold uppercase tracking-wider text-foreground/40">{isEnglish ? "Active Codes" : "Codigos Ativos"}</p>
                 {invites.map((invite) => (
-                  <div key={invite.id} className="flex items-center gap-3 rounded-xl border border-border bg-white/[0.02] p-3">
+                  <div key={invite.id} className="flex items-center gap-3 rounded-xl border border-border bg-muted/30 p-3">
                     <div className="flex-1 min-w-0">
                       <p className="font-mono font-bold text-sm text-foreground tracking-wider">{invite.invite_code}</p>
                       <div className="flex items-center gap-1 mt-1">
                         <Clock className="h-3 w-3 text-foreground/20" />
-                        <span className="text-[9px] text-foreground/20">
+                        <span className="text-[10px] text-foreground/20">
                           {isEnglish ? "Expires" : "Expira"}: {new Date(invite.expires_at).toLocaleDateString(isEnglish ? "en-US" : "pt-BR")}
                         </span>
                       </div>

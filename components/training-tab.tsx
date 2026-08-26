@@ -304,7 +304,7 @@ export function TrainingTab({ userGoal }: TrainingTabProps) {
               {t("training_subtitle")}
             </p>
           </div>
-          <Button onClick={() => setShowGeneratorModal(true)} className="h-11 rounded-xl bg-brand px-5 text-sm font-semibold text-white shadow-lg shadow-brand/25 hover:bg-brand/90">
+          <Button onClick={() => setShowGeneratorModal(true)} aria-label={t("training_new_workout")} className="h-11 rounded-xl bg-brand px-5 text-sm font-semibold text-white shadow-lg shadow-brand/25 hover:bg-brand/90">
             <Zap className="mr-2 h-4 w-4" />
             {t("training_new_workout")}
           </Button>
@@ -325,6 +325,7 @@ export function TrainingTab({ userGoal }: TrainingTabProps) {
               key={tab.id}
               type="button"
               onClick={() => setActiveSubTab(tab.id)}
+              aria-label={tab.label}
               className={cn(
                 "flex flex-1 items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-xs font-medium transition-all",
                 isActive
@@ -350,6 +351,7 @@ export function TrainingTab({ userGoal }: TrainingTabProps) {
                 key={filter.id}
                 type="button"
                 onClick={() => setActiveFilter(filter.id)}
+                aria-label={filter.label}
                 className={cn(
                   "flex shrink-0 items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-medium transition-all",
                   isActive
@@ -617,6 +619,7 @@ function WorkoutCard({ workout, index, onStart, onStartLive, onExerciseClick, on
               key={`${exercise.name}-${exerciseIndex}`}
               type="button"
               onClick={() => onExerciseClick(exercise)}
+              aria-label={`View ${exercise.name}`}
               className="flex w-full items-center justify-between rounded-xl bg-muted/30 p-3 text-left transition hover:bg-muted/50"
             >
               <div className="flex min-w-0 items-center gap-3">
@@ -633,15 +636,16 @@ function WorkoutCard({ workout, index, onStart, onStartLive, onExerciseClick, on
 
         {/* Actions */}
         <div className="flex gap-2">
-          <Button onClick={() => onStart(workout)} className="flex-1 h-11 rounded-xl bg-brand text-sm font-semibold text-white hover:bg-brand/90">
+          <Button onClick={() => onStart(workout)} aria-label={t("training_start_btn")} className="flex-1 h-11 rounded-xl bg-brand text-sm font-semibold text-white hover:bg-brand/90">
             <Play className="mr-2 h-4 w-4 fill-background" />
             {t("training_start_btn")}
           </Button>
-          <Button onClick={() => onStartLive(workout)} variant="outline" className="h-11 w-11 rounded-xl border-border px-0">
+          <Button onClick={() => onStartLive(workout)} aria-label="Live workout" variant="outline" className="h-11 w-11 rounded-xl border-border px-0">
             <Zap className="h-4 w-4" />
           </Button>
           <Button
             onClick={() => onSave(workout)}
+            aria-label={isSaved ? t("recipes_unsave") : t("recipes_save")}
             variant="outline"
             className={cn(
               "h-11 w-11 rounded-xl border-border px-0 transition-colors",
@@ -728,6 +732,7 @@ function SavedWorkoutCard({ saved, index, onUnsave, onStart, onStartLive, onExer
               key={`${exercise.name}-${exerciseIndex}`}
               type="button"
               onClick={() => onExerciseClick(exercise)}
+              aria-label={`View ${exercise.name}`}
               className="flex w-full items-center justify-between rounded-xl bg-muted/30 p-3 text-left transition hover:bg-muted/50"
             >
               <div className="flex min-w-0 items-center gap-3">
@@ -743,14 +748,14 @@ function SavedWorkoutCard({ saved, index, onUnsave, onStart, onStartLive, onExer
         </div>
 
         <div className="flex gap-2">
-          <Button onClick={() => onStart(workout)} className="flex-1 h-11 rounded-xl bg-brand text-sm font-semibold text-white hover:bg-brand/90">
+          <Button onClick={() => onStart(workout)} aria-label={t("training_start_btn")} className="flex-1 h-11 rounded-xl bg-brand text-sm font-semibold text-white hover:bg-brand/90">
             <Play className="mr-2 h-4 w-4 fill-background" />
             {t("training_start_btn")}
           </Button>
-          <Button onClick={() => onStartLive(workout)} variant="outline" className="h-11 w-11 rounded-xl border-border px-0">
+          <Button onClick={() => onStartLive(workout)} aria-label="Live workout" variant="outline" className="h-11 w-11 rounded-xl border-border px-0">
             <Zap className="h-4 w-4" />
           </Button>
-          <Button onClick={() => onUnsave(saved.id)} variant="outline" className="h-11 w-11 rounded-xl border-destructive/30 px-0 text-destructive hover:bg-destructive/10">
+          <Button onClick={() => onUnsave(saved.id)} aria-label={t("recipes_unsave")} variant="outline" className="h-11 w-11 rounded-xl border-destructive/30 px-0 text-destructive hover:bg-destructive/10">
             <HeartOff className="h-4 w-4" />
           </Button>
         </div>

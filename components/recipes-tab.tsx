@@ -265,19 +265,20 @@ export function RecipesTab({ metabolicPlan }: RecipesTabProps) {
         >
           <div className="rounded-2xl glass-strong p-3">
             <div className="flex gap-2">
-              <div className="flex min-h-12 flex-1 items-center gap-3 rounded-xl bg-muted/50 px-3">
+              <div className="flex h-11 flex-1 items-center gap-3 rounded-xl bg-muted/50 px-3">
                 <Search className="h-4 w-4 shrink-0 text-muted-foreground" />
                 <Input
                   placeholder={t("recipes_placeholder")}
                   value={ingredient}
                   onChange={(e) => setIngredient(e.target.value)}
-                  className="h-12 flex-1 border-none bg-transparent px-0 text-sm font-medium text-foreground placeholder:text-muted-foreground focus-visible:ring-0"
+                  className="h-11 flex-1 border-none bg-transparent px-0 text-sm font-medium text-foreground placeholder:text-muted-foreground focus-visible:ring-0"
                 />
               </div>
               <Button
                 type="submit"
                 disabled={isGenerating || !ingredient.trim()}
-                className="h-12 rounded-xl bg-brand px-5 text-sm font-semibold text-white shadow-lg shadow-brand/25 hover:bg-brand/90 disabled:opacity-40"
+                aria-label={isGenerating ? "Generating" : t("recipes_generate_btn")}
+                className="h-11 rounded-xl bg-brand px-5 text-sm font-semibold text-white shadow-lg shadow-brand/25 hover:bg-brand/90 disabled:opacity-40"
               >
                 {isGenerating ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
@@ -294,6 +295,7 @@ export function RecipesTab({ metabolicPlan }: RecipesTabProps) {
                   type="button"
                   onClick={() => handleGenerateRecipes(item)}
                   disabled={isGenerating}
+                  aria-label={`Generate recipes with ${item}`}
                   className="shrink-0 rounded-full bg-muted/50 px-3 py-1.5 text-xs font-medium text-muted-foreground transition hover:bg-muted disabled:opacity-40"
                 >
                   {item}
@@ -409,7 +411,7 @@ export function RecipesTab({ metabolicPlan }: RecipesTabProps) {
                 </div>
               </div>
 
-              <div className="rounded-2xl bg-muted/30 p-5">
+              <div className="rounded-2xl glass-strong p-5">
                 <p className="text-xs font-medium text-muted-foreground">
                   {isEnglish ? "Quick picks" : "Escolhas rapidas"}
                 </p>
@@ -419,6 +421,7 @@ export function RecipesTab({ metabolicPlan }: RecipesTabProps) {
                       key={item}
                       type="button"
                       onClick={() => handleGenerateRecipes(item)}
+                      aria-label={`Generate recipes with ${item}`}
                       className="flex items-center justify-between rounded-xl bg-muted/50 px-4 py-3 text-left text-sm font-medium text-foreground transition hover:bg-muted"
                     >
                       <span>{item}</span>
@@ -534,6 +537,7 @@ function RecipeCard({
       transition={{ delay: index * 0.05 }}
       whileTap={{ scale: 0.98 }}
       onClick={onOpen}
+      aria-label={`View ${recipe.name}`}
       className="group relative overflow-hidden rounded-2xl glass-strong p-5 text-left transition-all duration-200 hover:bg-brand/5"
     >
       <div className="flex items-start justify-between gap-3">
@@ -589,6 +593,7 @@ function RecipeCard({
             whileTap={{ scale: 0.85 }}
             onClick={() => onPortionsChange(-1)}
             disabled={portions <= 1}
+            aria-label="Decrease portions"
             className="flex h-6 w-6 items-center justify-center rounded-md bg-muted text-foreground transition hover:bg-muted/80 disabled:opacity-40"
           >
             <Minus className="h-3 w-3" />
@@ -598,6 +603,7 @@ function RecipeCard({
             type="button"
             whileTap={{ scale: 0.85 }}
             onClick={() => onPortionsChange(1)}
+            aria-label="Increase portions"
             className="flex h-6 w-6 items-center justify-center rounded-md bg-muted text-foreground transition hover:bg-muted/80"
           >
             <Plus className="h-3 w-3" />

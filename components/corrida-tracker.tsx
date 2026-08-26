@@ -305,7 +305,7 @@ export function CorridaTracker({ onBack }: { onBack?: () => void }) {
                       <s.icon className="w-3.5 h-3.5 text-brand" />
                     </div>
                     <p className="text-base font-bold text-white tabular-nums leading-none">{s.value}</p>
-                    <p className="text-[9px] text-white/30 uppercase tracking-wider mt-1.5 font-medium">{s.label}</p>
+                    <p className="text-[10px] text-white/30 uppercase tracking-wider mt-1.5 font-medium">{s.label}</p>
                   </div>
                 ))}
               </div>
@@ -319,7 +319,7 @@ export function CorridaTracker({ onBack }: { onBack?: () => void }) {
                       <s.icon className="w-3.5 h-3.5 text-brand" />
                     </div>
                     <p className="text-base font-bold text-white tabular-nums leading-none">{s.value}</p>
-                    <p className="text-[9px] text-white/30 uppercase tracking-wider mt-1.5 font-medium">{s.label}</p>
+                    <p className="text-[10px] text-white/30 uppercase tracking-wider mt-1.5 font-medium">{s.label}</p>
                   </div>
                 ))}
               </div>
@@ -469,7 +469,7 @@ export function CorridaTracker({ onBack }: { onBack?: () => void }) {
                     onClick={() => { setSelectedActivity(a.id); setShowActivityPicker(false) }}
                     className={cn(
                       "p-4 rounded-2xl border text-center transition-all",
-                      selectedActivity === a.id ? "border-brand bg-brand/10" : "border-border bg-white/[0.02] hover:bg-white/5"
+                      selectedActivity === a.id ? "border-brand bg-brand/10" : "border-border bg-muted/30 hover:bg-muted/50"
                     )}>
                     <div className={cn("w-12 h-12 mx-auto rounded-xl flex items-center justify-center mb-3",
                       selectedActivity === a.id ? "bg-brand/15" : "bg-white/5")}>
@@ -512,7 +512,7 @@ export function CorridaTracker({ onBack }: { onBack?: () => void }) {
                   return (
                     <div key={s.id}
                       onClick={() => { setReplaySession(s); setShowHistory(false) }}
-                      className="flex items-center gap-3 p-4 rounded-2xl bg-white/[0.02] border border-border hover:bg-white/5 transition-all cursor-pointer">
+                      className="flex items-center gap-3 p-4 rounded-2xl bg-muted/30 border border-border hover:bg-muted/50 transition-all cursor-pointer">
                       <div className="w-11 h-11 rounded-xl bg-brand/10 flex items-center justify-center shrink-0">
                         <act.icon className="w-5 h-5 text-brand" />
                       </div>

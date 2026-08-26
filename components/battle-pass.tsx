@@ -161,7 +161,7 @@ export function BattlePass({ isLocked = false }: BattlePassProps) {
       <div className="relative overflow-hidden rounded-3xl border border-border p-8">
         <div className="absolute inset-0 bg-gradient-to-br from-muted/60 to-muted/30 backdrop-blur-md flex items-center justify-center z-10">
           <div className="text-center">
-            <div className="mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-2xl bg-muted/50"><Lock className="h-8 w-8 text-muted-foreground" /></div>
+            <div className="paywall-icon"><Lock className="h-8 w-8 text-muted-foreground" /></div>
             <p className="font-bold text-foreground text-lg">{t("bp_pro_feature")}</p>
             <p className="text-sm text-muted-foreground mt-1">{t("bp_unlock_battle_pass")}</p>
           </div>

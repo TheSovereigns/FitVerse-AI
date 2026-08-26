@@ -188,7 +188,7 @@ export function SleepTracker({ isLocked = false }: { isLocked?: boolean }) {
               type="time"
               value={bedtime}
               onChange={(e) => setBedtime(e.target.value)}
-              className="h-9 pl-9 pr-3 rounded-xl bg-white/[0.06] border border-white/10 text-sm font-medium text-foreground focus:outline-none focus:ring-1 focus:ring-white/10"
+              className="h-9 pl-9 pr-3 rounded-xl bg-muted/50 border border-border text-sm font-medium text-foreground focus:outline-none focus:ring-1 focus:ring-border"
             />
           </div>
         </div>
@@ -200,7 +200,7 @@ export function SleepTracker({ isLocked = false }: { isLocked?: boolean }) {
               type="time"
               value={wakeTime}
               onChange={(e) => setWakeTime(e.target.value)}
-              className="h-9 pl-9 pr-3 rounded-xl bg-white/[0.06] border border-white/10 text-sm font-medium text-foreground focus:outline-none focus:ring-1 focus:ring-white/10"
+              className="h-9 pl-9 pr-3 rounded-xl bg-muted/50 border border-border text-sm font-medium text-foreground focus:outline-none focus:ring-1 focus:ring-border"
             />
           </div>
         </div>

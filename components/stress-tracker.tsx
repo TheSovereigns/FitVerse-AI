@@ -165,8 +165,8 @@ export function StressTracker({ isLocked = false }: { isLocked?: boolean }) {
           className="w-full h-1.5 rounded-full appearance-none bg-muted cursor-pointer accent-purple-500"
         />
         <div className="flex justify-between mt-1">
-          <span className="text-[9px] text-muted-foreground">1</span>
-          <span className="text-[9px] text-muted-foreground">10</span>
+          <span className="text-[10px] text-muted-foreground">1</span>
+          <span className="text-[10px] text-muted-foreground">10</span>
         </div>
       </div>
 
@@ -183,7 +183,7 @@ export function StressTracker({ isLocked = false }: { isLocked?: boolean }) {
               )}
             >
               <span className="text-lg">{m.emoji}</span>
-              <span className="text-[9px] text-muted-foreground">{isEnglish ? m.label.en : m.label.pt}</span>
+              <span className="text-[10px] text-muted-foreground">{isEnglish ? m.label.en : m.label.pt}</span>
             </button>
           ))}
         </div>
@@ -212,7 +212,7 @@ export function StressTracker({ isLocked = false }: { isLocked?: boolean }) {
               <XAxis dataKey="name" tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }} axisLine={false} tickLine={false} />
               <YAxis domain={[0, 10]} tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }} axisLine={false} tickLine={false} width={20} />
               <Tooltip
-                contentStyle={{ fontSize: 11, background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 8 }}
+                contentStyle={{ background: "hsl(0 0% 6%)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 12, color: "#fff", fontSize: 12 }}
                 formatter={(value: number) => [`${value}/10`, isEnglish ? "Stress" : "Estresse"]}
               />
               <Bar dataKey="stress" fill="#a855f7" radius={[4, 4, 0, 0]} />
@@ -236,7 +236,7 @@ export function StressTracker({ isLocked = false }: { isLocked?: boolean }) {
                   transition={{ delay: i * 0.05 }}
                 />
               </div>
-              <span className="text-[8px] text-muted-foreground">{d.name}</span>
+              <span className="text-[10px] text-muted-foreground">{d.name}</span>
             </div>
           ))}
         </div>

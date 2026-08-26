@@ -172,7 +172,7 @@ export function BodyEvolution() {
             const value = latest[key] as number | undefined
             const trend = getTrend(latest[key] as number | undefined, previous?.[key] as number | undefined)
             return (
-              <div key={key} className="text-center p-2 rounded-xl bg-muted/50">
+              <div key={key} className="text-center p-2 rounded-xl bg-card border border-border">
                 <p className="text-lg font-bold text-foreground">{value ?? "—"}</p>
                 <p className="text-[10px] text-muted-foreground">{unit}</p>
                 {trend && (
@@ -216,7 +216,7 @@ export function BodyEvolution() {
                 <XAxis dataKey="date" tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }} axisLine={false} tickLine={false} />
                 <YAxis tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }} axisLine={false} tickLine={false} width={35} />
                 <Tooltip
-                  contentStyle={{ fontSize: 11, background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 8 }}
+                  contentStyle={{ background: "hsl(0 0% 6%)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 12, color: "#fff", fontSize: 12 }}
                   formatter={(value: number) => [`${value}`, fields.find((f) => f.key === selectedField)?.label]}
                 />
                 <Line

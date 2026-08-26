@@ -91,7 +91,7 @@ export function RecipeModal({
                 <ChefHat className="h-4 w-4" />
               </div>
               <div>
-                <p className="text-[9px] font-black uppercase tracking-[0.26em] text-foreground/40">
+                <p className="text-[10px] font-black uppercase tracking-[0.26em] text-foreground/40">
                   {t("rm_ga_synthesis")}
                 </p>
                 <p className="text-xs font-black text-foreground/70">{getDifficultyLabel(recipe.difficulty)}</p>
@@ -130,18 +130,19 @@ export function RecipeModal({
                   <div key={stat.label} className="rounded-2xl border border-border bg-black/38 p-3 shadow-lg backdrop-blur-xl md:p-4">
                     <stat.icon className="h-5 w-5 text-foreground/70" />
                     <p className="mt-3 text-lg font-black leading-tight text-foreground md:text-xl">{stat.val}</p>
-                    <p className="mt-1 text-[9px] font-black uppercase tracking-widest text-foreground/38">{stat.label}</p>
+                    <p className="mt-1 text-[10px] font-black uppercase tracking-widest text-foreground/38">{stat.label}</p>
                   </div>
                 ))}
                 <div className="rounded-2xl border border-border bg-black/38 p-3 shadow-lg backdrop-blur-xl md:p-4">
                   <Users className="h-5 w-5 text-foreground/70" />
                   <div className="mt-3 flex items-center gap-2">
-                    {onPortionsChange && (
+                      {onPortionsChange && (
                       <motion.button
                         type="button"
                         whileTap={{ scale: 0.85 }}
                         onClick={() => onPortionsChange(-1)}
                         disabled={portions <= 1}
+                        aria-label="Decrease portions"
                         className="flex h-6 w-6 items-center justify-center rounded-lg border border-border bg-white/10 text-foreground transition hover:bg-white/20 disabled:opacity-40"
                       >
                         <Minus className="h-3 w-3" />
@@ -153,13 +154,14 @@ export function RecipeModal({
                         type="button"
                         whileTap={{ scale: 0.85 }}
                         onClick={() => onPortionsChange(1)}
+                        aria-label="Increase portions"
                         className="flex h-6 w-6 items-center justify-center rounded-lg border border-border bg-white/10 text-foreground transition hover:bg-white/20"
                       >
                         <Plus className="h-3 w-3" />
                       </motion.button>
                     )}
                   </div>
-                  <p className="mt-1 text-[9px] font-black uppercase tracking-widest text-foreground/38">{t("rm_servings")}</p>
+                  <p className="mt-1 text-[10px] font-black uppercase tracking-widest text-foreground/38">{t("rm_servings")}</p>
                 </div>
               </section>
 
@@ -182,7 +184,7 @@ export function RecipeModal({
                     ].map((macro) => (
                       <div key={macro.label} className="rounded-2xl border border-border bg-white/10 p-3">
                         <div className="mb-2 flex items-end justify-between">
-                          <span className="text-[9px] font-black uppercase tracking-widest text-foreground/42">{macro.label}</span>
+                          <span className="text-[10px] font-black uppercase tracking-widest text-foreground/42">{macro.label}</span>
                           <span className="text-xl font-black text-foreground">{macro.val}g</span>
                         </div>
                         <Progress

@@ -253,7 +253,7 @@ export function HydrationTracker() {
               <XAxis dataKey="name" tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }} axisLine={false} tickLine={false} />
               <YAxis domain={[0, "auto"]} tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }} axisLine={false} tickLine={false} width={25} />
               <Tooltip
-                contentStyle={{ fontSize: 11, background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 8 }}
+                contentStyle={{ background: "hsl(0 0% 6%)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 12, color: "#fff", fontSize: 12 }}
                 formatter={(value: number, name: string) => [`${value.toFixed(1)}${t("hyd_liters_short")}`, t("hyd_intake")]}
               />
               <Bar dataKey="amount" fill="hsl(var(--brand))" radius={[4, 4, 0, 0]} />

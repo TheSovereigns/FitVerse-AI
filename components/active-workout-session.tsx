@@ -174,7 +174,7 @@ export function ActiveWorkoutSession({ workout, onClose, onComplete }: ActiveWor
           </div>
           <button
             onClick={() => onComplete({ elapsedTime, rpeValues })}
-            className="w-full h-14 rounded-2xl border-none bg-brand text-white text-base font-bold cursor-pointer flex items-center justify-center gap-2"
+            className="w-full h-14 rounded-xl border-none bg-brand text-white text-base font-bold cursor-pointer flex items-center justify-center gap-2"
           >
             <Save className="w-5 h-5" />
             {t("aw_save_log")}
@@ -219,7 +219,7 @@ export function ActiveWorkoutSession({ workout, onClose, onComplete }: ActiveWor
                 key={idx}
                 className={cn(
                   "h-[3px] rounded-sm transition-all duration-500",
-                  exCompleted ? "bg-brand flex-1" : isCurrent ? "bg-brand/30 [flex:2]" : "bg-white/[0.08] flex-1"
+                  exCompleted ? "bg-brand flex-1" : isCurrent ? "bg-brand/30 [flex:2]" : "bg-border flex-1"
                 )}
               />
             )
@@ -438,7 +438,7 @@ export function ActiveWorkoutSession({ workout, onClose, onComplete }: ActiveWor
             {/* Next Button */}
             <button
               onClick={handleNextExercise}
-              className="w-full h-14 rounded-2xl border-none bg-brand text-white text-base font-bold cursor-pointer shadow-[0_4px_24px_rgba(16,185,129,0.3)] flex items-center justify-center gap-1"
+              className="w-full h-14 rounded-xl border-none bg-brand text-white text-base font-bold cursor-pointer shadow-[0_4px_24px_rgba(16,185,129,0.3)] flex items-center justify-center gap-1"
             >
               {currentExerciseIndex < totalExercises - 1 ? (
                 <>Próximo exercício <ChevronRight className="w-5 h-5" /></>

@@ -93,7 +93,7 @@ export default function RootLayout({
         <script dangerouslySetInnerHTML={{__html: `if('serviceWorker' in navigator){navigator.serviceWorker.register('/sw.js')}`}} />
       </head>
       <body
-        className={`${inter.className} ${barlow.variable} antialiased text-foreground min-h-screen bg-background`}
+        className={`${inter.variable} ${barlow.variable} font-sans antialiased text-foreground min-h-screen bg-background`}
       >
         <ThemeProvider
           attribute="class"

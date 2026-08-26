@@ -24,7 +24,7 @@ export function MobileBottomNav({ currentView, onNavigate, onOpenMore }: MobileB
 
   return (
     <nav
-      className="md:hidden fixed left-0 right-0 bottom-0 z-40 flex h-[84px] items-center justify-around rounded-t-[28px] rounded-b-none border-t bg-card/85 backdrop-blur-2xl px-2 shadow-[0_-8px_30px_rgba(0,0,0,0.06)]"
+      className="md:hidden fixed left-0 right-0 bottom-0 z-40 flex h-[84px] items-center justify-around rounded-t-3xl rounded-b-none border-t bg-card/85 backdrop-blur-2xl px-2 shadow-[0_-8px_30px_rgba(0,0,0,0.06)]"
       style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
     >
       {items.map((item) => {
@@ -39,7 +39,7 @@ export function MobileBottomNav({ currentView, onNavigate, onOpenMore }: MobileB
             >
               <div
                 className={cn(
-                  "h-14 w-14 rounded-2xl flex items-center justify-center shadow-lg shadow-brand/20 transition-all duration-200",
+                  "h-14 w-14 rounded-xl flex items-center justify-center shadow-lg shadow-brand/20 transition-all duration-200",
                   isActive
                     ? "bg-brand text-white"
                     : "bg-brand text-white hover:scale-105 active:scale-95"

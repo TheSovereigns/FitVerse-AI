@@ -305,7 +305,7 @@ export function ProductResult({ result, onBack, imageData, onSave, onDiscard, ha
             }}
           />
            <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-           <span className="text-xs font-black uppercase tracking-[0.4em] opacity-40">{t("pr_neural_sync")}</span>
+            <span className="section-label opacity-40">{t("pr_neural_sync")}</span>
         </div>
       </div>
 
@@ -327,7 +327,7 @@ export function ProductResult({ result, onBack, imageData, onSave, onDiscard, ha
             </div>
           )}
           <div className="flex-1 min-w-0">
-            <Badge className="bg-primary/20 text-primary border-none font-black text-[10px] tracking-widest px-3 py-1 rounded-full mb-2">
+            <Badge className="bg-primary/20 text-primary border-none font-bold text-[11px] tracking-wider px-3 py-1 rounded-full mb-2">
               {result.category || t("pr_complete_synthesis")}
             </Badge>
             <h1 className="text-2xl md:text-3xl font-black text-foreground tracking-tight leading-tight break-words line-clamp-2">
@@ -439,9 +439,9 @@ export function ProductResult({ result, onBack, imageData, onSave, onDiscard, ha
                           <div className="flex items-center justify-between mb-2">
                             <span className="text-sm font-bold text-foreground line-clamp-1 flex-1 mr-2">{iw.name}</span>
                             <div className="flex items-center gap-2">
-                              <button onClick={() => { const next = [...ingredientWeights]; next[i] = { ...next[i], grams: Math.max(5, next[i].grams - 10) }; setIngredientWeights(next) }} className="w-8 h-8 rounded-full bg-muted/50 hover:bg-muted/80 flex items-center justify-center transition-colors"><Minus className="w-4 h-4" /></button>
-                              <input type="number" value={iw.grams} onChange={(e) => { const val = Math.max(5, parseInt(e.target.value) || 5); const next = [...ingredientWeights]; next[i] = { ...next[i], grams: val }; setIngredientWeights(next) }} className="w-16 text-center text-sm font-black bg-muted/30 rounded-lg px-2 py-1 border border-border focus:border-primary focus:outline-none" />
-                              <button onClick={() => { const next = [...ingredientWeights]; next[i] = { ...next[i], grams: next[i].grams + 10 }; setIngredientWeights(next) }} className="w-8 h-8 rounded-full bg-muted/50 hover:bg-muted/80 flex items-center justify-center transition-colors"><Plus className="w-4 h-4" /></button>
+                              <button onClick={() => { const next = [...ingredientWeights]; next[i] = { ...next[i], grams: Math.max(5, next[i].grams - 10) }; setIngredientWeights(next) }} aria-label={`Decrease ${iw.name}`} className="w-8 h-8 rounded-full bg-muted/50 hover:bg-muted/80 flex items-center justify-center transition-colors"><Minus className="w-4 h-4" /></button>
+                              <input type="number" value={iw.grams} onChange={(e) => { const val = Math.max(5, parseInt(e.target.value) || 5); const next = [...ingredientWeights]; next[i] = { ...next[i], grams: val }; setIngredientWeights(next) }} aria-label={`${iw.name} grams`} className="w-16 text-center text-sm font-black bg-muted/30 rounded-lg px-2 py-1 border border-border focus:border-primary focus:outline-none" />
+                              <button onClick={() => { const next = [...ingredientWeights]; next[i] = { ...next[i], grams: next[i].grams + 10 }; setIngredientWeights(next) }} aria-label={`Increase ${iw.name}`} className="w-8 h-8 rounded-full bg-muted/50 hover:bg-muted/80 flex items-center justify-center transition-colors"><Plus className="w-4 h-4" /></button>
                               <span className="text-xs font-bold text-muted-foreground ml-1">g</span>
                             </div>
                           </div>

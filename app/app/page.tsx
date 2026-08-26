@@ -406,11 +406,11 @@ export default function DashboardPage() {
           <div className="hidden md:block" />
           <div className="flex items-center gap-1.5">
             {(isAdmin || user?.user_metadata?.is_admin) && (
-            <button onClick={() => router.push("/admin-dashboard")} className="w-9 h-9 rounded-xl flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-all">
+            <button onClick={() => router.push("/admin-dashboard")} aria-label="Admin" className="w-9 h-9 rounded-xl flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-all">
               <Shield className="w-[18px] h-[18px]" />
             </button>
           )}
-            <button onClick={() => setCurrentView("profile")} className="w-9 h-9 rounded-xl flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-all">
+            <button onClick={() => setCurrentView("profile")} aria-label="Profile" className="w-9 h-9 rounded-xl flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-all">
               <User className="w-[18px] h-[18px]" />
             </button>
           </div>
@@ -536,7 +536,7 @@ export default function DashboardPage() {
       {/* FAB - Scan - hidden during GPS tracker */}
       {currentView !== "corrida" && (
         <button onClick={handleNavScan}
-          className="mobile-fab-safe fixed right-4 z-50 h-14 w-14 rounded-2xl bg-brand text-white shadow-lg shadow-brand/20 flex items-center justify-center transition-all duration-200 hover:scale-105 active:scale-95 md:bottom-6 md:right-8"
+          className="mobile-fab-safe fixed right-4 z-50 h-14 w-14 rounded-xl bg-brand text-white shadow-lg shadow-brand/20 flex items-center justify-center transition-all duration-200 hover:scale-105 active:scale-95 md:bottom-6 md:right-8"
           aria-label={t("home_scan_product")}
         >
           <ScanLine className="w-6 h-6" />

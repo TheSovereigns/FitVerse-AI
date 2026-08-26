@@ -130,7 +130,7 @@ export default function ResetPasswordPage() {
                     onChange={(event) => setPassword(event.target.value)}
                     required
                     minLength={8}
-                    className="h-12 bg-white/[0.06] border-white/10 text-foreground placeholder:text-foreground/30 focus:border-brand/30 focus:bg-white/[0.08] focus:ring-brand/20 rounded-xl pr-12"
+                    className="h-12 bg-muted/50 border-border text-foreground placeholder:text-foreground/30 focus:border-brand/30 focus:ring-brand/20 rounded-xl pr-12"
                   />
                   <Button
                     type="button"
@@ -155,7 +155,7 @@ export default function ResetPasswordPage() {
                   onChange={(event) => setConfirmPassword(event.target.value)}
                   required
                   minLength={8}
-                  className="h-12 bg-white/[0.06] border-white/10 text-foreground placeholder:text-foreground/30 focus:border-brand/30 focus:bg-white/[0.08] focus:ring-brand/20 rounded-xl"
+                  className="h-12 bg-muted/50 border-border text-foreground placeholder:text-foreground/30 focus:border-brand/30 focus:ring-brand/20 rounded-xl"
                 />
               </div>
 

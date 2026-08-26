@@ -112,7 +112,7 @@ export function WeeklyReport() {
             <XAxis dataKey="label" tick={{ fontSize: 10, fill: "var(--muted-foreground)" }} />
             <YAxis tick={{ fontSize: 10, fill: "var(--muted-foreground)" }} />
             <Tooltip
-              contentStyle={{ background: "hsl(var(--popover))", border: "1px solid var(--border)", borderRadius: 12, fontSize: 12 }}
+              contentStyle={{ background: "hsl(0 0% 6%)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 12, color: "#fff", fontSize: 12 }}
               labelStyle={{ color: "var(--foreground)" }}
             />
             <Bar dataKey="score" fill="hsl(var(--brand))" radius={[8, 8, 0, 0]} />
