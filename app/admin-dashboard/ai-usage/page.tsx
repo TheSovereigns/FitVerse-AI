@@ -228,7 +228,7 @@ export default function AdminAIUsagePage() {
 
       {/* Hourly Heatmap */}
       <div className="glass-strong border border-border rounded-2xl p-6">
-        <h3 className="text-lg font-black text-foreground mb-6">
+        <h3 className="text-lg font-bold text-foreground mb-6">
           {locale === "en-US" ? "Usage by Hour of Day" : "Uso por Hora do Dia"}
         </h3>
         
@@ -264,7 +264,7 @@ export default function AdminAIUsagePage() {
 
       {/* Top Questions */}
       <div className="glass-strong border border-border rounded-2xl p-6">
-        <h3 className="text-lg font-black text-foreground mb-6">
+        <h3 className="text-lg font-bold text-foreground mb-6">
           {locale === "en-US" ? "Most Asked Questions" : "Perguntas Mais Frequentes"}
         </h3>
         

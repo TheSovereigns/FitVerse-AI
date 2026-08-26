@@ -30,7 +30,7 @@ export function ClanInviteModal({ isOpen, onClose, clanId, clanName }: {
             className="bg-background border border-border rounded-3xl p-6 w-full max-w-md max-h-[80vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-5">
               <div>
-                <h3 className="text-lg font-black text-foreground">{isEnglish ? "Invite to" : "Convidar para"} {clanName}</h3>
+                <h3 className="text-lg font-bold text-foreground">{isEnglish ? "Invite to" : "Convidar para"} {clanName}</h3>
                 <p className="text-[10px] font-bold uppercase tracking-wider text-foreground/40 mt-1">
                   {isEnglish ? "Share code or link" : "Compartilhe codigo ou link"}
                 </p>

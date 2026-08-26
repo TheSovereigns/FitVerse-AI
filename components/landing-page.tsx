@@ -133,7 +133,7 @@ export function LandingPage() {
                 <div className="w-12 h-12 rounded-2xl bg-brand-muted flex items-center justify-center mb-4 group-hover:shadow-[0_0_20px_rgba(52,211,153,0.2)] transition-shadow">
                   <f.icon className="w-6 h-6 text-brand" />
                 </div>
-                <h3 className="text-xl font-black mb-2">{f.title}</h3>
+                <h3 className="text-xl font-bold mb-2">{f.title}</h3>
                 <p className="text-sm text-muted-foreground">{f.desc}</p>
               </motion.div>
             ))}
@@ -158,10 +158,10 @@ export function LandingPage() {
                   </div>
                 )}
                 <div className="flex items-baseline gap-1 mb-2">
-                  <span className="text-4xl font-black text-score">{plan.price}</span>
+                  <span className="text-4xl text-score">{plan.price}</span>
                   {plan.period !== "forever" && <span className="text-muted-foreground">{plan.period}</span>}
                 </div>
-                <h3 className="text-xl font-black mb-1 text-cta">{plan.name}</h3>
+                <h3 className="text-xl mb-1 text-cta">{plan.name}</h3>
                 <p className="text-sm text-muted-foreground mb-6">{plan.description}</p>
                 <ul className="space-y-3 mb-8">
                   {plan.features.map((f, j) => (
@@ -192,7 +192,7 @@ export function LandingPage() {
             <motion.div key={i} initial={{ opacity: 0, y: 12 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }}
               className="text-center">
               <stat.icon className="w-5 h-5 text-brand mx-auto mb-2" />
-              <p className="text-3xl font-black text-score">{stat.value}</p>
+              <p className="text-3xl text-score">{stat.value}</p>
               <p className="text-[11px] uppercase tracking-widest text-muted-foreground mt-1">{stat.label}</p>
             </motion.div>
           ))}

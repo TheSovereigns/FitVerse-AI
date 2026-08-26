@@ -105,17 +105,55 @@ function applyAccentColor(hex: string) {
 }
 
 function ThemeSection() {
-  const { t } = useTranslation()
+  const { t, locale } = useTranslation()
   const [theme, setThemeState] = useState<string>("dark")
   const [accent, setAccent] = useState("green")
+  const [customHex, setCustomHex] = useState("#34D399")
+  const [showCustom, setShowCustom] = useState(false)
+
+  const ACCENT_COLORS = [
+    { id: "green", color: "#34D399" },
+    { id: "blue", color: "#0A84FF" },
+    { id: "purple", color: "#BF5AF2" },
+    { id: "pink", color: "#FF375F" },
+    { id: "orange", color: "#FF9500" },
+    { id: "red", color: "#FF453A" },
+  ]
+
+  const hexToRgb = (hex: string) => {
+    const r = parseInt(hex.slice(1, 3), 16) || 0
+    const g = parseInt(hex.slice(3, 5), 16) || 0
+    const b = parseInt(hex.slice(5, 7), 16) || 0
+    return { r, g, b }
+  }
+  const rgbToHex = (r: number, g: number, b: number) =>
+    `#${[r, g, b].map(v => Math.max(0, Math.min(255, v)).toString(16).padStart(2, "0")).join("")}`
+
+  const applyCustom = (hex: string) => {
+    if (!/^#[0-9A-Fa-f]{6}$/.test(hex)) return
+    setCustomHex(hex)
+    setAccent(hex)
+    localStorage.setItem("fitverse-accent", hex)
+    applyAccentColor(hex)
+  }
 
   useEffect(() => {
     try {
       const saved = localStorage.getItem("fitverse-accent")
       if (saved) {
-        setAccent(saved)
-        const match = ACCENT_COLORS.find((c) => c.id === saved)
-        if (match) applyAccentColor(match.color)
+        if (saved.startsWith("#")) {
+          setAccent(saved)
+          setCustomHex(saved)
+          setShowCustom(true)
+          applyAccentColor(saved)
+        } else {
+          setAccent(saved)
+          const match = ACCENT_COLORS.find((c) => c.id === saved)
+          if (match) {
+            applyAccentColor(match.color)
+            setCustomHex(match.color)
+          }
+        }
       }
       const savedTheme = localStorage.getItem("fitverse-theme")
       if (savedTheme) {
@@ -141,14 +179,7 @@ function ThemeSection() {
     localStorage.setItem("fitverse-theme", next)
   }
 
-  const ACCENT_COLORS = [
-    { id: "green", color: "#34D399" },
-    { id: "blue", color: "#0A84FF" },
-    { id: "purple", color: "#BF5AF2" },
-    { id: "pink", color: "#FF375F" },
-    { id: "orange", color: "#FF9500" },
-    { id: "red", color: "#FF453A" },
-  ]
+  const rgb = hexToRgb(customHex)
 
   return (
     <div className="rounded-2xl glass-strong p-5">
@@ -185,22 +216,81 @@ function ThemeSection() {
       </div>
 
       <div>
-        <p className="text-xs text-muted-foreground mb-2">{t("sp_accent_color")}</p>
-        <div className="flex gap-2">
+        <div className="flex items-center justify-between mb-2">
+          <p className="text-xs text-muted-foreground">{t("sp_accent_color")}</p>
+          <button onClick={() => setShowCustom(!showCustom)} className="text-[11px] font-medium text-brand hover:text-brand/80 transition-colors">
+            {showCustom ? (locale === "en-US" ? "Hide" : "Ocultar") : "RGB • HEX"}
+          </button>
+        </div>
+        <div className="flex flex-wrap gap-2">
           {ACCENT_COLORS.map((color) => (
             <button
               key={color.id}
-              onClick={() => { setAccent(color.id); localStorage.setItem("fitverse-accent", color.id); applyAccentColor(color.color) }}
+              onClick={() => { setAccent(color.id); localStorage.setItem("fitverse-accent", color.id); applyAccentColor(color.color); setCustomHex(color.color) }}
+              aria-label={color.id}
               className={cn(
-                "relative h-9 w-9 rounded-xl transition-all border-2",
+                "relative h-9 w-9 rounded-xl transition-all border-2 shrink-0",
                 accent === color.id ? "border-foreground scale-110" : "border-transparent hover:scale-105"
               )}
               style={{ backgroundColor: color.color }}
             >
-              {accent === color.id && <Check className="h-3.5 w-3.5 text-white absolute inset-0 m-auto" />}
+              {accent === color.id && <Check className="h-3.5 w-3.5 text-white absolute inset-0 m-auto drop-shadow" />}
             </button>
           ))}
+          {/* Custom picker trigger */}
+          <label className={cn(
+            "relative h-9 w-9 rounded-xl border-2 flex items-center justify-center cursor-pointer overflow-hidden shrink-0 transition-all",
+            accent.startsWith("#") ? "border-foreground scale-110" : "border-border hover:border-brand/50 hover:scale-105",
+            "bg-muted"
+          )} title="Escolher cor RGB">
+            <input type="color" value={customHex} onChange={(e) => applyCustom(e.target.value)} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" />
+            <div className="w-full h-full flex items-center justify-center" style={{ background: accent.startsWith("#") ? accent : customHex }}>
+              <Palette className="h-4 w-4 text-white drop-shadow" />
+            </div>
+            {accent.startsWith("#") && <Check className="h-3.5 w-3.5 text-white absolute inset-0 m-auto drop-shadow" />}
+          </label>
         </div>
+
+        {showCustom && (
+          <div className="mt-4 rounded-xl border border-border bg-card p-4 space-y-4 animate-fade-in">
+            <div className="flex items-center gap-3">
+              <div className="h-12 w-12 rounded-xl border border-border shrink-0" style={{ background: customHex }} />
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-medium text-foreground">Cor personalizada</p>
+                <p className="text-[11px] text-muted-foreground truncate">{customHex.toUpperCase()} • rgb({rgb.r}, {rgb.g}, {rgb.b})</p>
+              </div>
+              <label className="h-9 px-3 rounded-xl border border-border bg-muted text-xs font-medium flex items-center gap-2 cursor-pointer hover:bg-muted/80">
+                <input type="color" value={customHex} onChange={(e) => applyCustom(e.target.value)} className="sr-only" />
+                Escolher
+              </label>
+            </div>
+
+            {/* Hex input */}
+            <div>
+              <label className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">HEX</label>
+              <div className="mt-1 flex gap-2">
+                <Input value={customHex} onChange={(e) => { const v = e.target.value.startsWith("#") ? e.target.value : `#${e.target.value}`; if (/^#[0-9A-Fa-f]{0,6}$/.test(v)) setCustomHex(v); if (/^#[0-9A-Fa-f]{6}$/.test(v)) applyCustom(v) }} placeholder="#34D399" className="h-10 flex-1 rounded-xl bg-muted/50 border-border font-mono text-sm uppercase" maxLength={7} />
+                <Button onClick={() => applyCustom(customHex)} className="h-10 rounded-xl bg-brand text-brand-foreground px-4">Aplicar</Button>
+              </div>
+            </div>
+
+            {/* RGB sliders */}
+            {(["r", "g", "b"] as const).map((ch) => (
+              <div key={ch} className="space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <label className="text-[11px] font-bold uppercase tracking-wider" style={{ color: ch === "r" ? "#FF453A" : ch === "g" ? "#30D158" : "#0A84FF" }}>{ch.toUpperCase()}</label>
+                  <span className="text-xs font-mono bg-muted px-2 py-0.5 rounded-lg">{rgb[ch]}</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <input type="range" min={0} max={255} value={rgb[ch]} onChange={(e) => { const v = parseInt(e.target.value); const next = rgbToHex(ch === "r" ? v : rgb.r, ch === "g" ? v : rgb.g, ch === "b" ? v : rgb.b); applyCustom(next) }} className="flex-1 h-2 accent-brand" style={{ accentColor: customHex }} />
+                  <Input type="number" min={0} max={255} value={rgb[ch]} onChange={(e) => { const v = Math.max(0, Math.min(255, parseInt(e.target.value) || 0)); const next = rgbToHex(ch === "r" ? v : rgb.r, ch === "g" ? v : rgb.g, ch === "b" ? v : rgb.b); applyCustom(next) }} className="h-8 w-20 rounded-lg bg-muted/50 border-border text-center font-mono text-xs" />
+                </div>
+              </div>
+            ))}
+
+            <p className="text-[11px] text-muted-foreground text-center">Escolha qualquer cor. Aplica em botões, anéis, ícones e gráficos instantaneamente.</p>
+          </div>
+        )}
       </div>
     </div>
   )

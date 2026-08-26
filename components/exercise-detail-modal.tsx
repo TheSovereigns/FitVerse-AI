@@ -246,7 +246,7 @@ export function ExerciseDetailModal({ exercise, topProducts, onClose, onFeedback
               {/* Botão Google Search */}
               <Button
                 onClick={() => window.open(`https://www.google.com/search?q=${encodeURIComponent(getSearchTerm())}`, '_blank')}
-                className="w-full h-12 rounded-xl bg-primary/10 border border-primary/30 text-primary font-bold text-sm flex items-center justify-center gap-2 hover:bg-primary/20"
+                className="w-full h-12 rounded-xl bg-brand/10 border border-brand/30 text-brand font-bold text-sm flex items-center justify-center gap-2 hover:bg-brand/20"
               >
                 <Search className="w-4 h-4" />
                 {t("em_btn_search_google")}

@@ -190,7 +190,7 @@ export function ClansTab() {
               </div>
               <div className="flex-1">
                 <div className="flex items-center gap-2">
-                  <h2 className="text-xl font-black text-foreground">{selectedClan.name}</h2>
+                  <h2 className="text-xl font-bold text-foreground">{selectedClan.name}</h2>
                   {selectedClan.is_public ? (
                     <Globe className="h-4 w-4 text-brand" />
                   ) : (
@@ -336,7 +336,7 @@ export function ClansTab() {
                   <p className="text-[10px] font-bold uppercase tracking-wider" style={{ color: guildLevel.current.color }}>
                     {isEnglish ? "Your Guild" : "Sua Guild"}
                   </p>
-                  <h3 className="text-lg font-black text-foreground">{userClan.name}</h3>
+                  <h3 className="text-lg font-bold text-foreground">{userClan.name}</h3>
                   <p className="text-xs text-foreground/40">
                     {userClan.memberCount || 0} {isEnglish ? "members" : "membros"} · {userClan.role === "owner" ? "Owner" : userClan.role === "admin" ? "Admin" : "Member"}
                   </p>
@@ -415,7 +415,7 @@ export function ClansTab() {
       {/* Discover Section */}
       <div>
         <div className="flex items-center justify-between mb-3">
-          <h2 className="text-lg font-black text-foreground">
+          <h2 className="text-lg font-bold text-foreground">
             {isEnglish ? "Discover Guilds" : "Descobrir Guilds"}
           </h2>
           <button onClick={() => setShowCreateModal(true)}

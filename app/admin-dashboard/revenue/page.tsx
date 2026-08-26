@@ -294,7 +294,7 @@ export default function AdminRevenuePage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Revenue Chart */}
         <div className="lg:col-span-2 glass-strong border border-border rounded-2xl p-6">
-          <h3 className="text-lg font-black text-foreground mb-6">
+          <h3 className="text-lg font-bold text-foreground mb-6">
             {locale === "en-US" ? "Revenue & New Subscriptions" : "Receita e Novas Assinaturas"}
           </h3>
           
@@ -335,7 +335,7 @@ export default function AdminRevenuePage() {
 
         {/* Plan Distribution */}
         <div className="glass-strong border border-border rounded-2xl p-6">
-          <h3 className="text-lg font-black text-foreground mb-6">
+          <h3 className="text-lg font-bold text-foreground mb-6">
             {locale === "en-US" ? "Plan Distribution" : "Distribuição de Planos"}
           </h3>
           
@@ -376,7 +376,7 @@ export default function AdminRevenuePage() {
 
       {/* Recent Transactions */}
       <div className="glass-strong border border-border rounded-2xl p-6">
-        <h3 className="text-lg font-black text-foreground mb-6">
+        <h3 className="text-lg font-bold text-foreground mb-6">
           {locale === "en-US" ? "Recent Subscriptions" : "Assinaturas Recentes"}
         </h3>
         

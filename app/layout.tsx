@@ -70,9 +70,13 @@ export default function RootLayout({
           (function(){
             try {
               var saved = localStorage.getItem("fitverse-accent");
-              var colors = {green:"#34D399",blue:"#0A84FF",purple:"#BF5AF2",pink:"#FF375F",orange:"#FF9500",red:"#FF453A"};
-              var hex = colors[saved];
-              if (!hex) return;
+              var hex = null;
+              if (saved && saved.charAt(0) === "#") hex = saved;
+              else {
+                var colors = {green:"#34D399",blue:"#0A84FF",purple:"#BF5AF2",pink:"#FF375F",orange:"#FF9500",red:"#FF453A"};
+                hex = colors[saved];
+              }
+              if (!hex || !/^#[0-9A-Fa-f]{6}$/.test(hex)) return;
               var r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16);
               var s = document.documentElement.style;
               s.setProperty("--brand", hex);

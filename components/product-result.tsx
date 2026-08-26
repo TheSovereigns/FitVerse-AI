@@ -212,7 +212,7 @@ export function ProductResult({ result, onBack, imageData, onSave, onDiscard, ha
     return (
       <div className="flex flex-col items-center justify-center p-20 h-full">
         <div className="w-16 h-16 rounded-full border-4 border-primary/20 border-t-primary animate-spin mb-6" />
-        <p className="text-xl font-black text-foreground tracking-tighter animate-pulse uppercase tracking-[0.3em] opacity-40">{t("pr_syncing")}</p>
+        <p className="text-xl font-bold text-foreground tracking-tighter animate-pulse uppercase tracking-[0.3em] opacity-40">{t("pr_syncing")}</p>
       </div>
     )
   }
@@ -327,15 +327,15 @@ export function ProductResult({ result, onBack, imageData, onSave, onDiscard, ha
             </div>
           )}
           <div className="flex-1 min-w-0">
-            <Badge className="bg-primary/20 text-primary border-none font-bold text-[11px] tracking-wider px-3 py-1 rounded-full mb-2">
+            <Badge className="bg-brand/20 text-brand border-none font-bold text-[11px] tracking-wider px-3 py-1 rounded-full mb-2">
               {result.category || t("pr_complete_synthesis")}
             </Badge>
-            <h1 className="text-2xl md:text-3xl font-black text-foreground tracking-tight leading-tight break-words line-clamp-2">
+            <h1 className="text-2xl md:text-3xl font-bold text-foreground tracking-tight leading-tight break-words line-clamp-2">
               {result.productName}
             </h1>
             <p className="text-sm font-bold text-muted-foreground opacity-60 uppercase tracking-widest truncate">{result.brand || t("pr_generic")}</p>
             {result.servingSize && (
-              <p className="text-xs font-bold text-primary mt-1 uppercase tracking-widest">Porção: {result.servingSize}</p>
+              <p className="text-xs font-bold text-brand mt-1 uppercase tracking-widest">Porção: {result.servingSize}</p>
             )}
           </div>
           <div className="hidden md:flex flex-col items-center">
@@ -420,7 +420,7 @@ export function ProductResult({ result, onBack, imageData, onSave, onDiscard, ha
             isPremium ? (
               <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="glass-strong border border-border rounded-2xl p-4 md:p-6">
                 <div className="flex items-center gap-3 mb-4">
-                  <Scale className="w-6 h-6 text-primary" />
+                  <Scale className="w-6 h-6 text-brand" />
                   <span className="text-sm font-bold text-muted-foreground uppercase tracking-widest">{t("pr_weight_adjust")}</span>
                 </div>
                 {hasIngredientDetails ? (
@@ -456,7 +456,7 @@ export function ProductResult({ result, onBack, imageData, onSave, onDiscard, ha
                     })}
                     <div className="flex items-center justify-between pt-3 border-t border-border">
                       <span className="text-xs font-bold text-muted-foreground uppercase">{t("pr_total")}</span>
-                      <span className="text-lg font-black text-primary">{totalIngredientGrams}g</span>
+                      <span className="text-lg font-black text-brand">{totalIngredientGrams}g</span>
                     </div>
                     <button onClick={() => setIngredientWeights(defaultIngredientWeights)} className="w-full text-xs font-bold text-muted-foreground hover:text-foreground py-2 rounded-xl hover:bg-muted/30 transition-colors">{t("pr_reset_weights")}</button>
                   </div>
@@ -475,8 +475,8 @@ export function ProductResult({ result, onBack, imageData, onSave, onDiscard, ha
                 )}
               </motion.div>
             ) : (
-              <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="glass-strong border border-border rounded-2xl border-primary/30 p-4 md:p-6 flex flex-col items-center gap-4">
-                <div className="flex items-center gap-3"><Lock className="w-6 h-6 text-primary" /><span className="text-sm font-bold text-primary uppercase tracking-widest">{t("pr_weight_adjust")}</span></div>
+              <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="glass-strong border border-border rounded-2xl border-brand/30 p-4 md:p-6 flex flex-col items-center gap-4">
+                <div className="flex items-center gap-3"><Lock className="w-6 h-6 text-brand" /><span className="text-sm font-bold text-brand uppercase tracking-widest">{t("pr_weight_adjust")}</span></div>
                 <p className="text-sm text-muted-foreground text-center line-clamp-2">{t("pr_weight_desc")}</p>
               </motion.div>
             )
@@ -515,7 +515,7 @@ export function ProductResult({ result, onBack, imageData, onSave, onDiscard, ha
                   <motion.div key={i} whileHover={{ x: 10 }} className={cn("p-4 md:p-6 rounded-2xl glass-strong border flex items-start gap-4", getSeverityColor(a.severity))}>
                     {getSeverityIcon(a.severity)}
                     <div className="flex-1 min-w-0">
-                      <h4 className="text-lg font-black tracking-tight mb-1 line-clamp-2">{a.title}</h4>
+                      <h4 className="text-lg font-bold tracking-tight mb-1 line-clamp-2">{a.title}</h4>
                       <p className={cn("text-sm font-bold text-muted-foreground", !isExp && "line-clamp-2")}>{a.description}</p>
                       {a.description && a.description.length > 100 && (
                         <button onClick={() => toggleExpanded(expKey)} className="text-xs font-bold text-brand mt-1 hover:underline">{isExp ? "Ver menos" : "Expand"}</button>
@@ -543,7 +543,7 @@ export function ProductResult({ result, onBack, imageData, onSave, onDiscard, ha
                 <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="glass-strong border border-border rounded-2xl p-6">
                   <div className="flex items-center gap-3 mb-4">
                     <div className={cn("w-12 h-12 rounded-2xl flex items-center justify-center", getNOVAColor(result.novaClassification.group))}><Cookie className="w-6 h-6" /></div>
-                    <div><h4 className="text-lg font-black">Classificação NOVA</h4><p className={cn("text-sm font-bold", getNOVAColor(result.novaClassification.group).split(' ')[0])}>Grupo {result.novaClassification.group} - {result.novaClassification.label}</p></div>
+                    <div><h4 className="text-lg font-bold">Classificação NOVA</h4><p className={cn("text-sm font-bold", getNOVAColor(result.novaClassification.group).split(' ')[0])}>Grupo {result.novaClassification.group} - {result.novaClassification.label}</p></div>
                   </div>
                   <p className={cn("text-sm text-muted-foreground", !expanded["nova-desc"] && "line-clamp-2")}>{result.novaClassification.description}</p>
                   {result.novaClassification.description && result.novaClassification.description.length > 100 && (
@@ -555,7 +555,7 @@ export function ProductResult({ result, onBack, imageData, onSave, onDiscard, ha
                 <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="glass-strong border border-border rounded-2xl p-6">
                   <div className="flex items-center gap-3 mb-4">
                     <div className="w-12 h-12 rounded-2xl bg-purple-500/10 flex items-center justify-center"><TrendingUp className="w-6 h-6 text-purple-400" /></div>
-                    <div><h4 className="text-lg font-black">Índice Glicêmico</h4><p className="text-sm font-bold text-purple-400">{result.glycemicIndex.value} - {result.glycemicIndex.category}</p></div>
+                    <div><h4 className="text-lg font-bold">Índice Glicêmico</h4><p className="text-sm font-bold text-purple-400">{result.glycemicIndex.value} - {result.glycemicIndex.category}</p></div>
                   </div>
                   {result.glycemicIndex.note && (
                     <>
@@ -617,7 +617,7 @@ export function ProductResult({ result, onBack, imageData, onSave, onDiscard, ha
               <h3 className="text-sm font-black uppercase tracking-[0.4em] opacity-30">Benefícios para a Saúde</h3>
               {result.benefits.vitamins && result.benefits.vitamins.length > 0 && (
                 <div className="glass-strong border border-border rounded-2xl p-6">
-                  <div className="flex items-center gap-3 mb-4"><Sparkles className="w-6 h-6 text-foreground" /><h4 className="text-lg font-black uppercase">Vitaminas</h4></div>
+                  <div className="flex items-center gap-3 mb-4"><Sparkles className="w-6 h-6 text-foreground" /><h4 className="text-lg font-bold uppercase">Vitaminas</h4></div>
                   <div className="grid sm:grid-cols-2 gap-3">
                     {result.benefits.vitamins.map((v, i) => {
                       const [name, benefit] = v.split(' - ')
@@ -635,7 +635,7 @@ export function ProductResult({ result, onBack, imageData, onSave, onDiscard, ha
               )}
               {result.benefits.minerals && result.benefits.minerals.length > 0 && (
                 <div className="glass-strong border border-border rounded-2xl p-6">
-                  <div className="flex items-center gap-3 mb-4"><Droplet className="w-6 h-6 text-cyan-400" /><h4 className="text-lg font-black text-cyan-400 uppercase">Minerais</h4></div>
+                  <div className="flex items-center gap-3 mb-4"><Droplet className="w-6 h-6 text-cyan-400" /><h4 className="text-lg font-bold text-cyan-400 uppercase">Minerais</h4></div>
                   <div className="grid sm:grid-cols-2 gap-3">
                     {result.benefits.minerals.map((m, i) => {
                       const [name, benefit] = m.split(' - ')
@@ -653,7 +653,7 @@ export function ProductResult({ result, onBack, imageData, onSave, onDiscard, ha
               )}
               {result.benefits.proteins && result.benefits.proteins.length > 0 && (
                 <div className="glass-strong border border-border rounded-2xl p-6">
-                  <h4 className="text-lg font-black uppercase mb-3">Proteínas</h4>
+                  <h4 className="text-lg font-bold uppercase mb-3">Proteínas</h4>
                   <div className="flex flex-wrap gap-2">{result.benefits.proteins.map((p,i)=>(<Badge key={i} variant="secondary">{p}</Badge>))}</div>
                 </div>
               )}
@@ -688,7 +688,7 @@ export function ProductResult({ result, onBack, imageData, onSave, onDiscard, ha
         <div className="space-y-4 animate-in fade-in duration-300">
           {result.allergens && result.allergens.length > 0 && (
             <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="glass-strong border border-border border-yellow-500/30 rounded-2xl p-6">
-              <div className="flex items-center gap-3 mb-4"><AlertTriangle className="w-6 h-6 text-yellow-500" /><h4 className="text-lg font-black text-yellow-500">Alérgenos Detectados</h4></div>
+              <div className="flex items-center gap-3 mb-4"><AlertTriangle className="w-6 h-6 text-yellow-500" /><h4 className="text-lg font-bold text-yellow-500">Alérgenos Detectados</h4></div>
               <div className="flex flex-wrap gap-2">
                 {result.allergens.slice(0, showAllAllergens ? undefined : 6).map((allergen, i) => (<Badge key={i} className="bg-yellow-500/10 text-yellow-500 border-yellow-500/20 text-sm font-bold">{allergen}</Badge>))}
                 {result.allergens.length > 6 && (<button onClick={() => setShowAllAllergens(!showAllAllergens)} className="text-xs font-bold text-yellow-500 underline">{showAllAllergens ? "Ver menos" : `+${result.allergens.length - 6} mais`}</button>)}
@@ -699,7 +699,7 @@ export function ProductResult({ result, onBack, imageData, onSave, onDiscard, ha
           {result.ingredients && result.ingredients.length > 0 && (
             <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="glass-strong border border-border rounded-2xl p-6">
               <button onClick={() => setShowIngredients(!showIngredients)} className="flex items-center justify-between w-full">
-                <div className="flex items-center gap-3"><Apple className="w-6 h-6 text-primary" /><h4 className="text-lg font-black">Ingredientes ({result.ingredients.length})</h4></div>
+                <div className="flex items-center gap-3"><Apple className="w-6 h-6 text-brand" /><h4 className="text-lg font-bold">Ingredientes ({result.ingredients.length})</h4></div>
                 {showIngredients ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
               </button>
               <AnimatePresence>
@@ -708,8 +708,8 @@ export function ProductResult({ result, onBack, imageData, onSave, onDiscard, ha
                     <div className="mt-4 space-y-2">
                       {result.ingredients.map((ingredient, i) => (
                         <div key={i} className="flex items-center gap-2 text-sm text-muted-foreground">
-                          <span className="w-2 h-2 rounded-full bg-primary/50 shrink-0" />
-                          {i === 0 && <span className="text-xs font-black text-primary">(principal)</span>}
+                          <span className="w-2 h-2 rounded-full bg-brand/50 shrink-0" />
+                          {i === 0 && <span className="text-xs font-black text-brand">(principal)</span>}
                           <span className="line-clamp-2 flex-1">{ingredient}</span>
                         </div>
                       ))}
@@ -722,7 +722,7 @@ export function ProductResult({ result, onBack, imageData, onSave, onDiscard, ha
 
           {result.ingredientDetails && result.ingredientDetails.length > 0 && !showIngredients && (
             <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="glass-strong border border-border rounded-2xl p-6">
-              <h4 className="text-lg font-black mb-4 flex items-center gap-2"><Leaf className="w-5 h-5 text-brand" /> Detalhe por Ingrediente</h4>
+              <h4 className="text-lg font-bold mb-4 flex items-center gap-2"><Leaf className="w-5 h-5 text-brand" /> Detalhe por Ingrediente</h4>
               <div className="space-y-2">
                 {result.ingredientDetails.map((ing, i) => {
                   const expKey = `ing-detail-${i}`
@@ -763,7 +763,7 @@ export function ProductResult({ result, onBack, imageData, onSave, onDiscard, ha
                     <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary shrink-0"><Target className="w-6 h-6" /></div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between mb-2 gap-2">
-                        <h4 className="text-lg font-black line-clamp-2 flex-1">{align.goal}</h4>
+                        <h4 className="text-lg font-bold line-clamp-2 flex-1">{align.goal}</h4>
                         <span className={cn("text-sm font-black uppercase tracking-widest shrink-0", getSuitabilityColor(align.suitability))}>{getSuitabilityLabel(align.suitability)}</span>
                       </div>
                       <p className={cn("text-sm text-muted-foreground", !isExp && "line-clamp-2")}>{align.justification}</p>

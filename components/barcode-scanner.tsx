@@ -95,7 +95,7 @@ export function BarcodeScanner({ onProductFound, onClose }: BarcodeScannerProps)
       <div className="flex items-center justify-between p-4 border-b border-border">
         <div className="flex items-center gap-2">
           <Barcode className="h-5 w-5 text-foreground" />
-          <h2 className="text-lg font-black text-foreground">
+          <h2 className="text-lg font-bold text-foreground">
             {isEnglish ? "Barcode Scanner" : "Scanner de Codigo"}
           </h2>
         </div>

@@ -398,7 +398,7 @@ export default function DatasetPage() {
             <Database className="w-5 h-5 text-primary" />
           </div>
           <div>
-            <h1 className="text-xl font-black text-foreground tracking-tight">Dataset IA</h1>
+            <h1 className="text-xl font-bold text-foreground tracking-tight">Dataset IA</h1>
             <p className="text-xs text-neutral-500">Coleta de dados para fine-tuning</p>
           </div>
         </div>
@@ -818,7 +818,7 @@ export default function DatasetPage() {
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-black text-foreground">Mensagem Completa</h3>
+              <h3 className="text-lg font-bold text-foreground">Mensagem Completa</h3>
               <button onClick={() => setViewingMessage(null)} className="p-1 hover:bg-white/10 rounded-full">
                 <X className="w-5 h-5 text-muted-foreground" />
               </button>
@@ -861,7 +861,7 @@ export default function DatasetPage() {
           >
             <div className="p-6 space-y-4">
               <div className="flex items-center justify-between">
-                <h3 className="text-lg font-black text-foreground">Editar Resposta</h3>
+                <h3 className="text-lg font-bold text-foreground">Editar Resposta</h3>
                 <button onClick={() => setEditingMessage(null)} className="p-1 hover:bg-white/10 rounded-full">
                   <X className="w-5 h-5 text-muted-foreground" />
                 </button>
@@ -935,7 +935,7 @@ export default function DatasetPage() {
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-black text-foreground">Exportar Dataset</h3>
+              <h3 className="text-lg font-bold text-foreground">Exportar Dataset</h3>
               <button onClick={() => setShowExportModal(false)} className="p-1 hover:bg-white/10 rounded-full">
                 <X className="w-5 h-5 text-muted-foreground" />
               </button>

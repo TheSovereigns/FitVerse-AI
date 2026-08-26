@@ -51,6 +51,9 @@ export function SleepTracker({ isLocked = false }: { isLocked?: boolean }) {
   const [wakeTime, setWakeTime] = useState("07:00")
   const [quality, setQuality] = useState(3)
   const [showTip, setShowTip] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
+
+  useEffect(() => { const t = setTimeout(() => setIsLoading(false), 300); return () => clearTimeout(t) }, [])
 
   useEffect(() => {
     try {
@@ -120,6 +123,14 @@ export function SleepTracker({ isLocked = false }: { isLocked?: boolean }) {
         animate={{ opacity: 1, y: 0 }}
         className="rounded-2xl border border-border glass-strong p-5"
       >
+        {isLoading && (
+          <div className="space-y-4 animate-fade-in">
+            <div className="h-20 skeleton" />
+            <div className="h-32 skeleton" />
+          </div>
+        )}
+        {!isLoading && (
+          <>
         <div className="flex items-center gap-2.5 mb-3">
           <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-muted">
             <Moon className="h-4 w-4 text-brand" />
@@ -135,6 +146,8 @@ export function SleepTracker({ isLocked = false }: { isLocked?: boolean }) {
           <p className="text-[13px] text-muted-foreground mb-4">{isEnglish ? "Upgrade to Pro to track your sleep" : "Atualize para Pro para rastrear seu sono"}</p>
           <Button className="h-11 rounded-xl bg-brand text-brand-foreground w-full">Unlock with Pro →</Button>
         </div>
+          </>
+        )}
       </motion.div>
     )
   }
@@ -145,6 +158,22 @@ export function SleepTracker({ isLocked = false }: { isLocked?: boolean }) {
       animate={{ opacity: 1, y: 0 }}
       className="rounded-2xl border border-border glass-strong p-5"
     >
+      {isLoading && (
+        <div className="space-y-4 animate-fade-in">
+          <div className="grid grid-cols-3 gap-2">
+            <div className="h-20 skeleton" />
+            <div className="h-20 skeleton" />
+            <div className="h-20 skeleton" />
+          </div>
+          <div className="h-28 skeleton" />
+          <div className="space-y-2">
+            <div className="h-12 skeleton" />
+            <div className="h-12 skeleton" />
+          </div>
+        </div>
+      )}
+      {!isLoading && (
+        <>
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2.5">
           <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-muted">
@@ -264,6 +293,8 @@ export function SleepTracker({ isLocked = false }: { isLocked?: boolean }) {
             </div>
           ))}
         </div>
+      )}
+        </>
       )}
     </motion.div>
   )

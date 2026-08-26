@@ -97,10 +97,10 @@ export function MetabolicDashboard({ plan, perfil, onBack, planLevel = "full", o
           <div className="relative w-32 h-32 md:w-40 md:h-40">
             <div className="absolute inset-0 rounded-full border-[12px] border-muted" />
             <motion.div initial={{ rotate: -90 }} animate={{ rotate: 270 }} transition={{ duration: 1.5, ease: "easeOut" }}
-              className="absolute inset-0 rounded-full border-[12px] border-transparent border-t-primary border-r-primary/50"
+              className="absolute inset-0 rounded-full border-[12px] border-transparent border-t-brand border-r-brand/50"
             />
             <div className="absolute inset-0 flex flex-col items-center justify-center">
-              <Target className="w-8 h-8 text-primary mb-1" />
+              <Target className="w-8 h-8 text-brand mb-1" />
               <span className="text-xl font-bold">100%</span>
             </div>
           </div>
@@ -174,10 +174,10 @@ export function MetabolicDashboard({ plan, perfil, onBack, planLevel = "full", o
           {isLocked && (
             <div className="absolute inset-0 flex flex-col items-center justify-center z-10">
               <div className="glass-strong border border-border rounded-2xl p-6 text-center max-w-xs">
-                <Lock className="w-8 h-8 text-primary mx-auto mb-3" />
+                <Lock className="w-8 h-8 text-brand mx-auto mb-3" />
                 <h3 className="font-bold text-foreground mb-2">Plano Completo</h3>
                 <p className="text-xs text-muted-foreground mb-4">Upgrade para ver todas as refeicoes detalhadas</p>
-                <Button onClick={onUpgrade} className="h-10 rounded-xl bg-primary text-primary-foreground">
+                <Button onClick={onUpgrade} className="h-10 rounded-xl bg-brand text-brand-foreground">
                   <Crown className="w-4 h-4 mr-2" /> Upgrade Pro
                 </Button>
               </div>

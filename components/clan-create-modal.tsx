@@ -31,7 +31,7 @@ export function ClanCreateModal({ isOpen, onClose, onCreate, isLoading }: {
           <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }}
             className="bg-background border border-border rounded-3xl p-6 w-full max-w-md" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-5">
-              <h3 className="text-lg font-black text-foreground">{isEnglish ? "Create Clan" : "Criar Clan"}</h3>
+              <h3 className="text-lg font-bold text-foreground">{isEnglish ? "Create Clan" : "Criar Clan"}</h3>
               <button onClick={onClose} className="h-8 w-8 rounded-xl bg-muted/50 flex items-center justify-center text-foreground/40 hover:text-foreground/60 transition-colors">
                 <X className="h-4 w-4" />
               </button>

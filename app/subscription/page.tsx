@@ -304,7 +304,7 @@ export default function SubscriptionPage() {
           <div className="text-center min-w-0 flex items-center gap-2 justify-center">
             <img src="/icon.svg" alt="VyseFit" className="w-5 h-5" />
             <p className="text-[10px] font-black uppercase tracking-[0.08em] text-foreground/60">VyseFit AI</p>
-            <h1 className="text-base md:text-xl font-black tracking-tight truncate">
+            <h1 className="text-base md:text-xl font-bold tracking-tight truncate">
               {isEnglish ? "Subscription Plans" : "Planos de Assinatura"}
             </h1>
           </div>
@@ -330,7 +330,7 @@ export default function SubscriptionPage() {
                   {isEnglish ? "Stripe checkout protected" : "Checkout protegido pela Stripe"}
                 </span>
               </div>
-              <h2 className="max-w-3xl text-4xl md:text-6xl font-black tracking-tight leading-[1.02] text-cta">
+ <h2 className="max-w-3xl text-4xl md:text-6xl tracking-tight leading-[1.02] text-cta">
                 {isEnglish ? "VyseFit Black Plans." : "Planos VyseFit Black."}
               </h2>
               <p className="mt-3 max-w-2xl text-sm md:text-base text-foreground/50 leading-relaxed">
@@ -462,12 +462,12 @@ export default function SubscriptionPage() {
                 </div>
 
                 <div className="relative">
-                  <h3 className={cn("text-xl md:text-2xl font-black tracking-tight text-cta", styles.title)}>{planItem.name}</h3>
+                  <h3 className={cn("text-xl md:text-2xl tracking-tight text-cta", styles.title)}>{planItem.name}</h3>
                   <p className="text-sm text-foreground/50 mt-1 min-h-5">
                     {isEnglish ? planItem.subtitleEn : planItem.subtitle}
                   </p>
                   <div className="mt-4 flex items-end gap-1">
-                    <span className="text-4xl md:text-5xl font-black tracking-tight text-score">{isEnglish ? pricing.priceUsd : pricing.price}</span>
+                    <span className="text-4xl md:text-5xl tracking-tight text-score">{isEnglish ? pricing.priceUsd : pricing.price}</span>
                     <span className="text-sm text-foreground/50 mb-2">{isEnglish ? pricing.periodEn : pricing.period}</span>
                   </div>
                 </div>
@@ -487,7 +487,7 @@ export default function SubscriptionPage() {
                   onClick={() => handleSwitchPlan(planItem.id)}
                   disabled={isCurrentPlan || Boolean(loading)}
                   className={cn(
-                    "relative mt-5 h-11 rounded-xl border font-black tracking-[0.08em] uppercase text-sm shadow-[inset_0_1px_0_rgba(255,255,255,0.15)] text-cta",
+                    "relative mt-5 h-11 rounded-xl border tracking-[0.08em] uppercase text-sm shadow-[inset_0_1px_0_rgba(255,255,255,0.15)] text-cta",
                     isCurrentPlan ? "bg-white/5 text-foreground/40 border-border" : styles.button
                   )}
                 >

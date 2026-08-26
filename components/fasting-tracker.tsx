@@ -85,7 +85,10 @@ export function FastingTracker({ isLocked = false }: { isLocked?: boolean }) {
   const [showHistory, setShowHistory] = useState(false)
   const [showStages, setShowStages] = useState(false)
   const [showTips, setShowTips] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
   const intervalRef = useRef<NodeJS.Timeout | null>(null)
+
+  useEffect(() => { const t = setTimeout(() => setIsLoading(false), 300); return () => clearTimeout(t) }, [])
 
   useEffect(() => {
     try {
@@ -241,6 +244,14 @@ export function FastingTracker({ isLocked = false }: { isLocked?: boolean }) {
         animate={{ opacity: 1, y: 0 }}
         className="rounded-2xl border border-border glass-strong p-5 relative overflow-hidden"
       >
+        {isLoading && (
+          <div className="space-y-4 animate-fade-in">
+            <div className="h-32 skeleton" />
+            <div className="h-20 skeleton" />
+          </div>
+        )}
+        {!isLoading && (
+          <>
         <div className="flex items-center gap-2.5 mb-3">
           <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-muted">
             <Timer className="h-4 w-4 text-brand" />
@@ -260,6 +271,8 @@ export function FastingTracker({ isLocked = false }: { isLocked?: boolean }) {
           <p className="text-[13px] text-muted-foreground mb-4">{isEnglish ? "Unlock intermittent fasting tracking with Pro or Premium" : "Desbloqueie o rastreamento de jejum intermitente com Pro ou Premium"}</p>
           <Button className="h-11 rounded-xl bg-brand text-brand-foreground w-full">Unlock with Pro →</Button>
         </div>
+          </>
+        )}
       </motion.div>
     )
   }
@@ -270,6 +283,19 @@ export function FastingTracker({ isLocked = false }: { isLocked?: boolean }) {
       animate={{ opacity: 1, y: 0 }}
       className="rounded-2xl border border-border glass-strong p-5"
     >
+      {isLoading && (
+        <div className="space-y-4 animate-fade-in">
+          <div className="h-44 skeleton rounded-2xl" />
+          <div className="grid grid-cols-3 gap-2">
+            <div className="h-16 skeleton" />
+            <div className="h-16 skeleton" />
+            <div className="h-16 skeleton" />
+          </div>
+          <div className="h-32 skeleton" />
+        </div>
+      )}
+      {!isLoading && (
+        <>
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2.5">
           <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-muted">
@@ -546,6 +572,8 @@ export function FastingTracker({ isLocked = false }: { isLocked?: boolean }) {
         </div>
         <p className="text-[11px] text-muted-foreground">{t(`ft_${currentStage!.id}_tip`)}</p>
       </div>
+        </>
+      )}
     </motion.div>
   )
 }

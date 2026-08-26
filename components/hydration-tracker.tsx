@@ -34,6 +34,9 @@ export function HydrationTracker() {
   const [goal, setGoal] = useState(savedGoal)
   const [editingGoal, setEditingGoal] = useState(false)
   const [goalInput, setGoalInput] = useState(savedGoal.toString())
+  const [isLoading, setIsLoading] = useState(true)
+
+  useEffect(() => { const t = setTimeout(() => setIsLoading(false), 300); return () => clearTimeout(t) }, [])
 
   const today = format(new Date(), "yyyy-MM-dd")
 
@@ -107,6 +110,18 @@ export function HydrationTracker() {
 
   return (
     <div className="space-y-4">
+      {isLoading && (
+        <div className="space-y-4 animate-fade-in">
+          <div className="h-32 skeleton" />
+          <div className="grid grid-cols-2 gap-4">
+            <div className="h-20 skeleton" />
+            <div className="h-20 skeleton" />
+          </div>
+          <div className="h-32 skeleton" />
+        </div>
+      )}
+      {!isLoading && (
+        <>
       <div className="text-center">
         <div className="relative w-40 h-40 mx-auto mb-4">
           <svg className="w-full h-full -rotate-90" viewBox="0 0 160 160">
@@ -261,6 +276,8 @@ export function HydrationTracker() {
           </ResponsiveContainer>
         </div>
       </div>
+        </>
+      )}
     </div>
   )
 }

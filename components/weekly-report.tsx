@@ -33,8 +33,10 @@ export function WeeklyReport() {
   const isEnglish = locale === "en-US"
   const dateLocale = isEnglish ? enUS : ptBR
   const [mounted, setMounted] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => { setMounted(true) }, [])
+  useEffect(() => { const t = setTimeout(() => setIsLoading(false), 300); return () => clearTimeout(t) }, [])
 
   const weekStart = startOfWeek(new Date(), { weekStartsOn: 1 })
   const weekEnd = endOfWeek(new Date(), { weekStartsOn: 1 })
@@ -78,6 +80,18 @@ export function WeeklyReport() {
 
   return (
     <div className="glass-strong border border-border rounded-2xl p-6">
+      {isLoading && (
+        <div className="space-y-4 animate-fade-in">
+          <div className="grid grid-cols-3 gap-2">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="h-20 skeleton" />
+            ))}
+          </div>
+          <div className="h-48 skeleton" />
+        </div>
+      )}
+      {!isLoading && (
+        <>
       <div className="flex items-center gap-2 mb-4">
         <Calendar className="w-5 h-5 text-brand" />
         <h2 className="text-lg font-semibold text-foreground">{t("wr_weekly_report")}</h2>
@@ -119,6 +133,8 @@ export function WeeklyReport() {
           </BarChart>
         </ResponsiveContainer>
       </div>
+        </>
+      )}
     </div>
   )
 }

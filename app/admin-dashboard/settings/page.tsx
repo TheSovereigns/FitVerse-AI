@@ -112,7 +112,7 @@ export default function AdminSettingsPage() {
           >
             {activeTab === "general" && (
               <div className="space-y-6">
-                <h3 className="text-lg font-black text-white">
+                <h3 className="text-lg font-bold text-white">
                   {locale === "en-US" ? "General Settings" : "Configurações Gerais"}
                 </h3>
                 
@@ -155,7 +155,7 @@ export default function AdminSettingsPage() {
 
             {activeTab === "notifications" && (
               <div className="space-y-6">
-                <h3 className="text-lg font-black text-white">
+                <h3 className="text-lg font-bold text-white">
                   {locale === "en-US" ? "Notification Preferences" : "Preferências de Notificação"}
                 </h3>
                 
@@ -180,7 +180,7 @@ export default function AdminSettingsPage() {
 
             {activeTab === "security" && (
               <div className="space-y-6">
-                <h3 className="text-lg font-black text-white">
+                <h3 className="text-lg font-bold text-white">
                   {locale === "en-US" ? "Security Settings" : "Configurações de Segurança"}
                 </h3>
                 
@@ -206,7 +206,7 @@ export default function AdminSettingsPage() {
 
             {activeTab === "api" && (
               <div className="space-y-6">
-                <h3 className="text-lg font-black text-white">API Keys</h3>
+                <h3 className="text-lg font-bold text-white">API Keys</h3>
                 
                 <div className="space-y-4">
                   <div className="p-4 rounded-xl bg-white/5">
@@ -238,7 +238,7 @@ export default function AdminSettingsPage() {
 
             {activeTab === "appearance" && (
               <div className="space-y-6">
-                <h3 className="text-lg font-black text-white">
+                <h3 className="text-lg font-bold text-white">
                   {locale === "en-US" ? "Appearance" : "Aparência"}
                 </h3>
                 

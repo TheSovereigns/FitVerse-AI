@@ -88,7 +88,7 @@ export function ChallengesTab({ clanId }: { clanId?: string }) {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h3 className="text-lg font-black tracking-tight text-foreground">
+        <h3 className="text-lg font-bold tracking-tight text-foreground">
           {isEnglish ? "Challenges" : "Desafios"}
         </h3>
         <Button
@@ -226,7 +226,7 @@ export function ChallengesTab({ clanId }: { clanId?: string }) {
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex items-center justify-between mb-5">
-                <h3 className="text-lg font-black text-foreground">
+                <h3 className="text-lg font-bold text-foreground">
                   {isEnglish ? "New Challenge" : "Novo Desafio"}
                 </h3>
                 <Button variant="ghost" size="icon" onClick={() => setShowCreateModal(false)} className="h-8 w-8 rounded-xl">

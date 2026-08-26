@@ -193,7 +193,7 @@ export function MetabolicPlanner({ onPlanCreated }: MetabolicPlannerProps) {
         {/* Section 1: Basic Info */}
         <div className="bg-card border-border shadow-sm rounded-2xl md:rounded-2xl p-4 md:p-6 space-y-5 haptic-press transition-all duration-500">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg md:text-xl font-black flex items-center gap-3 tracking-tight">
+            <h2 className="text-lg md:text-xl font-bold flex items-center gap-3 tracking-tight">
               <div className="p-2 bg-primary/20 rounded-xl">
                 <User className="w-4 h-4 md:w-5 md:h-5 text-primary" />
               </div>
@@ -287,7 +287,7 @@ export function MetabolicPlanner({ onPlanCreated }: MetabolicPlannerProps) {
 
         {/* Section 2: Activity Level */}
         <div className="bg-card border-border shadow-sm rounded-2xl md:rounded-2xl p-4 md:p-6">
-          <h2 className="text-lg md:text-xl font-black tracking-tight flex items-center gap-3 mb-4">
+          <h2 className="text-lg md:text-xl font-bold tracking-tight flex items-center gap-3 mb-4">
             <div className="p-2 bg-primary/20 rounded-xl">
               <Activity className="w-4 h-4 md:w-5 md:h-5 text-primary" />
             </div>
@@ -322,7 +322,7 @@ export function MetabolicPlanner({ onPlanCreated }: MetabolicPlannerProps) {
 
         {/* Section 3: Goal */}
         <div className="bg-card border-border shadow-sm rounded-2xl md:rounded-2xl p-4 md:p-6">
-          <h2 className="text-lg md:text-xl font-black tracking-tight flex items-center gap-3 mb-4">
+          <h2 className="text-lg md:text-xl font-bold tracking-tight flex items-center gap-3 mb-4">
             <div className="p-2 bg-primary/20 rounded-xl">
               <Target className="w-4 h-4 md:w-5 md:h-5 text-primary" />
             </div>

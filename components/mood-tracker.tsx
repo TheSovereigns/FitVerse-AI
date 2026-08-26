@@ -46,6 +46,9 @@ export function MoodTracker({ isLocked = false }: MoodTrackerProps) {
   const [selectedMood, setSelectedMood] = useState<number | null>(null);
   const [note, setNote] = useState("");
   const [showInsight, setShowInsight] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => { const t = setTimeout(() => setIsLoading(false), 300); return () => clearTimeout(t) }, []);
 
   useEffect(() => {
     try {
@@ -110,6 +113,14 @@ export function MoodTracker({ isLocked = false }: MoodTrackerProps) {
   if (isLocked) {
     return (
       <div className="glass-strong border border-border rounded-2xl p-6 relative overflow-hidden">
+        {isLoading && (
+          <div className="space-y-4 animate-fade-in">
+            <div className="h-6 w-32 skeleton" />
+            <div className="h-20 skeleton" />
+          </div>
+        )}
+        {!isLoading && (
+          <>
         <h2 className="text-lg font-semibold text-foreground mb-4">{t("mt_title")}</h2>
         <div className="paywall-card">
           <div className="paywall-icon"><Lock className="w-6 h-6" /></div>
@@ -117,12 +128,26 @@ export function MoodTracker({ isLocked = false }: MoodTrackerProps) {
           <p className="text-[13px] text-muted-foreground mb-4">{t("mt_unlock")}</p>
           <button className="h-11 rounded-xl bg-brand text-brand-foreground w-full font-medium">Unlock with Pro →</button>
         </div>
+          </>
+        )}
       </div>
     );
   }
 
   return (
     <div className="glass-strong border border-border rounded-2xl p-6">
+      {isLoading && (
+        <div className="space-y-4 animate-fade-in">
+          <div className="flex gap-2">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <div key={i} className="w-14 h-14 skeleton" />
+            ))}
+          </div>
+          <div className="h-48 skeleton" />
+        </div>
+      )}
+      {!isLoading && (
+        <>
       <h2 className="text-lg font-semibold text-foreground mb-4">{t("mt_title")}</h2>
 
       <div className="mb-6">
@@ -207,6 +232,8 @@ export function MoodTracker({ isLocked = false }: MoodTrackerProps) {
           >
             <span className="font-medium text-foreground">{t("mt_ai_insight")}</span> {getInsight()}
           </motion.button>
+        </>
+      )}
         </>
       )}
     </div>

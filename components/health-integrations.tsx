@@ -175,8 +175,8 @@ export function HealthIntegrations() {
     <div className="w-full max-w-3xl mx-auto space-y-6 pb-32 animate-in fade-in duration-500">
       {/* Header */}
       <div className="flex items-center gap-3 mb-2">
-        <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center">
-          <Heart className="w-6 h-6 text-primary" />
+        <div className="w-12 h-12 rounded-2xl bg-brand/10 flex items-center justify-center">
+          <Heart className="w-6 h-6 text-brand" />
         </div>
         <div>
           <h1 className="text-2xl font-black text-foreground tracking-tight">{t("hi_title")}</h1>
@@ -235,7 +235,7 @@ export function HealthIntegrations() {
 
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
-                    <h4 className="text-base font-black text-foreground">{platform.name}</h4>
+                    <h4 className="text-base font-bold text-foreground">{platform.name}</h4>
                     {isConnected && (
                       <Badge className="bg-emerald-500/20 text-emerald-400 border-none text-[10px] font-black px-2 py-0.5 rounded-full">
                         {t("hi_status_connected")}
@@ -272,7 +272,7 @@ export function HealthIntegrations() {
                             "h-8 rounded-xl text-xs font-bold px-4",
                             isConnected
                               ? "bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30"
-                              : "bg-primary text-primary-foreground hover:bg-primary/90"
+                              : "bg-brand text-brand-foreground hover:bg-brand/90"
                           )}
                         >
                           {isConnected ? (
@@ -322,24 +322,24 @@ export function HealthIntegrations() {
         className="glass-strong border border-border rounded-2xl p-6"
       >
         <div className="flex items-center gap-3 mb-4">
-          <Shield className="w-5 h-5 text-primary" />
+          <Shield className="w-5 h-5 text-brand" />
           <h3 className="text-sm font-black uppercase tracking-wider">{t("hi_how_it_works")}</h3>
         </div>
         <div className="space-y-3 text-sm text-muted-foreground">
           <div className="flex items-start gap-3">
-            <span className="w-6 h-6 rounded-full bg-primary/20 text-primary text-xs font-black flex items-center justify-center shrink-0 mt-0.5">1</span>
+            <span className="w-6 h-6 rounded-full bg-brand/20 text-brand text-xs font-black flex items-center justify-center shrink-0 mt-0.5">1</span>
             <p>{t("hi_step_1")}</p>
           </div>
           <div className="flex items-start gap-3">
-            <span className="w-6 h-6 rounded-full bg-primary/20 text-primary text-xs font-black flex items-center justify-center shrink-0 mt-0.5">2</span>
+            <span className="w-6 h-6 rounded-full bg-brand/20 text-brand text-xs font-black flex items-center justify-center shrink-0 mt-0.5">2</span>
             <p>{t("hi_step_2")}</p>
           </div>
           <div className="flex items-start gap-3">
-            <span className="w-6 h-6 rounded-full bg-primary/20 text-primary text-xs font-black flex items-center justify-center shrink-0 mt-0.5">3</span>
+            <span className="w-6 h-6 rounded-full bg-brand/20 text-brand text-xs font-black flex items-center justify-center shrink-0 mt-0.5">3</span>
             <p>{t("hi_step_3")}</p>
           </div>
           <div className="flex items-start gap-3">
-            <span className="w-6 h-6 rounded-full bg-primary/20 text-primary text-xs font-black flex items-center justify-center shrink-0 mt-0.5">4</span>
+            <span className="w-6 h-6 rounded-full bg-brand/20 text-brand text-xs font-black flex items-center justify-center shrink-0 mt-0.5">4</span>
             <p>{t("hi_step_4")}</p>
           </div>
         </div>

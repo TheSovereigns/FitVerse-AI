@@ -199,7 +199,7 @@ export function AccountabilityPartnerCard() {
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex items-center justify-between mb-5">
-                <h3 className="text-lg font-black text-foreground">
+                <h3 className="text-lg font-bold text-foreground">
                   {isEnglish ? "Choose Partner" : "Escolher Parceiro"}
                 </h3>
                 <Button variant="ghost" size="icon" onClick={() => setShowPairModal(false)} className="h-8 w-8 rounded-xl">
