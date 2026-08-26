@@ -7,6 +7,10 @@ import { cn } from "@/lib/utils"
 import { useClanChat } from "@/hooks/useClanChat"
 import { useAuth } from "@/hooks/useAuth"
 import { useTranslation } from "@/lib/i18n"
+// Realtime: chat updates via useClanChat -> supabase.channel(`clan-chat-${clanId}`)
+//   .on('postgres_changes', { event:'INSERT', schema:'public', table:'clan_messages', filter:`clan_id=eq.${clanId}`})
+// Polling fallback (5s) kept for free tier 200-connections limit — see hooks/useClanChat
+// Enable publication: supabase/enable-realtime.sql => ALTER PUBLICATION supabase_realtime ADD TABLE clan_messages;
 
 export function ClanChat({ clanId }: { clanId: string }) {
   const { locale } = useTranslation()

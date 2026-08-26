@@ -62,6 +62,8 @@ export default function RootLayout({
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
         <link rel="icon" href="/icon.svg" type="image/svg+xml" />
         <link rel="apple-touch-icon" href="/apple-icon.png" />
+        <link rel="manifest" href="/manifest.json" />
+        <meta name="theme-color" content="#34D399" />
         <link rel="preconnect" href="https://*.supabase.co" />
         <link rel="dns-prefetch" href="https://*.supabase.co" />
         <script dangerouslySetInnerHTML={{ __html: `
@@ -88,6 +90,7 @@ export default function RootLayout({
             src="https://plausible.io/js/script.js"
           />
         )}
+        <script dangerouslySetInnerHTML={{__html: `if('serviceWorker' in navigator){navigator.serviceWorker.register('/sw.js')}`}} />
       </head>
       <body
         className={`${inter.className} ${barlow.variable} antialiased text-foreground min-h-screen bg-background`}

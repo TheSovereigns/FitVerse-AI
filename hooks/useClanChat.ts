@@ -37,6 +37,7 @@ export function useClanChat(clanId: string | null) {
   const [isLoading, setIsLoading] = useState(false)
   const [isSending, setIsSending] = useState(false)
   const channelRef = useRef<any>(null)
+  const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
   const fetchMessages = useCallback(async () => {
     if (!clanId) return
@@ -54,6 +55,24 @@ export function useClanChat(clanId: string | null) {
       console.error("Error fetching messages:", e)
     } finally {
       setIsLoading(false)
+    }
+  }, [clanId])
+
+  // Silent background fetch for polling fallback (no loading spinner)
+  const fetchMessagesSilent = useCallback(async () => {
+    if (!clanId) return
+    try {
+      const token = await getToken()
+      if (!token) return
+      const res = await fetch(`/api/clans/${clanId}/messages?limit=100`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      const data = await res.json()
+      if (Array.isArray(data.messages)) {
+        setMessages(data.messages)
+      }
+    } catch (e) {
+      console.error("Error polling messages:", e)
     }
   }, [clanId])
 
@@ -95,6 +114,7 @@ export function useClanChat(clanId: string | null) {
 
     fetchMessages()
 
+    // Realtime subscription (enhancement) - falls back to polling on free tier limits
     const channel = supabase
       .channel(`clan-chat-${clanId}`)
       .on(
@@ -113,17 +133,34 @@ export function useClanChat(clanId: string | null) {
           })
         }
       )
-      .subscribe()
+      .subscribe((status: string) => {
+        // Keep polling as fallback regardless; log status for debugging free-tier limits (200 connections)
+        if (status === "SUBSCRIBED") {
+          // realtime active
+        } else if (status === "CHANNEL_ERROR" || status === "TIMED_OUT" || status === "CLOSED") {
+          console.warn(`[useClanChat] Realtime ${status} for clan ${clanId} — polling fallback active (5s)`)
+        }
+      })
 
     channelRef.current = channel
+
+    // Polling fallback for free tier (realtime not enabled or 200 connections limit) — keep interval always active
+    // Realtime is enhancement; polling ensures messages still arrive even if channel fails.
+    pollingRef.current = setInterval(() => {
+      fetchMessagesSilent()
+    }, 5000)
 
     return () => {
       if (channelRef.current) {
         supabase.removeChannel(channelRef.current)
         channelRef.current = null
       }
+      if (pollingRef.current) {
+        clearInterval(pollingRef.current)
+        pollingRef.current = null
+      }
     }
-  }, [clanId, fetchMessages])
+  }, [clanId, fetchMessages, fetchMessagesSilent])
 
   return {
     messages,

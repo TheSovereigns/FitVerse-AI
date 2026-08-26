@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
 import { getSupabaseAdmin } from "./supabase-server"
+import { checkMemoryRateLimit } from "./rate-limit-memory"
 
 /*
   Supabase-backed rate limiter.
@@ -25,15 +26,25 @@ export async function checkRateLimit(
   key: string,
   config: RateLimitConfig
 ): Promise<{ allowed: boolean; remaining: number }> {
+  // 1. Memory LRU first — free, instant, no DB cost
+  const mem = checkMemoryRateLimit(key, config.windowMs, config.maxRequests)
+  if (!mem.allowed) return mem
+
+  // 2. Supabase fallback for cross-instance consistency (optional)
+  // Skip DB if MEMORY_ONLY or if we already have memory allow (saves 3 DB ops)
+  if (process.env.RATE_LIMIT_MEMORY_ONLY === "true") {
+    return mem
+  }
+
   const supabase = getSupabaseAdmin()
-  if (!supabase) return { allowed: true, remaining: config.maxRequests }
+  if (!supabase) return mem
 
   const windowStart = new Date(Date.now() - config.windowMs).toISOString()
 
   try {
-    // Clean up old entries (older than 1 hour)
+    // Clean up old entries (older than 1 hour) — best effort, don't block
     const oneHourAgo = new Date(Date.now() - 3600_000).toISOString()
-    await supabase.from('rate_limits').delete().lt('window_start', oneHourAgo)
+    supabase.from('rate_limits').delete().lt('window_start', oneHourAgo).then(() => {}, () => {})
 
     // Count requests in current window
     const { count, error: countError } = await supabase
@@ -44,7 +55,7 @@ export async function checkRateLimit(
 
     if (countError) {
       console.error('[RateLimit] Count error:', countError)
-      return { allowed: true, remaining: config.maxRequests }
+      return mem
     }
 
     const currentCount = count ?? 0
@@ -53,13 +64,13 @@ export async function checkRateLimit(
       return { allowed: false, remaining: 0 }
     }
 
-    // Insert new request record
-    await supabase.from('rate_limits').insert({ key })
+    // Insert new request record — best effort
+    supabase.from('rate_limits').insert({ key }).then(() => {}, () => {})
 
-    return { allowed: true, remaining: config.maxRequests - currentCount - 1 }
+    return { allowed: true, remaining: Math.min(mem.remaining, config.maxRequests - currentCount - 1) }
   } catch (error) {
     console.error('[RateLimit] Error:', error)
-    return { allowed: true, remaining: config.maxRequests }
+    return mem
   }
 }
 

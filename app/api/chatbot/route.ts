@@ -5,6 +5,7 @@ import { logger } from '@/lib/logger';
 import { checkRateLimit, getRateLimitKey, RATE_LIMITS } from '@/lib/rate-limit';
 import { detectCategory, detectLanguage } from '@/lib/chat-helpers';
 import { createStreamingFallback } from '@/lib/ai-fallback';
+import { isFeatureLocked, type Plan } from '@/lib/plan-limits';
 
 export async function OPTIONS() {
   return NextResponse.json({}, { headers: getCorsHeaders() });
@@ -119,6 +120,15 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Nao autorizado.' }, { status: 401, headers });
     }
     authenticatedUserId = auth.userId;
+
+    const admin = getSupabaseAdmin()
+    if (admin) {
+      const { data: profile } = await admin.from("profiles").select("plan").eq("id", auth.userId).single()
+      const plan = (profile?.plan as Plan) || "free"
+      if (isFeatureLocked(plan, "aiCoach")) {
+        return NextResponse.json({ error: "Recurso Pro/Premium. Faça upgrade." }, { status: 403, headers })
+      }
+    }
 
     if (!message) {
       return NextResponse.json({ error: 'Mensagem vazia.' }, { status: 400, headers });

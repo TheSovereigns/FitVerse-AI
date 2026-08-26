@@ -4,6 +4,7 @@ import { requireAuth } from '@/lib/auth-helpers';
 import { checkRateLimit, getRateLimitKey, RATE_LIMITS } from '@/lib/rate-limit';
 import { PLAN_LIMITS, type Plan } from '@/lib/plan-limits';
 import { getCorsHeaders } from "@/lib/auth-helpers";
+import { getCached, setCached, hashImage } from "@/lib/ai-cache";
 
 async function checkScanLimit(userId: string, plan: string): Promise<boolean> {
   const supabase = getSupabaseAdmin();
@@ -298,6 +299,22 @@ export async function POST(req: Request) {
       }, { status: 400, headers });
     }
 
+    // AI cache: check after plan limit but before AI call (saves tokens)
+    const cacheKey = await hashImage(base64Data)
+    const cached = getCached(cacheKey)
+    if (cached) {
+      // Still insert into scans for limit tracking
+      try {
+        await supabaseAdmin.from('scans').insert({
+          user_id: auth.userId,
+          product_name: cached.productName || 'Cached',
+          score: cached.longevityScore ?? cached.healthScore?.overall ?? 50,
+        })
+      } catch {}
+      const cachedScanId = (globalThis.crypto as any)?.randomUUID?.() ?? crypto.randomUUID()
+      return NextResponse.json({ ...cached, cached: true, scanId: cachedScanId, scannedAt: new Date().toISOString() }, { headers })
+    }
+
     const isEnglish = locale === "en-US"
     const lang = isEnglish ? "English" : "Portuguese"
 
@@ -409,6 +426,9 @@ export async function POST(req: Request) {
       recommendations: analysis.recommendations || { bestFor: '', avoidIf: '', alternatives: '' },
       aiConfidence: analysis.aiConfidence ?? 70,
     };
+
+    // Cache the result for future identical scans (7-day TTL, LRU 200)
+    try { setCached(cacheKey, transformed) } catch {}
 
     // Save scan to database (minimal - for limit tracking only)
     const { data: scanRecord } = await supabaseAdmin.from('scans').insert({

@@ -6,6 +6,10 @@ import { Activity, ScanLine, Dumbbell, Wheat, Zap, Trophy, Clock } from "lucide-
 import { cn } from "@/lib/utils"
 import { useClanFeed } from "@/hooks/useClanFeed"
 import { useTranslation } from "@/lib/i18n"
+// Realtime: feed updates via useClanFeed -> supabase.channel(`clan-feed-${clanId}`)
+//   .on('postgres_changes', { event:'INSERT', schema:'public', table:'clan_activities', filter:`clan_id=eq.${clanId}`})
+// Polling fallback (5s) kept for free tier 200-connections limit — see hooks/useClanFeed
+// Enable publication: supabase/enable-realtime.sql => ALTER PUBLICATION supabase_realtime ADD TABLE clan_activities;
 
 export function ClanFeed({ clanId }: { clanId: string }) {
   const { locale } = useTranslation()

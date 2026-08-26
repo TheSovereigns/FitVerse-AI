@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { getSupabaseAdmin } from "@/lib/supabase-server";
+import { getSupabaseAdmin, authUser } from "@/lib/supabase-server";
 import { getCorsHeaders } from "@/lib/auth-helpers";
 import { checkRateLimit, getRateLimitKey, rateLimitResponse, RATE_LIMITS } from "@/lib/rate-limit";
 import { generateContentWithFallback } from "@/lib/ai-fallback";
@@ -37,22 +37,13 @@ export async function POST(req: Request) {
   const supabase = getSupabaseAdmin();
   const headers = getCorsHeaders();
   try {
-    const authHeader = req.headers.get("Authorization");
-    if (!authHeader) {
-      return NextResponse.json({ error: "Nao autorizado." }, { status: 401, headers });
-    }
-
     if (!supabase) {
       return NextResponse.json({ error: "Configuracao do servidor incompleta." }, { status: 500, headers });
     }
 
-    const token = authHeader.replace("Bearer ", "");
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser(token);
-    if (!user || authError) {
-      return NextResponse.json({ error: "Token invalido." }, { status: 401, headers });
+    const auth = await authUser(req);
+    if (!auth) {
+      return NextResponse.json({ error: "Nao autorizado." }, { status: 401, headers });
     }
 
     const rlKey = getRateLimitKey(req, "generate-metabolic")

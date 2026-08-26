@@ -35,6 +35,7 @@ export function useClanFeed(clanId: string | null) {
   const [activities, setActivities] = useState<ClanActivity[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const channelRef = useRef<any>(null)
+  const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
   const fetchActivities = useCallback(async () => {
     if (!clanId) return
@@ -52,6 +53,24 @@ export function useClanFeed(clanId: string | null) {
       console.error("Error fetching activities:", e)
     } finally {
       setIsLoading(false)
+    }
+  }, [clanId])
+
+  // Silent background fetch for polling fallback (no loading spinner)
+  const fetchActivitiesSilent = useCallback(async () => {
+    if (!clanId) return
+    try {
+      const token = await getToken()
+      if (!token) return
+      const res = await fetch(`/api/clans/${clanId}/activities?limit=50`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      const data = await res.json()
+      if (Array.isArray(data.activities)) {
+        setActivities(data.activities)
+      }
+    } catch (e) {
+      console.error("Error polling activities:", e)
     }
   }, [clanId])
 
@@ -89,6 +108,7 @@ export function useClanFeed(clanId: string | null) {
 
     fetchActivities()
 
+    // Realtime subscription (enhancement) - falls back to polling on free tier limits
     const channel = supabase
       .channel(`clan-feed-${clanId}`)
       .on(
@@ -107,17 +127,32 @@ export function useClanFeed(clanId: string | null) {
           })
         }
       )
-      .subscribe()
+      .subscribe((status: string) => {
+        if (status === "SUBSCRIBED") {
+          // realtime active
+        } else if (status === "CHANNEL_ERROR" || status === "TIMED_OUT" || status === "CLOSED") {
+          console.warn(`[useClanFeed] Realtime ${status} for clan ${clanId} — polling fallback active (5s)`)
+        }
+      })
 
     channelRef.current = channel
+
+    // Polling fallback for free tier (realtime not enabled or 200 connections limit) — keep interval always active
+    pollingRef.current = setInterval(() => {
+      fetchActivitiesSilent()
+    }, 5000)
 
     return () => {
       if (channelRef.current) {
         supabase.removeChannel(channelRef.current)
         channelRef.current = null
       }
+      if (pollingRef.current) {
+        clearInterval(pollingRef.current)
+        pollingRef.current = null
+      }
     }
-  }, [clanId, fetchActivities])
+  }, [clanId, fetchActivities, fetchActivitiesSilent])
 
   return {
     activities,

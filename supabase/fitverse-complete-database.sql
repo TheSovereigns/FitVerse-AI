@@ -784,12 +784,17 @@ ORDER BY e.created_at DESC
 LIMIT 100;
 
 -- ═══════════════════════════════════════════════════════════════════════════
--- PARTE 38: HABILITAR REALTIME
+-- PARTE 38: HABILITAR REALTIME (com fallback de polling 5s para free tier 200 conexoes)
+-- Realtime e enhancement; polling em hooks/useClanChat & hooks/useClanFeed garante fallback
+-- Para habilitar manualmente: veja supabase/enable-realtime.sql
+-- ALTER PUBLICATION supabase_realtime ADD TABLE clan_messages;
+-- ALTER PUBLICATION supabase_realtime ADD TABLE clan_activities;
+-- ALTER PUBLICATION supabase_realtime ADD TABLE clans;
 -- ═══════════════════════════════════════════════════════════════════════════
 DO $$
 DECLARE
   tbl TEXT;
-  tables_to_add TEXT[] := ARRAY['events', 'profiles', 'clan_messages', 'clan_activities', 'challenges', 'challenge_participants'];
+  tables_to_add TEXT[] := ARRAY['events', 'profiles', 'clan_messages', 'clan_activities', 'clans', 'challenges', 'challenge_participants'];
 BEGIN
   FOREACH tbl IN ARRAY tables_to_add LOOP
     IF NOT EXISTS (
