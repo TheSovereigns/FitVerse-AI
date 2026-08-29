@@ -119,7 +119,7 @@ export function StreakDisplay({ compact = false, onNavigate }: StreakDisplayProp
               </svg>
               <div className="absolute inset-0 flex flex-col items-center justify-center">
                 <span className="text-3xl font-bold text-brand">{currentStreak}</span>
-                <span className="text-[9px] font-medium uppercase tracking-wider text-muted-foreground">
+                <span className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
                   {currentStreak === 1 ? (isEnglish ? "day" : "dia") : (isEnglish ? "days" : "dias")}
                 </span>
               </div>
@@ -151,7 +151,7 @@ export function StreakDisplay({ compact = false, onNavigate }: StreakDisplayProp
                   const isToday = day?.date === new Date().toISOString().split("T")[0]
                   return (
                     <div key={i} className="flex flex-col items-center gap-1">
-                      <span className={cn("text-[9px] font-medium", isToday ? "text-foreground" : "text-muted-foreground")}>{label}</span>
+                      <span className={cn("text-[10px] font-medium", isToday ? "text-foreground" : "text-muted-foreground")}>{label}</span>
                       <div className={cn("h-2.5 w-2.5 rounded-full", isActive ? "bg-brand" : "bg-border", isToday && !isActive && "ring-1 ring-brand/30")} />
                     </div>
                   )

@@ -63,7 +63,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           <div className="w-8 h-8 rounded-lg bg-brand/10 border border-brand/20 flex items-center justify-center overflow-hidden">
             <img src="/icon.svg" alt="VyseFit" className="w-5 h-5" />
           </div>
-          <span className="text-lg font-black text-foreground">VyseFit</span>
+          <span className="text-lg font-bold text-foreground">VyseFit</span>
         </Link>
 
         <button
@@ -99,7 +99,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                     <img src="/icon.svg" alt="VyseFit" className="w-6 h-6" />
                   </div>
                   <div>
-                    <span className="text-lg font-black text-foreground">VyseFit</span>
+                    <span className="text-lg font-bold text-foreground">VyseFit</span>
                     <span className="text-xs text-brand ml-1">AI</span>
                   </div>
                 </Link>
@@ -169,7 +169,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               <img src="/icon.svg" alt="VyseFit" className="w-6 h-6" />
             </div>
             <div>
-              <span className="text-lg font-black text-foreground">VyseFit</span>
+              <span className="text-lg font-bold text-foreground">VyseFit</span>
               <span className="text-xs text-brand ml-1">AI</span>
             </div>
           </Link>

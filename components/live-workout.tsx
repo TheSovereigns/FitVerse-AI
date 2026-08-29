@@ -145,22 +145,22 @@ export function LiveWorkout({ workout, onBack }: LiveWorkoutProps) {
           >
             <div className="rounded-2xl border border-border bg-black/30 p-4 text-center">
               <Timer className="h-5 w-5 text-foreground/60 mx-auto mb-2" />
-              <p className="text-xl font-black text-foreground">{formatTime(elapsedTime)}</p>
-              <p className="text-[9px] font-black uppercase tracking-widest text-foreground/30">
+              <p className="text-xl font-bold text-foreground">{formatTime(elapsedTime)}</p>
+              <p className="text-[10px] font-black uppercase tracking-widest text-foreground/30">
                 {isEnglish ? "Duration" : "Duracao"}
               </p>
             </div>
             <div className="rounded-2xl border border-border bg-black/30 p-4 text-center">
               <Dumbbell className="h-5 w-5 text-blue-400 mx-auto mb-2" />
-              <p className="text-xl font-black text-foreground">{totalExercises}</p>
-              <p className="text-[9px] font-black uppercase tracking-widest text-foreground/30">
+              <p className="text-xl font-bold text-foreground">{totalExercises}</p>
+              <p className="text-[10px] font-black uppercase tracking-widest text-foreground/30">
                 {isEnglish ? "Exercises" : "Exercicios"}
               </p>
             </div>
             <div className="rounded-2xl border border-border bg-black/30 p-4 text-center">
               <Flame className="h-5 w-5 text-red-400 mx-auto mb-2" />
-              <p className="text-xl font-black text-foreground">{estimatedCalories}</p>
-              <p className="text-[9px] font-black uppercase tracking-widest text-foreground/30">KCAL</p>
+              <p className="text-xl font-bold text-foreground">{estimatedCalories}</p>
+              <p className="text-[10px] font-black uppercase tracking-widest text-foreground/30">KCAL</p>
             </div>
           </motion.div>
 
@@ -179,12 +179,12 @@ export function LiveWorkout({ workout, onBack }: LiveWorkoutProps) {
                 calories: estimatedCalories,
               }}
               variant="default"
-              className="h-12 rounded-xl bg-white/10 border border-border text-foreground/60 hover:bg-white/15 w-full"
+              className="h-12 rounded-xl bg-muted/30 border border-border text-foreground/60 hover:bg-muted/30 w-full"
             />
             <Button
               onClick={onBack}
               variant="ghost"
-              className="h-12 rounded-xl border border-border bg-white/8 text-foreground/60 hover:bg-white/16 w-full"
+              className="h-12 rounded-xl border border-border bg-muted/30 text-foreground/60 hover:bg-muted/30 w-full"
             >
               {isEnglish ? "Back to Workouts" : "Voltar aos Treinos"}
             </Button>
@@ -202,7 +202,7 @@ export function LiveWorkout({ workout, onBack }: LiveWorkoutProps) {
             onClick={onBack}
             variant="ghost"
             size="icon"
-            className="h-10 w-10 rounded-xl border border-border bg-white/8 text-foreground hover:bg-white/16"
+            className="h-10 w-10 rounded-xl border border-border bg-muted/30 text-foreground hover:bg-muted/30"
           >
             <ArrowLeft className="h-4 w-4" />
           </Button>
@@ -214,7 +214,7 @@ export function LiveWorkout({ workout, onBack }: LiveWorkoutProps) {
             onClick={() => activateFocus("workout", workout.name)}
             variant="ghost"
             size="icon"
-            className="h-10 w-10 rounded-xl border border-border bg-white/8 text-foreground hover:bg-white/16"
+            className="h-10 w-10 rounded-xl border border-border bg-muted/30 text-foreground hover:bg-muted/30"
           >
             <Dumbbell className="h-4 w-4" />
           </Button>
@@ -227,7 +227,7 @@ export function LiveWorkout({ workout, onBack }: LiveWorkoutProps) {
             </span>
             <span className="text-[10px] font-black text-foreground">{Math.round(progressPercent)}%</span>
           </div>
-          <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
+          <div className="h-1.5 bg-muted/30 rounded-full overflow-hidden">
             <motion.div
               className="h-full bg-gradient-to-r from-white/60 to-white/40 rounded-full"
               animate={{ width: `${progressPercent}%` }}
@@ -261,7 +261,7 @@ export function LiveWorkout({ workout, onBack }: LiveWorkoutProps) {
               className="rounded-[1.5rem] border border-border bg-background/70 p-6 backdrop-blur-2xl"
             >
               <div className="mb-4">
-                <p className="text-[10px] font-black uppercase tracking-[0.25em] text-foreground/50 mb-1">
+                <p className="text-[10px] font-black uppercase tracking-widest text-foreground/50 mb-1">
                   {isEnglish ? "Exercise" : "Exercicio"} {currentExerciseIndex + 1}
                 </p>
                 <h3 className="text-2xl font-black text-foreground">{currentExercise?.name}</h3>
@@ -270,33 +270,33 @@ export function LiveWorkout({ workout, onBack }: LiveWorkoutProps) {
               <div className="grid grid-cols-3 gap-3 mb-6">
                 <div className="rounded-xl border border-border bg-black/30 p-3 text-center">
                   <p className="text-2xl font-black text-foreground">{currentSet}/{currentExercise?.sets}</p>
-                  <p className="text-[9px] font-black uppercase tracking-widest text-foreground/30">
+                  <p className="text-[10px] font-black uppercase tracking-widest text-foreground/30">
                     {isEnglish ? "Series" : "Series"}
                   </p>
                 </div>
                 <div className="rounded-xl border border-border bg-black/30 p-3 text-center">
                   <p className="text-2xl font-black text-foreground">{currentExercise?.reps || currentExercise?.duration || "—"}</p>
-                  <p className="text-[9px] font-black uppercase tracking-widest text-foreground/30">
+                  <p className="text-[10px] font-black uppercase tracking-widest text-foreground/30">
                     {currentExercise?.reps ? (isEnglish ? "Reps" : "Reps") : (isEnglish ? "Time" : "Tempo")}
                   </p>
                 </div>
                 <div className="rounded-xl border border-border bg-black/30 p-3 text-center">
                   <p className="text-2xl font-black text-foreground">{currentExercise?.rest || restDuration}s</p>
-                  <p className="text-[9px] font-black uppercase tracking-widest text-foreground/30">
+                  <p className="text-[10px] font-black uppercase tracking-widest text-foreground/30">
                     {isEnglish ? "Rest" : "Descanso"}
                   </p>
                 </div>
               </div>
 
               {currentExercise?.notes && (
-                <div className="rounded-xl border border-border bg-white/5 p-3 mb-6">
+                <div className="rounded-xl border border-border bg-muted/30 p-3 mb-6">
                   <p className="text-xs text-foreground/50">{currentExercise.notes}</p>
                 </div>
               )}
 
               <Button
                 onClick={handleSetComplete}
-                className="w-full h-14 rounded-2xl bg-foreground text-lg font-black uppercase tracking-widest text-background hover:bg-foreground/80 active:scale-[0.98] transition-all"
+                className="w-full h-14 rounded-2xl bg-foreground text-lg font-bold uppercase tracking-widest text-background hover:bg-foreground/80 active:scale-[0.98] transition-all"
               >
                 <Check className="h-5 w-5 mr-2" />
                 {currentSet < Number(currentExercise?.sets || 1)
@@ -317,7 +317,7 @@ export function LiveWorkout({ workout, onBack }: LiveWorkoutProps) {
                   ? "w-6 bg-white"
                     : completedExercises.includes(i)
                       ? "w-1.5 bg-emerald-400"
-                      : "w-1.5 bg-white/10"
+                      : "w-1.5 bg-muted/30"
               )}
             />
           ))}

@@ -92,6 +92,7 @@ export function HealthProfile({ scanHistory, onNavigateToSettings, onNavigateToS
   const [totalXp, setTotalXp] = useState(0)
   const [unlockedAchievements, setUnlockedAchievements] = useState<string[]>([])
   const [latestWeight, setLatestWeight] = useState<number | null>(null)
+  const [isOnboardingSkipped, setIsOnboardingSkipped] = useState(false)
 
   useEffect(() => {
     if (!user) return
@@ -149,6 +150,9 @@ export function HealthProfile({ scanHistory, onNavigateToSettings, onNavigateToS
         if (measurements.length > 0 && measurements[0].weight) {
           setLatestWeight(measurements[0].weight)
         }
+      }
+      if (localStorage.getItem("onboarding_skipped") === "true") {
+        setIsOnboardingSkipped(true)
       }
     } catch {}
   }, [])
@@ -336,6 +340,30 @@ export function HealthProfile({ scanHistory, onNavigateToSettings, onNavigateToS
 
   return (
     <div className="relative mx-auto w-full max-w-2xl space-y-4 pb-safe-nav md:space-y-5">
+      {isOnboardingSkipped && (
+        <motion.div
+          initial={{ opacity: 0, y: -8 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="rounded-2xl border border-amber-500/20 bg-amber-500/10 p-4 flex items-center justify-between gap-3"
+        >
+          <div>
+            <p className="text-sm font-semibold text-foreground">{t("onboard_incomplete_title")}</p>
+            <p className="text-xs text-muted-foreground">{t("onboard_incomplete_desc")}</p>
+          </div>
+          <Button
+            onClick={() => {
+              localStorage.removeItem("onboarding_skipped")
+              localStorage.removeItem("onboarding_completed")
+              setIsOnboardingSkipped(false)
+              // trigger onboarding again by reloading step
+              window.location.reload()
+            }}
+            className="h-9 shrink-0 rounded-xl bg-amber-500 text-black hover:bg-amber-500/90 text-xs font-semibold px-4"
+          >
+            {t("onboard_complete_now")}
+          </Button>
+        </motion.div>
+      )}
 
       {/* ═══════ PROFILE HEADER ═══════ */}
       <motion.section
@@ -439,7 +467,7 @@ export function HealthProfile({ scanHistory, onNavigateToSettings, onNavigateToS
                         transition={{ duration: 0.8, ease: "easeOut" }}
                       />
                     </div>
-                    <span className="text-[9px] text-purple-400/60">{xpInLevel}/500</span>
+                    <span className="text-[10px] text-purple-400/60">{xpInLevel}/500</span>
                   </div>
                 )}
               </div>
@@ -501,7 +529,7 @@ export function HealthProfile({ scanHistory, onNavigateToSettings, onNavigateToS
             </svg>
             <div className="absolute inset-0 flex flex-col items-center justify-center">
               <span className="text-xl md:text-2xl font-bold text-foreground text-score">{averageScore || "–"}</span>
-              <span className="text-[8px] text-muted-foreground">{locale === "en-US" ? "avg" : "media"}</span>
+              <span className="text-[10px] text-muted-foreground">{locale === "en-US" ? "avg" : "media"}</span>
             </div>
           </div>
           <p className="mt-2 text-[10px] text-muted-foreground font-medium">{t("profile_avg_score")}</p>
@@ -616,7 +644,7 @@ export function HealthProfile({ scanHistory, onNavigateToSettings, onNavigateToS
           ].map((item) => (
             <div key={item.label} className="rounded-xl bg-background/50 p-2.5 text-center">
               <p className="text-lg font-bold text-foreground">{item.value}</p>
-              <p className="text-[9px] text-muted-foreground">{item.label} <span className="opacity-60">{item.sub}</span></p>
+              <p className="text-[10px] text-muted-foreground">{item.label} <span className="opacity-60">{item.sub}</span></p>
             </div>
           ))}
         </div>
@@ -645,7 +673,7 @@ export function HealthProfile({ scanHistory, onNavigateToSettings, onNavigateToS
               ? "bg-brand text-white hover:bg-brand/90"
               : userSubscription === "pro"
               ? "bg-amber-500 text-black hover:bg-amber-500/90"
-              : "bg-white/10 text-foreground hover:bg-white/15 border border-border"
+              : "bg-muted/30 text-foreground hover:bg-muted/30 border border-border"
           )}
         >
           {userSubscription === "free"
@@ -745,7 +773,7 @@ export function HealthProfile({ scanHistory, onNavigateToSettings, onNavigateToS
                 <div key={item.label} className="rounded-xl bg-muted/30 p-3 text-center">
                   <item.icon className="h-3.5 w-3.5 text-muted-foreground mx-auto" />
                   <p className="mt-1.5 text-sm font-bold text-foreground">{item.value}</p>
-                  <p className="text-[9px] text-muted-foreground">{item.label}</p>
+                  <p className="text-[10px] text-muted-foreground">{item.label}</p>
                 </div>
               ))}
             </div>
@@ -755,7 +783,7 @@ export function HealthProfile({ scanHistory, onNavigateToSettings, onNavigateToS
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <Scale className="h-3.5 w-3.5 text-muted-foreground" />
-                    <span className="text-[9px] text-muted-foreground">{t("hp_bmi")}</span>
+                    <span className="text-[10px] text-muted-foreground">{t("hp_bmi")}</span>
                   </div>
                   <span className={cn(
                     "rounded-full px-2 py-0.5 text-[10px] font-semibold",

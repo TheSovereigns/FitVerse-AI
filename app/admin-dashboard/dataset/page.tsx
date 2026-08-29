@@ -437,7 +437,7 @@ export default function DatasetPage() {
             {readyForTraining.toLocaleString()} / {DATASET_GOAL.toLocaleString()}
           </span>
         </div>
-        <div className="h-3 bg-white/5 rounded-full overflow-hidden">
+        <div className="h-3 bg-muted/30 rounded-full overflow-hidden">
           <motion.div
             initial={{ width: 0 }}
             animate={{ width: `${progressPercent}%` }}
@@ -460,12 +460,12 @@ export default function DatasetPage() {
             placeholder="Buscar..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="h-8 text-xs bg-white/5 border-border rounded-lg"
+            className="h-8 text-xs bg-muted/30 border-border rounded-lg"
           />
           <select
             value={filterStatus}
             onChange={(e) => { setFilterStatus(e.target.value); setPage(1) }}
-            className="h-8 text-xs bg-white/5 border border-border rounded-lg px-2 text-white"
+            className="h-8 text-xs bg-muted/30 border border-border rounded-lg px-2 text-white"
           >
             <option value="all">Todos Status</option>
             <option value="raw">Pendentes</option>
@@ -476,7 +476,7 @@ export default function DatasetPage() {
           <select
             value={filterCategory}
             onChange={(e) => { setFilterCategory(e.target.value); setPage(1) }}
-            className="h-8 text-xs bg-white/5 border border-border rounded-lg px-2 text-white"
+            className="h-8 text-xs bg-muted/30 border border-border rounded-lg px-2 text-white"
           >
             <option value="all">Todas Categorias</option>
             {Object.entries(CATEGORY_LABELS).map(([k, v]) => (
@@ -486,7 +486,7 @@ export default function DatasetPage() {
           <select
             value={filterLang}
             onChange={(e) => { setFilterLang(e.target.value); setPage(1) }}
-            className="h-8 text-xs bg-white/5 border border-border rounded-lg px-2 text-white"
+            className="h-8 text-xs bg-muted/30 border border-border rounded-lg px-2 text-white"
           >
             <option value="all">Todos Idiomas</option>
             <option value="pt">Português</option>
@@ -495,7 +495,7 @@ export default function DatasetPage() {
           <select
             value={filterRating}
             onChange={(e) => { setFilterRating(e.target.value); setPage(1) }}
-            className="h-8 text-xs bg-white/5 border border-border rounded-lg px-2 text-white"
+            className="h-8 text-xs bg-muted/30 border border-border rounded-lg px-2 text-white"
           >
             <option value="all">Todas Ratings</option>
             <option value="5">5★</option>
@@ -508,7 +508,7 @@ export default function DatasetPage() {
               "h-8 text-xs rounded-lg px-2 border transition-all font-bold",
               filterThumbsUp
                 ? "bg-emerald-500/20 border-emerald-500/30 text-emerald-400"
-                : "bg-white/5 border-border text-muted-foreground"
+                : "bg-muted/30 border-border text-muted-foreground"
             )}
           >
             👍 Only
@@ -519,7 +519,7 @@ export default function DatasetPage() {
               "h-8 text-xs rounded-lg px-2 border transition-all font-bold",
               filterFlagged
                 ? "bg-rose-500/20 border-rose-500/30 text-rose-400"
-                : "bg-white/5 border-border text-muted-foreground"
+                : "bg-muted/30 border-border text-muted-foreground"
             )}
           >
             🚩 Flagged
@@ -673,7 +673,7 @@ export default function DatasetPage() {
                     type="checkbox"
                     checked={selectedMessages.size === messages.length && messages.length > 0}
                     onChange={toggleSelectAll}
-                    className="rounded border-border bg-white/5"
+                    className="rounded border-border bg-muted/30"
                   />
                 </th>
                 <th className="p-3 text-left text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Data</th>
@@ -688,13 +688,13 @@ export default function DatasetPage() {
             </thead>
             <tbody>
               {messages.map((msg) => (
-                <tr key={msg.id} className="border-b border-border hover:bg-white/5 transition-colors">
+                <tr key={msg.id} className="border-b border-border hover:bg-muted/30 transition-colors">
                   <td className="p-3">
                     <input
                       type="checkbox"
                       checked={selectedMessages.has(msg.id)}
                       onChange={() => toggleSelect(msg.id)}
-                      className="rounded border-border bg-white/5"
+                      className="rounded border-border bg-muted/30"
                     />
                   </td>
                   <td className="p-3 text-xs text-muted-foreground">
@@ -720,7 +720,7 @@ export default function DatasetPage() {
                   </td>
                   <td className="p-3">
                     {msg.category && (
-                      <Badge className="text-[9px] font-bold border-0" style={{ backgroundColor: CATEGORY_COLORS[msg.category] + "33", color: CATEGORY_COLORS[msg.category] }}>
+                      <Badge className="text-[10px] font-bold border-0" style={{ backgroundColor: CATEGORY_COLORS[msg.category] + "33", color: CATEGORY_COLORS[msg.category] }}>
                         {CATEGORY_LABELS[msg.category] || msg.category}
                       </Badge>
                     )}
@@ -737,7 +737,7 @@ export default function DatasetPage() {
                     </div>
                   </td>
                   <td className="p-3">
-                    <span className={cn("text-[9px] font-bold px-2 py-0.5 rounded-full border", STATUS_COLORS[msg.training_status] || STATUS_COLORS.raw)}>
+                    <span className={cn("text-[10px] font-bold px-2 py-0.5 rounded-full border", STATUS_COLORS[msg.training_status] || STATUS_COLORS.raw)}>
                       {STATUS_LABELS[msg.training_status] || msg.training_status}
                     </span>
                   </td>
@@ -766,7 +766,7 @@ export default function DatasetPage() {
                       </button>
                       <button
                         onClick={() => setViewingMessage(msg)}
-                        className="p-1 hover:bg-white/10 rounded text-muted-foreground transition-colors"
+                        className="p-1 hover:bg-muted/30 rounded text-muted-foreground transition-colors"
                         title="Ver completo"
                       >
                         <Eye className="w-3.5 h-3.5" />
@@ -819,18 +819,18 @@ export default function DatasetPage() {
           >
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-bold text-foreground">Mensagem Completa</h3>
-              <button onClick={() => setViewingMessage(null)} className="p-1 hover:bg-white/10 rounded-full">
+              <button onClick={() => setViewingMessage(null)} className="p-1 hover:bg-muted/30 rounded-full">
                 <X className="w-5 h-5 text-muted-foreground" />
               </button>
             </div>
             <div className="space-y-4">
               <div>
                 <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Pergunta</span>
-                <p className="text-sm text-foreground mt-1 p-3 bg-white/5 rounded-xl">{viewingMessage.user_message}</p>
+                <p className="text-sm text-foreground mt-1 p-3 bg-muted/30 rounded-xl">{viewingMessage.user_message}</p>
               </div>
               <div>
                 <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Resposta IA</span>
-                <p className="text-sm text-foreground mt-1 p-3 bg-white/5 rounded-xl whitespace-pre-wrap">{viewingMessage.ai_response}</p>
+                <p className="text-sm text-foreground mt-1 p-3 bg-muted/30 rounded-xl whitespace-pre-wrap">{viewingMessage.ai_response}</p>
               </div>
               {viewingMessage.edited_response && (
                 <div>
@@ -840,7 +840,7 @@ export default function DatasetPage() {
               )}
               <div>
                 <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Contexto</span>
-                <pre className="text-xs text-muted-foreground mt-1 p-3 bg-white/5 rounded-xl overflow-x-auto">
+                <pre className="text-xs text-muted-foreground mt-1 p-3 bg-muted/30 rounded-xl overflow-x-auto">
                   {JSON.stringify(viewingMessage.user_context, null, 2)}
                 </pre>
               </div>
@@ -862,26 +862,26 @@ export default function DatasetPage() {
             <div className="p-6 space-y-4">
               <div className="flex items-center justify-between">
                 <h3 className="text-lg font-bold text-foreground">Editar Resposta</h3>
-                <button onClick={() => setEditingMessage(null)} className="p-1 hover:bg-white/10 rounded-full">
+                <button onClick={() => setEditingMessage(null)} className="p-1 hover:bg-muted/30 rounded-full">
                   <X className="w-5 h-5 text-muted-foreground" />
                 </button>
               </div>
 
               <div>
                 <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Pergunta do Usuário</span>
-                <p className="text-sm text-foreground mt-1 p-3 bg-white/5 rounded-xl">{editingMessage.user_message}</p>
+                <p className="text-sm text-foreground mt-1 p-3 bg-muted/30 rounded-xl">{editingMessage.user_message}</p>
               </div>
 
               <div>
                 <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Contexto</span>
-                <pre className="text-xs text-muted-foreground mt-1 p-3 bg-white/5 rounded-xl overflow-x-auto text-[10px]">
+                <pre className="text-xs text-muted-foreground mt-1 p-3 bg-muted/30 rounded-xl overflow-x-auto text-[10px]">
                   {JSON.stringify(editingMessage.user_context, null, 2)}
                 </pre>
               </div>
 
               <div>
                 <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Resposta Original</span>
-                <p className="text-xs text-muted-foreground mt-1 p-3 bg-white/5 rounded-xl max-h-32 overflow-y-auto whitespace-pre-wrap">
+                <p className="text-xs text-muted-foreground mt-1 p-3 bg-muted/30 rounded-xl max-h-32 overflow-y-auto whitespace-pre-wrap">
                   {editingMessage.ai_response}
                 </p>
               </div>
@@ -891,7 +891,7 @@ export default function DatasetPage() {
                 <textarea
                   value={editText}
                   onChange={(e) => setEditText(e.target.value)}
-                  className="w-full h-48 mt-1 p-3 bg-white/5 border border-border rounded-xl text-sm text-foreground resize-none focus:border-primary/50 focus:outline-none"
+                  className="w-full h-48 mt-1 p-3 bg-muted/30 border border-border rounded-xl text-sm text-foreground resize-none focus:border-primary/50 focus:outline-none"
                 />
               </div>
 
@@ -936,7 +936,7 @@ export default function DatasetPage() {
           >
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-bold text-foreground">Exportar Dataset</h3>
-              <button onClick={() => setShowExportModal(false)} className="p-1 hover:bg-white/10 rounded-full">
+              <button onClick={() => setShowExportModal(false)} className="p-1 hover:bg-muted/30 rounded-full">
                 <X className="w-5 h-5 text-muted-foreground" />
               </button>
             </div>
@@ -1031,7 +1031,7 @@ function StatCard({
         <Icon className={cn("w-4 h-4", color)} />
         <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">{label}</span>
       </div>
-      <p className={cn("text-xl font-black", color)}>{value}</p>
+      <p className={cn("text-xl font-bold", color)}>{value}</p>
     </div>
   )
 }

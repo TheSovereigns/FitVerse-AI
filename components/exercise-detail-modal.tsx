@@ -215,15 +215,15 @@ export function ExerciseDetailModal({ exercise, topProducts, onClose, onFeedback
           className="flex-1 glass-strong border-t border-border rounded-2xl flex flex-col overflow-hidden shadow-2xl"
         >
           {/* Top Handle Bar */}
-          <div className="w-8 h-1 bg-white/20 rounded-full mx-auto mt-3 mb-2 shrink-0" />
+          <div className="w-8 h-1 bg-muted/30 rounded-full mx-auto mt-3 mb-2 shrink-0" />
 
           {/* Header Action Bar */}
           <div className="flex items-center justify-between px-4 py-2 shrink-0 border-b border-border">
              <div className="flex items-center gap-2">
                 <Activity className="w-4 h-4 text-primary animate-pulse" />
-                 <span className="text-[8px] font-black uppercase tracking-[0.2em] opacity-40">{t("em_exercise")}</span>
+                 <span className="text-[10px] font-black uppercase tracking-widest opacity-40">{t("em_exercise")}</span>
              </div>
-             <Button variant="ghost" onClick={onClose} className="rounded-full hover:bg-white/10 h-8 w-8 p-0">
+             <Button variant="ghost" onClick={onClose} className="rounded-full hover:bg-muted/30 h-8 w-8 p-0">
                 <X className="w-4 h-4" />
              </Button>
           </div>
@@ -232,7 +232,7 @@ export function ExerciseDetailModal({ exercise, topProducts, onClose, onFeedback
             <div className="p-4 space-y-4 pb-20">
               {/* Nome do exercício */}
               <div>
-                <Badge className={cn("mb-2 px-2 py-1 font-black text-[8px] tracking-wider uppercase", getDifficultyColor(exercise.difficulty))}>
+                <Badge className={cn("mb-2 px-2 py-1 font-black text-[10px] tracking-wider uppercase", getDifficultyColor(exercise.difficulty))}>
                   {exercise.difficulty}
                 </Badge>
                 <h2 className="text-2xl font-black text-foreground leading-tight mb-1">
@@ -268,7 +268,7 @@ export function ExerciseDetailModal({ exercise, topProducts, onClose, onFeedback
               <div className="p-4 glass border-border rounded-xl">
                  <div className="flex items-center gap-2 mb-2">
                     <Sparkles className="w-4 h-4 text-primary" />
-                    <span className="text-[8px] font-black uppercase tracking-wider opacity-40">{t("em_ai_insight")}</span>
+                    <span className="text-[10px] font-black uppercase tracking-wider opacity-40">{t("em_ai_insight")}</span>
                  </div>
                  <p className="text-sm font-bold text-foreground/80 italic">"{exercise.aiInsight}"</p>
               </div>
@@ -310,13 +310,13 @@ export function ExerciseDetailModal({ exercise, topProducts, onClose, onFeedback
                  <div className="flex items-center justify-between mb-3">
                      <span className="text-xs font-black uppercase tracking-wider">{t("em_tracker_label").replace("{currentSet}", String(currentSet)).replace("{sets}", String(sets))}</span>
                     <div className="flex gap-2">
-                       <button onClick={() => setSets(s => Math.max(1, s - 1))} className="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center text-xs">-</button>
-                       <button onClick={() => setSets(s => s + 1)} className="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center text-xs">+</button>
+                       <button onClick={() => setSets(s => Math.max(1, s - 1))} className="w-6 h-6 rounded-full bg-muted/30 flex items-center justify-center text-xs">-</button>
+                       <button onClick={() => setSets(s => s + 1)} className="w-6 h-6 rounded-full bg-muted/30 flex items-center justify-center text-xs">+</button>
                     </div>
                  </div>
                  <div className="flex gap-1 mb-3">
                     {Array.from({ length: sets }).map((_, i) => (
-                       <div key={i} className={cn("h-1.5 flex-1 rounded-full", i < currentSet ? "bg-primary" : "bg-white/10")} />
+                       <div key={i} className={cn("h-1.5 flex-1 rounded-full", i < currentSet ? "bg-primary" : "bg-muted/30")} />
                     ))}
                  </div>
                  <Button

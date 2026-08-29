@@ -210,22 +210,22 @@ export function DailySummary() {
         <div className="grid grid-cols-4 gap-4">
           <div className="text-center">
             <Flame className="w-5 h-5 mx-auto mb-1 text-[#FF453A]" />
-            <p className="text-xl font-black">{totalMacros.calories}</p>
+            <p className="text-xl font-bold">{totalMacros.calories}</p>
             <p className="text-xs opacity-40">{t("common_kcal")}</p>
           </div>
           <div className="text-center">
             <Dumbbell className="w-5 h-5 mx-auto mb-1 text-[#0A84FF]" />
-            <p className="text-xl font-black">{totalMacros.protein}g</p>
+            <p className="text-xl font-bold">{totalMacros.protein}g</p>
             <p className="text-xs opacity-40">{t("common_protein")}</p>
           </div>
           <div className="text-center">
             <Wheat className="w-5 h-5 mx-auto mb-1 text-[#FFD60A]" />
-            <p className="text-xl font-black">{totalMacros.carbs}g</p>
+            <p className="text-xl font-bold">{totalMacros.carbs}g</p>
             <p className="text-xs opacity-40">{t("common_carbs")}</p>
           </div>
           <div className="text-center">
             <Droplets className="w-5 h-5 mx-auto mb-1 text-[#FF375F]" />
-            <p className="text-xl font-black">{totalMacros.fat}g</p>
+            <p className="text-xl font-bold">{totalMacros.fat}g</p>
             <p className="text-xs opacity-40">{t("common_fat")}</p>
           </div>
         </div>
@@ -237,7 +237,7 @@ export function DailySummary() {
         <div className="flex items-end justify-between gap-2 h-32">
           {weekData.map((day, i) => (
             <div key={i} className="flex-1 flex flex-col items-center gap-2">
-              <div className="w-full bg-white/5 rounded-t-lg relative overflow-hidden flex-1">
+              <div className="w-full bg-muted/30 rounded-t-lg relative overflow-hidden flex-1">
                 <motion.div
                   initial={{ height: 0 }}
                   animate={{ height: `${(day.calories / maxCalories) * 100}%` }}
@@ -278,7 +278,7 @@ export function DailySummary() {
               >
                 <div className="flex items-center gap-3">
                   <div className={cn(
-                    "w-10 h-10 rounded-xl flex items-center justify-center font-black text-lg",
+                    "w-10 h-10 rounded-xl flex items-center justify-center font-bold text-lg",
                     item.longevityScore >= 70 ? "bg-emerald-500/20 text-emerald-400" :
                     item.longevityScore >= 40 ? "bg-foreground/20 text-foreground/60" :
                     "bg-rose-500/20 text-rose-400"

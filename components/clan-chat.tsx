@@ -58,7 +58,7 @@ export function ClanChat({ clanId }: { clanId: string }) {
           <div key={group.dateKey}>
               <div className="flex items-center gap-3 my-4">
               <div className="flex-1 h-px bg-muted/50" />
-              <span className="text-[9px] font-bold uppercase tracking-wider text-foreground/40">{group.date}</span>
+              <span className="text-[10px] font-bold uppercase tracking-wider text-foreground/40">{group.date}</span>
               <div className="flex-1 h-px bg-muted/50" />
             </div>
             {group.messages.map((msg: any) => {
@@ -71,7 +71,7 @@ export function ClanChat({ clanId }: { clanId: string }) {
                   )}>
                     {!isOwn && <p className="text-[10px] font-bold text-foreground/40 mb-1">{msg.profiles?.name || "User"}</p>}
                     <p className="text-sm text-foreground/80 break-words whitespace-pre-wrap">{msg.content}</p>
-                    <p className="text-[9px] text-foreground/40 mt-1 text-right">{formatTime(msg.created_at)}</p>
+                    <p className="text-[10px] text-foreground/40 mt-1 text-right">{formatTime(msg.created_at)}</p>
                   </div>
                 </motion.div>
               )

@@ -33,13 +33,13 @@ export function AdBanner({ position = "bottom", className = "" }: AdBannerProps)
       <div className="relative glass-strong border border-border rounded-2xl p-3 mx-4 overflow-hidden">
         <button 
           onClick={handleDismiss}
-          className="absolute top-1 right-1 p-1 hover:bg-white/10 rounded-full transition-colors"
+          className="absolute top-1 right-1 p-1 hover:bg-muted/30 rounded-full transition-colors"
         >
           <X className="w-4 h-4 text-muted-foreground" />
         </button>
         
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center shrink-0">
+          <div className="w-10 h-10 rounded-xl bg-muted/30 flex items-center justify-center shrink-0">
             <span className="text-lg">📢</span>
           </div>
           <div className="flex-1 min-w-0">

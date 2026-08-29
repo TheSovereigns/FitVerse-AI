@@ -315,10 +315,10 @@ export default function AdminDashboardPage() {
             <div className="space-y-4">
               {[...Array(5)].map((_, i) => (
                 <div key={i} className="animate-pulse flex items-center gap-3 p-3 rounded-xl">
-                  <div className="w-10 h-10 rounded-full bg-white/5" />
+                  <div className="w-10 h-10 rounded-full bg-muted/30" />
                   <div className="flex-1 space-y-2">
-                    <div className="h-4 bg-white/5 rounded w-1/2" />
-                    <div className="h-3 bg-white/5 rounded w-1/4" />
+                    <div className="h-4 bg-muted/30 rounded w-1/2" />
+                    <div className="h-3 bg-muted/30 rounded w-1/4" />
                   </div>
                 </div>
               ))}
@@ -334,7 +334,7 @@ export default function AdminDashboardPage() {
               {topUsers.map((user, index) => (
                 <div 
                   key={user.id}
-                  className="flex items-center gap-3 p-3 rounded-xl bg-white/5 hover:bg-white/10 transition-colors"
+                  className="flex items-center gap-3 p-3 rounded-xl bg-muted/30 hover:bg-muted/30 transition-colors"
                 >
                   <div className="w-8 h-8 rounded-full bg-orange-500/20 flex items-center justify-center text-orange-400 font-bold text-sm">
                     {index + 1}

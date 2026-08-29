@@ -71,7 +71,7 @@ export function ClanFeed({ clanId }: { clanId: string }) {
                 <p className="text-sm font-bold text-foreground/80 leading-relaxed">{formatActivityText(activity)}</p>
                 <div className="flex items-center gap-1.5 mt-1">
                   <Clock className="h-3 w-3 text-foreground/40" />
-                  <span className="text-[9px] font-bold text-foreground/40">{timeAgo(activity.created_at)}</span>
+                  <span className="text-[10px] font-bold text-foreground/40">{timeAgo(activity.created_at)}</span>
                 </div>
               </div>
             </motion.div>

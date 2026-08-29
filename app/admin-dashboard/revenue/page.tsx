@@ -191,7 +191,7 @@ export default function AdminRevenuePage() {
       })
       const totalProfiles = profiles?.length || 1
       setPlanDistribution([
-        { name: "Free", value: Math.round(((planCounts.free ?? 0) / totalProfiles) * 100), color: "bg-white/20" },
+        { name: "Free", value: Math.round(((planCounts.free ?? 0) / totalProfiles) * 100), color: "bg-muted/30" },
         { name: "Pro", value: Math.round(((planCounts.pro ?? 0) / totalProfiles) * 100), color: "bg-blue-500" },
         { name: "Premium", value: Math.round(((planCounts.premium ?? 0) / totalProfiles) * 100), color: "bg-primary" },
       ])
@@ -346,7 +346,7 @@ export default function AdminRevenuePage() {
                   <span className="text-sm text-white/60">{plan.name}</span>
                   <span className="text-sm font-medium text-foreground">{plan.value}%</span>
                 </div>
-                <div className="h-2 bg-white/10 rounded-full overflow-hidden">
+                <div className="h-2 bg-muted/30 rounded-full overflow-hidden">
                   <div 
                     className={cn("h-full rounded-full transition-all", plan.color)}
                     style={{ width: `${plan.value}%` }}
@@ -384,7 +384,7 @@ export default function AdminRevenuePage() {
           {subscriptions.slice(0, 10).map((sub) => (
             <div
               key={sub.id}
-              className="flex items-center justify-between p-4 rounded-xl bg-white/5"
+              className="flex items-center justify-between p-4 rounded-xl bg-muted/30"
             >
               <div className="flex items-center gap-4">
                 <div className={cn(

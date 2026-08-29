@@ -100,11 +100,13 @@ export function ProductResult({ result, onBack, imageData, onSave, onDiscard, ha
     return ingredientWeights.reduce((sum, iw) => sum + iw.grams, 0)
   }, [ingredientWeights])
 
+  const toFavoriteId = (name: string) => name.toLowerCase().trim().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "")
+
   useEffect(() => {
     if (!result) return
     try {
       const favs = JSON.parse(localStorage.getItem("fitverse-favorites") || "[]") as string[]
-      setIsFavorite(favs.includes(result.productName))
+      setIsFavorite(favs.includes(toFavoriteId(result.productName)))
     } catch {}
     try {
       const compare = JSON.parse(localStorage.getItem("fitverse-compare") || "null") as { productName: string } | null
@@ -129,13 +131,14 @@ export function ProductResult({ result, onBack, imageData, onSave, onDiscard, ha
   const toggleFavorite = () => {
     if (!result) return
     try {
+      const favId = toFavoriteId(result.productName)
       const favs = JSON.parse(localStorage.getItem("fitverse-favorites") || "[]") as string[]
-      const next = favs.includes(result.productName)
-        ? favs.filter(f => f !== result.productName)
-        : [...favs, result.productName]
+      const next = favs.includes(favId)
+        ? favs.filter(f => f !== favId)
+        : [...favs, favId]
       localStorage.setItem("fitverse-favorites", JSON.stringify(next))
-      setIsFavorite(next.includes(result.productName))
-      toast.success(next.includes(result.productName) ? t("scan_added_favorite") : t("scan_removed_favorite"))
+      setIsFavorite(next.includes(favId))
+      toast.success(next.includes(favId) ? t("scan_added_favorite") : t("scan_removed_favorite"))
     } catch {}
   }
 
@@ -164,37 +167,36 @@ export function ProductResult({ result, onBack, imageData, onSave, onDiscard, ha
     if (!result?.macros) return null
 
     if (hasIngredientDetails && ingredientWeights.length > 0) {
-      const totalCalories = ingredientWeights.reduce((sum, iw) => {
-        const ratio = iw.grams / (iw.grams || 1)
-        return sum + iw.calories * ratio
-      }, 0)
-      const totalProtein = ingredientWeights.reduce((sum, iw) => {
-        const ratio = iw.grams / (iw.grams || 1)
-        return sum + iw.protein * ratio
-      }, 0)
-      const totalCarbs = ingredientWeights.reduce((sum, iw) => {
-        const ratio = iw.grams / (iw.grams || 1)
-        return sum + iw.carbs * ratio
-      }, 0)
-      const totalFat = ingredientWeights.reduce((sum, iw) => {
-        const ratio = iw.grams / (iw.grams || 1)
-        return sum + iw.fat * ratio
-      }, 0)
-      const totalFiber = ingredientWeights.reduce((sum, iw) => {
-        const ratio = iw.grams / (iw.grams || 1)
-        return sum + (iw.fiber || 0) * ratio
-      }, 0)
+      // Build map of original grams per ingredient to correctly scale when grams are edited.
+      // Scaling needs originalGrams (estimatedGrams); fallback to defaultGrams / 100 or iw.grams (no scaling) if unavailable.
+      const originalGramsMap: Record<string, number> = {}
+      defaultIngredientWeights.forEach((iw) => {
+        originalGramsMap[iw.name] = iw.grams
+      })
+      const totals = ingredientWeights.reduce(
+        (acc, iw) => {
+          const originalGrams = originalGramsMap[iw.name] || (result as any).grams || defaultGrams || iw.grams
+          const ratio = iw.grams / (originalGrams || iw.grams || 1)
+          acc.calories += iw.calories * ratio
+          acc.protein += iw.protein * ratio
+          acc.carbs += iw.carbs * ratio
+          acc.fat += iw.fat * ratio
+          acc.fiber += (iw.fiber || 0) * ratio
+          return acc
+        },
+        { calories: 0, protein: 0, carbs: 0, fat: 0, fiber: 0 }
+      )
       return {
-        calories: Math.round(totalCalories),
-        protein: Math.round(totalProtein),
-        carbs: Math.round(totalCarbs),
-        fat: Math.round(totalFat),
-        fiber: Math.round(totalFiber),
-        sugar: Math.round((result.macros.sugar || 0) * (totalIngredientGrams / defaultGrams)),
+        calories: Math.round(totals.calories),
+        protein: Math.round(totals.protein),
+        carbs: Math.round(totals.carbs),
+        fat: Math.round(totals.fat),
+        fiber: Math.round(totals.fiber),
+        sugar: Math.round((result.macros.sugar || 0) * (totalIngredientGrams / (defaultGrams || 1))),
       }
     }
 
-    const ratio = grams / defaultGrams
+    const ratio = grams / (defaultGrams || 1)
     return {
       calories: Math.round(result.macros.calories * ratio),
       protein: Math.round(result.macros.protein * ratio),
@@ -203,7 +205,7 @@ export function ProductResult({ result, onBack, imageData, onSave, onDiscard, ha
       fiber: Math.round((result.macros.fiber || 0) * ratio),
       sugar: Math.round((result.macros.sugar || 0) * ratio),
     }
-  }, [result?.macros, grams, defaultGrams, ingredientWeights, hasIngredientDetails, defaultIngredientWeights, totalIngredientGrams])
+  }, [result?.macros, grams, defaultGrams, ingredientWeights, hasIngredientDetails, defaultIngredientWeights, totalIngredientGrams, result])
   
   const incrementGrams = () => setGrams(prev => prev + 10)
   const decrementGrams = () => setGrams(prev => Math.max(10, prev - 10))
@@ -212,7 +214,7 @@ export function ProductResult({ result, onBack, imageData, onSave, onDiscard, ha
     return (
       <div className="flex flex-col items-center justify-center p-20 h-full">
         <div className="w-16 h-16 rounded-full border-4 border-primary/20 border-t-primary animate-spin mb-6" />
-        <p className="text-xl font-bold text-foreground tracking-tighter animate-pulse uppercase tracking-[0.3em] opacity-40">{t("pr_syncing")}</p>
+        <p className="text-xl font-bold text-foreground tracking-tighter animate-pulse uppercase tracking-widest opacity-40">{t("pr_syncing")}</p>
       </div>
     )
   }
@@ -340,7 +342,7 @@ export function ProductResult({ result, onBack, imageData, onSave, onDiscard, ha
           </div>
           <div className="hidden md:flex flex-col items-center">
             <span className={cn("text-3xl font-black", getScoreColor(score))}>{score}</span>
-            <span className="text-[10px] font-black text-primary uppercase tracking-[0.2em]">{t("pr_score_bio")}</span>
+            <span className="text-[10px] font-black text-primary uppercase tracking-widest">{t("pr_score_bio")}</span>
           </div>
         </div>
       </motion.div>
@@ -376,7 +378,7 @@ export function ProductResult({ result, onBack, imageData, onSave, onDiscard, ha
                 <div className="absolute inset-0 bg-primary/20 blur-[40px] rounded-full" />
                 <div className="relative w-36 h-36 md:w-48 md:h-48 rounded-full border-8 border-border flex flex-col items-center justify-center bg-background/50 shadow-2xl">
                   <span className={cn("text-5xl md:text-7xl font-black tracking-tighter leading-none", getScoreColor(score))}>{score}</span>
-                  <span className="text-xs font-black text-primary uppercase tracking-[0.3em] mt-2">{t("pr_score_bio")}</span>
+                  <span className="text-xs font-black text-primary uppercase tracking-widest mt-2">{t("pr_score_bio")}</span>
                 </div>
                 <svg className="absolute inset-0 w-full h-full -rotate-90" viewBox="0 0 144 144">
                   <defs>
@@ -392,7 +394,7 @@ export function ProductResult({ result, onBack, imageData, onSave, onDiscard, ha
             </div>
             {result.healthScore && (
               <div className="relative z-10 mt-6 space-y-3">
-                <h3 className="text-[11px] font-black uppercase tracking-[0.3em] opacity-30">{t("pr_breakdown")}</h3>
+                <h3 className="text-[11px] font-black uppercase tracking-widest opacity-30">{t("pr_breakdown")}</h3>
                 <div className="grid grid-cols-2 gap-3">
                   {[
                     { label: t("pr_overall"), value: healthScore.overall },
@@ -456,7 +458,7 @@ export function ProductResult({ result, onBack, imageData, onSave, onDiscard, ha
                     })}
                     <div className="flex items-center justify-between pt-3 border-t border-border">
                       <span className="text-xs font-bold text-muted-foreground uppercase">{t("pr_total")}</span>
-                      <span className="text-lg font-black text-brand">{totalIngredientGrams}g</span>
+                      <span className="text-lg font-bold text-brand">{totalIngredientGrams}g</span>
                     </div>
                     <button onClick={() => setIngredientWeights(defaultIngredientWeights)} className="w-full text-xs font-bold text-muted-foreground hover:text-foreground py-2 rounded-xl hover:bg-muted/30 transition-colors">{t("pr_reset_weights")}</button>
                   </div>
@@ -485,7 +487,7 @@ export function ProductResult({ result, onBack, imageData, onSave, onDiscard, ha
           {/* Macros */}
           {result.macros && (
             <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="glass-strong border border-border rounded-2xl p-5 md:p-6 space-y-4">
-              <h3 className="text-sm font-black uppercase tracking-[0.4em] opacity-30">{t("pr_macros")}</h3>
+              <h3 className="text-sm font-black uppercase tracking-widest opacity-30">{t("pr_macros")}</h3>
               <div className="space-y-3">
                 {[
                   { label: t("common_p"), val: (isPremium && adjustedMacros) ? adjustedMacros.protein : result.macros.protein, color: "bg-brand", textColor: "text-brand", max: 50 },
@@ -507,7 +509,7 @@ export function ProductResult({ result, onBack, imageData, onSave, onDiscard, ha
           {/* Alerts */}
           {result.alerts && result.alerts.length > 0 && (
             <div className="space-y-4">
-              <h3 className="text-sm font-black uppercase tracking-[0.4em] opacity-30">Alertas</h3>
+              <h3 className="text-sm font-black uppercase tracking-widest opacity-30">Alertas</h3>
               {result.alerts.map((a, i) => {
                 const expKey = `alert-${i}`
                 const isExp = expanded[expKey]
@@ -573,7 +575,7 @@ export function ProductResult({ result, onBack, imageData, onSave, onDiscard, ha
           {/* Macros detail */}
           {result.macros && (
             <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="glass-strong border border-border rounded-2xl p-5 md:p-6 space-y-4">
-              <h3 className="text-sm font-black uppercase tracking-[0.4em] opacity-30">Detalhe de Macros + Vitaminas</h3>
+              <h3 className="text-sm font-black uppercase tracking-widest opacity-30">Detalhe de Macros + Vitaminas</h3>
               <div className="space-y-3">
                 {[
                   { label: t("common_p"), val: (isPremium && adjustedMacros) ? adjustedMacros.protein : result.macros.protein, color: "bg-brand", textColor: "text-brand", max: 50 },
@@ -614,7 +616,7 @@ export function ProductResult({ result, onBack, imageData, onSave, onDiscard, ha
           {/* Health Benefits detailed */}
           {result.benefits && (
             <div className="space-y-4">
-              <h3 className="text-sm font-black uppercase tracking-[0.4em] opacity-30">Benefícios para a Saúde</h3>
+              <h3 className="text-sm font-black uppercase tracking-widest opacity-30">Benefícios para a Saúde</h3>
               {result.benefits.vitamins && result.benefits.vitamins.length > 0 && (
                 <div className="glass-strong border border-border rounded-2xl p-6">
                   <div className="flex items-center gap-3 mb-4"><Sparkles className="w-6 h-6 text-foreground" /><h4 className="text-lg font-bold uppercase">Vitaminas</h4></div>
@@ -663,7 +665,7 @@ export function ProductResult({ result, onBack, imageData, onSave, onDiscard, ha
           {/* Insights as Nutrients benefits */}
           {result.insights && result.insights.length > 0 && (
             <div className="space-y-4">
-              <h3 className="text-sm font-black uppercase tracking-[0.4em] opacity-30">Benefícios</h3>
+              <h3 className="text-sm font-black uppercase tracking-widest opacity-30">Benefícios</h3>
               {result.insights.map((ins, i) => {
                 const expKey = `insight-nut-${i}`
                 const isExp = expanded[expKey]
@@ -754,7 +756,7 @@ export function ProductResult({ result, onBack, imageData, onSave, onDiscard, ha
         <div className="space-y-4 animate-in fade-in duration-300">
           {result.fitnessAlignment && result.fitnessAlignment.length > 0 && (
             <div className="space-y-4">
-              <h3 className="text-sm font-black uppercase tracking-[0.4em] opacity-30">Alinhamento com Objetivos</h3>
+              <h3 className="text-sm font-black uppercase tracking-widest opacity-30">Alinhamento com Objetivos</h3>
               {result.fitnessAlignment.map((align, i) => {
                 const expKey = `fitness-${i}`
                 const isExp = expanded[expKey]
@@ -777,7 +779,7 @@ export function ProductResult({ result, onBack, imageData, onSave, onDiscard, ha
 
           {result.recommendations && (
             <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="glass-strong border border-border rounded-2xl p-6">
-              <h3 className="text-sm font-black uppercase tracking-[0.4em] opacity-30 mb-4">Recomendações da IA</h3>
+              <h3 className="text-sm font-black uppercase tracking-widest opacity-30 mb-4">Recomendações da IA</h3>
               <div className="space-y-4">
                 {result.recommendations.bestFor && (
                   <div className="p-4 rounded-2xl bg-emerald-500/5 border border-emerald-500/20">
@@ -806,7 +808,7 @@ export function ProductResult({ result, onBack, imageData, onSave, onDiscard, ha
 
           {result.insights && result.insights.length > 0 && (
             <div className="space-y-4">
-              <h3 className="text-sm font-black uppercase tracking-[0.4em] opacity-30">Insights do Coach</h3>
+              <h3 className="text-sm font-black uppercase tracking-widest opacity-30">Insights do Coach</h3>
               {result.insights.map((ins, i) => {
                 const expKey = `insight-coach-${i}`
                 const isExp = expanded[expKey]
@@ -839,7 +841,7 @@ export function ProductResult({ result, onBack, imageData, onSave, onDiscard, ha
       {compareData && compareData.productName !== result.productName && (
         <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="glass-strong border border-border rounded-2xl p-6">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-sm font-black uppercase tracking-[0.4em] opacity-30">{t("scan_compare")}</h3>
+            <h3 className="text-sm font-black uppercase tracking-widest opacity-30">{t("scan_compare")}</h3>
             <button onClick={() => { localStorage.removeItem("fitverse-compare"); setIsComparing(false); setCompareData(null) }} className="text-xs font-bold text-muted-foreground underline">{t("scan_clear_compare")}</button>
           </div>
           <div className="grid grid-cols-2 gap-4">

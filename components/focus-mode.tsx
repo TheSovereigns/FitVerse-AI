@@ -27,11 +27,11 @@ export function FocusMode({ isActive, type, title, onDeactivate, children }: Foc
 
           <div className="relative z-10 flex items-center justify-between px-4 py-3 border-b border-border">
             <div className="flex items-center gap-2">
-              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-white/10 border border-border">
+              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-muted/30 border border-border">
                 <Eye className="h-3.5 w-3.5 text-foreground/50" />
               </div>
               <div>
-                <p className="text-[9px] font-black uppercase tracking-[0.25em] text-foreground/50">
+                <p className="text-[10px] font-black uppercase tracking-widest text-foreground/50">
                   {type === "workout" ? "Modo Treino" : type === "recipe" ? "Modo Receita" : "Modo Foco"}
                 </p>
                 {title && (
@@ -43,7 +43,7 @@ export function FocusMode({ isActive, type, title, onDeactivate, children }: Foc
               onClick={onDeactivate}
               variant="ghost"
               size="icon"
-              className="h-8 w-8 rounded-lg border border-border bg-white/8 text-foreground/60 hover:bg-white/16"
+              className="h-8 w-8 rounded-lg border border-border bg-muted/30 text-foreground/60 hover:bg-muted/30"
             >
               <Minimize2 className="h-3.5 w-3.5" />
             </Button>
@@ -60,7 +60,7 @@ export function FocusMode({ isActive, type, title, onDeactivate, children }: Foc
           >
             <button
               onClick={onDeactivate}
-              className="w-full h-10 rounded-xl border border-border bg-white/8 text-[10px] font-black uppercase tracking-widest text-foreground/50 hover:bg-white/16 transition-all"
+              className="w-full h-10 rounded-xl border border-border bg-muted/30 text-[10px] font-black uppercase tracking-widest text-foreground/50 hover:bg-muted/30 transition-all"
             >
               Sair do Modo Foco
             </button>

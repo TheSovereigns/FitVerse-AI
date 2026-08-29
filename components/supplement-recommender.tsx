@@ -206,7 +206,7 @@ export function SupplementRecommender({
                   </div>
                 </div>
                 <span className={cn(
-                  "text-[9px] font-medium px-1.5 py-0.5 rounded-md",
+                  "text-[10px] font-medium px-1.5 py-0.5 rounded-md",
                   sup.priority === "essential" ? "bg-amber-500/10 text-amber-500" : "bg-muted text-muted-foreground"
                 )}>
                   {sup.priority === "essential"

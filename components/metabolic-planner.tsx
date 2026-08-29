@@ -110,21 +110,9 @@ export function MetabolicPlanner({ onPlanCreated }: MetabolicPlannerProps) {
     };
 
     try {
-      let token = ''
-      // Get token from localStorage directly
-      for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i)
-        if (key && key.includes('sb-') && key.includes('-auth-token')) {
-          const storedSession = localStorage.getItem(key)
-          if (storedSession) {
-            const parsed = JSON.parse(storedSession)
-            if (parsed?.access_token) {
-              token = parsed.access_token
-              break
-            }
-          }
-        }
-      }
+      // httpOnly migration: use supabase session instead of localStorage scraping
+      const { data: { session } } = await supabase.auth.getSession()
+      let token = session?.access_token || ''
 
       const controller = new AbortController()
       const timeoutId = setTimeout(() => controller.abort(), 60000)
@@ -215,7 +203,7 @@ export function MetabolicPlanner({ onPlanCreated }: MetabolicPlannerProps) {
                   type="number"
                   value={manualWeight}
                   onChange={(e) => setManualWeight(e.target.value)}
-                  className="text-center font-black text-lg bg-muted/50 border-border rounded-xl h-12"
+                  className="text-center font-bold text-lg bg-muted/50 border-border rounded-xl h-12"
                 />
               </div>
               <div className="space-y-2">
@@ -224,7 +212,7 @@ export function MetabolicPlanner({ onPlanCreated }: MetabolicPlannerProps) {
                   type="number"
                   value={manualHeight}
                   onChange={(e) => setManualHeight(e.target.value)}
-                  className="text-center font-black text-lg bg-muted/50 border-border rounded-xl h-12"
+                  className="text-center font-bold text-lg bg-muted/50 border-border rounded-xl h-12"
                 />
               </div>
               <div className="space-y-2">
@@ -233,7 +221,7 @@ export function MetabolicPlanner({ onPlanCreated }: MetabolicPlannerProps) {
                   type="number"
                   value={manualAge}
                   onChange={(e) => setManualAge(e.target.value)}
-                  className="text-center font-black text-lg bg-muted/50 border-border rounded-xl h-12"
+                  className="text-center font-bold text-lg bg-muted/50 border-border rounded-xl h-12"
                 />
               </div>
             </div>
@@ -264,7 +252,7 @@ export function MetabolicPlanner({ onPlanCreated }: MetabolicPlannerProps) {
           )}
 
           <div className="pt-4">
-            <Label className="text-xs font-black uppercase tracking-[0.3em] mb-4 block opacity-40 text-center">{t('mp_gender')}</Label>
+            <Label className="text-xs font-black uppercase tracking-widest mb-4 block opacity-40 text-center">{t('mp_gender')}</Label>
             <div className="grid grid-cols-2 gap-2 p-1.5 bg-muted/50 dark:bg-muted/50 rounded-2xl md:rounded-2xl relative">
               {[
                 { value: 'male', label: t('mp_male') },
@@ -370,7 +358,7 @@ export function MetabolicPlanner({ onPlanCreated }: MetabolicPlannerProps) {
           <Button
             onClick={handleCalculate}
             disabled={isLoading}
-            className="w-full h-12 md:h-16 text-base md:text-xl font-black rounded-full shadow-sm transition-all bg-primary text-primary-foreground haptic-press border border-border uppercase tracking-[0.2em] relative z-10"
+            className="w-full h-12 md:h-16 text-base md:text-xl font-bold rounded-full shadow-sm transition-all bg-primary text-primary-foreground haptic-press border border-border uppercase tracking-[0.2em] relative z-10"
           >
             {isLoading ? (
               <>

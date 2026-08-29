@@ -117,7 +117,7 @@ export function SeasonSystem() {
             <div className="text-right">
               <div className="flex items-center gap-1.5">
                 <Flame className="h-4 w-4 text-orange-400" />
-                <span className="text-lg font-black text-foreground">{daysElapsed}</span>
+                <span className="text-lg font-bold text-foreground">{daysElapsed}</span>
                 <span className="text-xs text-muted-foreground">/ {currentSeason.totalDays}</span>
               </div>
               <p className="text-[10px] text-muted-foreground">{daysRemaining} {t("lb_days_left")}</p>
@@ -152,7 +152,7 @@ export function SeasonSystem() {
         <div className="relative flex items-center gap-4">
           <div className="relative">
             <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-brand/20 to-emerald-500/10 border border-brand/20">
-              <span className="text-xl font-black text-brand">#{userRank}</span>
+              <span className="text-xl font-bold text-brand">#{userRank}</span>
             </div>
             {userRank <= 3 && (
               <div className="absolute -top-1.5 -right-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-yellow-400 text-[10px]">
@@ -268,7 +268,7 @@ export function SeasonSystem() {
                     <p className={cn("text-sm font-semibold truncate", entry.isUser ? "text-brand" : "text-foreground")}>
                       {entry.name}
                       {entry.isUser && (
-                        <span className="ml-1.5 inline-flex items-center text-[8px] font-black text-brand bg-brand/15 px-1.5 py-0.5 rounded-full align-middle">
+                        <span className="ml-1.5 inline-flex items-center text-[10px] font-black text-brand bg-brand/15 px-1.5 py-0.5 rounded-full align-middle">
                           {t("lb_you")}
                         </span>
                       )}
@@ -352,7 +352,7 @@ export function SeasonSystem() {
                           <p className={cn("text-sm font-semibold", isCurrent ? "text-foreground" : isCompleted ? "text-green-400" : "text-muted-foreground")}>
                             {t("lb_day")} {ch.day}
                           </p>
-                          {isCurrent && <span className="text-[9px] font-bold text-brand bg-brand/15 px-1.5 py-0.5 rounded-full">{isEnglish ? "NOW" : "AGORA"}</span>}
+                          {isCurrent && <span className="text-[10px] font-bold text-brand bg-brand/15 px-1.5 py-0.5 rounded-full">{isEnglish ? "NOW" : "AGORA"}</span>}
                         </div>
                         <div className="flex items-center gap-2 mt-1">
                           <span className="flex items-center gap-1 text-[10px] text-muted-foreground bg-muted/30 px-2 py-0.5 rounded-full">
@@ -403,7 +403,7 @@ export function SeasonSystem() {
                           {reward.badge === "Early Bird" ? t("ls_badge_early_bird") : reward.badge === "Legend" ? t("ls_badge_legend") : reward.badge === "Champion" ? t("ls_badge_champion") : reward.badge}
                         </h4>
                         {isUnlocked && (
-                          <span className="rounded-full bg-green-500/15 px-2 py-0.5 text-[9px] font-black text-green-400 border border-green-500/20">
+                          <span className="rounded-full bg-green-500/15 px-2 py-0.5 text-[10px] font-black text-green-400 border border-green-500/20">
                             {t("lb_unlocked")}
                           </span>
                         )}
@@ -415,7 +415,7 @@ export function SeasonSystem() {
                           <div className="h-1.5 overflow-hidden rounded-full bg-border/50">
                             <div className="h-full rounded-full bg-brand/50" style={{ width: `${progressToReward}%` }} />
                           </div>
-                          <p className="text-[9px] text-muted-foreground mt-0.5">{progressToReward}% {isEnglish ? "complete" : "completo"}</p>
+                          <p className="text-[10px] text-muted-foreground mt-0.5">{progressToReward}% {isEnglish ? "complete" : "completo"}</p>
                         </div>
                       )}
                     </div>

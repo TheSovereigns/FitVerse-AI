@@ -109,6 +109,12 @@ export default function DashboardPage() {
   const bottomNavInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
+    return () => {
+      if (scannedImage?.startsWith('blob:')) URL.revokeObjectURL(scannedImage)
+    }
+  }, [scannedImage])
+
+  useEffect(() => {
     const timer = setTimeout(() => setAuthTimedOut(true), 8000)
     return () => clearTimeout(timer)
   }, [])
@@ -128,43 +134,35 @@ export default function DashboardPage() {
     if (clanInvite && user) {
       const autoJoinClan = async () => {
         try {
-          for (let i = 0; i < localStorage.length; i++) {
-            const key = localStorage.key(i)
-            if (key && key.includes("sb-") && key.includes("-auth-token")) {
-              const stored = localStorage.getItem(key)
-              if (stored) {
-                const parsed = JSON.parse(stored)
-                if (parsed?.access_token) {
-                  // Find clan by invite code
-                  const searchRes = await fetch(`/api/clans?view=discover`, {
-                    headers: { Authorization: `Bearer ${parsed.access_token}` },
-                  })
-                  const searchData = await searchRes.json()
-                  const clans = searchData.clans || []
+          // httpOnly migration: use supabase session instead of localStorage scraping
+          const { data: { session } } = await supabase.auth.getSession()
+          const token = session?.access_token
+          if (!token) return
+          // Find clan by invite code
+          const searchRes = await fetch(`/api/clans?view=discover`, {
+            headers: { Authorization: `Bearer ${token}` },
+          })
+          const searchData = await searchRes.json()
+          const clans = searchData.clans || []
 
-                  // Try to find and join any clan with this invite
-                  for (const clan of clans) {
-                    const joinRes = await fetch(`/api/clans/${clan.id}/join`, {
-                      method: "POST",
-                      headers: {
-                        Authorization: `Bearer ${parsed.access_token}`,
-                        "Content-Type": "application/json",
-                      },
-                      body: JSON.stringify({ inviteCode: clanInvite }),
-                    })
-                    if (joinRes.ok) {
-                      setCurrentView("clans" as View)
-                      window.history.replaceState({}, "", "/app?view=clans")
-                      return
-                    }
-                  }
-                  window.history.replaceState({}, "", "/app?view=clans")
-                  setCurrentView("clans" as View)
-                  return
-                }
-              }
+          // Try to find and join any clan with this invite
+          for (const clan of clans) {
+            const joinRes = await fetch(`/api/clans/${clan.id}/join`, {
+              method: "POST",
+              headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ inviteCode: clanInvite }),
+            })
+            if (joinRes.ok) {
+              setCurrentView("clans" as View)
+              window.history.replaceState({}, "", "/app?view=clans")
+              return
             }
           }
+          window.history.replaceState({}, "", "/app?view=clans")
+          setCurrentView("clans" as View)
         } catch (e) {
           console.error("Error auto-joining clan:", e)
         }
@@ -236,7 +234,9 @@ export default function DashboardPage() {
         const canvas = document.createElement("canvas")
         const ctx = canvas.getContext("2d")
         const img = new Image()
+        const objectUrl = URL.createObjectURL(file)
         img.onload = () => {
+          URL.revokeObjectURL(objectUrl)
           let { width, height } = img
           const maxDim = 1024
           if (width > maxDim || height > maxDim) {
@@ -253,16 +253,11 @@ export default function DashboardPage() {
           ctx?.drawImage(img, 0, 0, width, height)
           resolve(canvas.toDataURL("image/jpeg", 0.7))
         }
-        img.onerror = reject
-        img.src = URL.createObjectURL(file)
-      })
-
-    const toBase64 = (file: File): Promise<string> =>
-      new Promise((resolve, reject) => {
-        const reader = new FileReader()
-        reader.readAsDataURL(file)
-        reader.onload = () => resolve(reader.result as string)
-        reader.onerror = (error) => reject(error)
+        img.onerror = (e) => {
+          URL.revokeObjectURL(objectUrl)
+          reject(e)
+        }
+        img.src = objectUrl
       })
 
     try {
@@ -286,18 +281,8 @@ export default function DashboardPage() {
           const { data: sessionData } = await Promise.race([sessionPromise, timeoutPromise])
           token = sessionData.session?.access_token || ''
         } catch (e) { logger.error("[Page] Session promise timed out:", e) }
-        if (!token) {
-          for (let i = 0; i < localStorage.length; i++) {
-            const key = localStorage.key(i)
-            if (key && key.includes('sb-') && key.includes('-auth-token')) {
-              const storedSession = localStorage.getItem(key)
-              if (storedSession) {
-                const parsed = JSON.parse(storedSession)
-                if (parsed?.access_token) { token = parsed.access_token; break }
-              }
-            }
-          }
-        }
+        // httpOnly migration: fallback localStorage scraping removed; session already attempted above
+        void 0;
       } catch (e) { logger.error("[Page] Failed to get auth token:", e) }
       if (!token) throw new Error(t("page_sign_in_again"))
 

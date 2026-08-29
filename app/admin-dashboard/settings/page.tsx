@@ -92,7 +92,7 @@ export default function AdminSettingsPage() {
                   "w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all",
                   activeTab === tab.id
                     ? "bg-primary/20 text-primary"
-                    : "text-white/60 hover:text-white hover:bg-white/5"
+                    : "text-white/60 hover:text-white hover:bg-muted/30"
                 )}
               >
                 <tab.icon className="w-5 h-5" />
@@ -125,14 +125,14 @@ export default function AdminSettingsPage() {
                       <Button
                         variant={locale === "pt-BR" ? "default" : "outline"}
                         onClick={() => setLocale("pt-BR")}
-                        className={locale === "pt-BR" ? "bg-primary text-white" : "bg-white/5 text-white/60 border-border"}
+                        className={locale === "pt-BR" ? "bg-primary text-white" : "bg-muted/30 text-white/60 border-border"}
                       >
                         🇧🇷 Português
                       </Button>
                       <Button
                         variant={locale === "en-US" ? "default" : "outline"}
                         onClick={() => setLocale("en-US")}
-                        className={locale === "en-US" ? "bg-primary text-white" : "bg-white/5 text-white/60 border-border"}
+                        className={locale === "en-US" ? "bg-primary text-white" : "bg-muted/30 text-white/60 border-border"}
                       >
                         🇺🇸 English
                       </Button>
@@ -143,7 +143,7 @@ export default function AdminSettingsPage() {
                     <Label className="text-white/80 text-sm mb-2 block">
                       {locale === "en-US" ? "Timezone" : "Fuso Horário"}
                     </Label>
-                    <select className="w-full h-12 px-4 bg-white/5 border border-border rounded-xl text-white">
+                    <select className="w-full h-12 px-4 bg-muted/30 border border-border rounded-xl text-white">
                       <option value="America/Sao_Paulo">America/São Paulo (GMT-3)</option>
                       <option value="America/New_York">America/New York (GMT-5)</option>
                       <option value="Europe/London">Europe/London (GMT+0)</option>
@@ -166,12 +166,12 @@ export default function AdminSettingsPage() {
                     { label: locale === "en-US" ? "AI usage alerts" : "Alertas de uso da IA", desc: "Alert when AI usage exceeds threshold" },
                     { label: locale === "en-US" ? "Weekly reports" : "Relatórios semanais", desc: "Receive weekly analytics summary" },
                   ].map((item, index) => (
-                    <div key={index} className="flex items-center justify-between p-4 rounded-xl bg-white/5">
+                    <div key={index} className="flex items-center justify-between p-4 rounded-xl bg-muted/30">
                       <div>
                         <p className="text-sm font-medium text-white">{item.label}</p>
                         <p className="text-xs text-white/40">{item.desc}</p>
                       </div>
-                      <input type="checkbox" defaultChecked className="w-5 h-5 rounded bg-white/10 border-border text-primary focus:ring-primary/20" />
+                      <input type="checkbox" defaultChecked className="w-5 h-5 rounded bg-muted/30 border-border text-primary focus:ring-primary/20" />
                     </div>
                   ))}
                 </div>
@@ -185,18 +185,18 @@ export default function AdminSettingsPage() {
                 </h3>
                 
                 <div className="space-y-4">
-                  <div className="p-4 rounded-xl bg-white/5">
+                  <div className="p-4 rounded-xl bg-muted/30">
                     <p className="text-sm font-medium text-white mb-2">Two-Factor Authentication</p>
                     <p className="text-xs text-white/40 mb-3">Add an extra layer of security to your account</p>
-                    <Button variant="outline" className="bg-white/5 text-white border-border hover:bg-white/10">
+                    <Button variant="outline" className="bg-muted/30 text-white border-border hover:bg-muted/30">
                       {locale === "en-US" ? "Enable 2FA" : "Ativar 2FA"}
                     </Button>
                   </div>
                   
-                  <div className="p-4 rounded-xl bg-white/5">
+                  <div className="p-4 rounded-xl bg-muted/30">
                     <p className="text-sm font-medium text-white mb-2">Session Management</p>
                     <p className="text-xs text-white/40 mb-3">Manage active sessions and devices</p>
-                    <Button variant="outline" className="bg-white/5 text-white border-border hover:bg-white/10">
+                    <Button variant="outline" className="bg-muted/30 text-white border-border hover:bg-muted/30">
                       {locale === "en-US" ? "View Sessions" : "Ver Sessões"}
                     </Button>
                   </div>
@@ -209,7 +209,7 @@ export default function AdminSettingsPage() {
                 <h3 className="text-lg font-bold text-white">API Keys</h3>
                 
                 <div className="space-y-4">
-                  <div className="p-4 rounded-xl bg-white/5">
+                  <div className="p-4 rounded-xl bg-muted/30">
                     <div className="flex items-center justify-between mb-2">
                       <p className="text-sm font-medium text-white">SupabaseAnon Key</p>
                       <span className="text-xs text-emerald-400">Active</span>
@@ -219,7 +219,7 @@ export default function AdminSettingsPage() {
                     </code>
                   </div>
                   
-                  <div className="p-4 rounded-xl bg-white/5">
+                  <div className="p-4 rounded-xl bg-muted/30">
                     <div className="flex items-center justify-between mb-2">
                       <p className="text-sm font-medium text-white">Stripe API Key</p>
                       <span className="text-xs text-emerald-400">Active</span>
@@ -247,7 +247,7 @@ export default function AdminSettingsPage() {
                     <p className="text-sm font-medium text-primary">Dark (Orange)</p>
                     <p className="text-xs text-white/40 mt-1">Current</p>
                   </div>
-                  <div className="p-4 rounded-xl bg-white/5 border border-border text-center cursor-pointer opacity-50">
+                  <div className="p-4 rounded-xl bg-muted/30 border border-border text-center cursor-pointer opacity-50">
                     <p className="text-sm font-medium text-white">Light</p>
                     <p className="text-xs text-white/40 mt-1">{locale === "en-US" ? "Coming soon" : "Em breve"}</p>
                   </div>

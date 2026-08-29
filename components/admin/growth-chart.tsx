@@ -41,7 +41,7 @@ export function GrowthChart({ data, isLoading = false }: GrowthChartProps) {
   if (isLoading) {
     return (
       <div className="glass-strong border border-orange-500/10 rounded-2xl p-6">
-        <div className="animate-pulse h-64 bg-white/5 rounded-lg" />
+        <div className="animate-pulse h-64 bg-muted/30 rounded-lg" />
       </div>
     )
   }

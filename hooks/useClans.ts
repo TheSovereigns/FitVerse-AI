@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react"
 import { supabase } from "@/lib/supabase"
+import { getToken } from "@/lib/auth/getToken"
 
 interface Clan {
   id: string
@@ -41,21 +42,6 @@ interface ClanInvite {
   status: string
   expires_at: string
   created_at: string
-}
-
-async function getToken(): Promise<string> {
-  for (let i = 0; i < localStorage.length; i++) {
-    const key = localStorage.key(i)
-    if (key && key.includes("sb-") && key.includes("-auth-token")) {
-      const stored = localStorage.getItem(key)
-      if (stored) {
-        const parsed = JSON.parse(stored)
-        if (parsed?.access_token) return parsed.access_token
-      }
-    }
-  }
-  const { data } = await supabase.auth.getSession()
-  return data.session?.access_token || ""
 }
 
 export function useClans() {

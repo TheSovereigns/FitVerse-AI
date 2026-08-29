@@ -553,13 +553,13 @@ export function MobilityRoutines({
                         {routine.exercises.slice(0, 3).map((ex) => (
                           <span
                             key={ex.id}
-                            className="px-1.5 py-0.5 rounded bg-muted text-[9px] text-muted-foreground"
+                            className="px-1.5 py-0.5 rounded bg-muted text-[10px] text-muted-foreground"
                           >
                             {ex.name}
                           </span>
                         ))}
                         {routine.exercises.length > 3 && (
-                           <span className="px-1.5 py-0.5 rounded bg-brand-muted text-[9px] text-brand">
+                           <span className="px-1.5 py-0.5 rounded bg-brand-muted text-[10px] text-brand">
                             +{routine.exercises.length - 3}
                           </span>
                         )}

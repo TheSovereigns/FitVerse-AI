@@ -275,7 +275,7 @@ export default function AdminAIUsagePage() {
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: index * 0.1 }}
-              className="flex items-center gap-4 p-4 rounded-xl bg-white/5"
+              className="flex items-center gap-4 p-4 rounded-xl bg-muted/30"
             >
               <div className="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center text-primary font-black text-sm">
                 {index + 1}

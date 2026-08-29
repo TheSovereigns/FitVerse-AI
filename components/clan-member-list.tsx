@@ -6,21 +6,12 @@ import { Users, Crown, Shield, UserMinus, ArrowLeftRight, Loader2 } from "lucide
 import { cn } from "@/lib/utils"
 import { useAuth } from "@/hooks/useAuth"
 import { useTranslation } from "@/lib/i18n"
+import { supabase } from "@/lib/supabase"
+import { getToken } from "@/lib/auth/getToken"
 
 interface Member {
   id: string; clan_id: string; user_id: string; role: string; joined_at: string
   profiles?: { id: string; name: string; avatar_url: string | null; plan: string }
-}
-
-async function getToken(): Promise<string> {
-  for (let i = 0; i < localStorage.length; i++) {
-    const key = localStorage.key(i)
-    if (key && key.includes("sb-") && key.includes("-auth-token")) {
-      const stored = localStorage.getItem(key)
-      if (stored) { const parsed = JSON.parse(stored); if (parsed?.access_token) return parsed.access_token }
-    }
-  }
-  return ""
 }
 
 export function ClanMemberList({ clanId, userRole, onKick, onTransfer }: {
@@ -105,12 +96,12 @@ export function ClanMemberList({ clanId, userRole, onKick, onTransfer }: {
                 isMe && "border-border bg-card"
               )}>
               <div className="w-10 h-10 rounded-xl bg-muted/50 flex items-center justify-center shrink-0">
-                <span className="text-lg font-black text-foreground/60">{profile?.name?.charAt(0)?.toUpperCase() || "?"}</span>
+                <span className="text-lg font-bold text-foreground/60">{profile?.name?.charAt(0)?.toUpperCase() || "?"}</span>
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
                   <p className="font-bold text-sm text-foreground truncate">{profile?.name || "Unknown"}</p>
-                  {isMe && <span className="text-[9px] font-bold text-foreground/40">(voce)</span>}
+                  {isMe && <span className="text-[10px] font-bold text-foreground/40">(voce)</span>}
                 </div>
                 <div className="flex items-center gap-2 mt-0.5">
                   <Icon className={cn("h-3 w-3", roleColors[member.role])} />
@@ -118,7 +109,7 @@ export function ClanMemberList({ clanId, userRole, onKick, onTransfer }: {
                     {roleLabels[member.role]}
                   </span>
                   {profile?.plan && profile.plan !== "free" && (
-                    <span className="text-[8px] font-bold uppercase px-1.5 py-0.5 rounded-full bg-brand/10 text-brand">
+                    <span className="text-[10px] font-bold uppercase px-1.5 py-0.5 rounded-full bg-brand/10 text-brand">
                       {profile.plan}
                     </span>
                   )}

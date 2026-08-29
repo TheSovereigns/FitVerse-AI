@@ -1,17 +1,16 @@
-import { getSupabaseClient } from './supabase-client'
-import { SupabaseClient } from '@supabase/supabase-js'
-import { logger } from './logger'
+/**
+ * @deprecated This is a compatibility shim. Prefer direct imports:
+ *   - Client: `import { supabase } from "@/lib/supabase/client"`
+ *   - Server: `import { getSupabaseAdmin } from "@/lib/supabase/server"`
+ * This file re-exports the canonical browser client and retains profile helpers.
+ */
+import { supabase } from "./supabase/client"
+import { logger } from "./logger"
+export { supabase } from "./supabase/client"
+export { getSupabase, getSupabaseClient } from "./supabase/client"
 
-// Lazy getter - only creates client on first access
-export function getSupabase() {
-  return getSupabaseClient()
-}
-
-// Direct export - avoids Proxy val.bind() pattern that breaks JWT header attachment
-export const supabase: SupabaseClient = getSupabaseClient()
-
-// Re-export server utilities from supabase-server.ts
-export { getSupabaseAdmin, authUser, getCorsHeaders } from './supabase-server'
+// Re-export server utilities from canonical server module
+export { getSupabaseAdmin, authUser, getCorsHeaders } from "./supabase/server"
 
 // Type definitions for better TypeScript support
 export type Profile = {

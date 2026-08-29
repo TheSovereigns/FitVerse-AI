@@ -279,7 +279,7 @@ export function CorridaTracker({ onBack }: { onBack?: () => void }) {
             )}
             {!isTracking && displayPoints.length === 0 && (
               <motion.div key="idle" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="text-center">
-                <div className="w-20 h-20 mx-auto mb-5 rounded-3xl bg-white/5 border border-border flex items-center justify-center">
+                <div className="w-20 h-20 mx-auto mb-5 rounded-3xl bg-muted/30 border border-border flex items-center justify-center">
                   <activity.icon className="w-10 h-10 text-white/20" />
                 </div>
                 <p className="text-base font-semibold text-white/80">{isEnglish ? "Tap to start" : "Toque para iniciar"}</p>
@@ -301,7 +301,7 @@ export function CorridaTracker({ onBack }: { onBack?: () => void }) {
                   { icon: Flame, value: `${calories}`, label: "kcal" },
                 ].map((s, i) => (
                   <div key={i} className="bg-black/50 backdrop-blur-xl border border-border rounded-2xl p-3 text-center">
-                    <div className="w-7 h-7 mx-auto rounded-lg bg-white/5 flex items-center justify-center mb-2">
+                    <div className="w-7 h-7 mx-auto rounded-lg bg-muted/30 flex items-center justify-center mb-2">
                       <s.icon className="w-3.5 h-3.5 text-brand" />
                     </div>
                     <p className="text-base font-bold text-white tabular-nums leading-none">{s.value}</p>
@@ -315,7 +315,7 @@ export function CorridaTracker({ onBack }: { onBack?: () => void }) {
                   { icon: Footprints, value: steps > 0 ? steps.toLocaleString() : "—", label: isEnglish ? "Steps" : "Passos" },
                 ].map((s, i) => (
                   <div key={i} className="min-w-[120px] flex-1 snap-center bg-black/50 backdrop-blur-xl border border-border rounded-2xl p-3 text-center">
-                    <div className="w-7 h-7 mx-auto rounded-lg bg-white/5 flex items-center justify-center mb-2">
+                    <div className="w-7 h-7 mx-auto rounded-lg bg-muted/30 flex items-center justify-center mb-2">
                       <s.icon className="w-3.5 h-3.5 text-brand" />
                     </div>
                     <p className="text-base font-bold text-white tabular-nums leading-none">{s.value}</p>
@@ -337,7 +337,7 @@ export function CorridaTracker({ onBack }: { onBack?: () => void }) {
             {status === "tracking" && (
               <>
                 <motion.button whileTap={{ scale: 0.95 }} onClick={pauseTracking}
-                  className="h-12 w-12 rounded-full bg-white/10 backdrop-blur-xl border border-border flex items-center justify-center text-white/70 hover:text-white transition-colors focus-visible:ring-2 focus-visible:ring-white/30 focus-visible:ring-offset-2 focus-visible:ring-offset-black">
+                  className="h-12 w-12 rounded-full bg-muted/30 backdrop-blur-xl border border-border flex items-center justify-center text-white/70 hover:text-white transition-colors focus-visible:ring-2 focus-visible:ring-white/30 focus-visible:ring-offset-2 focus-visible:ring-offset-black">
                   <Pause className="w-5 h-5" />
                 </motion.button>
                 <motion.button whileTap={{ scale: 0.95 }} onClick={stopTracking}
@@ -349,7 +349,7 @@ export function CorridaTracker({ onBack }: { onBack?: () => void }) {
             {status === "paused" && (
               <>
                 <motion.button whileTap={{ scale: 0.95 }} onClick={stopTracking}
-                  className="h-12 w-12 rounded-full bg-white/10 backdrop-blur-xl border border-border flex items-center justify-center text-white/70 hover:text-white transition-colors">
+                  className="h-12 w-12 rounded-full bg-muted/30 backdrop-blur-xl border border-border flex items-center justify-center text-white/70 hover:text-white transition-colors">
                   <Square className="w-4 h-4" />
                 </motion.button>
                 <motion.button whileTap={{ scale: 0.95 }} onClick={resumeTracking}
@@ -382,15 +382,15 @@ export function CorridaTracker({ onBack }: { onBack?: () => void }) {
               </p>
 
               <div className="grid grid-cols-3 gap-3 mb-6">
-                <div className="p-3 rounded-xl bg-white/5">
+                <div className="p-3 rounded-xl bg-muted/30">
                   <p className="text-lg font-bold text-white tabular-nums">{fmtDist(lastSessionData.distance)}</p>
                   <p className="text-[10px] text-white/30 mt-1">{isEnglish ? "Distance" : "Distância"}</p>
                 </div>
-                <div className="p-3 rounded-xl bg-white/5">
+                <div className="p-3 rounded-xl bg-muted/30">
                   <p className="text-lg font-bold text-white tabular-nums">{fmtDuration(lastSessionData.duration)}</p>
                   <p className="text-[10px] text-white/30 mt-1">{isEnglish ? "Duration" : "Tempo"}</p>
                 </div>
-                <div className="p-3 rounded-xl bg-white/5">
+                <div className="p-3 rounded-xl bg-muted/30">
                   <p className="text-lg font-bold text-white tabular-nums">{lastSessionData.calories}</p>
                   <p className="text-[10px] text-white/30 mt-1">kcal</p>
                 </div>
@@ -410,7 +410,7 @@ export function CorridaTracker({ onBack }: { onBack?: () => void }) {
                   {isEnglish ? "Share" : "Compartilhar"}
                 </button>
                 <button onClick={() => setShowSummary(false)}
-                  className="h-12 px-5 rounded-xl bg-white/5 text-white/60 font-semibold text-sm border border-border hover:bg-white/10 transition-colors">
+                  className="h-12 px-5 rounded-xl bg-muted/30 text-white/60 font-semibold text-sm border border-border hover:bg-muted/30 transition-colors">
                   {isEnglish ? "Done" : "Fechar"}
                 </button>
               </div>
@@ -459,7 +459,7 @@ export function CorridaTracker({ onBack }: { onBack?: () => void }) {
                   <h3 className="text-lg font-bold text-white">{isEnglish ? "Choose Activity" : "Escolher Atividade"}</h3>
                   <p className="text-xs text-white/40 mt-1">{isEnglish ? "Select your cardio workout" : "Selecione seu treino"}</p>
                 </div>
-                <button onClick={() => setShowActivityPicker(false)} className="w-9 h-9 rounded-xl bg-white/5 flex items-center justify-center text-white/40 hover:text-white transition-colors">
+                <button onClick={() => setShowActivityPicker(false)} className="w-9 h-9 rounded-xl bg-muted/30 flex items-center justify-center text-white/40 hover:text-white transition-colors">
                   <X className="w-4 h-4" />
                 </button>
               </div>
@@ -472,7 +472,7 @@ export function CorridaTracker({ onBack }: { onBack?: () => void }) {
                       selectedActivity === a.id ? "border-brand bg-brand/10" : "border-border bg-muted/30 hover:bg-muted/50"
                     )}>
                     <div className={cn("w-12 h-12 mx-auto rounded-xl flex items-center justify-center mb-3",
-                      selectedActivity === a.id ? "bg-brand/15" : "bg-white/5")}>
+                      selectedActivity === a.id ? "bg-brand/15" : "bg-muted/30")}>
                       <a.icon className={cn("w-6 h-6", selectedActivity === a.id ? "text-brand" : "text-white/30")} />
                     </div>
                     <p className="text-sm font-semibold text-white">{isEnglish ? a.labelEn : a.label}</p>
@@ -498,7 +498,7 @@ export function CorridaTracker({ onBack }: { onBack?: () => void }) {
                   <h3 className="text-lg font-bold text-white">{isEnglish ? "History" : "Histórico"}</h3>
                   <p className="text-xs text-white/40 mt-1">{sessions.length} {isEnglish ? "sessions" : "sessões"}</p>
                 </div>
-                <button onClick={() => setShowHistory(false)} className="w-9 h-9 rounded-xl bg-white/5 flex items-center justify-center text-white/40 hover:text-white transition-colors">
+                <button onClick={() => setShowHistory(false)} className="w-9 h-9 rounded-xl bg-muted/30 flex items-center justify-center text-white/40 hover:text-white transition-colors">
                   <X className="w-4 h-4" />
                 </button>
               </div>
@@ -519,7 +519,7 @@ export function CorridaTracker({ onBack }: { onBack?: () => void }) {
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
                           <p className="text-sm font-semibold text-white">{isEnglish ? act.labelEn : act.label}</p>
-                          <span className="text-[10px] text-white/30 px-2 py-0.5 rounded-full bg-white/5">
+                          <span className="text-[10px] text-white/30 px-2 py-0.5 rounded-full bg-muted/30">
                             {new Date(s.startedAt).toLocaleDateString(isEnglish ? "en-US" : "pt-BR", { day: "2-digit", month: "short" })}
                           </span>
                         </div>

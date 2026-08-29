@@ -112,7 +112,7 @@ export function BarcodeScanner({ onProductFound, onClose }: BarcodeScannerProps)
             className={cn(
               "flex items-center gap-1.5 rounded-xl px-3 py-2 text-[10px] font-black uppercase tracking-widest transition-all",
               mode === m
-                ? "bg-white/8 text-foreground border border-border"
+                ? "bg-muted/30 text-foreground border border-border"
                 : "text-foreground/50 border border-transparent"
             )}
           >
@@ -129,7 +129,7 @@ export function BarcodeScanner({ onProductFound, onClose }: BarcodeScannerProps)
           <div className="space-y-4">
             <div className="rounded-2xl border border-border bg-black/40 p-6">
               <div className="flex items-center gap-3 mb-4">
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/5 border border-border">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-muted/30 border border-border">
                   <ScanLine className="h-5 w-5 text-foreground/60" />
                 </div>
                 <div>
@@ -171,7 +171,7 @@ export function BarcodeScanner({ onProductFound, onClose }: BarcodeScannerProps)
               </div>
             )}
 
-            <div className="rounded-xl border border-border bg-white/5 p-4">
+            <div className="rounded-xl border border-border bg-muted/30 p-4">
               <p className="text-[10px] font-black uppercase tracking-widest text-foreground/50 mb-2">
                 {isEnglish ? "Where to find it" : "Onde encontrar"}
               </p>
@@ -230,7 +230,7 @@ export function BarcodeScanner({ onProductFound, onClose }: BarcodeScannerProps)
                   <Button
                     onClick={clearHistory}
                     variant="ghost"
-                    className="h-8 rounded-lg text-[9px] font-black uppercase tracking-widest text-red-400/60 hover:text-red-400"
+                    className="h-8 rounded-lg text-[10px] font-black uppercase tracking-widest text-red-400/60 hover:text-red-400"
                   >
                     <Trash2 className="h-3 w-3 mr-1" />
                     {isEnglish ? "Clear" : "Limpar"}
@@ -240,18 +240,18 @@ export function BarcodeScanner({ onProductFound, onClose }: BarcodeScannerProps)
                   <button
                     key={item.barcode}
                     onClick={() => handleHistorySelect(item.barcode)}
-                    className="w-full flex items-center gap-3 rounded-xl border border-border bg-black/40 p-3 hover:bg-white/5 transition-all"
+                    className="w-full flex items-center gap-3 rounded-xl border border-border bg-black/40 p-3 hover:bg-muted/30 transition-all"
                   >
                     {item.image ? (
                       <img src={item.image} alt={item.name || "Product"} className="h-10 w-10 rounded-lg object-cover" />
                     ) : (
-                      <div className="h-10 w-10 rounded-lg bg-white/5 flex items-center justify-center">
+                      <div className="h-10 w-10 rounded-lg bg-muted/30 flex items-center justify-center">
                         <Barcode className="h-5 w-5 text-foreground/50" />
                       </div>
                     )}
                     <div className="flex-1 text-left min-w-0">
                       <p className="text-sm font-black text-foreground truncate">{item.name}</p>
-                      <p className="text-[9px] font-bold text-foreground/50 font-mono">{item.barcode}</p>
+                      <p className="text-[10px] font-bold text-foreground/50 font-mono">{item.barcode}</p>
                     </div>
                     <div className="text-right flex-shrink-0">
                       <div className={cn(

@@ -292,7 +292,7 @@ export function BattlePass({ isLocked = false }: BattlePassProps) {
 
                   {/* Label */}
                   <p className={cn(
-                    "text-center text-[9px] font-semibold leading-tight min-h-[24px] flex items-center",
+                    "text-center text-[10px] font-semibold leading-tight min-h-[24px] flex items-center",
                     unlocked ? "text-foreground" : "text-muted-foreground"
                   )}>
                     {getLocalizedLabel(tier.label)}

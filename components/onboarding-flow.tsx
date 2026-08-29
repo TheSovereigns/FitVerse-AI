@@ -3,9 +3,7 @@
 import { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import {
-  ChevronRight, ChevronLeft, Rocket, Moon, Brain, AlertTriangle,
-  Dumbbell, Apple, Scale, Heart, Zap, Check, Loader2,
-  Droplets, Target, Activity, Calendar,
+  ChevronRight, ChevronLeft, Rocket, Scale, Target, Activity, Check, Loader2, Watch,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -13,6 +11,8 @@ import { cn } from "@/lib/utils"
 import { useTranslation } from "@/lib/i18n"
 import { supabase } from "@/lib/supabase"
 import { useAuth } from "@/hooks/useAuth"
+import { toast } from "sonner"
+import { z } from "zod"
 
 interface OnboardingData {
   name: string
@@ -32,6 +32,7 @@ interface OnboardingData {
   workoutsPerWeek: string
   smokingStatus: string
   waterIntake: string
+  wearable: string
 }
 
 const defaultData: OnboardingData = {
@@ -40,7 +41,15 @@ const defaultData: OnboardingData = {
   sleepHours: "", sleepQuality: "", stressLevel: "",
   injuries: [], equipment: [], dietaryRestrictions: [],
   experience: "", workoutsPerWeek: "", smokingStatus: "", waterIntake: "",
+  wearable: "",
 }
+
+const bioSchema = z.object({
+  age: z.coerce.number().min(10).max(120),
+  weight: z.coerce.number().min(20).max(300),
+  height: z.coerce.number().min(100).max(250),
+  gender: z.string().min(1),
+})
 
 export function OnboardingFlow({ onComplete }: { onComplete: () => void }) {
   const { t, locale } = useTranslation()
@@ -53,7 +62,37 @@ export function OnboardingFlow({ onComplete }: { onComplete: () => void }) {
 
   useEffect(() => {
     const completed = localStorage.getItem("onboarding_completed")
-    if (!completed) setIsVisible(true)
+    const skipped = localStorage.getItem("onboarding_skipped")
+    if (completed) {
+      setIsVisible(false)
+      return
+    }
+    // restore persisted step and data
+    const savedStep = localStorage.getItem("vysefit-onboarding-step")
+    const savedData = localStorage.getItem("vysefit-onboarding-data")
+    if (savedData) {
+      try { setData(prev => ({ ...prev, ...JSON.parse(savedData) })) } catch {}
+    }
+    if (savedStep && !isNaN(parseInt(savedStep))) {
+      const s = parseInt(savedStep)
+      if (s >= 0 && s < 5) setStep(s)
+    }
+    // also restore legacy userProfile/bioProfile if exists
+    try {
+      const up = localStorage.getItem("userProfile")
+      if (up) {
+        const p = JSON.parse(up)
+        setData(prev => ({
+          ...prev,
+          age: p.age || prev.age,
+          weight: p.weight || prev.weight,
+          height: p.height || prev.height,
+          gender: p.gender || prev.gender,
+          goal: p.goal || prev.goal,
+        }))
+      }
+    } catch {}
+    setIsVisible(true)
   }, [])
 
   const update = (field: keyof OnboardingData, value: any) => {
@@ -69,40 +108,84 @@ export function OnboardingFlow({ onComplete }: { onComplete: () => void }) {
     }))
   }
 
-  const totalSteps = 12
+  const totalSteps = 5
   const progress = ((step + 1) / totalSteps) * 100
 
   const canProceed = () => {
     switch (step) {
-      case 0: return data.name.trim().length > 0
-      case 1: return data.age && data.weight && data.height && data.gender
-      case 2: return data.goal
-      case 3: return data.activityLevel
-      case 4: return data.sleepHours && data.sleepQuality && data.stressLevel
-      case 5: return true
-      case 6: return data.experience
-      case 7: return true
-      case 8: return data.workoutsPerWeek
-      case 9: return data.waterIntake
-      case 10: return true
-      case 11: return true
+      case 0: return data.age.trim() !== "" && data.weight.trim() !== "" && data.height.trim() !== "" && data.gender !== ""
+      case 1: return !!data.goal
+      case 2: return true
+      case 3: return true
+      case 4: return true
       default: return true
     }
   }
 
+  const persistPerStep = async (): Promise<boolean> => {
+    // save step and data locally always
+    localStorage.setItem("vysefit-onboarding-step", String(step))
+    localStorage.setItem("vysefit-onboarding-data", JSON.stringify(data))
+    if (data.wearable) localStorage.setItem("vysefit-wearable", data.wearable)
+    if (data.goal) localStorage.setItem("fitverse-fitness-goal", data.goal)
+
+    if (!user) return true
+    try {
+      const payload: Record<string, any> = {}
+      if (data.age) payload.age = parseInt(data.age)
+      if (data.weight) payload.weight = parseFloat(data.weight)
+      if (data.height) payload.height = parseFloat(data.height)
+      if (data.gender) payload.gender = data.gender as any
+      if (data.goal) payload.fitness_goal = data.goal as any
+      // restrictions persisted each step as well
+      if (data.injuries) payload.injuries = data.injuries
+      if (data.dietaryRestrictions) payload.dietary_restrictions = data.dietaryRestrictions
+
+      // only update if payload has something
+      if (Object.keys(payload).length === 0) return true
+
+      const { error } = await supabase.from("profiles").update(payload).eq("id", user.id)
+      if (error) {
+        toast.error(t("onboard_save_error"))
+        return false
+      }
+      return true
+    } catch (e) {
+      toast.error(t("onboard_save_error"))
+      return false
+    }
+  }
+
   const handleNext = async () => {
-    if (step === 2) {
-      localStorage.setItem("fitverse-fitness-goal", data.goal)
-    } else if (step === 3) {
-      localStorage.setItem("fitverse-activity-level", data.activityLevel)
-    } else if (step === 8) {
-      localStorage.setItem("fitverse-workout-frequency", data.workoutsPerWeek)
-    } else if (step === 9) {
-      localStorage.setItem("fitverse-water-goal", data.waterIntake)
+    // step 0 validation with zod
+    if (step === 0) {
+      const parsed = bioSchema.safeParse({
+        age: data.age,
+        weight: data.weight,
+        height: data.height,
+        gender: data.gender,
+      })
+      if (!parsed.success) {
+        const msg = t("onboard_bio_invalid") || t("validation_age_range")
+        toast.error(msg)
+        return
+      }
+      // JS clamp enforcement (also ensure values within range)
+      const ageNum = Math.min(120, Math.max(10, Number(data.age)))
+      const weightNum = Math.min(300, Math.max(20, Number(data.weight)))
+      const heightNum = Math.min(250, Math.max(100, Number(data.height)))
+      if (String(ageNum) !== data.age || String(weightNum) !== data.weight || String(heightNum) !== data.height) {
+        setData(prev => ({ ...prev, age: String(ageNum), weight: String(weightNum), height: String(heightNum) }))
+      }
     }
 
+    const ok = await persistPerStep()
+    if (!ok) return
+
     if (step < totalSteps - 1) {
-      setStep(step + 1)
+      const next = step + 1
+      setStep(next)
+      localStorage.setItem("vysefit-onboarding-step", String(next))
     } else {
       await generatePlan()
     }
@@ -112,45 +195,34 @@ export function OnboardingFlow({ onComplete }: { onComplete: () => void }) {
     setIsGenerating(true)
     try {
       if (user) {
-        await supabase.from("profiles").update({
-          name: data.name,
+        const { error } = await supabase.from("profiles").update({
           age: parseInt(data.age),
           weight: parseFloat(data.weight),
           height: parseFloat(data.height),
           gender: data.gender as any,
           fitness_goal: data.goal as any,
-          activity_level: data.activityLevel,
-          sleep_hours: parseFloat(data.sleepHours),
-          sleep_quality: data.sleepQuality,
-          stress_level: data.stressLevel,
           injuries: data.injuries,
-          equipment: data.equipment,
           dietary_restrictions: data.dietaryRestrictions,
-          experience: data.experience,
-          workouts_per_week: parseInt(data.workoutsPerWeek || "3"),
-          smoking_status: data.smokingStatus,
-          water_intake: parseFloat(data.waterIntake || "2"),
+          // wearable not stored in profiles yet, keep locally
           profile_setup_completed: true,
         }).eq("id", user.id)
 
+        if (error) {
+          toast.error(t("onboard_save_error"))
+          setIsGenerating(false)
+          return
+        }
+
         const bioProfile = {
-          sleepHours: parseFloat(data.sleepHours),
-          sleepQuality: data.sleepQuality,
-          stressLevel: data.stressLevel,
           injuries: data.injuries,
-          equipment: data.equipment,
           dietaryRestrictions: data.dietaryRestrictions,
-          experience: data.experience,
-          workoutsPerWeek: parseInt(data.workoutsPerWeek || "3"),
-          smokingStatus: data.smokingStatus,
-          waterIntake: parseFloat(data.waterIntake || "2"),
+          wearable: data.wearable,
         }
 
         localStorage.setItem("bioProfile", JSON.stringify(bioProfile))
         localStorage.setItem("userProfile", JSON.stringify({
-          name: data.name, age: data.age, weight: data.weight,
+          age: data.age, weight: data.weight,
           height: data.height, gender: data.gender, goal: data.goal,
-          activityLevel: data.activityLevel,
         }))
 
         try {
@@ -166,16 +238,10 @@ export function OnboardingFlow({ onComplete }: { onComplete: () => void }) {
               height: parseFloat(data.height),
               age: parseInt(data.age),
               gender: data.gender,
-              activityLevel: data.activityLevel,
               goal: data.goal,
-              sleepHours: parseFloat(data.sleepHours),
-              sleepQuality: data.sleepQuality,
-              stressLevel: data.stressLevel,
               injuries: data.injuries,
-              equipment: data.equipment,
               dietaryRestrictions: data.dietaryRestrictions,
-              experience: data.experience,
-              workoutsPerWeek: parseInt(data.workoutsPerWeek || "3"),
+              wearable: data.wearable,
               locale,
             }),
           })
@@ -190,6 +256,8 @@ export function OnboardingFlow({ onComplete }: { onComplete: () => void }) {
       }
 
       localStorage.setItem("onboarding_completed", "true")
+      localStorage.removeItem("onboarding_skipped")
+      localStorage.removeItem("vysefit-onboarding-step")
       setIsVisible(false)
       onComplete()
     } finally {
@@ -198,7 +266,11 @@ export function OnboardingFlow({ onComplete }: { onComplete: () => void }) {
   }
 
   const handleSkip = () => {
-    localStorage.setItem("onboarding_completed", "true")
+    // Do NOT mark onboarding_completed without profile
+    localStorage.setItem("onboarding_skipped", "true")
+    // keep current progress for CTA to resume
+    localStorage.setItem("vysefit-onboarding-step", String(step))
+    localStorage.setItem("vysefit-onboarding-data", JSON.stringify(data))
     setIsVisible(false)
     onComplete()
   }
@@ -206,6 +278,29 @@ export function OnboardingFlow({ onComplete }: { onComplete: () => void }) {
   if (!isVisible) return null
 
   const l = (pt: string, en: string) => isEnglish ? en : pt
+
+  // injury / dietary translation helpers using t()
+  const injuryOptions = [
+    { value: "Joelho", label: t("onboard_injury_knee") },
+    { value: "Lombar", label: t("onboard_injury_lower_back") },
+    { value: "Ombro", label: t("onboard_injury_shoulder") },
+    { value: "Tornozelo", label: t("onboard_injury_ankle") },
+    { value: "Pescoco", label: t("onboard_injury_neck") },
+    { value: "Cotovelo", label: t("onboard_injury_elbow") },
+    { value: "Quadril", label: t("onboard_injury_hip") },
+    { value: "Nenhuma", label: t("onboard_injury_none") },
+  ]
+
+  const dietaryOptions = [
+    { value: "none", label: t("onboard_diet_none") },
+    { value: "vegetarian", label: t("onboard_diet_vegetarian") },
+    { value: "vegan", label: t("onboard_diet_vegan") },
+    { value: "gluten_free", label: t("onboard_diet_gluten_free") },
+    { value: "lactose_free", label: t("onboard_diet_lactose_free") },
+    { value: "diabetic", label: t("onboard_diet_diabetic") },
+    { value: "hypertension", label: t("onboard_diet_hypertension") },
+    { value: "keto", label: t("onboard_diet_keto") },
+  ]
 
   return (
     <AnimatePresence>
@@ -245,36 +340,14 @@ export function OnboardingFlow({ onComplete }: { onComplete: () => void }) {
               {step === 0 && (
                 <div className="space-y-6">
                   <div className="text-center mb-8">
-                    <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-4 overflow-hidden">
-                      <img src="/icon.svg" alt="VyseFit" className="w-9 h-9" />
-                    </div>
-                    <h2 className="text-2xl font-bold text-foreground">
-                      {l("Qual seu nome?", "What's your name?")}
-                    </h2>
-                    <p className="text-sm text-muted-foreground mt-2">
-                      {l("Para personalizarmos sua experiencia", "To personalize your experience")}
-                    </p>
-                  </div>
-                  <Input
-                    value={data.name}
-                    onChange={(e) => update("name", e.target.value)}
-                    placeholder={l("Seu nome", "Your name")}
-                    className="h-14 rounded-2xl border-border bg-card text-foreground text-center text-lg"
-                  />
-                </div>
-              )}
-
-              {step === 1 && (
-                <div className="space-y-6">
-                  <div className="text-center mb-8">
                     <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
                       <Scale className="h-8 w-8 text-primary" />
                     </div>
                     <h2 className="text-2xl font-bold text-foreground">
-                      {l("Seus dados biometricos", "Your biometric data")}
+                      {t("onboard_step_bio_title")}
                     </h2>
                     <p className="text-sm text-muted-foreground mt-2">
-                      {l("Para calculos precisos de metabolism", "For accurate metabolic calculations")}
+                      {t("onboard_step_bio_desc")}
                     </p>
                   </div>
 
@@ -307,7 +380,7 @@ export function OnboardingFlow({ onComplete }: { onComplete: () => void }) {
                       />
                     </div>
                     <div className="space-y-2">
-                      <label className="text-xs text-muted-foreground">{l("Genero", "Gender")}</label>
+                      <label className="text-xs text-muted-foreground">{l("Gênero", "Gender")}</label>
                       <div className="grid grid-cols-2 gap-2">
                         {[
                           { value: "male", label: l("Masc", "Male") },
@@ -332,26 +405,26 @@ export function OnboardingFlow({ onComplete }: { onComplete: () => void }) {
                 </div>
               )}
 
-              {step === 2 && (
+              {step === 1 && (
                 <div className="space-y-6">
                   <div className="text-center mb-8">
                     <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
                       <Target className="h-8 w-8 text-primary" />
                     </div>
                     <h2 className="text-2xl font-bold text-foreground">
-                      {l("Qual seu objetivo principal?", "What's your main goal?")}
+                      {t("onboard_step_goal_title")}
                     </h2>
                     <p className="text-sm text-muted-foreground mt-2">
-                      {l("Isso vai guiar todo o seu plano", "This will guide your entire plan")}
+                      {t("onboard_step_goal_desc")}
                     </p>
                   </div>
 
                   <div className="grid grid-cols-2 gap-3">
                     {[
                       { value: "lose_weight", label: l("Perder peso", "Lose weight"), icon: "📉", desc: l("Queimar gordura e definir", "Burn fat and tone up") },
-                      { value: "gain_muscle", label: l("Ganhar massa", "Gain muscle"), icon: "💪", desc: l("Construir musculos e forca", "Build muscle and strength") },
-                      { value: "maintain", label: l("Manter saude", "Maintain health"), icon: "⚖️", desc: l("Manter forma e equilibrio", "Stay fit and balanced") },
-                      { value: "improve_performance", label: l("Melhorar performance", "Improve performance"), icon: "🚀", desc: l("Evoluir seu desempenho", "Evolve your performance") },
+                      { value: "gain_muscle", label: l("Ganhar massa", "Gain muscle"), icon: "💪", desc: l("Construir músculos e força", "Build muscle and strength") },
+                      { value: "maintain", label: l("Manter saúde", "Maintain health"), icon: "⚖️", desc: l("Manter forma e equilíbrio", "Stay fit and balanced") },
+                      { value: "improve_health", label: l("Melhorar saúde", "Improve health"), icon: "🚀", desc: l("Evoluir bem-estar geral", "Improve overall wellness") },
                     ].map((g) => (
                       <button
                         key={g.value}
@@ -372,46 +445,100 @@ export function OnboardingFlow({ onComplete }: { onComplete: () => void }) {
                 </div>
               )}
 
-              {step === 3 && (
+              {step === 2 && (
                 <div className="space-y-6">
                   <div className="text-center mb-8">
                     <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
                       <Activity className="h-8 w-8 text-primary" />
                     </div>
                     <h2 className="text-2xl font-bold text-foreground">
-                      {l("Seu nivel de atividade", "Your activity level")}
+                      {t("onboard_step_restrictions_title")}
                     </h2>
                     <p className="text-sm text-muted-foreground mt-2">
-                      {l("Para calibrar a intensidade dos treinos", "To calibrate workout intensity")}
+                      {t("onboard_step_restrictions_desc")}
+                    </p>
+                  </div>
+
+                  <div className="space-y-3">
+                    <label className="text-xs text-muted-foreground uppercase tracking-wider">{l("Lesões e limitações", "Injuries & limitations")}</label>
+                    <div className="grid grid-cols-2 gap-2">
+                      {injuryOptions.map((inj) => (
+                        <button
+                          key={inj.value}
+                          onClick={() => toggleArrayItem("injuries", inj.value)}
+                          className={cn(
+                            "p-3 rounded-xl border text-sm font-medium transition-all",
+                            data.injuries.includes(inj.value)
+                              ? "border-primary bg-primary/10 text-primary"
+                              : "border-border bg-card text-muted-foreground hover:bg-accent"
+                          )}
+                        >
+                          {inj.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="space-y-3">
+                    <label className="text-xs text-muted-foreground uppercase tracking-wider">{l("Restrições alimentares", "Dietary restrictions")}</label>
+                    <div className="grid grid-cols-2 gap-2">
+                      {dietaryOptions.map((r) => (
+                        <button
+                          key={r.value}
+                          onClick={() => toggleArrayItem("dietaryRestrictions", r.value)}
+                          className={cn(
+                            "p-3 rounded-xl border text-sm font-medium transition-all",
+                            data.dietaryRestrictions.includes(r.value)
+                              ? "border-primary bg-primary/10 text-primary"
+                              : "border-border bg-card text-muted-foreground hover:bg-accent"
+                          )}
+                        >
+                          {r.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {step === 3 && (
+                <div className="space-y-6">
+                  <div className="text-center mb-8">
+                    <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
+                      <Watch className="h-8 w-8 text-primary" />
+                    </div>
+                    <h2 className="text-2xl font-bold text-foreground">
+                      {t("onboard_step_wearable_title")}
+                    </h2>
+                    <p className="text-sm text-muted-foreground mt-2">
+                      {t("onboard_step_wearable_desc")}
                     </p>
                   </div>
 
                   <div className="space-y-2">
                     {[
-                      { value: "sedentary", label: l("Sedentario", "Sedentary"), desc: l("Pouco ou nenhum exercicio", "Little or no exercise"), icon: "🪑" },
-                      { value: "light", label: l("Leve", "Light"), desc: l("1-2x por semana", "1-2x per week"), icon: "🚶" },
-                      { value: "moderate", label: l("Moderado", "Moderate"), desc: l("3-4x por semana", "3-4x per week"), icon: "🏃" },
-                      { value: "intense", label: l("Intenso", "Intense"), desc: l("5-6x por semana", "5-6x per week"), icon: "🔥" },
-                      { value: "athlete", label: l("Atleta", "Athlete"), desc: l("Treino diario e rigoroso", "Daily and rigorous training"), icon: "🏆" },
-                    ].map((a) => (
+                      { value: "google_fit", label: t("onboard_wearable_google_fit"), icon: "📱" },
+                      { value: "apple_health", label: t("onboard_wearable_apple_health"), icon: "⌚" },
+                      { value: "fitbit", label: t("onboard_wearable_fitbit"), icon: "🏃" },
+                      { value: "", label: t("onboard_wearable_none"), icon: "🚫" },
+                    ].map((w) => (
                       <button
-                        key={a.value}
-                        onClick={() => update("activityLevel", a.value)}
+                        key={w.value || "none"}
+                        onClick={() => update("wearable", w.value)}
                         className={cn(
                           "w-full p-4 rounded-xl border text-left transition-all flex items-center gap-3",
-                          data.activityLevel === a.value
+                          data.wearable === w.value
                             ? "border-primary bg-primary/10"
                             : "border-border bg-card hover:bg-accent"
                         )}
                       >
-                        <span className="text-xl">{a.icon}</span>
-                        <div>
-                          <p className={cn("text-sm font-semibold", data.activityLevel === a.value ? "text-primary" : "text-foreground")}>{a.label}</p>
-                          <p className="text-xs text-muted-foreground">{a.desc}</p>
-                        </div>
+                        <span className="text-xl">{w.icon}</span>
+                        <p className={cn("text-sm font-semibold", data.wearable === w.value ? "text-primary" : "text-foreground")}>{w.label}</p>
+                        {data.wearable === w.value && <Check className="ml-auto h-4 w-4 text-primary" />}
                       </button>
                     ))}
                   </div>
+                  <p className="text-xs text-muted-foreground text-center">{t("onboard_step_wearable_skip")}</p>
                 </div>
               )}
 
@@ -419,344 +546,24 @@ export function OnboardingFlow({ onComplete }: { onComplete: () => void }) {
                 <div className="space-y-6">
                   <div className="text-center mb-8">
                     <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
-                      <Moon className="h-8 w-8 text-primary" />
-                    </div>
-                    <h2 className="text-2xl font-bold text-foreground">
-                      {l("Sono e Estresse", "Sleep & Stress")}
-                    </h2>
-                    <p className="text-sm text-muted-foreground mt-2">
-                      {l("Impactam diretamente seus resultados", "Directly impact your results")}
-                    </p>
-                  </div>
-
-                  <div className="space-y-3">
-                    <label className="text-xs text-muted-foreground uppercase tracking-wider">{l("Horas de Sono por Noite", "Hours of Sleep per Night")}</label>
-                    <div className="grid grid-cols-4 gap-2">
-                      {["5", "6", "7", "8"].map((h) => (
-                        <button
-                          key={h}
-                          onClick={() => update("sleepHours", h)}
-                          className={cn(
-                            "h-12 rounded-xl border text-sm font-semibold transition-all",
-                            data.sleepHours === h
-                              ? "border-primary bg-primary/10 text-primary"
-                              : "border-border bg-card text-muted-foreground hover:bg-accent"
-                          )}
-                        >
-                          {h}h
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="space-y-3">
-                    <label className="text-xs text-muted-foreground uppercase tracking-wider">{l("Qualidade do Sono", "Sleep Quality")}</label>
-                    <div className="grid grid-cols-3 gap-2">
-                      {[
-                        { value: "poor", label: l("Ruim", "Poor") },
-                        { value: "normal", label: l("Normal", "Normal") },
-                        { value: "good", label: l("Otima", "Great") },
-                      ].map((q) => (
-                        <button
-                          key={q.value}
-                          onClick={() => update("sleepQuality", q.value)}
-                          className={cn(
-                            "h-12 rounded-xl border text-sm font-semibold transition-all",
-                            data.sleepQuality === q.value
-                              ? "border-primary bg-primary/10 text-primary"
-                              : "border-border bg-card text-muted-foreground hover:bg-accent"
-                          )}
-                        >
-                          {q.label}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="space-y-3">
-                    <label className="text-xs text-muted-foreground uppercase tracking-wider">{l("Nivel de Estresse", "Stress Level")}</label>
-                    <div className="grid grid-cols-4 gap-2">
-                      {[
-                        { value: "low", label: l("Baixo", "Low") },
-                        { value: "moderate", label: l("Moderado", "Moderate") },
-                        { value: "high", label: l("Alto", "High") },
-                        { value: "very_high", label: l("Muito Alto", "Very High") },
-                      ].map((s) => (
-                        <button
-                          key={s.value}
-                          onClick={() => update("stressLevel", s.value)}
-                          className={cn(
-                            "h-12 rounded-xl border text-sm font-semibold transition-all",
-                            data.stressLevel === s.value
-                              ? "border-primary bg-primary/10 text-primary"
-                              : "border-border bg-card text-muted-foreground hover:bg-accent"
-                          )}
-                        >
-                          {s.label}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {step === 5 && (
-                <div className="space-y-6">
-                  <div className="text-center mb-8">
-                    <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
-                      <AlertTriangle className="h-8 w-8 text-primary" />
-                    </div>
-                    <h2 className="text-2xl font-bold text-foreground">
-                      {l("Lesoes e Limitacoes", "Injuries & Limitations")}
-                    </h2>
-                    <p className="text-sm text-muted-foreground mt-2">
-                      {l("Seleciona todas que se aplicam", "Select all that apply")}
-                    </p>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-2">
-                    {[
-                      "Joelho", "Lombar", "Ombro", "Tornozelo",
-                      "Pescoco", "Cotovelo", "Quadril", "Nenhuma",
-                    ].map((inj) => (
-                      <button
-                        key={inj}
-                        onClick={() => toggleArrayItem("injuries", inj)}
-                        className={cn(
-                          "p-3 rounded-xl border text-sm font-medium transition-all",
-                          data.injuries.includes(inj)
-                            ? "border-primary bg-primary/10 text-primary"
-                            : "border-border bg-card text-muted-foreground hover:bg-accent"
-                        )}
-                      >
-                        {inj}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {step === 6 && (
-                <div className="space-y-6">
-                  <div className="text-center mb-8">
-                    <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
-                      <Dumbbell className="h-8 w-8 text-primary" />
-                    </div>
-                    <h2 className="text-2xl font-bold text-foreground">
-                      {l("Equipamento e Experiencia", "Equipment & Experience")}
-                    </h2>
-                  </div>
-
-                  <div className="space-y-3">
-                    <label className="text-xs text-muted-foreground uppercase tracking-wider">{l("Equipamento Disponivel", "Available Equipment")}</label>
-                    <div className="grid grid-cols-2 gap-2">
-                      {[
-                        { value: "none", label: l("Nenhum", "None") },
-                        { value: "dumbbells", label: l("Halteres", "Dumbbells") },
-                        { value: "barbell", label: l("Barra", "Barbell") },
-                        { value: "machines", label: l("Maquinas", "Machines") },
-                        { value: "bands", label: l("Elas Elasticas", "Resistance Bands") },
-                        { value: "pullup_bar", label: l("Barra Fixa", "Pull-up Bar") },
-                      ].map((eq) => (
-                        <button
-                          key={eq.value}
-                          onClick={() => toggleArrayItem("equipment", eq.value)}
-                          className={cn(
-                            "p-3 rounded-xl border text-sm font-medium transition-all",
-                            data.equipment.includes(eq.value)
-                              ? "border-primary bg-primary/10 text-primary"
-                              : "border-border bg-card text-muted-foreground hover:bg-accent"
-                          )}
-                        >
-                          {eq.label}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="space-y-3">
-                    <label className="text-xs text-muted-foreground uppercase tracking-wider">{l("Experiencia com Treino", "Training Experience")}</label>
-                    <div className="space-y-2">
-                      {[
-                        { value: "beginner", label: l("Iniciante (0-6 meses)", "Beginner (0-6 months)") },
-                        { value: "intermediate", label: l("Intermediario (6 meses - 2 anos)", "Intermediate (6mo - 2yr)") },
-                        { value: "advanced", label: l("Avancado (2+ anos)", "Advanced (2+ years)") },
-                      ].map((e) => (
-                        <button
-                          key={e.value}
-                          onClick={() => update("experience", e.value)}
-                          className={cn(
-                            "w-full p-3 rounded-xl border text-left text-sm transition-all",
-                            data.experience === e.value
-                              ? "border-primary bg-primary/10 text-primary font-semibold"
-                              : "border-border bg-card text-muted-foreground hover:bg-accent"
-                          )}
-                        >
-                          {e.label}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {step === 7 && (
-                <div className="space-y-6">
-                  <div className="text-center mb-8">
-                    <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
-                      <Apple className="h-8 w-8 text-primary" />
-                    </div>
-                    <h2 className="text-2xl font-bold text-foreground">
-                      {l("Restricoes Alimentares", "Dietary Restrictions")}
-                    </h2>
-                    <p className="text-sm text-muted-foreground mt-2">
-                      {l("Para adaptar seu plano nutricional", "To adapt your nutritional plan")}
-                    </p>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-2">
-                    {[
-                      { value: "none", label: l("Nenhuma", "None") },
-                      { value: "vegetarian", label: l("Vegetariano", "Vegetarian") },
-                      { value: "vegan", label: l("Vegano", "Vegan") },
-                      { value: "gluten_free", label: l("Sem Gluten", "Gluten Free") },
-                      { value: "lactose_free", label: l("Sem Lactose", "Lactose Free") },
-                      { value: "diabetic", label: l("Diabetico", "Diabetic") },
-                      { value: "hypertension", label: l("Hipertensao", "Hypertension") },
-                      { value: "keto", label: l("Cetogenica", "Keto") },
-                    ].map((r) => (
-                      <button
-                        key={r.value}
-                        onClick={() => toggleArrayItem("dietaryRestrictions", r.value)}
-                        className={cn(
-                          "p-3 rounded-xl border text-sm font-medium transition-all",
-                          data.dietaryRestrictions.includes(r.value)
-                            ? "border-primary bg-primary/10 text-primary"
-                            : "border-border bg-card text-muted-foreground hover:bg-accent"
-                        )}
-                      >
-                        {r.label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {step === 8 && (
-                <div className="space-y-6">
-                  <div className="text-center mb-8">
-                    <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
-                      <Calendar className="h-8 w-8 text-primary" />
-                    </div>
-                    <h2 className="text-2xl font-bold text-foreground">
-                      {l("Treinos por semana", "Workouts per week")}
-                    </h2>
-                    <p className="text-sm text-muted-foreground mt-2">
-                      {l("Quantos dias voce quer treinar?", "How many days do you want to train?")}
-                    </p>
-                  </div>
-
-                  <div className="grid grid-cols-4 gap-2">
-                    {["1", "2", "3", "4", "5", "6", "7"].map((w) => (
-                      <button
-                        key={w}
-                        onClick={() => update("workoutsPerWeek", w)}
-                        className={cn(
-                          "h-14 rounded-xl border text-sm font-semibold transition-all",
-                          data.workoutsPerWeek === w
-                            ? "border-primary bg-primary/10 text-primary"
-                            : "border-border bg-card text-muted-foreground hover:bg-accent"
-                        )}
-                      >
-                        {w}x
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {step === 9 && (
-                <div className="space-y-6">
-                  <div className="text-center mb-8">
-                    <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
-                      <Droplets className="h-8 w-8 text-primary" />
-                    </div>
-                    <h2 className="text-2xl font-bold text-foreground">
-                      {l("Meta de agua diaria", "Daily water goal")}
-                    </h2>
-                    <p className="text-sm text-muted-foreground mt-2">
-                      {l("Manter-se hidratado e essencial", "Staying hydrated is essential")}
-                    </p>
-                  </div>
-
-                  <div className="grid grid-cols-3 gap-2">
-                    {["1.5", "2", "2.5", "3", "3.5", "4"].map((w) => (
-                      <button
-                        key={w}
-                        onClick={() => update("waterIntake", w)}
-                        className={cn(
-                          "h-14 rounded-xl border text-sm font-semibold transition-all",
-                          data.waterIntake === w
-                            ? "border-primary bg-primary/10 text-primary"
-                            : "border-border bg-card text-muted-foreground hover:bg-accent"
-                        )}
-                      >
-                        {w}L
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {step === 10 && (
-                <div className="space-y-6">
-                  <div className="text-center mb-8">
-                    <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
-                      <Brain className="h-8 w-8 text-primary" />
-                    </div>
-                    <h2 className="text-2xl font-bold text-foreground">
-                      {l("Fumante", "Smoker")}
-                    </h2>
-                    <p className="text-sm text-muted-foreground mt-2">
-                      {l("Isso afeta sua capacidade respiratoria", "This affects your respiratory capacity")}
-                    </p>
-                  </div>
-
-                  <div className="grid grid-cols-3 gap-2">
-                    {[
-                      { value: "no", label: l("Nao", "No") },
-                      { value: "former", label: l("Ex-fumante", "Former") },
-                      { value: "yes", label: l("Sim", "Yes") },
-                    ].map((s) => (
-                      <button
-                        key={s.value}
-                        onClick={() => update("smokingStatus", s.value)}
-                        className={cn(
-                          "h-12 rounded-xl border text-sm font-semibold transition-all",
-                          data.smokingStatus === s.value
-                            ? "border-primary bg-primary/10 text-primary"
-                            : "border-border bg-card text-muted-foreground hover:bg-accent"
-                        )}
-                      >
-                        {s.label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {step === 11 && (
-                <div className="space-y-6">
-                  <div className="text-center mb-8">
-                    <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
                       <Rocket className="h-8 w-8 text-primary" />
                     </div>
                     <h2 className="text-2xl font-bold text-foreground">
-                      {l("Quase pronto!", "Almost ready!")}
+                      {t("onboard_step_summary_title")}
                     </h2>
                     <p className="text-sm text-muted-foreground mt-2">
-                      {l("Iremos gerar seu plano personalizado com IA", "We'll generate your personalized AI plan")}
+                      {t("onboard_step_summary_desc")}
                     </p>
+                  </div>
+
+                  <div className="rounded-2xl border border-border bg-card p-4 space-y-2 text-sm">
+                    <div className="flex justify-between"><span className="text-muted-foreground">{l("Idade", "Age")}</span><span className="font-semibold text-foreground">{data.age || "–"}</span></div>
+                    <div className="flex justify-between"><span className="text-muted-foreground">{l("Peso", "Weight")}</span><span className="font-semibold text-foreground">{data.weight ? `${data.weight} kg` : "–"}</span></div>
+                    <div className="flex justify-between"><span className="text-muted-foreground">{l("Altura", "Height")}</span><span className="font-semibold text-foreground">{data.height ? `${data.height} cm` : "–"}</span></div>
+                    <div className="flex justify-between"><span className="text-muted-foreground">{l("Objetivo", "Goal")}</span><span className="font-semibold text-foreground">{data.goal || "–"}</span></div>
+                    <div className="flex justify-between"><span className="text-muted-foreground">{l("Wearable", "Wearable")}</span><span className="font-semibold text-foreground">{data.wearable ? (data.wearable === "google_fit" ? t("onboard_wearable_google_fit") : data.wearable === "apple_health" ? t("onboard_wearable_apple_health") : data.wearable === "fitbit" ? t("onboard_wearable_fitbit") : t("onboard_wearable_none")) : t("onboard_wearable_none")}</span></div>
+                    <div className="flex justify-between"><span className="text-muted-foreground">{l("Lesões", "Injuries")}</span><span className="font-semibold text-foreground">{data.injuries.length ? data.injuries.map(v => injuryOptions.find(o=>o.value===v)?.label || v).join(", ") : "–"}</span></div>
+                    <div className="flex justify-between"><span className="text-muted-foreground">{l("Dieta", "Diet")}</span><span className="font-semibold text-foreground">{data.dietaryRestrictions.length ? data.dietaryRestrictions.map(v => dietaryOptions.find(o=>o.value===v)?.label || v).join(", ") : "–"}</span></div>
                   </div>
                 </div>
               )}
@@ -773,7 +580,7 @@ export function OnboardingFlow({ onComplete }: { onComplete: () => void }) {
             {isGenerating ? (
               <><Loader2 className="h-5 w-5 animate-spin mr-2" /> {l("Gerando plano...", "Generating plan...")}</>
             ) : step < totalSteps - 1 ? (
-              <>{l("Proximo", "Next")} <ChevronRight className="h-5 w-5 ml-2" /></>
+              <>{l("Próximo", "Next")} <ChevronRight className="h-5 w-5 ml-2" /></>
             ) : (
               <><Rocket className="h-5 w-5 mr-2" /> {l("Gerar Meu Plano", "Generate My Plan")}</>
             )}
@@ -781,7 +588,11 @@ export function OnboardingFlow({ onComplete }: { onComplete: () => void }) {
 
           {step > 0 && (
             <Button
-              onClick={() => setStep(step - 1)}
+              onClick={() => {
+                const prev = step - 1
+                setStep(prev)
+                localStorage.setItem("vysefit-onboarding-step", String(prev))
+              }}
               variant="ghost"
               className="h-12 rounded-2xl border border-border text-muted-foreground hover:bg-accent"
             >

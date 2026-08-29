@@ -86,8 +86,8 @@ export function ActivityFeed({ events, isLoading = false }: ActivityFeedProps) {
             <div key={i} className="animate-pulse flex items-center gap-3 p-3 rounded-xl">
               <div className="w-8 h-8 rounded-lg bg-muted" />
               <div className="flex-1 space-y-2">
-                <div className="h-4 bg-white/5 rounded w-3/4" />
-                <div className="h-3 bg-white/5 rounded w-1/4" />
+                <div className="h-4 bg-muted/30 rounded w-3/4" />
+                <div className="h-3 bg-muted/30 rounded w-1/4" />
               </div>
             </div>
           ))}
@@ -129,7 +129,7 @@ export function ActivityFeed({ events, isLoading = false }: ActivityFeedProps) {
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0 }}
-                  className="flex items-center gap-3 p-3 rounded-xl bg-white/5 hover:bg-white/10 transition-colors"
+                  className="flex items-center gap-3 p-3 rounded-xl bg-muted/30 hover:bg-muted/30 transition-colors"
                 >
                   <div className={cn("w-8 h-8 rounded-lg flex items-center justify-center", config.bgColor)}>
                     <Icon className={cn("w-4 h-4", config.color)} />

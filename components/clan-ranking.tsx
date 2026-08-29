@@ -5,21 +5,12 @@ import { motion } from "framer-motion"
 import { Trophy, Medal, Crown, ScanLine, Dumbbell, Loader2 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useTranslation } from "@/lib/i18n"
+import { supabase } from "@/lib/supabase"
+import { getToken } from "@/lib/auth/getToken"
 
 interface RankingEntry {
   user_id: string; user_name: string; user_avatar: string | null
   scan_count: number; workout_count: number; total_points: number
-}
-
-async function getToken(): Promise<string> {
-  for (let i = 0; i < localStorage.length; i++) {
-    const key = localStorage.key(i)
-    if (key && key.includes("sb-") && key.includes("-auth-token")) {
-      const stored = localStorage.getItem(key)
-      if (stored) { const parsed = JSON.parse(stored); if (parsed?.access_token) return parsed.access_token }
-    }
-  }
-  return ""
 }
 
 export function ClanRanking({ clanId }: { clanId: string }) {
@@ -102,7 +93,7 @@ export function ClanRanking({ clanId }: { clanId: string }) {
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="text-lg font-black text-foreground">{entry.total_points}</p>
+                  <p className="text-lg font-bold text-foreground">{entry.total_points}</p>
                   <p className="text-[10px] font-black uppercase tracking-widest text-foreground/40">pts</p>
                 </div>
               </motion.div>

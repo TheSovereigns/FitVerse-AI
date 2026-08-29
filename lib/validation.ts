@@ -23,7 +23,14 @@ export const messageSchema = z
 
 export const weightSchema = z.number().min(20, "Peso inválido").max(300, "Peso inválido")
 export const heightSchema = z.number().min(100, "Altura inválida").max(250, "Altura inválida")
-export const ageSchema = z.number().min(14, "Idade mínima é 14 anos").max(120, "Idade inválida")
+export const ageSchema = z.number().min(10, "Idade mínima é 10 anos").max(120, "Idade inválida")
+
+export const onboardingBioSchema = z.object({
+  age: z.coerce.number().min(10, "Idade deve estar entre 10 e 120").max(120, "Idade deve estar entre 10 e 120"),
+  weight: z.coerce.number().min(20, "Peso deve estar entre 20 e 300").max(300, "Peso deve estar entre 20 e 300"),
+  height: z.coerce.number().min(100, "Altura deve estar entre 100 e 250").max(250, "Altura deve estar entre 100 e 250"),
+  gender: z.string().min(1, "Gênero obrigatório"),
+})
 
 export function sanitizeString(input: string): string {
   return input

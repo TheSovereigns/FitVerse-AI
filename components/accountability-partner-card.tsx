@@ -78,7 +78,7 @@ export function AccountabilityPartnerCard() {
                 <h3 className="text-sm font-black text-foreground">
                   {isEnglish ? "Accountability Partner" : "Parceiro de Accountability"}
                 </h3>
-                <p className="text-[9px] font-black uppercase tracking-widest text-foreground/50">
+                <p className="text-[10px] font-black uppercase tracking-widest text-foreground/50">
                   {isEnglish ? "Stay consistent together" : "Mantenham a consistencia juntos"}
                 </p>
               </div>
@@ -86,7 +86,7 @@ export function AccountabilityPartnerCard() {
             {pairs.length === 0 && (
               <Button
                 onClick={() => setShowPairModal(true)}
-                className="h-8 rounded-lg bg-pink-500/15 border border-pink-500/20 px-3 text-[9px] font-black uppercase tracking-widest text-pink-400 hover:bg-pink-500/25"
+                className="h-8 rounded-lg bg-pink-500/15 border border-pink-500/20 px-3 text-[10px] font-black uppercase tracking-widest text-pink-400 hover:bg-pink-500/25"
               >
                 <UserPlus className="h-3 w-3 mr-1" />
                 {isEnglish ? "Pair Up" : "Parear"}
@@ -125,7 +125,7 @@ export function AccountabilityPartnerCard() {
                         </div>
                         <div>
                           <p className="text-sm font-black text-foreground">{pair.partner?.name}</p>
-                          <p className="text-[9px] font-bold text-foreground/50">
+                          <p className="text-[10px] font-bold text-foreground/50">
                             {isEnglish ? "Partner" : "Parceiro"}
                           </p>
                         </div>
@@ -145,7 +145,7 @@ export function AccountabilityPartnerCard() {
                         <div className="flex items-center gap-1">
                           <Zap className="h-3 w-3 text-foreground/60" />
                           <span className="text-xs font-black text-foreground/60">{pair.combined_streak}</span>
-                          <span className="text-[9px] font-bold text-foreground/50">
+                          <span className="text-[10px] font-bold text-foreground/50">
                             {isEnglish ? "days together" : "dias juntos"}
                           </span>
                         </div>
@@ -155,7 +155,7 @@ export function AccountabilityPartnerCard() {
                         onClick={() => handleCheckin(pair.id)}
                         disabled={isCheckedIn}
                         className={cn(
-                          "h-8 rounded-lg px-3 text-[9px] font-black uppercase tracking-widest",
+                          "h-8 rounded-lg px-3 text-[10px] font-black uppercase tracking-widest",
                           isCheckedIn
                             ? "bg-emerald-500/15 text-emerald-400 border border-emerald-500/20"
                             : "bg-pink-500/15 text-pink-400 border border-pink-500/20 hover:bg-pink-500/25"

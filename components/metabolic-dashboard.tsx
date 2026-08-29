@@ -127,7 +127,7 @@ export function MetabolicDashboard({ plan, perfil, onBack, planLevel = "full", o
                   className={`h-full bg-${m.color}-500 rounded-full`}
                 />
               </div>
-              <Badge className={`mt-2 bg-${m.color}-500/10 text-${m.color}-500 border-none text-[9px]`}>{m.pct}%</Badge>
+              <Badge className={`mt-2 bg-${m.color}-500/10 text-${m.color}-500 border-none text-[10px]`}>{m.pct}%</Badge>
             </motion.div>
           ))}
         </div>

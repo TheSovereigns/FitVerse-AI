@@ -249,7 +249,7 @@ export default function AdminUsersPage() {
 
   const getPlanBadge = (plan: string) => {
     const styles: Record<string, string> = {
-      free: "bg-white/10 text-white/60",
+      free: "bg-muted/30 text-white/60",
       pro: "bg-blue-500/20 text-blue-400",
       premium: "bg-primary/20 text-primary",
       banned: "bg-red-500/20 text-red-400"
@@ -281,7 +281,7 @@ export default function AdminUsersPage() {
         </div>
         <Button
           onClick={exportToCSV}
-          className="bg-white/10 text-white hover:bg-white/20 border border-border"
+          className="bg-muted/30 text-white hover:bg-muted/30 border border-border"
         >
           <Download className="w-4 h-4 mr-2" />
           {locale === "en-US" ? "Export CSV" : "Exportar CSV"}
@@ -297,7 +297,7 @@ export default function AdminUsersPage() {
             onChange={(e) => setSearchQuery(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleSearch()}
             placeholder={locale === "en-US" ? "Search by name or email..." : "Buscar por nome ou email..."}
-            className="pl-12 bg-white/5 border-border text-white placeholder:text-white/30"
+            className="pl-12 bg-muted/30 border-border text-white placeholder:text-white/30"
           />
         </div>
         <div className="flex gap-2">
@@ -307,7 +307,7 @@ export default function AdminUsersPage() {
               variant={filter === f ? "default" : "ghost"}
               onClick={() => { setFilter(f); setCurrentPage(1) }}
               className={cn(
-                filter === f ? "bg-primary text-white" : "bg-white/5 text-white/60 hover:bg-white/10"
+                filter === f ? "bg-primary text-white" : "bg-muted/30 text-white/60 hover:bg-muted/30"
               )}
             >
               {f === "all" ? (locale === "en-US" ? "All" : "Todos") :
@@ -364,7 +364,7 @@ export default function AdminUsersPage() {
                     key={user.id}
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
-                    className="border-b border-border hover:bg-white/5"
+                    className="border-b border-border hover:bg-muted/30"
                   >
                     <td className="p-4">
                       <div className="flex items-center gap-3">
@@ -392,7 +392,7 @@ export default function AdminUsersPage() {
                         <select
                           value={user.plan}
                           onChange={(e) => handleChangePlan(user.id, e.target.value)}
-                          className="bg-white/5 border border-border text-white text-xs rounded-lg px-2 py-1"
+                          className="bg-muted/30 border border-border text-white text-xs rounded-lg px-2 py-1"
                         >
                           <option value="free">Free</option>
                           <option value="pro">Pro</option>

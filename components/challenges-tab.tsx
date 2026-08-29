@@ -133,7 +133,7 @@ export function ChallengesTab({ clanId }: { clanId?: string }) {
               >
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/5 border border-border">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-muted/30 border border-border">
                       <Icon className="h-5 w-5 text-foreground/60" />
                     </div>
                     <div>
@@ -145,7 +145,7 @@ export function ChallengesTab({ clanId }: { clanId?: string }) {
                   </div>
                   <div className="flex items-center gap-1 text-white/15">
                     <Clock className="h-3 w-3" />
-                    <span className="text-[9px] font-bold">{timeLeft(challenge.end_date)}</span>
+                    <span className="text-[10px] font-bold">{timeLeft(challenge.end_date)}</span>
                   </div>
                 </div>
 
@@ -169,7 +169,7 @@ export function ChallengesTab({ clanId }: { clanId?: string }) {
 
                 {myProgress && !myProgress.completed && (
                   <div className="mb-3">
-                    <div className="h-1.5 bg-white/5 rounded-full overflow-hidden">
+                    <div className="h-1.5 bg-muted/30 rounded-full overflow-hidden">
                       <motion.div
                         initial={{ width: 0 }}
                         animate={{ width: `${progressPercent}%` }}
@@ -190,7 +190,7 @@ export function ChallengesTab({ clanId }: { clanId?: string }) {
                 ) : myProgress ? (
                   <Button
                     onClick={() => updateProgress(challenge.id)}
-                    className="w-full h-10 rounded-xl bg-white/8 border border-border text-[10px] font-black uppercase tracking-widest text-foreground/60 hover:bg-white/10"
+                    className="w-full h-10 rounded-xl bg-muted/30 border border-border text-[10px] font-black uppercase tracking-widest text-foreground/60 hover:bg-muted/30"
                   >
                     <Zap className="h-3.5 w-3.5 mr-1.5" />
                     {isEnglish ? "Log Progress" : "Registrar Progresso"}
@@ -271,9 +271,9 @@ export function ChallengesTab({ clanId }: { clanId?: string }) {
                           key={type}
                           onClick={() => setNewType(type)}
                           className={cn(
-                            "flex flex-col items-center gap-1 rounded-xl p-2.5 text-[9px] font-black uppercase tracking-widest transition-all border",
+                            "flex flex-col items-center gap-1 rounded-xl p-2.5 text-[10px] font-black uppercase tracking-widest transition-all border",
                             newType === type
-                              ? "bg-white/8 text-foreground/60 border-border"
+                              ? "bg-muted/30 text-foreground/60 border-border"
                               : "text-foreground/50 border-border hover:text-foreground/70"
                           )}
                         >

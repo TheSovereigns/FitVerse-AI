@@ -6,6 +6,13 @@ import { PLAN_LIMITS, type Plan } from '@/lib/plan-limits';
 import { getCorsHeaders } from "@/lib/auth-helpers";
 import { getCached, setCached, hashImage } from "@/lib/ai-cache";
 
+// JS fallback limit check (non-atomic). Reads count then checks - vulnerable to race
+// under concurrent requests. For strict atomicity, use the DB function from
+// supabase/atomic-plan-limits.sql (idempotent, CREATE OR REPLACE):
+//   const { data: allowed } = await supabaseAdmin.rpc('check_and_increment_scan', { p_user_id: auth.userId });
+//   if (allowed === false) return 403; // limit reached
+// Keep this JS check as fallback for free tier when DB function is not deployed;
+// for premium/pro strict enforcement, prefer the RPC above.
 async function checkScanLimit(userId: string, plan: string): Promise<boolean> {
   const supabase = getSupabaseAdmin();
   if (!supabase) return true;
@@ -263,6 +270,9 @@ export async function POST(req: Request) {
     .single();
 
   const userPlan = profile?.plan || 'free';
+  // Fallback JS limit check; for strict race-free enforcement optionally call:
+  // const { data: atomicAllowed } = await supabaseAdmin.rpc('check_and_increment_scan', { p_user_id: auth.userId });
+  // if (atomicAllowed === false) return 403; // handled atomically via pg_advisory_xact_lock + SELECT FOR UPDATE (see supabase/atomic-plan-limits.sql)
   const canProceed = await checkScanLimit(auth.userId, userPlan);
 
   if (!canProceed) {

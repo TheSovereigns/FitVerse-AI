@@ -1,5 +1,3 @@
-"use client"
-
 const cache = new Map<string, { data: unknown; timestamp: number }>()
 const DEFAULT_TTL = 5 * 60 * 1000
 

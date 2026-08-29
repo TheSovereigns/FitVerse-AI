@@ -145,25 +145,9 @@ export function RecipesTab({ metabolicPlan }: RecipesTabProps) {
     setIsGenerating(true)
     setGenerationError(null)
     try {
-      let token = ""
-      for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i)
-        if (key && key.includes("sb-") && key.includes("-auth-token")) {
-          const storedSession = localStorage.getItem(key)
-          if (storedSession) {
-            const parsed = JSON.parse(storedSession)
-            if (parsed?.access_token) {
-              token = parsed.access_token
-              break
-            }
-          }
-        }
-      }
-
-      if (!token) {
-        const { data: { session } } = await supabase.auth.getSession()
-        token = session?.access_token || ""
-      }
+      // httpOnly migration: use supabase session instead of localStorage scraping
+      const { data: { session } } = await supabase.auth.getSession()
+      let token = session?.access_token || ""
 
       if (!token) {
         throw new Error(isEnglish ? "Please sign in again before generating recipes." : "Entre novamente antes de gerar receitas.")

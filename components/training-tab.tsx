@@ -207,25 +207,9 @@ export function TrainingTab({ userGoal }: TrainingTabProps) {
     setShowGeneratorModal(false)
 
     try {
-      let token = ""
-      for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i)
-        if (key && key.includes("sb-") && key.includes("-auth-token")) {
-          const storedSession = localStorage.getItem(key)
-          if (storedSession) {
-            const parsed = JSON.parse(storedSession)
-            if (parsed?.access_token) {
-              token = parsed.access_token
-              break
-            }
-          }
-        }
-      }
-
-      if (!token) {
-        const { data: { session } } = await supabase.auth.getSession()
-        token = session?.access_token || ""
-      }
+      // httpOnly migration: use supabase session instead of localStorage scraping
+      const { data: { session } } = await supabase.auth.getSession()
+      let token = session?.access_token || ""
 
       if (!token) {
         throw new Error(locale === "en-US" ? "Please sign in again before generating a workout." : "Entre novamente antes de gerar um treino.")

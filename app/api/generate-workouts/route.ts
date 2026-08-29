@@ -17,6 +17,12 @@ function getGoogle() {
 
 export const maxDuration = 30
 
+// JS fallback limit check (non-atomic). For strict atomicity under concurrency,
+// use DB function from supabase/atomic-plan-limits.sql:
+//   const { data: allowed } = await supabase.rpc('check_and_increment_workout', { p_user_id: auth.userId });
+//   if (allowed === false) return 403;
+// This JS check remains as fallback when DB function not deployed.
+// DB version uses pg_advisory_xact_lock + SELECT FOR UPDATE on profiles.
 async function checkWorkoutLimit(userId: string, plan: string): Promise<boolean> {
   const supabase = getSupabaseAdmin();
   if (!supabase) return true;
@@ -106,6 +112,9 @@ export async function POST(req: Request) {
       .single()
 
     const userPlan = profile?.plan || 'free'
+    // Fallback JS check; strict alternative (race-free):
+    // const { data: atomicAllowed } = await supabase.rpc('check_and_increment_workout', { p_user_id: auth.userId });
+    // if (atomicAllowed === false) return 403; // see supabase/atomic-plan-limits.sql
     const canProceed = await checkWorkoutLimit(auth.userId, userPlan)
 
     if (!canProceed) {

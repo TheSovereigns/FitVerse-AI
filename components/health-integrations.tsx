@@ -209,7 +209,7 @@ export function HealthIntegrations() {
 
       {/* Platforms */}
       <div className="space-y-3">
-        <h3 className="text-sm font-black uppercase tracking-[0.4em] opacity-30">{t("hi_available_platforms")}</h3>
+        <h3 className="text-sm font-black uppercase tracking-widest opacity-30">{t("hi_available_platforms")}</h3>
 
         {platforms.map((platform, i) => {
           const isConnected = !!connectedPlatforms[platform.id]

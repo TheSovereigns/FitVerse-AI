@@ -42,20 +42,9 @@ export function ChatbotTab() {
 
     const loadHistory = async () => {
       try {
-        let token = ""
-        for (let i = 0; i < localStorage.length; i++) {
-          const key = localStorage.key(i)
-          if (key && key.includes("sb-") && key.includes("-auth-token")) {
-            const storedSession = localStorage.getItem(key)
-            if (storedSession) {
-              const parsed = JSON.parse(storedSession)
-              if (parsed?.access_token) {
-                token = parsed.access_token
-                break
-              }
-            }
-          }
-        }
+        // httpOnly migration: use supabase session instead of localStorage scraping
+        const { data: { session } } = await supabase.auth.getSession()
+        const token = session?.access_token || ""
         if (!token) return
 
         const response = await fetch("/api/chatbot", {
@@ -98,19 +87,8 @@ export function ChatbotTab() {
     try {
       let token = ""
       try {
-        for (let i = 0; i < localStorage.length; i++) {
-          const key = localStorage.key(i)
-          if (key && key.includes("sb-") && key.includes("-auth-token")) {
-            const storedSession = localStorage.getItem(key)
-            if (storedSession) {
-              const parsed = JSON.parse(storedSession)
-              if (parsed?.access_token) {
-                token = parsed.access_token
-                break
-              }
-            }
-          }
-        }
+        const { data: { session } } = await supabase.auth.getSession()
+        token = session?.access_token || ""
       } catch (e) {
         logger.error("[Chatbot] Failed to get auth token:", e)
       }
@@ -220,7 +198,7 @@ export function ChatbotTab() {
       <div className="relative mx-auto flex min-h-[70vh] w-full max-w-4xl items-center justify-center p-4">
         <section className="paywall-card relative w-full overflow-hidden">
           <div className="relative mx-auto max-w-xl">
-            <div className="mx-auto mb-5 flex h-20 w-20 items-center justify-center rounded-[1.75rem] border border-border bg-white/10 text-foreground/80 shadow-xl">
+            <div className="mx-auto mb-5 flex h-20 w-20 items-center justify-center rounded-[1.75rem] border border-border bg-muted/30 text-foreground/80 shadow-xl">
               <Bot className="h-10 w-10" />
             </div>
             <h1 className="text-4xl font-black tracking-tight text-foreground md:text-5xl">{t("chatbot_header")}</h1>

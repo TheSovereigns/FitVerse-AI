@@ -2,22 +2,24 @@ import { NextResponse } from "next/server"
 import type { NextRequest } from "next/server"
 import { createClient } from "@supabase/supabase-js"
 
-// Supabase anon client for token verification (works with any valid JWT)
+// Supabase service-role client for admin DB queries (bypasses RLS)
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ""
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ""
-const supabaseAuth = supabaseUrl && supabaseAnonKey
-  ? createClient(supabaseUrl, supabaseAnonKey, {
-      auth: { autoRefreshToken: false, persistSession: false },
-    })
-  : null
-
-// Supabase service-role client for admin DB queries (bypasses RLS)
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || ""
 const supabaseAdmin = supabaseUrl && supabaseServiceKey
   ? createClient(supabaseUrl, supabaseServiceKey, {
       auth: { autoRefreshToken: false, persistSession: false },
     })
   : null
+
+// Legacy anon client for fallback when @supabase/ssr is not installed
+// TODO: Remove after `npm install @supabase/ssr` and httpOnly migration is verified
+function getLegacyAnonClient() {
+  if (!supabaseUrl || !supabaseAnonKey) return null
+  return createClient(supabaseUrl, supabaseAnonKey, {
+    auth: { autoRefreshToken: false, persistSession: false },
+  })
+}
 
 // Routes that don't require authentication
 const publicRoutes = [
@@ -66,28 +68,54 @@ function matchesRoute(path: string, route: string) {
   return path === route || path.startsWith(`${route}/`)
 }
 
-async function getSession(request: NextRequest) {
-  if (!supabaseAuth) return null
+/**
+ * httpOnly-first session resolution.
+ * 1) Try @supabase/ssr via lib/supabase/middleware.ts (httpOnly cookies, local JWT via getClaims)
+ * 2) Fallback: Authorization Bearer header (API clients)
+ * 3) Legacy fallback: sb-access-token cookie (non-httpOnly, to be removed)
+ */
+async function getSession(request: NextRequest, response: NextResponse) {
+  // 1) httpOnly SSR path — prefers getClaims (local verify, no network)
+  try {
+    const { createClient: createSSRClient } = await import("@/lib/supabase/middleware")
+    const ssrClient = await createSSRClient(request, response)
+    if (ssrClient) {
+      // Prefer getClaims for performance (local JWT verify)
+      try {
+        const maybeGetClaims = (ssrClient.auth as unknown as { getClaims?: () => Promise<any> }).getClaims
+        if (typeof maybeGetClaims === "function") {
+          const { data, error } = await maybeGetClaims.call(ssrClient.auth)
+          if (!error && data?.claims?.sub) {
+            return { id: data.claims.sub as string, email: data.claims.email as string | undefined }
+          }
+        }
+      } catch {}
+      const { data: { user } } = await ssrClient.auth.getUser()
+      if (user) return user
+    }
+  } catch {
+    // @supabase/ssr not installed or SSR client failed — continue to fallback
+    // TODO: run `npm install @supabase/ssr`
+  }
+
+  // 2) + 3) Legacy fallback (kept working until migration complete)
+  const legacyClient = getLegacyAnonClient()
+  if (!legacyClient) return null
 
   try {
     const bearerToken = request.headers.get("Authorization")?.replace("Bearer ", "")
     if (bearerToken) {
-      const { data: { user }, error } = await supabaseAuth.auth.getUser(bearerToken)
-      if (error || !user) return null
-      return user
+      const { data: { user }, error } = await legacyClient.auth.getUser(bearerToken)
+      if (!error && user) return user
     }
 
-    // Fallback for deployments that store Supabase auth in cookies.
-    const cookieHeader = request.headers.get("cookie") || ""
-    const token = cookieHeader
-      .split("; ")
-      .find((row) => row.startsWith("sb-access-token="))
-      ?.split("=")[1]
+    // Legacy non-httpOnly cookie — read via NextRequest cookies (more robust than raw header split)
+    // TODO: Remove after httpOnly migration: `sb-access-token` should not be set via document.cookie
+    const legacyToken = request.cookies.get("sb-access-token")?.value
+      || request.headers.get("cookie")?.split("; ").find((row) => row.startsWith("sb-access-token="))?.split("=")[1]
+    if (!legacyToken) return null
 
-    if (!token) return null
-
-    // Verify the token
-    const { data: { user }, error } = await supabaseAuth.auth.getUser(token)
+    const { data: { user }, error } = await legacyClient.auth.getUser(legacyToken)
     if (error || !user) return null
 
     return user
@@ -115,6 +143,12 @@ async function isAdmin(userId: string): Promise<boolean> {
     console.error("Admin check error:", error)
     return false
   }
+}
+
+function copyCookies(from: NextResponse, to: NextResponse) {
+  from.cookies.getAll().forEach((c) => {
+    to.cookies.set(c.name, c.value, c as any)
+  })
 }
 
 export async function middleware(request: NextRequest) {
@@ -158,9 +192,13 @@ export async function middleware(request: NextRequest) {
 
   // 3b. Landing → App redirect for authed users
   if (path === "/") {
-    const user = await getSession(request)
+    const user = await getSession(request, response)
     if (user) {
-      return NextResponse.redirect(new URL("/app", request.url))
+      const redirectRes = NextResponse.redirect(new URL("/app", request.url))
+      copyCookies(response, redirectRes)
+      // Preserve security headers on redirect
+      redirectRes.headers.set("X-Frame-Options", response.headers.get("X-Frame-Options") || "DENY")
+      return redirectRes
     }
     return response
   }
@@ -179,7 +217,7 @@ export async function middleware(request: NextRequest) {
   const isAdminRoute = adminRoutes.some((route) => matchesRoute(path, route))
 
   if (isAppRoute || isProtectedRoute || isAdminRoute) {
-    const user = await getSession(request)
+    const user = await getSession(request, response)
 
     // Not authenticated
     if (!user) {
@@ -189,7 +227,9 @@ export async function middleware(request: NextRequest) {
       }
       const redirectUrl = new URL("/auth/login", request.url)
       redirectUrl.searchParams.set("redirect", path)
-      return NextResponse.redirect(redirectUrl)
+      const redirectRes = NextResponse.redirect(redirectUrl)
+      copyCookies(response, redirectRes)
+      return redirectRes
     }
 
     // Admin route - check if user is admin
@@ -199,7 +239,9 @@ export async function middleware(request: NextRequest) {
         if (path.startsWith("/api/")) {
           return NextResponse.json({ error: "Forbidden" }, { status: 403 })
         }
-        return NextResponse.redirect(new URL("/app", request.url))
+        const redirectRes = NextResponse.redirect(new URL("/app", request.url))
+        copyCookies(response, redirectRes)
+        return redirectRes
       }
     }
 

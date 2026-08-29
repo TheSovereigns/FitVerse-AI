@@ -87,7 +87,7 @@ export function RecipeModal({
 
           <div className="relative flex items-center justify-between border-b border-border bg-black/35 px-4 py-3 md:px-5">
             <div className="flex items-center gap-2">
-              <div className="flex h-9 w-9 items-center justify-center rounded-2xl border border-border bg-white/10 text-foreground">
+              <div className="flex h-9 w-9 items-center justify-center rounded-2xl border border-border bg-muted/30 text-foreground">
                 <ChefHat className="h-4 w-4" />
               </div>
               <div>
@@ -100,7 +100,7 @@ export function RecipeModal({
             <button
               type="button"
               onClick={onClose}
-              className="flex h-10 w-10 items-center justify-center rounded-2xl border border-border bg-white/8 text-foreground/70 transition hover:bg-white/16 hover:text-foreground"
+              className="flex h-10 w-10 items-center justify-center rounded-2xl border border-border bg-muted/30 text-foreground/70 transition hover:bg-muted/30 hover:text-foreground"
               aria-label="Close"
             >
               <X className="h-5 w-5" />
@@ -109,7 +109,7 @@ export function RecipeModal({
 
           <ScrollArea className="relative flex-1">
             <div className="space-y-5 p-4 pb-28 md:p-6 md:pb-28">
-              <section className="relative overflow-hidden rounded-[1.75rem] border border-border bg-white/10 p-5 md:p-6">
+              <section className="relative overflow-hidden rounded-[1.75rem] border border-border bg-muted/30 p-5 md:p-6">
                 <div className="absolute inset-y-0 left-0 w-1.5 bg-gradient-to-b from-white/20 via-white/10 to-transparent" />
                 <DialogTitle className="max-w-3xl text-2xl font-black leading-tight tracking-tight text-foreground md:text-4xl">
                   {recipe.name}
@@ -129,7 +129,7 @@ export function RecipeModal({
                 ].map((stat) => (
                   <div key={stat.label} className="rounded-2xl border border-border bg-black/38 p-3 shadow-lg backdrop-blur-xl md:p-4">
                     <stat.icon className="h-5 w-5 text-foreground/70" />
-                    <p className="mt-3 text-lg font-black leading-tight text-foreground md:text-xl">{stat.val}</p>
+                    <p className="mt-3 text-lg font-bold leading-tight text-foreground md:text-xl">{stat.val}</p>
                     <p className="mt-1 text-[10px] font-black uppercase tracking-widest text-foreground/38">{stat.label}</p>
                   </div>
                 ))}
@@ -143,19 +143,19 @@ export function RecipeModal({
                         onClick={() => onPortionsChange(-1)}
                         disabled={portions <= 1}
                         aria-label="Decrease portions"
-                        className="flex h-6 w-6 items-center justify-center rounded-lg border border-border bg-white/10 text-foreground transition hover:bg-white/20 disabled:opacity-40"
+                        className="flex h-6 w-6 items-center justify-center rounded-lg border border-border bg-muted/30 text-foreground transition hover:bg-muted/30 disabled:opacity-40"
                       >
                         <Minus className="h-3 w-3" />
                       </motion.button>
                     )}
-                    <p className="text-lg font-black leading-tight text-foreground md:text-xl">{portions}</p>
+                    <p className="text-lg font-bold leading-tight text-foreground md:text-xl">{portions}</p>
                     {onPortionsChange && (
                       <motion.button
                         type="button"
                         whileTap={{ scale: 0.85 }}
                         onClick={() => onPortionsChange(1)}
                         aria-label="Increase portions"
-                        className="flex h-6 w-6 items-center justify-center rounded-lg border border-border bg-white/10 text-foreground transition hover:bg-white/20"
+                        className="flex h-6 w-6 items-center justify-center rounded-lg border border-border bg-muted/30 text-foreground transition hover:bg-muted/30"
                       >
                         <Plus className="h-3 w-3" />
                       </motion.button>
@@ -172,7 +172,7 @@ export function RecipeModal({
                     <h3 className="text-sm font-black uppercase tracking-[0.18em] text-foreground">
                       {t("rm_energy")}
                     </h3>
-                    <span className="rounded-full border border-border bg-white/10 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-foreground">
+                    <span className="rounded-full border border-border bg-muted/30 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-foreground">
                       {Math.round(recipe.macros.calories * factor)} kcal
                     </span>
                   </div>
@@ -182,14 +182,14 @@ export function RecipeModal({
                       { label: t("rm_carb"), val: Math.round(recipe.macros.carbs * factor), bar: "bg-foreground/20" },
                       { label: t("rm_fat"), val: Math.round(recipe.macros.fat * factor), bar: "bg-foreground/20" },
                     ].map((macro) => (
-                      <div key={macro.label} className="rounded-2xl border border-border bg-white/10 p-3">
+                      <div key={macro.label} className="rounded-2xl border border-border bg-muted/30 p-3">
                         <div className="mb-2 flex items-end justify-between">
                           <span className="text-[10px] font-black uppercase tracking-widest text-foreground/42">{macro.label}</span>
-                          <span className="text-xl font-black text-foreground">{macro.val}g</span>
+                          <span className="text-xl font-bold text-foreground">{macro.val}g</span>
                         </div>
                         <Progress
                           value={(macro.val / totalMacros) * 100}
-                          className="h-2 bg-white/10"
+                          className="h-2 bg-muted/30"
                           indicatorClassName={macro.bar}
                         />
                       </div>
@@ -201,7 +201,7 @@ export function RecipeModal({
               <section className="grid gap-4 md:grid-cols-2">
                 <div className="rounded-[1.75rem] border border-border bg-black/42 p-4 shadow-xl backdrop-blur-2xl md:p-5">
                   <h3 className="mb-4 flex items-center gap-3 text-sm font-black uppercase tracking-[0.18em] text-foreground">
-                    <span className="flex h-9 w-9 items-center justify-center rounded-2xl border border-border bg-white/10 text-foreground">
+                    <span className="flex h-9 w-9 items-center justify-center rounded-2xl border border-border bg-muted/30 text-foreground">
                       <Utensils className="h-4 w-4" />
                     </span>
                     {t("rm_ingredients")}
@@ -210,7 +210,7 @@ export function RecipeModal({
                     {recipe.ingredients.map((ingredient, index) => (
                       <div
                         key={`${ingredient}-${index}`}
-                        className="flex items-start gap-3 rounded-2xl border border-border bg-white/10 p-3"
+                        className="flex items-start gap-3 rounded-2xl border border-border bg-muted/30 p-3"
                       >
                         <span className="mt-1 h-2.5 w-2.5 shrink-0 rounded-full bg-foreground/20 shadow-[0_0_18px_rgba(255,255,255,0.15)]" />
                         <span className="text-sm font-bold leading-relaxed text-foreground/76">{ingredient}</span>
@@ -221,7 +221,7 @@ export function RecipeModal({
 
                 <div className="rounded-[1.75rem] border border-border bg-black/42 p-4 shadow-xl backdrop-blur-2xl md:p-5">
                   <h3 className="mb-4 flex items-center gap-3 text-sm font-black uppercase tracking-[0.18em] text-foreground">
-                    <span className="flex h-9 w-9 items-center justify-center rounded-2xl border border-border bg-white/10 text-foreground">
+                    <span className="flex h-9 w-9 items-center justify-center rounded-2xl border border-border bg-muted/30 text-foreground">
                       <ChefHat className="h-4 w-4" />
                     </span>
                     {t("rm_instructions")}
@@ -229,7 +229,7 @@ export function RecipeModal({
                   <div className="space-y-3">
                     {recipe.instructions.map((step, index) => (
                       <div key={`${step}-${index}`} className="flex gap-3">
-                        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl border border-border bg-white/10 text-sm font-black text-foreground">
+                        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl border border-border bg-muted/30 text-sm font-black text-foreground">
                           {index + 1}
                         </div>
                         <p className="pt-1 text-sm font-bold leading-relaxed text-foreground/70">{step}</p>
@@ -240,7 +240,7 @@ export function RecipeModal({
               </section>
 
               {recipe.biohackingTips && recipe.biohackingTips.length > 0 && (
-                <section className="rounded-[1.75rem] border border-border bg-white/10 p-4 shadow-xl backdrop-blur-2xl md:p-5">
+                <section className="rounded-[1.75rem] border border-border bg-muted/30 p-4 shadow-xl backdrop-blur-2xl md:p-5">
                   <h3 className="mb-4 flex items-center gap-3 text-sm font-black uppercase tracking-[0.18em] text-foreground">
                     <Sparkles className="h-5 w-5 text-foreground/70" />
                     {t("rm_biohacks")}
@@ -269,8 +269,8 @@ export function RecipeModal({
                     className={cn(
                       "flex w-full items-center justify-center gap-3 rounded-2xl border p-4 text-sm font-black uppercase tracking-[0.14em] transition",
                       shoppingListAdded
-                        ? "border-border bg-white/10 text-foreground/50"
-                        : "border-border bg-white/10 text-foreground hover:bg-white/16"
+                        ? "border-border bg-muted/30 text-foreground/50"
+                        : "border-border bg-muted/30 text-foreground hover:bg-muted/30"
                     )}
                   >
                     <ShoppingCart className="h-5 w-5" />

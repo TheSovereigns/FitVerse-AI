@@ -476,11 +476,11 @@ export function FastingTracker({ isLocked = false }: { isLocked?: boolean }) {
                           <span className={cn("text-xs font-semibold", isActive ? "text-foreground" : "text-muted-foreground", isPast && "opacity-60")}>
                             {t(`ft_${stage.id}_name`)}
                           </span>
-                          <span className="text-[9px] text-muted-foreground">
+                          <span className="text-[10px] text-muted-foreground">
                             {stage.start}h — {stage.end}h
                           </span>
                           {isActive && (
-                            <span className="px-1.5 py-0.5 rounded-full bg-brand/10 text-[8px] font-bold text-brand uppercase">
+                            <span className="px-1.5 py-0.5 rounded-full bg-brand/10 text-[10px] font-bold text-brand uppercase">
                               NOW
                             </span>
                           )}
@@ -519,19 +519,19 @@ export function FastingTracker({ isLocked = false }: { isLocked?: boolean }) {
               >
                 <div className="grid grid-cols-4 gap-2 mb-3">
                   <div className="rounded-xl border border-border p-2 text-center">
-                    <p className="text-[9px] text-muted-foreground uppercase">{isEnglish ? "Avg" : "Media"}</p>
+                    <p className="text-[10px] text-muted-foreground uppercase">{isEnglish ? "Avg" : "Media"}</p>
                     <p className="text-sm font-bold text-foreground">{Math.round(stats.avgDuration)}m</p>
                   </div>
                   <div className="rounded-xl border border-border p-2 text-center">
-                    <p className="text-[9px] text-muted-foreground uppercase">{isEnglish ? "Longest" : "Maior"}</p>
+                    <p className="text-[10px] text-muted-foreground uppercase">{isEnglish ? "Longest" : "Maior"}</p>
                     <p className="text-sm font-bold text-foreground">{Math.round(stats.longestFast)}m</p>
                   </div>
                   <div className="rounded-xl border border-border p-2 text-center">
-                    <p className="text-[9px] text-muted-foreground uppercase">{isEnglish ? "Streak" : "Sequencia"}</p>
+                    <p className="text-[10px] text-muted-foreground uppercase">{isEnglish ? "Streak" : "Sequencia"}</p>
                     <p className="text-sm font-bold text-brand">{stats.currentStreak}</p>
                   </div>
                   <div className="rounded-xl border border-border p-2 text-center">
-                    <p className="text-[9px] text-muted-foreground uppercase">{isEnglish ? "Total" : "Total"}</p>
+                    <p className="text-[10px] text-muted-foreground uppercase">{isEnglish ? "Total" : "Total"}</p>
                     <p className="text-sm font-bold text-foreground">{stats.totalFasts}</p>
                   </div>
                 </div>
@@ -551,7 +551,7 @@ export function FastingTracker({ isLocked = false }: { isLocked?: boolean }) {
                       <div className="flex items-center gap-2">
                         <span className="text-xs font-bold text-foreground">{entry.duration}m</span>
                         {entry.completed && (
-                          <span className="px-1.5 py-0.5 rounded-full bg-emerald-500/10 text-[8px] font-bold text-emerald-500">
+                          <span className="px-1.5 py-0.5 rounded-full bg-emerald-500/10 text-[10px] font-bold text-emerald-500">
                             {isEnglish ? "DONE" : "FEITO"}
                           </span>
                         )}

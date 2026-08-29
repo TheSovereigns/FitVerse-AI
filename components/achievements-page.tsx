@@ -101,13 +101,13 @@ export function AchievementsPage() {
                         "border rounded-xl p-4 space-y-2 transition-colors",
                         done
                           ? "border-green-500/40 bg-green-500/10"
-                          : "border-border bg-white/5"
+                          : "border-border bg-muted/30"
                       )}
                     >
                       <div className="flex items-start gap-3">
                         <div className={cn(
                           "p-2 rounded-lg shrink-0",
-                          done ? "bg-green-500/20 text-green-400" : "bg-white/10 text-muted-foreground"
+                          done ? "bg-green-500/20 text-green-400" : "bg-muted/30 text-muted-foreground"
                         )}>
                           {done ? ach.icon : <Lock className="w-5 h-5" />}
                         </div>
@@ -124,7 +124,7 @@ export function AchievementsPage() {
                           <span>{current}/{ach.requirement}</span>
                           <span>{Math.round(pct)}%</span>
                         </div>
-                        <div className="h-1.5 rounded-full bg-white/10 overflow-hidden">
+                        <div className="h-1.5 rounded-full bg-muted/30 overflow-hidden">
                           <motion.div
                             className={cn("h-full rounded-full", done ? "bg-green-500" : "bg-primary")}
                             initial={{ width: 0 }}

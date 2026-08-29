@@ -108,15 +108,15 @@ const plans = [
 
 const accentStyles = {
   zinc: {
-    shell: "border-border bg-white/5",
-    icon: "bg-white/10 text-foreground border-border",
+    shell: "border-border bg-muted/30",
+    icon: "bg-muted/30 text-foreground border-border",
     title: "text-foreground",
-    button: "bg-white/10 hover:bg-white/18 text-foreground border-border",
+    button: "bg-muted/30 hover:bg-muted/30 text-foreground border-border",
     check: "text-foreground/60",
     shine: "from-white/10 via-white/5 to-transparent",
     ring: "shadow-[inset_0_1px_0_rgba(255,255,255,0.14),0_24px_80px_rgba(0,0,0,0.24)]",
-    badge: "border-border bg-white/5 text-foreground",
-    topBar: "bg-white/20",
+    badge: "border-border bg-muted/30 text-foreground",
+    topBar: "bg-muted/30",
   },
   brand: {
     shell: "border-brand/30 bg-brand/5",
@@ -298,7 +298,7 @@ export default function SubscriptionPage() {
       {/* Header */}
       <header className="relative z-10 border-b border-border bg-black/50 backdrop-blur-2xl">
         <div className="max-w-7xl mx-auto px-4 md:px-6 py-4 flex items-center justify-between gap-3">
-          <Button variant="ghost" size="icon" onClick={() => router.push("/")} className="rounded-2xl border border-border bg-white/5 hover:bg-white/8">
+          <Button variant="ghost" size="icon" onClick={() => router.push("/")} className="rounded-2xl border border-border bg-muted/30 hover:bg-muted/30">
             <ArrowLeft className="w-5 h-5" />
           </Button>
           <div className="text-center min-w-0 flex items-center gap-2 justify-center">
@@ -308,7 +308,7 @@ export default function SubscriptionPage() {
               {isEnglish ? "Subscription Plans" : "Planos de Assinatura"}
             </h1>
           </div>
-          <div className="h-10 px-3 rounded-2xl border border-border bg-white/5 flex items-center gap-2">
+          <div className="h-10 px-3 rounded-2xl border border-border bg-muted/30 flex items-center gap-2">
             <span className="hidden sm:inline text-[10px] uppercase tracking-widest text-foreground/50">{isEnglish ? "Current" : "Atual"}</span>
             <span className="text-xs font-black text-foreground">{currentPlan.toUpperCase()}</span>
           </div>
@@ -324,7 +324,7 @@ export default function SubscriptionPage() {
           <div className="absolute inset-0 pointer-events-none bg-[linear-gradient(135deg,rgba(255,255,255,0.04),transparent_34%,rgba(255,255,255,0.03)_64%,rgba(255,255,255,0.03))]" />
           <div className="relative grid lg:grid-cols-[1fr_auto] gap-5 items-end">
             <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }}>
-              <div className="inline-flex items-center gap-2 rounded-full border border-border bg-white/5 px-3 py-2 mb-3">
+              <div className="inline-flex items-center gap-2 rounded-full border border-border bg-muted/30 px-3 py-2 mb-3">
                 <Lock className="w-4 h-4 text-foreground/60" />
                 <span className="text-xs font-black uppercase tracking-widest text-foreground/60">
                   {isEnglish ? "Stripe checkout protected" : "Checkout protegido pela Stripe"}
@@ -347,9 +347,9 @@ export default function SubscriptionPage() {
                 { label: isEnglish ? "Workouts" : "Treinos", value: planSummary.workouts },
                 { label: isEnglish ? "Recipes" : "Receitas", value: planSummary.recipes },
               ].map((item) => (
-                <div key={item.label} className="rounded-2xl border border-border bg-white/5 backdrop-blur-xl p-3">
+                <div key={item.label} className="rounded-2xl border border-border bg-muted/30 backdrop-blur-xl p-3">
                   <p className="text-[10px] uppercase tracking-widest text-foreground/50">{item.label}</p>
-                  <p className="mt-2 text-lg md:text-2xl font-black text-white">{item.value}</p>
+                  <p className="mt-2 text-lg md:text-2xl font-bold text-white">{item.value}</p>
                 </div>
               ))}
             </motion.div>
@@ -395,9 +395,9 @@ export default function SubscriptionPage() {
         {/* Ads toggle */}
         {(currentPlan === "pro" || currentPlan === "premium") && (
           <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }}
-            className="mb-6 rounded-2xl border border-border bg-white/5 backdrop-blur-xl p-4 flex items-center justify-between">
+            className="mb-6 rounded-2xl border border-border bg-muted/30 backdrop-blur-xl p-4 flex items-center justify-between">
             <div className="flex items-center gap-3 min-w-0">
-              <div className="w-10 h-10 rounded-xl bg-white/10 text-foreground/60 flex items-center justify-center shrink-0">
+              <div className="w-10 h-10 rounded-xl bg-muted/30 text-foreground/60 flex items-center justify-center shrink-0">
                 <Sparkles className="w-5 h-5" />
               </div>
               <div className="min-w-0">
@@ -475,7 +475,7 @@ export default function SubscriptionPage() {
                 <div className="relative mt-5 space-y-2.5 flex-1">
                   {planItem.features.map((feature) => (
                     <div key={feature.text} className="flex items-center gap-2.5 text-[13px]">
-                      <span className="w-5 h-5 rounded-full bg-white/5 border border-border flex items-center justify-center shrink-0">
+                      <span className="w-5 h-5 rounded-full bg-muted/30 border border-border flex items-center justify-center shrink-0">
                         <Check className={cn("w-3.5 h-3.5", styles.check)} />
                       </span>
                       <span className="text-foreground/60">{isEnglish ? feature.textEn : feature.text}</span>
@@ -488,7 +488,7 @@ export default function SubscriptionPage() {
                   disabled={isCurrentPlan || Boolean(loading)}
                   className={cn(
                     "relative mt-5 h-11 rounded-xl border tracking-[0.08em] uppercase text-sm shadow-[inset_0_1px_0_rgba(255,255,255,0.15)] text-cta",
-                    isCurrentPlan ? "bg-white/5 text-foreground/40 border-border" : styles.button
+                    isCurrentPlan ? "bg-muted/30 text-foreground/40 border-border" : styles.button
                   )}
                 >
                   {isCurrentPlan ? (isEnglish ? "Current plan" : "Plano atual")
@@ -577,8 +577,8 @@ export default function SubscriptionPage() {
               { icon: BadgeCheck, title: isEnglish ? "Plan sync" : "Plano sincronizado", desc: isEnglish ? "Webhook updates your account after payment." : "O webhook atualiza sua conta apos o pagamento." },
               { icon: Sparkles, title: isEnglish ? "Ad control" : "Controle de anuncios", desc: isEnglish ? "Paid users can disable ads." : "Usuarios pagos podem desativar anuncios." },
             ].map((item) => (
-              <div key={item.title} className="flex items-center gap-3 rounded-2xl border border-border bg-white/5 p-3">
-                <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-foreground/60 shrink-0">
+              <div key={item.title} className="flex items-center gap-3 rounded-2xl border border-border bg-muted/30 p-3">
+                <div className="w-10 h-10 rounded-xl bg-muted/30 flex items-center justify-center text-foreground/60 shrink-0">
                   <item.icon className="w-5 h-5" />
                 </div>
                 <div>

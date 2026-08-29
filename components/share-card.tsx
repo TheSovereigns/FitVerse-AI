@@ -286,13 +286,13 @@ export function ShareCard({
           <h3 className="text-lg font-bold text-white">
             {isEnglish ? "Share Activity" : "Compartilhar Atividade"}
           </h3>
-          <button onClick={onClose} className="w-9 h-9 rounded-xl bg-white/10 flex items-center justify-center text-white/60 hover:text-white transition-colors">
+          <button onClick={onClose} className="w-9 h-9 rounded-xl bg-muted/30 flex items-center justify-center text-white/60 hover:text-white transition-colors">
             <X className="w-4 h-4" />
           </button>
         </div>
 
         {generating ? (
-          <div className="w-full aspect-[9/16] rounded-3xl bg-white/5 flex items-center justify-center">
+          <div className="w-full aspect-[9/16] rounded-3xl bg-muted/30 flex items-center justify-center">
             <div className="text-center">
               <div className="w-12 h-12 border-3 border-brand border-t-transparent rounded-full animate-spin mx-auto mb-3" />
               <p className="text-sm text-white/60">{isEnglish ? "Generating image..." : "Gerando imagem..."}</p>
@@ -311,7 +311,7 @@ export function ShareCard({
                   "flex-1 h-12 rounded-2xl font-bold text-sm flex items-center justify-center gap-2 transition-all",
                   shared
                     ? "bg-green-500/20 text-green-400 border border-green-500/30"
-                    : "bg-white/10 text-white border border-border hover:bg-white/15"
+                    : "bg-muted/30 text-white border border-border hover:bg-muted/30"
                 )}>
                 {shared ? <Check className="w-4 h-4" /> : <Download className="w-4 h-4" />}
                 {shared ? (isEnglish ? "Saved!" : "Salvo!") : (isEnglish ? "Save Image" : "Salvar")}

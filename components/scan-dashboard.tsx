@@ -50,11 +50,14 @@ export function ScanDashboard({ onScan, onBarcodeProduct, isScanning = false }: 
     } catch {}
   }, [])
 
+  const toFavoriteId = (name: string) => name.toLowerCase().trim().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "")
+
   const toggleFavorite = (id: string) => {
+    const favId = toFavoriteId(id)
     setFavorites(prev => {
-      const next = prev.includes(id) ? prev.filter(f => f !== id) : [...prev, id]
+      const next = prev.includes(favId) ? prev.filter(f => f !== favId) : [...prev, favId]
       localStorage.setItem("fitverse-favorites", JSON.stringify(next))
-      toast.success(prev.includes(id) ? t("scan_removed_favorite") : t("scan_added_favorite"))
+      toast.success(prev.includes(favId) ? t("scan_removed_favorite") : t("scan_added_favorite"))
       return next
     })
   }
@@ -64,7 +67,7 @@ export function ScanDashboard({ onScan, onBarcodeProduct, isScanning = false }: 
   }, [scanHistory])
 
   const favoriteScans = useMemo(() => {
-    return scanHistory.filter(s => s.id && favorites.includes(s.id))
+    return scanHistory.filter(s => s.name && favorites.includes(toFavoriteId(s.name)))
   }, [scanHistory, favorites])
 
   const filteredScans = useMemo(() => {
@@ -266,9 +269,9 @@ export function ScanDashboard({ onScan, onBarcodeProduct, isScanning = false }: 
                 {scan.score != null && (
                   <span className="rounded-full bg-brand/10 px-2.5 py-1 text-xs font-medium text-brand">{scan.score}</span>
                 )}
-                {scan.id && (
-                  <button onClick={() => toggleFavorite(scan.id!)} className="ml-1">
-                    <Heart className={cn("h-5 w-5", favorites.includes(scan.id) ? "fill-rose-500 text-rose-500" : "text-muted-foreground")} />
+                {scan.name && (
+                  <button onClick={() => toggleFavorite(scan.name!)} className="ml-1">
+                    <Heart className={cn("h-5 w-5", favorites.includes(toFavoriteId(scan.name)) ? "fill-rose-500 text-rose-500" : "text-muted-foreground")} />
                   </button>
                 )}
               </div>
@@ -308,7 +311,7 @@ export function ScanDashboard({ onScan, onBarcodeProduct, isScanning = false }: 
                 {scan.score != null && (
                   <span className="rounded-full bg-brand/10 px-2.5 py-1 text-xs font-medium text-brand">{scan.score}</span>
                 )}
-                <button onClick={() => toggleFavorite(scan.id!)}>
+                <button onClick={() => toggleFavorite(scan.name!)}>
                   <Heart className="h-5 w-5 fill-rose-500 text-rose-500" />
                 </button>
               </div>
@@ -349,9 +352,9 @@ export function ScanDashboard({ onScan, onBarcodeProduct, isScanning = false }: 
                 {scan.score != null && (
                   <span className="rounded-full bg-brand/10 px-2.5 py-1 text-xs font-medium text-brand">{scan.score}</span>
                 )}
-                {scan.id && (
-                  <button onClick={() => toggleFavorite(scan.id!)} className="ml-1">
-                    <Heart className={cn("h-5 w-5", favorites.includes(scan.id) ? "fill-rose-500 text-rose-500" : "text-muted-foreground")} />
+                {scan.name && (
+                  <button onClick={() => toggleFavorite(scan.name!)} className="ml-1">
+                    <Heart className={cn("h-5 w-5", favorites.includes(toFavoriteId(scan.name)) ? "fill-rose-500 text-rose-500" : "text-muted-foreground")} />
                   </button>
                 )}
               </div>

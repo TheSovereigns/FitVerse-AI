@@ -417,7 +417,7 @@ export function ActiveWorkoutSession({ workout, onClose, onComplete }: ActiveWor
             <div className="p-4 rounded-2xl border border-border bg-card">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-sm font-bold text-foreground">RPE</span>
-                <span className="font-black tabular-nums text-brand text-lg">
+                <span className="font-bold tabular-nums text-brand text-lg">
                   {rpeValues[currentExercise.name] || 5}<span className="text-xs font-bold text-white/[0.35]">/10</span>
                 </span>
               </div>

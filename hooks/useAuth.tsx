@@ -7,13 +7,16 @@ import { useRouter } from "next/navigation"
 import { clearVyseFitStorage } from "@/lib/auth-helpers"
 import { logger } from "@/lib/logger"
 
-function syncSessionToCookie(accessToken: string | undefined) {
-  if (typeof document === 'undefined') return
-  if (accessToken) {
-    document.cookie = `sb-access-token=${accessToken}; path=/; SameSite=Lax; max-age=3600`
-  } else {
-    document.cookie = 'sb-access-token=; path=/; max-age=0'
-  }
+/**
+ * @deprecated Non-httpOnly document.cookie path removed.
+ * httpOnly cookies are now set server-side via `lib/supabase/middleware.ts`
+ * using `@supabase/ssr` (see middleware.ts). This no-op is kept for
+ * backwards compatibility until `npm install @supabase/ssr` is complete.
+ * TODO: Remove this function after httpOnly migration is verified.
+ */
+function syncSessionToCookie(_accessToken: string | undefined) {
+  // No-op: session cookies are managed httpOnly by the server/middleware.
+  return
 }
 
 interface AuthContextType {

@@ -55,11 +55,11 @@ export function ClanInviteModal({ isOpen, onClose, clanId, clanName }: {
                     </div>
                     <div className="flex gap-1">
                       <button onClick={() => copyCode(invite.invite_code)}
-                        className="h-8 w-8 rounded-lg bg-muted/50 border border-border flex items-center justify-center hover:bg-white/10 transition-colors">
+                        className="h-8 w-8 rounded-lg bg-muted/50 border border-border flex items-center justify-center hover:bg-muted/30 transition-colors">
                         {copiedCode === invite.invite_code ? <Check className="h-3.5 w-3.5 text-brand" /> : <Copy className="h-3.5 w-3.5 text-foreground/40" />}
                       </button>
                       <button onClick={() => copyLink(invite.invite_code)}
-                        className="h-8 w-8 rounded-lg bg-muted/50 border border-border flex items-center justify-center hover:bg-white/10 transition-colors">
+                        className="h-8 w-8 rounded-lg bg-muted/50 border border-border flex items-center justify-center hover:bg-muted/30 transition-colors">
                         <LinkIcon className="h-3.5 w-3.5 text-foreground/40" />
                       </button>
                     </div>
@@ -68,7 +68,7 @@ export function ClanInviteModal({ isOpen, onClose, clanId, clanName }: {
               </div>
             )}
             <button onClick={handleCreateInvite} disabled={isCreating}
-              className="w-full h-11 rounded-xl bg-muted/50 border border-border text-foreground/40 text-xs font-bold hover:bg-white/10 transition-colors flex items-center justify-center gap-2">
+              className="w-full h-11 rounded-xl bg-muted/50 border border-border text-foreground/40 text-xs font-bold hover:bg-muted/30 transition-colors flex items-center justify-center gap-2">
               {isCreating && <Loader2 className="h-4 w-4 animate-spin" />}
               {isEnglish ? "Generate New Code" : "Gerar Novo Codigo"}
             </button>

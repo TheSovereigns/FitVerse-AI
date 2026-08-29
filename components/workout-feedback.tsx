@@ -402,7 +402,7 @@ export function WorkoutFeedback({
                     >
                       {t(area.key)}
                       {freq > 0 && (
-                        <span className="ml-1 text-[9px] opacity-60">{freq}x</span>
+                        <span className="ml-1 text-[10px] opacity-60">{freq}x</span>
                       )}
                     </button>
                   )

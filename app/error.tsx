@@ -48,7 +48,7 @@ export default function GlobalError({
           <Link href="/">
             <Button 
               variant="outline"
-              className="h-12 px-8 rounded-2xl font-bold border-border text-white hover:bg-white/10"
+              className="h-12 px-8 rounded-2xl font-bold border-border text-white hover:bg-muted/30"
             >
               <Home className="w-5 h-5 mr-2" />
               {isEnglish ? "Home" : "Inicio"}
