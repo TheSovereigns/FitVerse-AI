@@ -11,6 +11,7 @@ import {
   ChevronDown,
 } from "lucide-react"
 import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { useClans } from "@/hooks/useClans"
 import { useTranslation } from "@/lib/i18n"
@@ -80,6 +81,7 @@ export function ClansTab() {
   const [joinCode, setJoinCode] = useState("")
   const [isJoining, setIsJoining] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
+  const [discoverLimit, setDiscoverLimit] = useState(20)
 
   useEffect(() => {
     fetchDiscoverClans()
@@ -138,6 +140,10 @@ export function ClansTab() {
     c.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     c.description?.toLowerCase().includes(searchQuery.toLowerCase())
   )
+
+  useEffect(() => {
+    setDiscoverLimit(20)
+  }, [searchQuery])
 
   if (view === "detail" && selectedClan) {
     return (
@@ -441,11 +447,11 @@ export function ClansTab() {
           </div>
         ) : (
           <div className="space-y-2">
-            {filteredDiscover.map((clan, i) => {
+            {filteredDiscover.slice(0, discoverLimit).map((clan, i) => {
               const clanLevel = getGuildLevel(clan.total_xp || 0)
               return (
                 <motion.div key={clan.id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.03 }}
+                  transition={{ delay: Math.min(i * 0.02, 0.2) }}
                   className="flex items-center gap-3 rounded-xl border border-border bg-card p-4 cursor-pointer hover:border-border hover:bg-muted/30 transition-all"
                   onClick={() => handleSelectClan(clan)}>
                   <div className="w-12 h-12 rounded-xl flex items-center justify-center"
@@ -477,6 +483,11 @@ export function ClansTab() {
                 </motion.div>
               )
             })}
+            {filteredDiscover.length > discoverLimit && (
+              <Button onClick={() => setDiscoverLimit((l) => l + 20)} className="w-full h-11 rounded-xl glass-strong mt-3">
+                {isEnglish ? "Load more" : "Carregar mais"}
+              </Button>
+            )}
           </div>
         )}
       </div>

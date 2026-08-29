@@ -1,5 +1,6 @@
 const cache = new Map<string, { data: unknown; timestamp: number }>()
 const DEFAULT_TTL = 5 * 60 * 1000
+const MAX_CACHE_SIZE = 100
 
 export function getCached<T>(key: string, ttl: number = DEFAULT_TTL): T | null {
   const entry = cache.get(key)
@@ -12,7 +13,17 @@ export function getCached<T>(key: string, ttl: number = DEFAULT_TTL): T | null {
 }
 
 export function setCache(key: string, data: unknown): void {
+  // Evict oldest entry if we exceed max size (FIFO)
+  if (cache.size >= MAX_CACHE_SIZE) {
+    const oldestKey = cache.keys().next().value as string | undefined
+    if (oldestKey !== undefined) cache.delete(oldestKey)
+  }
   cache.set(key, { data, timestamp: Date.now() })
+  // Safety: if somehow still over limit, evict again
+  if (cache.size > MAX_CACHE_SIZE) {
+    const oldestKey = cache.keys().next().value as string | undefined
+    if (oldestKey !== undefined) cache.delete(oldestKey)
+  }
 }
 
 export function clearCache(pattern?: string): void {
@@ -39,7 +50,7 @@ export async function cachedFetch<T>(
   const response = await fetch(url, options)
   if (!response.ok) throw new Error(`HTTP ${response.status}`)
 
-  const data = await response.json() as T
+  const data = (await response.json()) as T
   setCache(cacheKey, data)
   return data
 }

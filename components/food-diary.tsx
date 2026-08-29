@@ -37,6 +37,7 @@ export function FoodDiary({ onBack }: { onBack: () => void }) {
   const [showAdd, setShowAdd] = useState(false)
   const [selectedMeal, setSelectedMeal] = useState<FoodEntry["meal"]>("breakfast")
   const [form, setForm] = useState({ name: "", calories: "", protein: "", carbs: "", fat: "" })
+  const [mealLimits, setMealLimits] = useState<Record<string, number>>({})
 
   useEffect(() => {
     const saved = localStorage.getItem(getStorageKey())
@@ -107,6 +108,7 @@ export function FoodDiary({ onBack }: { onBack: () => void }) {
       {MEAL_TYPES.map(meal => {
         const mealEntries = todayEntries.filter(e => e.meal === meal.key)
         const mealCal = mealEntries.reduce((s, e) => s + e.calories, 0)
+        const limit = mealLimits[meal.key] || 20
         return (
           <div key={meal.key} className="glass-strong rounded-2xl p-4">
             <div className="flex items-center justify-between mb-3">
@@ -128,8 +130,8 @@ export function FoodDiary({ onBack }: { onBack: () => void }) {
               </div>
             ) : (
               <div className="space-y-1.5">
-                {mealEntries.map(entry => (
-                  <div key={entry.id} className="flex items-center justify-between py-1.5 px-2 rounded-lg hover:bg-muted/50">
+                {mealEntries.slice(0, limit).map((entry, index) => (
+                  <motion.div key={entry.id} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: Math.min(index * 0.02, 0.2) }} className="flex items-center justify-between py-1.5 px-2 rounded-lg hover:bg-muted/50 content-visibility-auto">
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium text-foreground truncate">{entry.name}</p>
                       <p className="text-[10px] text-muted-foreground">{entry.calories} kcal · P{entry.protein} · C{entry.carbs} · G{entry.fat}</p>
@@ -137,8 +139,13 @@ export function FoodDiary({ onBack }: { onBack: () => void }) {
                     <button onClick={() => removeEntry(entry.id)} className="p-1 text-muted-foreground hover:text-destructive transition-colors">
                       <Trash2 className="w-3 h-3" />
                     </button>
-                  </div>
+                  </motion.div>
                 ))}
+                {mealEntries.length > limit && (
+                  <Button onClick={() => setMealLimits(prev => ({ ...prev, [meal.key]: limit + 20 }))} className="w-full h-11 rounded-xl glass-strong mt-2">
+                    {isEnglish ? "Load more" : "Carregar mais"}
+                  </Button>
+                )}
               </div>
             )}
           </div>

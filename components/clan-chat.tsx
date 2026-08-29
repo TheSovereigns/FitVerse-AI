@@ -36,7 +36,8 @@ export function ClanChat({ clanId }: { clanId: string }) {
     return new Date(d).toLocaleDateString(isEnglish ? "en-US" : "pt-BR", { day: "numeric", month: "short" })
   }
 
-  const grouped = messages.reduce((g: any[], msg) => {
+  const visibleMessages = messages.slice(-100)
+  const grouped = visibleMessages.reduce((g: any[], msg) => {
     const key = new Date(msg.created_at).toISOString().split("T")[0]
     const last = g[g.length - 1]
     if (last?.dateKey === key) last.messages.push(msg)
@@ -46,7 +47,7 @@ export function ClanChat({ clanId }: { clanId: string }) {
 
   return (
     <div className="flex flex-col rounded-2xl border border-border bg-background overflow-hidden" style={{ height: "calc(100vh - 320px)", minHeight: "400px" }}>
-      <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 space-y-4">
+      <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 space-y-4 content-visibility-auto">
         {isLoading ? (
           <div className="flex items-center justify-center h-full"><Loader2 className="h-6 w-6 text-foreground/20 animate-spin" /></div>
         ) : messages.length === 0 ? (
@@ -61,11 +62,11 @@ export function ClanChat({ clanId }: { clanId: string }) {
               <span className="text-[10px] font-bold uppercase tracking-wider text-foreground/40">{group.date}</span>
               <div className="flex-1 h-px bg-muted/50" />
             </div>
-            {group.messages.map((msg: any) => {
+            {group.messages.map((msg: any, idx: number) => {
               const isOwn = msg.user_id === user?.id
               return (
-                <motion.div key={msg.id} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}
-                  className={cn("flex gap-2 mb-2", isOwn ? "justify-end" : "justify-start")}>
+                <motion.div key={msg.id} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: Math.min(idx * 0.02, 0.2) }}
+                  className={cn("flex gap-2 mb-2 content-visibility-auto", isOwn ? "justify-end" : "justify-start")}>
                   <div className={cn("max-w-[75%] rounded-2xl px-4 py-2.5",
                     isOwn ? "bg-brand/10 border border-brand/10 rounded-br-md" : "bg-card border border-border rounded-bl-md"
                   )}>

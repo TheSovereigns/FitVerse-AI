@@ -168,8 +168,32 @@ export function useStreak() {
   useEffect(() => {
     recalculate()
 
-    const interval = setInterval(recalculate, 5000)
-    return () => clearInterval(interval)
+    const onVisible = () => {
+      if (document.visibilityState === 'visible') recalculate()
+    }
+    const onStorage = (e: StorageEvent) => {
+      if (
+        e.key === 'fitverse-app-store' ||
+        e.key === 'nutritrain-workouts' ||
+        e.key === 'streakData' ||
+        e.key === null
+      ) {
+        recalculate()
+      }
+    }
+
+    const interval = setInterval(() => {
+      if (document.hidden) return
+      recalculate()
+    }, 60000)
+
+    document.addEventListener('visibilitychange', onVisible)
+    window.addEventListener('storage', onStorage)
+    return () => {
+      clearInterval(interval)
+      document.removeEventListener('visibilitychange', onVisible)
+      window.removeEventListener('storage', onStorage)
+    }
   }, [recalculate])
 
   const weekActivity: DayActivity[] = useMemo(() => {

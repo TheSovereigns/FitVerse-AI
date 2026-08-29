@@ -1,5 +1,6 @@
 "use client"
 
+import Image from "next/image"
 import { useState, useMemo, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { ArrowLeft, AlertTriangle, Check, AlertCircle, Flame, Dumbbell, Wheat, Droplets, Sparkles, Heart, Leaf, Droplet, Scale, Plus, Minus, Info, Pill, Apple, Cookie, AlertOctagon, TrendingUp, Target, ChevronDown, ChevronUp, GitCompareArrows } from "lucide-react"
@@ -321,7 +322,7 @@ export function ProductResult({ result, onBack, imageData, onSave, onDiscard, ha
           {imageData && (
             <div className="relative shrink-0">
               <div className="w-20 h-20 md:w-24 md:h-24 rounded-2xl overflow-hidden border border-border shadow">
-                <img src={imageData} alt={result.productName} className="w-full h-full object-cover" />
+                <Image src={imageData} alt={result.productName} width={96} height={96} priority sizes="(max-width: 768px) 100vw, 400px" unoptimized className="w-full h-full object-cover" />
               </div>
               <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-emerald-500 flex items-center justify-center shadow">
                 <Check className="w-3 h-3 text-white" />

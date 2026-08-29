@@ -1,6 +1,7 @@
 "use client"
 
 import { useRef, useState, useEffect, useMemo } from "react"
+import Image from "next/image"
 import { motion, AnimatePresence } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
@@ -29,6 +30,8 @@ export function ScanDashboard({ onScan, onBarcodeProduct, isScanning = false }: 
   const [searchQuery, setSearchQuery] = useState("")
   const [scanHistory, setScanHistory] = useState<Array<{ id?: string; name?: string; scannedAt?: string; score?: number; image?: string }>>([])
   const [favorites, setFavorites] = useState<string[]>([])
+  const [filteredLimit, setFilteredLimit] = useState(20)
+  const [favoritesLimit, setFavoritesLimit] = useState(20)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const cameraInputRef = useRef<HTMLInputElement>(null)
 
@@ -75,6 +78,9 @@ export function ScanDashboard({ onScan, onBarcodeProduct, isScanning = false }: 
     const q = searchQuery.toLowerCase()
     return scanHistory.filter(s => s.name?.toLowerCase().includes(q))
   }, [scanHistory, searchQuery])
+
+  useEffect(() => { setFilteredLimit(20) }, [searchQuery])
+  useEffect(() => { setFavoritesLimit(20) }, [favorites])
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -253,10 +259,10 @@ export function ScanDashboard({ onScan, onBarcodeProduct, isScanning = false }: 
             {filteredScans.length === 0 && (
               <p className="text-sm text-muted-foreground text-center py-4">{t("scan_no_results")}</p>
             )}
-            {filteredScans.map((scan, index) => (
+            {filteredScans.slice(0, filteredLimit).map((scan, index) => (
               <div key={scan.id || index} className="flex items-center gap-3 rounded-xl bg-muted/50 p-3">
                 {scan.image ? (
-                  <img src={scan.image} alt={scan.name || "Product"} className="h-12 w-12 rounded-xl object-cover" />
+                  <Image src={scan.image} alt={scan.name || "Product"} width={48} height={48} loading="lazy" decoding="async" unoptimized className="h-12 w-12 rounded-xl object-cover" />
                 ) : (
                   <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-muted text-muted-foreground">
                     <Scan className="h-5 w-5" />
@@ -276,6 +282,11 @@ export function ScanDashboard({ onScan, onBarcodeProduct, isScanning = false }: 
                 )}
               </div>
             ))}
+            {filteredScans.length > filteredLimit && (
+              <Button onClick={() => setFilteredLimit((l) => l + 20)} className="w-full h-11 rounded-xl glass-strong">
+                Carregar mais
+              </Button>
+            )}
           </div>
         </motion.section>
       )}
@@ -295,10 +306,10 @@ export function ScanDashboard({ onScan, onBarcodeProduct, isScanning = false }: 
             </h2>
           </div>
           <div className="space-y-3">
-            {favoriteScans.map((scan, index) => (
+            {favoriteScans.slice(0, favoritesLimit).map((scan, index) => (
               <div key={scan.id || index} className="flex items-center gap-3 rounded-xl bg-muted/50 p-3">
                 {scan.image ? (
-                  <img src={scan.image} alt={scan.name || "Product"} className="h-12 w-12 rounded-xl object-cover" />
+                  <Image src={scan.image} alt={scan.name || "Product"} width={48} height={48} loading="lazy" decoding="async" unoptimized className="h-12 w-12 rounded-xl object-cover" />
                 ) : (
                   <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-muted text-muted-foreground">
                     <Scan className="h-5 w-5" />
@@ -316,6 +327,11 @@ export function ScanDashboard({ onScan, onBarcodeProduct, isScanning = false }: 
                 </button>
               </div>
             ))}
+            {favoriteScans.length > favoritesLimit && (
+              <Button onClick={() => setFavoritesLimit((l) => l + 20)} className="w-full h-11 rounded-xl glass-strong mt-3">
+                Carregar mais
+              </Button>
+            )}
           </div>
         </motion.section>
       )}
@@ -339,7 +355,7 @@ export function ScanDashboard({ onScan, onBarcodeProduct, isScanning = false }: 
             {recentScans.map((scan, index) => (
               <div key={scan.id || index} className="flex items-center gap-3 rounded-xl bg-muted/50 p-3">
                 {scan.image ? (
-                  <img src={scan.image} alt={scan.name || "Product"} className="h-12 w-12 rounded-xl object-cover" />
+                  <Image src={scan.image} alt={scan.name || "Product"} width={48} height={48} loading="lazy" decoding="async" unoptimized className="h-12 w-12 rounded-xl object-cover" />
                 ) : (
                   <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-muted text-muted-foreground">
                     <Scan className="h-5 w-5" />

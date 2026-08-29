@@ -32,6 +32,7 @@ export async function checkRateLimit(
 
   // 2. Supabase fallback for cross-instance consistency (optional)
   // Skip DB if MEMORY_ONLY or if we already have memory allow (saves 3 DB ops)
+  // Set RATE_LIMIT_MEMORY_ONLY=true in Vercel Env for 0 DB ops (single region)
   if (process.env.RATE_LIMIT_MEMORY_ONLY === "true") {
     return mem
   }

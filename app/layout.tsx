@@ -94,7 +94,7 @@ export default function RootLayout({
             src="https://plausible.io/js/script.js"
           />
         )}
-        <script dangerouslySetInnerHTML={{__html: `if('serviceWorker' in navigator){navigator.serviceWorker.register('/sw.js')}`}} />
+        <script dangerouslySetInnerHTML={{__html: `if('serviceWorker' in navigator){ window.addEventListener('load', ()=> navigator.serviceWorker.register('/sw.js', {scope: '/app'}).catch(()=>{})) }`}} />
       </head>
       <body
         className={`${inter.variable} ${barlow.variable} font-sans antialiased text-foreground min-h-screen bg-background`}

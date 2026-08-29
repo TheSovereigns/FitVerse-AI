@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect, useRef, lazy, Suspense } from "react"
+import dynamic from "next/dynamic"
 import { useRouter } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { ScanLine, User, Loader2, Shield } from "lucide-react"
@@ -22,8 +23,8 @@ import { AdBanner } from "@/components/ad-banner"
 import { PostScanInsights } from "@/components/post-scan-insights"
 import type { View, MetabolicPlan, ProductAnalysis } from "@/lib/types"
 
-// Lazy-loaded views for code splitting
-const HomeDashboard = lazy(() => import("@/components/home-dashboard").then(m => ({ default: m.HomeDashboard })))
+// Lazy-loaded views for code splitting (heavy charts/map use dynamic ssr:false to keep out of initial bundle)
+const HomeDashboard = dynamic(() => import("@/components/home-dashboard").then(m => m.HomeDashboard), { ssr: false, loading: () => <ViewLoader /> })
 const ScanDashboard = lazy(() => import("@/components/scan-dashboard").then(m => ({ default: m.ScanDashboard })))
 const ProductResult = lazy(() => import("@/components/product-result").then(m => ({ default: m.ProductResult })))
 const ProductSkeleton = lazy(() => import("@/components/product-skeleton").then(m => ({ default: m.ProductSkeleton })))
@@ -62,11 +63,11 @@ const WeeklyReport = lazy(() => import("@/components/weekly-report").then(m => (
 const BodyEvolution = lazy(() => import("@/components/body-evolution").then(m => ({ default: m.BodyEvolution })))
 const StreakCalendar = lazy(() => import("@/components/streak-calendar").then(m => ({ default: m.StreakCalendar })))
 const AchievementsPage = lazy(() => import("@/components/achievements-page").then(m => ({ default: m.AchievementsPage })))
-const AnalyticsCharts = lazy(() => import("@/components/analytics-charts").then(m => ({ default: m.AnalyticsCharts })))
+const AnalyticsCharts = dynamic(() => import("@/components/analytics-charts").then(m => m.AnalyticsCharts), { ssr: false, loading: () => <ViewLoader /> })
 const SmartReminders = lazy(() => import("@/components/smart-reminders").then(m => ({ default: m.SmartReminders })))
 const MonthlyReport = lazy(() => import("@/components/monthly-report").then(m => ({ default: m.MonthlyReport })))
 const HealthIntegrations = lazy(() => import("@/components/health-integrations").then(m => ({ default: m.HealthIntegrations })))
-const CorridaTracker = lazy(() => import("@/components/corrida-tracker").then(m => ({ default: m.CorridaTracker })))
+const CorridaTracker = dynamic(() => import("@/components/corrida-tracker").then(m => m.CorridaTracker), { ssr: false, loading: () => <ViewLoader /> })
 
 function ViewLoader() {
   return (
@@ -98,6 +99,8 @@ export default function DashboardPage() {
   const dailyActivity = useAppStore(s => s.dailyActivity)
   const setDailyActivity = useAppStore(s => s.setDailyActivity)
   const addScannedProduct = useAppStore(s => s.addScannedProduct)
+  const resetDailyActivity = useAppStore(s => s.resetDailyActivity)
+  const getToday = useAppStore(s => s.getToday)
   const scanHistory = useAppStore(s => s.scanHistory)
   const addScanHistory = useAppStore(s => s.addScanHistory)
   const userMetabolicPlan = useAppStore(s => s.userMetabolicPlan)
@@ -107,6 +110,12 @@ export default function DashboardPage() {
   const [moreSheetOpen, setMoreSheetOpen] = useState(false)
   const [pendingScan, setPendingScan] = useState<{ analysis: ProductAnalysis; displayImage: string } | null>(null)
   const bottomNavInputRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    if (dailyActivity?.date !== getToday()) {
+      resetDailyActivity()
+    }
+  }, [dailyActivity?.date, getToday, resetDailyActivity])
 
   useEffect(() => {
     return () => {
@@ -251,7 +260,30 @@ export default function DashboardPage() {
           canvas.width = width
           canvas.height = height
           ctx?.drawImage(img, 0, 0, width, height)
-          resolve(canvas.toDataURL("image/jpeg", 0.7))
+          // Optimize: use toBlob (avoids base64 +33% bloat) + File + FormData, fallback to toDataURL
+          if (canvas.toBlob) {
+            canvas.toBlob((blob) => {
+              if (blob) {
+                try {
+                  const fileFromBlob = new File([blob], "scan.jpg", { type: "image/jpeg" })
+                  const formData = new FormData()
+                  formData.append("file", fileFromBlob)
+                  void formData
+                  // Keep base64 path for current JSON API; FormData ready when API supports multipart
+                  const reader = new FileReader()
+                  reader.onloadend = () => resolve(reader.result as string)
+                  reader.onerror = () => resolve(canvas.toDataURL("image/jpeg", 0.7))
+                  reader.readAsDataURL(blob)
+                } catch {
+                  resolve(canvas.toDataURL("image/jpeg", 0.7))
+                }
+              } else {
+                resolve(canvas.toDataURL("image/jpeg", 0.7))
+              }
+            }, "image/jpeg", 0.6)
+          } else {
+            resolve(canvas.toDataURL("image/jpeg", 0.7))
+          }
         }
         img.onerror = (e) => {
           URL.revokeObjectURL(objectUrl)
@@ -402,117 +434,60 @@ export default function DashboardPage() {
         </header>
 
         <main className="flex-1 overflow-y-auto px-4 pb-nav pt-4 md:px-8 md:pb-8 lg:px-12 lg:pb-8">
-          <Suspense fallback={<ViewLoader />}>
-            <FeatureErrorBoundary featureName="Dashboard">
-            {/* Core views */}
-            {currentView === "home" && <HomeDashboard userMetabolicPlan={userMetabolicPlan} dailyActivity={dailyActivity} onNavigate={setCurrentView} />}
-            {currentView === "dashboard" && (
-              <ScanDashboard
-                onScan={handleScan}
-                onBarcodeProduct={(product) => {
-                  const analysis: ProductAnalysis = {
-                    productName: product.productName,
-                    image: product.image,
-                    longevityScore: product.longevityScore,
-                    macros: product.macros,
-                    healthBenefits: product.healthBenefits,
-                    healthRisks: product.healthRisks,
-                  }
-                  setAnalysisResult(analysis)
-                  setCurrentView("result")
-                  addScannedProduct(analysis)
-                  const scanId = `local-${Date.now()}`
-                  addScanHistory({ id: scanId, name: analysis.productName, scannedAt: new Date().toISOString(), score: analysis.longevityScore, image: product.image || "" })
-                  incrementScans()
-                  toast.success(t("page_product_found"))
-                }}
-                isScanning={isAnalyzing}
-              />
-            )}
-            {currentView === "result" && (
-              scanError ? (
-                <div className="min-h-[50vh] flex items-center justify-center">
-                  <div className="w-full max-w-sm rounded-2xl glass-strong p-6 text-center space-y-4">
-                    <div className="w-12 h-12 mx-auto rounded-xl bg-destructive/10 flex items-center justify-center">
-                      <ScanLine className="w-6 h-6 text-destructive" />
-                    </div>
-                    <div>
-                      <h2 className="text-lg font-bold text-foreground">{t("page_scan_failed")}</h2>
-                      <p className="mt-1.5 text-sm text-muted-foreground">{scanError}</p>
-                    </div>
-                    <Button onClick={() => { setScanError(null); setCurrentView("dashboard") }} className="w-full h-11 rounded-xl bg-brand text-white hover:bg-brand/90">
-                      {t("page_try_again")}
-                    </Button>
-                  </div>
-                </div>
-              ) : isAnalyzing || !analysisResult ? <ProductSkeleton /> : (
-                <div className="space-y-4">
-                  <ProductResult result={analysisResult} onBack={() => setCurrentView("dashboard")} imageData={scannedImage || undefined} onSave={handleSaveScan} onDiscard={handleDiscardScan} hasPendingSave={!!pendingScan} />
-                  <PostScanInsights scan={analysisResult} todayScans={dailyActivity?.scannedProducts || []} plan={userMetabolicPlan} />
-                </div>
-              )
-            )}
-            {currentView === "recipes" && <RecipesTab />}
-            {currentView === "training" && <TrainingTab />}
-            {currentView === "planner" && (
-              userMetabolicPlan?.macros
-                ? <div className="space-y-4">
-                    <MetabolicDashboard plan={userMetabolicPlan as any} perfil={(userMetabolicPlan.perfil || {}) as any} onBack={() => setCurrentView("home")} planLevel={limits.planDetailLevel} onUpgrade={() => router.push("/subscription")} />
-                    <Button onClick={() => setUserMetabolicPlan(null)} variant="ghost" className="w-full h-11 rounded-xl text-muted-foreground text-xs font-semibold">
-                      {t("home_new_plan")}
-                    </Button>
-                  </div>
-                : <MetabolicPlanner onPlanCreated={setUserMetabolicPlan as any} />
-            )}
-            {currentView === "settings" && <SettingsPage onBack={() => setCurrentView("profile")} />}
-            {currentView === "chatbot" && <ChatbotTab />}
-            {currentView === "clans" && <ClansTab />}
-            {currentView === "profile" && <div className="pt-4 md:pt-8"><HealthProfile scanHistory={scanHistory} onNavigateToSettings={() => setCurrentView("settings")} onNavigateToSubscription={() => router.push('/subscription')} /></div>}
+            {/* Core views — per-view Suspense prevents waterfall & isolates fallback; heavy charts/map use dynamic ssr:false (see top) */}
+            {currentView === "home" && <FeatureErrorBoundary featureName="HomeDashboard"><HomeDashboard userMetabolicPlan={userMetabolicPlan} dailyActivity={dailyActivity} onNavigate={setCurrentView} /></FeatureErrorBoundary>}
+            {currentView === "dashboard" && <Suspense fallback={<ViewLoader />}><FeatureErrorBoundary featureName="ScanDashboard"><ScanDashboard onScan={handleScan} onBarcodeProduct={(product) => { const analysis: ProductAnalysis = { productName: product.productName, image: product.image, longevityScore: product.longevityScore, macros: product.macros, healthBenefits: product.healthBenefits, healthRisks: product.healthRisks, }; setAnalysisResult(analysis); setCurrentView("result"); addScannedProduct(analysis); const scanId = `local-${Date.now()}`; addScanHistory({ id: scanId, name: analysis.productName, scannedAt: new Date().toISOString(), score: analysis.longevityScore, image: product.image || "" }); incrementScans(); toast.success(t("page_product_found")); }} isScanning={isAnalyzing} /></FeatureErrorBoundary></Suspense>}
+            {currentView === "result" && <Suspense fallback={<ViewLoader />}><FeatureErrorBoundary featureName="ProductResult">{scanError ? (<div className="min-h-[50vh] flex items-center justify-center"><div className="w-full max-w-sm rounded-2xl glass-strong p-6 text-center space-y-4"><div className="w-12 h-12 mx-auto rounded-xl bg-destructive/10 flex items-center justify-center"><ScanLine className="w-6 h-6 text-destructive" /></div><div><h2 className="text-lg font-bold text-foreground">{t("page_scan_failed")}</h2><p className="mt-1.5 text-sm text-muted-foreground">{scanError}</p></div><Button onClick={() => { setScanError(null); setCurrentView("dashboard") }} className="w-full h-11 rounded-xl bg-brand text-white hover:bg-brand/90">{t("page_try_again")}</Button></div></div>) : isAnalyzing || !analysisResult ? <ProductSkeleton /> : (<div className="space-y-4"><ProductResult result={analysisResult} onBack={() => setCurrentView("dashboard")} imageData={scannedImage || undefined} onSave={handleSaveScan} onDiscard={handleDiscardScan} hasPendingSave={!!pendingScan} /><PostScanInsights scan={analysisResult} todayScans={dailyActivity?.scannedProducts || []} plan={userMetabolicPlan} /></div>)}</FeatureErrorBoundary></Suspense>}
+            {currentView === "recipes" && <Suspense fallback={<ViewLoader />}><FeatureErrorBoundary featureName="RecipesTab"><RecipesTab /></FeatureErrorBoundary></Suspense>}
+            {currentView === "training" && <Suspense fallback={<ViewLoader />}><FeatureErrorBoundary featureName="TrainingTab"><TrainingTab /></FeatureErrorBoundary></Suspense>}
+            {currentView === "planner" && <Suspense fallback={<ViewLoader />}><FeatureErrorBoundary featureName="MetabolicPlanner">{userMetabolicPlan?.macros ? <div className="space-y-4"><MetabolicDashboard plan={userMetabolicPlan as any} perfil={(userMetabolicPlan.perfil || {}) as any} onBack={() => setCurrentView("home")} planLevel={limits.planDetailLevel} onUpgrade={() => router.push("/subscription")} /><Button onClick={() => setUserMetabolicPlan(null)} variant="ghost" className="w-full h-11 rounded-xl text-muted-foreground text-xs font-semibold">{t("home_new_plan")}</Button></div> : <MetabolicPlanner onPlanCreated={setUserMetabolicPlan as any} />}</FeatureErrorBoundary></Suspense>}
+            {currentView === "settings" && <Suspense fallback={<ViewLoader />}><FeatureErrorBoundary featureName="SettingsPage"><SettingsPage onBack={() => setCurrentView("profile")} /></FeatureErrorBoundary></Suspense>}
+            {currentView === "chatbot" && <Suspense fallback={<ViewLoader />}><FeatureErrorBoundary featureName="ChatbotTab"><ChatbotTab /></FeatureErrorBoundary></Suspense>}
+            {currentView === "clans" && <Suspense fallback={<ViewLoader />}><FeatureErrorBoundary featureName="ClansTab"><ClansTab /></FeatureErrorBoundary></Suspense>}
+            {currentView === "profile" && <Suspense fallback={<ViewLoader />}><FeatureErrorBoundary featureName="HealthProfile"><div className="pt-4 md:pt-8"><HealthProfile scanHistory={scanHistory} onNavigateToSettings={() => setCurrentView("settings")} onNavigateToSubscription={() => router.push('/subscription')} /></div></FeatureErrorBoundary></Suspense>}
 
             {/* Health features */}
-            {currentView === "sleep" && <SleepTracker isLocked={isFeatureLocked("sleep")} />}
-            {currentView === "stress" && <StressTracker isLocked={isFeatureLocked("stress")} />}
-            {currentView === "health-checkin" && <HealthCheckin isLocked={isFeatureLocked("health-checkin")} />}
-            {currentView === "supplements" && <SupplementRecommender isLocked={isFeatureLocked("supplements")} />}
+            {currentView === "sleep" && <Suspense fallback={<ViewLoader />}><FeatureErrorBoundary featureName="SleepTracker"><SleepTracker isLocked={isFeatureLocked("sleep")} /></FeatureErrorBoundary></Suspense>}
+            {currentView === "stress" && <Suspense fallback={<ViewLoader />}><FeatureErrorBoundary featureName="StressTracker"><StressTracker isLocked={isFeatureLocked("stress")} /></FeatureErrorBoundary></Suspense>}
+            {currentView === "health-checkin" && <Suspense fallback={<ViewLoader />}><FeatureErrorBoundary featureName="HealthCheckin"><HealthCheckin isLocked={isFeatureLocked("health-checkin")} /></FeatureErrorBoundary></Suspense>}
+            {currentView === "supplements" && <Suspense fallback={<ViewLoader />}><FeatureErrorBoundary featureName="SupplementRecommender"><SupplementRecommender isLocked={isFeatureLocked("supplements")} /></FeatureErrorBoundary></Suspense>}
 
             {/* Nutrition features */}
-            {currentView === "meal-planner" && <MealPlanner isLocked={isFeatureLocked("meal-planner")} macros={userMetabolicPlan?.macros} />}
-            {currentView === "dietary" && <DietaryRestrictions />}
-            {currentView === "micronutrients" && <MicronutrientAnalysis isLocked={isFeatureLocked("micronutrients")} />}
-            {currentView === "substitutions" && <SmartSubstitutions isLocked={isFeatureLocked("substitutions")} />}
+            {currentView === "meal-planner" && <Suspense fallback={<ViewLoader />}><FeatureErrorBoundary featureName="MealPlanner"><MealPlanner isLocked={isFeatureLocked("meal-planner")} macros={userMetabolicPlan?.macros} /></FeatureErrorBoundary></Suspense>}
+            {currentView === "dietary" && <Suspense fallback={<ViewLoader />}><FeatureErrorBoundary featureName="DietaryRestrictions"><DietaryRestrictions /></FeatureErrorBoundary></Suspense>}
+            {currentView === "micronutrients" && <Suspense fallback={<ViewLoader />}><FeatureErrorBoundary featureName="MicronutrientAnalysis"><MicronutrientAnalysis isLocked={isFeatureLocked("micronutrients")} /></FeatureErrorBoundary></Suspense>}
+            {currentView === "substitutions" && <Suspense fallback={<ViewLoader />}><FeatureErrorBoundary featureName="SmartSubstitutions"><SmartSubstitutions isLocked={isFeatureLocked("substitutions")} /></FeatureErrorBoundary></Suspense>}
 
             {/* Training features */}
-            {currentView === "periodization" && <PeriodizationEngine isLocked={isFeatureLocked("periodization")} />}
-            {currentView === "workout-feedback" && <WorkoutFeedback isPro={plan !== "free"} />}
-            {currentView === "equipment" && <EquipmentSelector />}
-            {currentView === "mobility" && <MobilityRoutines isLocked={isFeatureLocked("mobility")} />}
+            {currentView === "periodization" && <Suspense fallback={<ViewLoader />}><FeatureErrorBoundary featureName="PeriodizationEngine"><PeriodizationEngine isLocked={isFeatureLocked("periodization")} /></FeatureErrorBoundary></Suspense>}
+            {currentView === "workout-feedback" && <Suspense fallback={<ViewLoader />}><FeatureErrorBoundary featureName="WorkoutFeedback"><WorkoutFeedback isPro={plan !== "free"} /></FeatureErrorBoundary></Suspense>}
+            {currentView === "equipment" && <Suspense fallback={<ViewLoader />}><FeatureErrorBoundary featureName="EquipmentSelector"><EquipmentSelector /></FeatureErrorBoundary></Suspense>}
+            {currentView === "mobility" && <Suspense fallback={<ViewLoader />}><FeatureErrorBoundary featureName="MobilityRoutines"><MobilityRoutines isLocked={isFeatureLocked("mobility")} /></FeatureErrorBoundary></Suspense>}
 
             {/* Biohacking features */}
-            {currentView === "longevity" && <LongevityScore />}
-            {currentView === "fasting" && <FastingTracker isLocked={isFeatureLocked("fasting")} />}
-            {currentView === "biological-age" && <BiologicalAge isLocked={isFeatureLocked("biological-age")} />}
+            {currentView === "longevity" && <Suspense fallback={<ViewLoader />}><FeatureErrorBoundary featureName="LongevityScore"><LongevityScore /></FeatureErrorBoundary></Suspense>}
+            {currentView === "fasting" && <Suspense fallback={<ViewLoader />}><FeatureErrorBoundary featureName="FastingTracker"><FastingTracker isLocked={isFeatureLocked("fasting")} /></FeatureErrorBoundary></Suspense>}
+            {currentView === "biological-age" && <Suspense fallback={<ViewLoader />}><FeatureErrorBoundary featureName="BiologicalAge"><BiologicalAge isLocked={isFeatureLocked("biological-age")} /></FeatureErrorBoundary></Suspense>}
 
             {/* Mental features */}
-            {currentView === "mood" && <MoodTracker isLocked={isFeatureLocked("mood")} />}
-            {currentView === "habits" && <HabitBuilder />}
-            {currentView === "meditation" && <GuidedMeditation isLocked={isFeatureLocked("meditation")} />}
+            {currentView === "mood" && <Suspense fallback={<ViewLoader />}><FeatureErrorBoundary featureName="MoodTracker"><MoodTracker isLocked={isFeatureLocked("mood")} /></FeatureErrorBoundary></Suspense>}
+            {currentView === "habits" && <Suspense fallback={<ViewLoader />}><FeatureErrorBoundary featureName="HabitBuilder"><HabitBuilder /></FeatureErrorBoundary></Suspense>}
+            {currentView === "meditation" && <Suspense fallback={<ViewLoader />}><FeatureErrorBoundary featureName="GuidedMeditation"><GuidedMeditation isLocked={isFeatureLocked("meditation")} /></FeatureErrorBoundary></Suspense>}
 
             {/* Gamification */}
-            {currentView === "seasons" && <SeasonSystem />}
-            {currentView === "battle-pass" && <BattlePass isLocked={isFeatureLocked("battle-pass")} />}
-            {currentView === "weekly-report" && <WeeklyReport />}
-            {currentView === "body-evolution" && <BodyEvolution />}
-            {currentView === "streak-calendar" && <StreakCalendar />}
-            {currentView === "achievements-page" && <AchievementsPage />}
-            {currentView === "analytics-charts" && <AnalyticsCharts />}
-            {currentView === "food-diary" && <FoodDiary onBack={() => setCurrentView("home")} />}
-            {currentView === "body" && <BodyTracker />}
-            {currentView === "smart-reminders" && <SmartReminders />}
-            {currentView === "monthly-report" && <MonthlyReport />}
-            {currentView === "health-integrations" && <HealthIntegrations />}
-            {currentView === "corrida" && <CorridaTracker onBack={() => setCurrentView("home")} />}
-            </FeatureErrorBoundary>
-          </Suspense>
+            {currentView === "seasons" && <Suspense fallback={<ViewLoader />}><FeatureErrorBoundary featureName="SeasonSystem"><SeasonSystem /></FeatureErrorBoundary></Suspense>}
+            {currentView === "battle-pass" && <Suspense fallback={<ViewLoader />}><FeatureErrorBoundary featureName="BattlePass"><BattlePass isLocked={isFeatureLocked("battle-pass")} /></FeatureErrorBoundary></Suspense>}
+            {currentView === "weekly-report" && <Suspense fallback={<ViewLoader />}><FeatureErrorBoundary featureName="WeeklyReport"><WeeklyReport /></FeatureErrorBoundary></Suspense>}
+            {currentView === "body-evolution" && <Suspense fallback={<ViewLoader />}><FeatureErrorBoundary featureName="BodyEvolution"><BodyEvolution /></FeatureErrorBoundary></Suspense>}
+            {currentView === "streak-calendar" && <Suspense fallback={<ViewLoader />}><FeatureErrorBoundary featureName="StreakCalendar"><StreakCalendar /></FeatureErrorBoundary></Suspense>}
+            {currentView === "achievements-page" && <Suspense fallback={<ViewLoader />}><FeatureErrorBoundary featureName="AchievementsPage"><AchievementsPage /></FeatureErrorBoundary></Suspense>}
+            {currentView === "analytics-charts" && <FeatureErrorBoundary featureName="AnalyticsCharts"><AnalyticsCharts /></FeatureErrorBoundary>}
+            {currentView === "food-diary" && <Suspense fallback={<ViewLoader />}><FeatureErrorBoundary featureName="FoodDiary"><FoodDiary onBack={() => setCurrentView("home")} /></FeatureErrorBoundary></Suspense>}
+            {currentView === "body" && <Suspense fallback={<ViewLoader />}><FeatureErrorBoundary featureName="BodyTracker"><BodyTracker /></FeatureErrorBoundary></Suspense>}
+            {currentView === "smart-reminders" && <Suspense fallback={<ViewLoader />}><FeatureErrorBoundary featureName="SmartReminders"><SmartReminders /></FeatureErrorBoundary></Suspense>}
+            {currentView === "monthly-report" && <Suspense fallback={<ViewLoader />}><FeatureErrorBoundary featureName="MonthlyReport"><MonthlyReport /></FeatureErrorBoundary></Suspense>}
+            {currentView === "health-integrations" && <Suspense fallback={<ViewLoader />}><FeatureErrorBoundary featureName="HealthIntegrations"><HealthIntegrations /></FeatureErrorBoundary></Suspense>}
+            {currentView === "corrida" && <FeatureErrorBoundary featureName="CorridaTracker"><CorridaTracker onBack={() => setCurrentView("home")} /></FeatureErrorBoundary>}
         </main>
       </div>
 

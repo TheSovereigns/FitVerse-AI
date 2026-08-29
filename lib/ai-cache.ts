@@ -2,7 +2,9 @@
  * Simple in-memory LRU cache with TTL for AI results.
  * Free-tier friendly — no external deps.
  * Used by analyze-product to avoid duplicate AI calls for identical images.
+ * For shared cache, set UPSTASH_REDIS_REST_URL and use @upstash/redis
  */
+// For shared cache, set UPSTASH_REDIS_REST_URL and use @upstash/redis
 
 const cache = new Map<string, { data: any; expires: number }>()
 

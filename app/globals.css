@@ -832,3 +832,5 @@
   background: transparent !important;
   font-family: inherit !important;
 }
+
+.content-visibility-auto { content-visibility: auto; contain-intrinsic-size: 500px; }

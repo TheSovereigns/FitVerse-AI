@@ -81,6 +81,24 @@ export function usePlanLimits() {
     await fetchPlan()
   }, [user?.id, fetchPlan])
 
+  const fetchScansToday = useCallback(async () => {
+    if (!user?.id) return
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+
+    try {
+      const { count } = await supabase
+        .from('scans')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', user.id)
+        .gte('created_at', today.toISOString())
+
+      setScansToday(count || 0)
+    } catch (e) {
+      logger.error("[usePlanLimits] Failed to fetch scans:", e)
+    }
+  }, [user?.id])
+
   useEffect(() => {
     if (!user) {
       setIsLoading(false)
@@ -88,33 +106,31 @@ export function usePlanLimits() {
     }
 
     fetchPlan()
+    fetchScansToday()
 
-    const pollInterval = setInterval(fetchPlan, 30000)
-    return () => clearInterval(pollInterval)
-  }, [user, fetchPlan])
-
-  useEffect(() => {
-    if (!user) return
-
-    const fetchScansToday = async () => {
-      const today = new Date()
-      today.setHours(0, 0, 0, 0)
-
-      try {
-        const { count } = await supabase
-          .from('scans')
-          .select('*', { count: 'exact', head: true })
-          .eq('user_id', user.id)
-          .gte('created_at', today.toISOString())
-
-        setScansToday(count || 0)
-      } catch (e) {
-        logger.error("[usePlanLimits] Failed to fetch scans:", e)
+    const onVisible = () => {
+      if (document.visibilityState === 'visible') {
+        fetchPlan()
+        fetchScansToday()
       }
     }
+    const onFocus = () => {
+      fetchPlan()
+      fetchScansToday()
+    }
 
-    fetchScansToday()
-  }, [user])
+    document.addEventListener('visibilitychange', onVisible)
+    window.addEventListener('focus', onFocus)
+
+    // Fallback poll disabled: profile sync via useAuth is primary.
+    // If polling must be kept, use 5min + hidden guard:
+    // const pollInterval = setInterval(() => { if (document.hidden) return; fetchPlan(); fetchScansToday() }, 300000)
+    return () => {
+      document.removeEventListener('visibilitychange', onVisible)
+      window.removeEventListener('focus', onFocus)
+      // clearInterval(pollInterval)
+    }
+  }, [user, fetchPlan, fetchScansToday])
 
   const incrementScans = () => {
     setScansToday(prev => prev + 1)

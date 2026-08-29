@@ -3,9 +3,11 @@
 import { Clock, Filter, SearchX } from "lucide-react"
 import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
 import { EmptyState } from "@/components/ui/empty-state"
 import { useTranslation } from "@/lib/i18n"
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { motion } from "framer-motion"
 
 interface ScanHistoryItem {
   id: string
@@ -22,6 +24,7 @@ interface ScanHistoryProps {
 
 export function ScanHistory({ items, showAll = false }: ScanHistoryProps) {
   const [filter, setFilter] = useState<"all" | "healthy" | "moderate" | "poor">("all")
+  const [limit, setLimit] = useState(20)
   const { t } = useTranslation()
 
   const getScoreColor = (score: number) => {
@@ -47,6 +50,10 @@ export function ScanHistory({ items, showAll = false }: ScanHistoryProps) {
     if (filter === "poor") return item.score < 40
     return true
   })
+
+  useEffect(() => {
+    setLimit(20)
+  }, [filter, items])
 
   return (
     <div className={showAll ? "" : "px-4 py-6"}>
@@ -80,30 +87,39 @@ export function ScanHistory({ items, showAll = false }: ScanHistoryProps) {
         />
       ) : (
         <div className="space-y-3">
-          {filteredItems.map((item) => (
-            <Card
+          {filteredItems.slice(0, limit).map((item, index) => (
+            <motion.div
               key={item.id}
-              className="p-4 glass border-primary/20 hover:border-primary/40 hover:shadow-xl hover:shadow-primary/10 transition-all cursor-pointer group"
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: Math.min(index * 0.02, 0.2) }}
             >
-              <div className="flex items-center gap-3">
-                <div className="relative">
-                  <img
-                    src={item.image || "/placeholder.svg"}
-                    alt={item.name}
-                    className="w-14 h-14 rounded-xl object-cover bg-muted flex-shrink-0 border border-primary/20"
-                  />
-                  <div className="absolute inset-0 rounded-xl bg-primary/0 group-hover:bg-primary/10 transition-colors" />
+              <Card className="p-4 glass border-primary/20 hover:border-primary/40 hover:shadow-xl hover:shadow-primary/10 transition-all cursor-pointer group">
+                <div className="flex items-center gap-3">
+                  <div className="relative">
+                    <img
+                      src={item.image || "/placeholder.svg"}
+                      alt={item.name}
+                      className="w-14 h-14 rounded-xl object-cover bg-muted flex-shrink-0 border border-primary/20"
+                    />
+                    <div className="absolute inset-0 rounded-xl bg-primary/0 group-hover:bg-primary/10 transition-colors" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-semibold text-sm truncate group-hover:text-primary transition-colors">
+                      {item.name}
+                    </p>
+                    <p className="text-xs text-muted-foreground">{formatTime(item.scannedAt)}</p>
+                  </div>
+                  <Badge className={`${getScoreColor(item.score)} font-bold shadow-lg`}>{item.score}</Badge>
                 </div>
-                <div className="flex-1 min-w-0">
-                  <p className="font-semibold text-sm truncate group-hover:text-primary transition-colors">
-                    {item.name}
-                  </p>
-                  <p className="text-xs text-muted-foreground">{formatTime(item.scannedAt)}</p>
-                </div>
-                <Badge className={`${getScoreColor(item.score)} font-bold shadow-lg`}>{item.score}</Badge>
-              </div>
-            </Card>
+              </Card>
+            </motion.div>
           ))}
+          {filteredItems.length > limit && (
+            <Button onClick={() => setLimit((l) => l + 20)} className="w-full h-11 rounded-xl glass-strong">
+              Carregar mais
+            </Button>
+          )}
         </div>
       )}
     </div>

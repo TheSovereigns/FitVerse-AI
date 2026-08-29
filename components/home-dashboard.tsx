@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react"
 import { motion } from "framer-motion"
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Cell } from "recharts"
+import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
 import { useTranslation } from "@/lib/i18n"
@@ -454,7 +455,7 @@ export function HomeDashboard({
                 transition={{ delay: index * 0.03 }}
                 className="group flex items-center gap-4 rounded-xl glass-strong p-4 list-interactive"
               >
-                <img src={product.image || "/placeholder.svg?width=100&height=100"} alt={product.productName} className="h-10 w-10 rounded-lg object-cover" />
+                <Image src={product.image || "/placeholder.svg?width=100&height=100"} alt={product.productName} width={48} height={48} loading="lazy" decoding="async" unoptimized className="h-10 w-10 rounded-lg object-cover" />
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-sm font-medium text-foreground">{product.productName}</p>
                   <p className="text-xs text-muted-foreground">

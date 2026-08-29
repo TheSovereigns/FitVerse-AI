@@ -54,6 +54,7 @@ export function RecipesTab({ metabolicPlan }: RecipesTabProps) {
   const [savedRecipes, setSavedRecipes] = useState<Recipe[]>([])
   const [selectedPortions, setSelectedPortions] = useState<Record<number, number>>({})
   const [shoppingListRecipe, setShoppingListRecipe] = useState<string | null>(null)
+  const [recipesLimit, setRecipesLimit] = useState(20)
 
   const isEnglish = locale === "en-US"
   const totalCalories = useMemo(
@@ -179,6 +180,7 @@ export function RecipesTab({ metabolicPlan }: RecipesTabProps) {
       }
 
       setRecipes(data.recipes)
+      setRecipesLimit(20)
       localStorage.setItem("fitverse-recipes", JSON.stringify(data.recipes))
       toast.success(isEnglish ? "Recipes generated!" : "Receitas geradas!")
     } catch (error) {
@@ -344,26 +346,33 @@ export function RecipesTab({ metabolicPlan }: RecipesTabProps) {
               ))}
             </motion.div>
           ) : recipes.length > 0 ? (
-            <motion.div
-              key="results"
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -12 }}
-              className="grid grid-cols-1 gap-4 sm:grid-cols-2"
-            >
-              {recipes.map((recipe, index) => (
-                <RecipeCard
-                  key={`${recipe.name}-${index}`}
-                  recipe={recipe}
-                  index={index}
-                  portions={getPortions(index, recipe)}
-                  onPortionsChange={(delta) => updatePortions(index, delta, recipe)}
-                  isSaved={isRecipeSaved(recipe)}
-                  onToggleSave={() => toggleSaveRecipe(recipe)}
-                  onOpen={() => setSelectedRecipe(recipe)}
-                />
-              ))}
-            </motion.div>
+            <>
+              <motion.div
+                key="results"
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -12 }}
+                className="grid grid-cols-1 gap-4 sm:grid-cols-2"
+              >
+                {recipes.slice(0, recipesLimit).map((recipe, index) => (
+                  <RecipeCard
+                    key={`${recipe.name}-${index}`}
+                    recipe={recipe}
+                    index={index}
+                    portions={getPortions(index, recipe)}
+                    onPortionsChange={(delta) => updatePortions(index, delta, recipe)}
+                    isSaved={isRecipeSaved(recipe)}
+                    onToggleSave={() => toggleSaveRecipe(recipe)}
+                    onOpen={() => setSelectedRecipe(recipe)}
+                  />
+                ))}
+              </motion.div>
+              {recipes.length > recipesLimit && (
+                <Button onClick={() => setRecipesLimit((l) => l + 20)} className="w-full h-11 rounded-xl glass-strong mt-2">
+                  {isEnglish ? "Load more" : "Carregar mais"}
+                </Button>
+              )}
+            </>
           ) : (
             <motion.section
               key="empty"
@@ -518,7 +527,7 @@ function RecipeCard({
       type="button"
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.05 }}
+      transition={{ delay: Math.min(index * 0.02, 0.2) }}
       whileTap={{ scale: 0.98 }}
       onClick={onOpen}
       aria-label={`View ${recipe.name}`}

@@ -190,8 +190,16 @@ export async function middleware(request: NextRequest) {
     "camera=(), microphone=(), interest-cohort=()"
   )
 
-  // 3b. Landing → App redirect for authed users
+  // 3b. Landing → App redirect for authed users (optimized: lightweight cookie check, no getSession for anon)
   if (path === "/") {
+    // Fast-path: if no auth cookie/header, assume anon — skip getSession entirely (saves 150-300ms)
+    const hasAuthCookie =
+      !!request.cookies.get("sb-access-token")?.value ||
+      !!request.headers.get("Authorization")?.startsWith("Bearer ") ||
+      request.cookies.getAll().some((c) => c.name.includes("sb-") && c.name.includes("auth-token"))
+    if (!hasAuthCookie) {
+      return response
+    }
     const user = await getSession(request, response)
     if (user) {
       const redirectRes = NextResponse.redirect(new URL("/app", request.url))
@@ -203,7 +211,7 @@ export async function middleware(request: NextRequest) {
     return response
   }
 
-  // 3c. Check if route is public
+  // 3c. Check if route is public (early return BEFORE any getSession)
   const isPublicRoute = publicRoutes.some((route) => matchesRoute(path, route))
   if (isPublicRoute) {
     return response

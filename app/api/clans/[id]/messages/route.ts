@@ -28,6 +28,30 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
     const { searchParams } = new URL(req.url)
     const limit = Math.min(parseInt(searchParams.get("limit") || "50"), 100)
     const offset = parseInt(searchParams.get("offset") || "0")
+    const afterId = searchParams.get("after")
+
+    // Incremental poll: return only messages after last known id (avoids full 100 re-fetch)
+    if (afterId) {
+      const { data: afterMsg } = await supabase
+        .from("clan_messages")
+        .select("created_at")
+        .eq("id", afterId)
+        .eq("clan_id", params.id)
+        .maybeSingle()
+
+      if (afterMsg?.created_at) {
+        const { data: incremental } = await supabase
+          .from("clan_messages")
+          .select("id, content, message_type, metadata, created_at, user_id, profiles:user_id(name, avatar_url)")
+          .eq("clan_id", params.id)
+          .gt("created_at", afterMsg.created_at)
+          .order("created_at", { ascending: true })
+          .limit(limit)
+
+        return NextResponse.json({ messages: incremental || [] })
+      }
+      // if afterId not found (e.g. deleted), fall through to full fetch
+    }
 
     const { data: messages } = await supabase
       .from("clan_messages")

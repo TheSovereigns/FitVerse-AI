@@ -19,6 +19,28 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
 
   const { searchParams } = new URL(req.url)
   const limit = Math.min(parseInt(searchParams.get("limit") || "30"), 100)
+  const afterId = searchParams.get("after")
+
+  if (afterId) {
+    const { data: afterAct } = await supabase
+      .from("clan_activities")
+      .select("created_at")
+      .eq("id", afterId)
+      .eq("clan_id", params.id)
+      .maybeSingle()
+
+    if (afterAct?.created_at) {
+      const { data: incremental } = await supabase
+        .from("clan_activities")
+        .select("id, activity_type, activity_data, created_at, user_id, profiles:user_id(name, avatar_url)")
+        .eq("clan_id", params.id)
+        .gt("created_at", afterAct.created_at)
+        .order("created_at", { ascending: true })
+        .limit(limit)
+
+      return NextResponse.json({ activities: incremental || [] })
+    }
+  }
 
   const { data: activities } = await supabase
     .from("clan_activities")

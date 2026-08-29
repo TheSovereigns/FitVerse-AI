@@ -22,6 +22,9 @@ export function useClanFeed(clanId: string | null) {
   const [isLoading, setIsLoading] = useState(false)
   const channelRef = useRef<any>(null)
   const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  const isRealtimeRef = useRef(false)
+  const activitiesRef = useRef<ClanActivity[]>([])
+  useEffect(() => { activitiesRef.current = activities }, [activities])
 
   const fetchActivities = useCallback(async () => {
     if (!clanId) return
@@ -42,18 +45,30 @@ export function useClanFeed(clanId: string | null) {
     }
   }, [clanId])
 
-  // Silent background fetch for polling fallback (no loading spinner)
+  // Silent background fetch for polling fallback (no loading spinner) — incremental via ?after=lastId
   const fetchActivitiesSilent = useCallback(async () => {
     if (!clanId) return
     try {
       const token = await getToken()
       if (!token) return
-      const res = await fetch(`/api/clans/${clanId}/activities?limit=50`, {
+      const lastId = activitiesRef.current[0]?.id // activities are DESC, newest first
+      const url = lastId
+        ? `/api/clans/${clanId}/activities?limit=50&after=${encodeURIComponent(lastId)}`
+        : `/api/clans/${clanId}/activities?limit=50`
+      const res = await fetch(url, {
         headers: { Authorization: `Bearer ${token}` },
       })
       const data = await res.json()
-      if (Array.isArray(data.activities)) {
-        setActivities(data.activities)
+      if (Array.isArray(data.activities) && data.activities.length > 0) {
+        if (lastId) {
+          setActivities((prev) => {
+            const existing = new Set(prev.map((a) => a.id))
+            const next = data.activities.filter((a: ClanActivity) => !existing.has(a.id))
+            return next.length ? [...next, ...prev] : prev
+          })
+        } else {
+          setActivities(data.activities)
+        }
       }
     } catch (e) {
       console.error("Error polling activities:", e)
@@ -94,7 +109,24 @@ export function useClanFeed(clanId: string | null) {
 
     fetchActivities()
 
-    // Realtime subscription (enhancement) - falls back to polling on free tier limits
+    const startPolling = (ms: number) => {
+      if (pollingRef.current) clearInterval(pollingRef.current)
+      pollingRef.current = setInterval(() => {
+        if (document.hidden) return
+        if (isRealtimeRef.current) return
+        fetchActivitiesSilent()
+      }, ms)
+    }
+    const stopPolling = () => {
+      if (pollingRef.current) {
+        clearInterval(pollingRef.current)
+        pollingRef.current = null
+      }
+    }
+
+    startPolling(30000)
+
+    // Realtime subscription (enhancement) - adaptive fallback for free tier
     const channel = supabase
       .channel(`clan-feed-${clanId}`)
       .on(
@@ -114,29 +146,27 @@ export function useClanFeed(clanId: string | null) {
         }
       )
       .subscribe((status: string) => {
-        if (status === "SUBSCRIBED") {
-          // realtime active
-        } else if (status === "CHANNEL_ERROR" || status === "TIMED_OUT" || status === "CLOSED") {
+        if (status === 'SUBSCRIBED') {
+          isRealtimeRef.current = true
+          stopPolling()
+        } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT' || status === 'CLOSED') {
+          isRealtimeRef.current = false
           console.warn(`[useClanFeed] Realtime ${status} for clan ${clanId} — polling fallback active (5s)`)
+          startPolling(5000)
+        } else {
+          isRealtimeRef.current = false
         }
       })
 
     channelRef.current = channel
-
-    // Polling fallback for free tier (realtime not enabled or 200 connections limit) — keep interval always active
-    pollingRef.current = setInterval(() => {
-      fetchActivitiesSilent()
-    }, 5000)
 
     return () => {
       if (channelRef.current) {
         supabase.removeChannel(channelRef.current)
         channelRef.current = null
       }
-      if (pollingRef.current) {
-        clearInterval(pollingRef.current)
-        pollingRef.current = null
-      }
+      stopPolling()
+      isRealtimeRef.current = false
     }
   }, [clanId, fetchActivities, fetchActivitiesSilent])
 
