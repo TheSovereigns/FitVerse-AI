@@ -28,6 +28,7 @@
     "@radix-ui/react-tabs": "1.1.2",
     "@sentry/nextjs": "^10.66.0",
     "@stripe/stripe-js": "^4.1.0",
+    "@supabase/ssr": "0.8.0",
     "@supabase/supabase-js": "^2.101.1",
     "@tailwindcss/typography": "^0.5.19",
     "@types/react-leaflet": "^2.8.3",

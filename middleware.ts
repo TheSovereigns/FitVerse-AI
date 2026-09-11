@@ -164,6 +164,7 @@ export async function middleware(request: NextRequest) {
   const isDev = process.env.NODE_ENV === "development"
   const cspHeader = `
     default-src 'self';
+    media-src 'self' blob:;
     script-src 'self'${isDev ? " 'unsafe-eval'" : ""} 'unsafe-inline' https://js.stripe.com;
     style-src 'self' 'unsafe-inline';
     img-src 'self' blob: data: https://*.stripe.com https://*.google.com https://*.tile.openstreetmap.org https://*.basemaps.cartocdn.com https://*.cartocdn.com;

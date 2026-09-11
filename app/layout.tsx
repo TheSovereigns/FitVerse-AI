@@ -4,7 +4,7 @@ import { Inter, Barlow_Condensed } from "next/font/google"
 import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
 import { I18nProvider } from "@/lib/i18n"
-import { AuthProvider } from "@/hooks/useAuth"
+import { RouteAuthProvider as AuthProvider } from "@/components/route-auth-provider"
 import { Analytics } from "@/components/analytics"
 import { Toaster } from "sonner"
 
