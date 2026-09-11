@@ -39,59 +39,46 @@ export default function AuthCallbackPage() {
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    const handleCallback = async () => {
-      try {
-        const { data: { session } } = await supabase.auth.getSession()
+    let cancelled = false
 
-        if (session) {
-          await ensureProfileExists(session.user.id, session.user.email || '')
-          router.replace("/app")
-        } else {
-          router.replace("/auth/login")
-        }
-      } catch (e) {
-        // Lock contention (detectSessionInUrl racing getSession):
-        // retry once after a short delay instead of unhandled rejection.
+    const goApp = async (userId: string, email: string) => {
+      try {
+        await ensureProfileExists(userId, email)
+      } catch {}
+      if (!cancelled) router.replace("/app")
+    }
+
+    // Single robust flow: poll for the session (covers slow OAuth code
+    // exchange + lock waits) instead of 3 racing getSession() calls.
+    const waitForSession = async () => {
+      for (let i = 0; i < 16 && !cancelled; i++) {
         try {
-          await new Promise((r) => setTimeout(r, 400))
           const { data: { session } } = await supabase.auth.getSession()
           if (session) {
-            await ensureProfileExists(session.user.id, session.user.email || '')
-            router.replace("/app")
+            await goApp(session.user.id, session.user.email || '')
             return
           }
-        } catch {}
-        router.replace("/auth/login")
+        } catch {
+          // lock contention / transient - just retry
+        }
+        await new Promise((r) => setTimeout(r, 500))
+      }
+      if (!cancelled) {
+        setError("Não foi possível concluir o login. Verifique sua conexão e tente novamente.")
       }
     }
 
-    handleCallback().catch(() => router.replace("/auth/login"))
-
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event: string, session: { user: { id: string; email?: string } } | null) => {
-      if (event === "SIGNED_IN" || event === "INITIAL_SESSION") {
-        if (session) {
-          ensureProfileExists(session.user.id, session.user.email || '').then(() => {
-            router.replace("/app")
-          })
-        }
+      if ((event === "SIGNED_IN" || event === "INITIAL_SESSION") && session && !cancelled) {
+        goApp(session.user.id, session.user.email || '')
       }
     })
 
-    const timer = setTimeout(() => {
-      supabase.auth.getSession().then(({ data: { session } }: { data: { session: { user: { id: string; email?: string } } | null } }) => {
-        if (session) {
-          ensureProfileExists(session.user.id, session.user.email || '').then(() => {
-            router.replace("/app")
-          }).catch(() => router.replace("/app"))
-        } else {
-          router.replace("/auth/login")
-        }
-      }).catch(() => router.replace("/auth/login"))
-    }, 3000)
+    waitForSession()
 
     return () => {
+      cancelled = true
       subscription.unsubscribe()
-      clearTimeout(timer)
     }
   }, [router])
 

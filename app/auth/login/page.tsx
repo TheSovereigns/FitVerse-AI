@@ -3,7 +3,6 @@
 export const dynamic = 'force-dynamic'
 
 import { useState } from "react"
-import { useRouter } from "next/navigation"
 import { motion } from "framer-motion"
 import Link from "next/link"
 import { Eye, EyeOff, Loader2 } from "lucide-react"
@@ -23,7 +22,6 @@ const loginSchema = z.object({
 type LoginErrors = { email?: string; password?: string }
 
 export default function LoginPage() {
-  const router = useRouter()
   const { signIn, signInWithGoogle } = useAuth()
   const { t, locale } = useTranslation()
   
@@ -63,12 +61,8 @@ export default function LoginPage() {
       setError(locale === "en-US" ? "Invalid email or password" : "Email ou senha inválidos")
       setIsLoading(false)
     }
-    // If no error but still loading after 5s, force redirect
-    setTimeout(() => {
-      if (isLoading) {
-        router.push("/app")
-      }
-    }, 5000)
+    // Success path redirects via useAuth (router.push("/app")).
+    // No force-redirect here: pushing without a session bounces back to login.
   }
 
   const handleGoogleLogin = async () => {
