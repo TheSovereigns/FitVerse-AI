@@ -51,20 +51,23 @@ export default function AuthCallbackPage() {
     // Covers BOTH OAuth flows:
     // - PKCE (?code=): explicit exchange, regardless of client flowType
     // - Implicit (#access_token): getSession() detects the hash
+    // Exchange errors are RECORDED (not shown yet): the client's own
+    // auto-detect may win the race and create the session anyway.
+    let oauthNote = ""
     const finishOAuth = async (): Promise<boolean> => {
       try {
         const params = new URLSearchParams(window.location.search)
         const oauthError = params.get("error_description") || params.get("error")
         if (oauthError) {
-          if (!cancelled) setError(`Login recusado: ${oauthError}`)
-          return true
+          oauthNote = `Login recusado pelo provedor: ${oauthError}`
+          return false
         }
         const code = params.get("code")
         if (!code) return false
         const { data, error } = await supabase.auth.exchangeCodeForSession(code)
         if (error) {
-          if (!cancelled) setError(`Falha na troca do código OAuth: ${error.message}`)
-          return true
+          oauthNote = `Falha na troca do código OAuth: ${error.message}`
+          return false
         }
         if (data.session) {
           await goApp(data.session.user.id, data.session.user.email || '')
@@ -72,8 +75,7 @@ export default function AuthCallbackPage() {
         }
       } catch (e) {
         const msg = e instanceof Error ? e.message : String(e ?? "")
-        if (!cancelled) setError(`Erro no callback OAuth: ${msg}`)
-        return true
+        oauthNote = `Erro no callback OAuth: ${msg}`
       }
       return false
     }
@@ -95,6 +97,10 @@ export default function AuthCallbackPage() {
         await new Promise((r) => setTimeout(r, 500))
       }
       if (!cancelled) {
+        if (oauthNote) {
+          setError(oauthNote)
+          return
+        }
         const hasHash = typeof window !== "undefined" && window.location.hash.includes("access_token")
         const hasCode = typeof window !== "undefined" && window.location.search.includes("code=")
         setError(
