@@ -40,17 +40,32 @@ export default function AuthCallbackPage() {
 
   useEffect(() => {
     const handleCallback = async () => {
-      const { data: { session } } = await supabase.auth.getSession()
-      
-      if (session) {
-        await ensureProfileExists(session.user.id, session.user.email || '')
-        router.replace("/app")
-      } else {
+      try {
+        const { data: { session } } = await supabase.auth.getSession()
+
+        if (session) {
+          await ensureProfileExists(session.user.id, session.user.email || '')
+          router.replace("/app")
+        } else {
+          router.replace("/auth/login")
+        }
+      } catch (e) {
+        // Lock contention (detectSessionInUrl racing getSession):
+        // retry once after a short delay instead of unhandled rejection.
+        try {
+          await new Promise((r) => setTimeout(r, 400))
+          const { data: { session } } = await supabase.auth.getSession()
+          if (session) {
+            await ensureProfileExists(session.user.id, session.user.email || '')
+            router.replace("/app")
+            return
+          }
+        } catch {}
         router.replace("/auth/login")
       }
     }
 
-    handleCallback()
+    handleCallback().catch(() => router.replace("/auth/login"))
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event: string, session: { user: { id: string; email?: string } } | null) => {
       if (event === "SIGNED_IN" || event === "INITIAL_SESSION") {
@@ -67,11 +82,11 @@ export default function AuthCallbackPage() {
         if (session) {
           ensureProfileExists(session.user.id, session.user.email || '').then(() => {
             router.replace("/app")
-          })
+          }).catch(() => router.replace("/app"))
         } else {
           router.replace("/auth/login")
         }
-      })
+      }).catch(() => router.replace("/auth/login"))
     }, 3000)
 
     return () => {
