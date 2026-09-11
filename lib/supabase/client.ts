@@ -1,9 +1,45 @@
 import { createClient, SupabaseClient } from "@supabase/supabase-js"
 
-let _supabase: SupabaseClient | null = null
+type GlobalWithSupabase = typeof globalThis & { __vysefit_supabase?: SupabaseClient }
+
+/**
+ * Custom Navigator LockManager wrapper.
+ *
+ * Default @supabase/auth-js lock tries to acquire the storage lock with
+ * `ifAvailable: true` (acquireTimeout 0) and throws
+ * "Acquiring an exclusive Navigator LockManager lock immediately failed"
+ * when another tab/operation holds it (e.g. signIn racing refreshSession).
+ * Waiting for the lock instead of failing immediately fixes login.
+ */
+async function supabaseLock<T>(name: string, acquireTimeout: number, fn: () => Promise<T>): Promise<T> {
+  if (typeof window === "undefined" || !("locks" in navigator) || typeof (navigator as any).locks?.request !== "function") {
+    return fn()
+  }
+  // Always wait (up to timeout) instead of failing immediately.
+  const timeout = acquireTimeout > 0 ? acquireTimeout : 5000
+  const controller = new AbortController()
+  const timer = setTimeout(() => controller.abort(), timeout)
+  try {
+    return await (navigator as any).locks.request(
+      name,
+      { mode: "exclusive", signal: controller.signal },
+      async () => fn()
+    )
+  } catch (e: any) {
+    // If we timed out waiting, run without the lock as last resort
+    // instead of surfacing "immediately failed" to the user.
+    if (e?.name === "AbortError") {
+      return fn()
+    }
+    throw e
+  } finally {
+    clearTimeout(timer)
+  }
+}
 
 export function getSupabaseClient(): SupabaseClient {
-  if (_supabase) return _supabase
+  const g = globalThis as GlobalWithSupabase
+  if (g.__vysefit_supabase) return g.__vysefit_supabase
 
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ""
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ""
@@ -17,11 +53,12 @@ export function getSupabaseClient(): SupabaseClient {
     )
   }
 
-  _supabase = createClient(supabaseUrl, supabaseAnonKey, {
+  const client = createClient(supabaseUrl, supabaseAnonKey, {
     auth: {
       autoRefreshToken: true,
       persistSession: true,
       detectSessionInUrl: true,
+      lock: supabaseLock,
       storage: {
         getItem: (key: string) => {
           if (typeof window === "undefined") return null
@@ -47,7 +84,8 @@ export function getSupabaseClient(): SupabaseClient {
     },
   })
 
-  return _supabase
+  g.__vysefit_supabase = client
+  return client
 }
 
 export function getSupabase(): SupabaseClient {

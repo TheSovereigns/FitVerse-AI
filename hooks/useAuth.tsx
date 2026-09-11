@@ -129,16 +129,51 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, [])
 
+  const isLockError = (e: unknown) => {
+    const msg = e instanceof Error ? e.message : String(e ?? "")
+    return msg.includes("Navigator LockManager") || msg.includes("immediately failed") || msg.includes("lock:")
+  }
+
+  const confirmSessionAfterLockError = async () => {
+    try {
+      await new Promise((r) => setTimeout(r, 300))
+      const { data: { session } } = await supabase.auth.getSession()
+      if (session?.user) {
+        setUser(session.user)
+        syncSessionToCookie(session.access_token)
+        await loadProfile(session.user.id)
+        if (!hasRedirectedRef.current) {
+          hasRedirectedRef.current = true
+          router.push("/app")
+        }
+        return true
+      }
+    } catch {
+      // ignore - caller surfaces the original error
+    }
+    return false
+  }
+
   const signIn = async (email: string, password: string) => {
     try {
       setIsLoading(true)
 
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      })
-
-      if (error) throw error
+      let data
+      try {
+        const res = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        })
+        if (res.error) throw res.error
+        data = res.data
+      } catch (e) {
+        // Lock contention (multiple tabs / refresh racing sign-in):
+        // the session is often already persisted - verify before failing.
+        if (isLockError(e) && (await confirmSessionAfterLockError())) {
+          return { error: null }
+        }
+        throw e
+      }
 
       if (data.user) {
         try {
@@ -199,17 +234,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return { error: null }
       }
 
-      const { error: signInError } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      })
+      try {
+        const { error: signInError } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        })
 
-      if (!signInError) {
-        return { error: null }
+        if (!signInError) {
+          return { error: null }
+        }
+        if (isLockError(signInError) && (await confirmSessionAfterLockError())) {
+          return { error: null }
+        }
+      } catch (e) {
+        if (isLockError(e) && (await confirmSessionAfterLockError())) {
+          return { error: null }
+        }
       }
 
       return { error: null }
     } catch (error) {
+      if (isLockError(error) && (await confirmSessionAfterLockError())) {
+        return { error: null }
+      }
       return { error: error as Error }
     } finally {
       setIsLoading(false)
