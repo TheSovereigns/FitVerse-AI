@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react"
 import { Loader2 } from "lucide-react"
-import type { Session } from "@supabase/supabase-js"
 import Link from "next/link"
 import { supabase } from "@/lib/supabase"
 
@@ -47,34 +46,12 @@ export default function AuthCallbackPage() {
         const providerError = query.get("error_description") || query.get("error")
         if (providerError) throw new Error(providerError)
 
-        const code = query.get("code")
-        let session: Session | null = null
-
-        if (code) {
-          // This page is the only owner of the one-time PKCE exchange.
-          const result = await supabase.auth.exchangeCodeForSession(code)
-          if (result.error) throw result.error
-          session = result.data.session
-        } else {
-          // Supports a login started by an older deployed implicit-flow build.
-          const hash = new URLSearchParams(window.location.hash.slice(1))
-          const accessToken = hash.get("access_token")
-          const refreshToken = hash.get("refresh_token")
-          if (accessToken && refreshToken) {
-            const result = await supabase.auth.setSession({
-              access_token: accessToken,
-              refresh_token: refreshToken,
-            })
-            if (result.error) throw result.error
-            session = result.data.session
-          }
-        }
-
-        if (!session) {
-          const result = await supabase.auth.getSession()
-          if (result.error) throw result.error
-          session = result.data.session
-        }
+        // createBrowserClient automatically exchanges the PKCE code during
+        // client initialization, reading the verifier from its cookie. Wait
+        // for that single initialization instead of exchanging the code again.
+        const result = await supabase.auth.getSession()
+        if (result.error) throw result.error
+        const session = result.data.session
 
         if (!session?.user) {
           throw new Error("O Google não retornou uma sessão válida. Tente entrar novamente.")

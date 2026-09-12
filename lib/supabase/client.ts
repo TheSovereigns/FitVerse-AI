@@ -1,4 +1,5 @@
-import { createClient, SupabaseClient } from "@supabase/supabase-js"
+import { createBrowserClient } from "@supabase/ssr"
+import type { SupabaseClient } from "@supabase/supabase-js"
 
 type GlobalWithSupabase = typeof globalThis & { __vysefit_supabase?: SupabaseClient }
 
@@ -53,40 +54,14 @@ export function getSupabaseClient(): SupabaseClient {
     )
   }
 
-  const client = createClient(supabaseUrl, supabaseAnonKey, {
+  // `createBrowserClient` stores the PKCE verifier and session in cookies.
+  // That keeps the verifier available when Google returns to another page
+  // instance, which is required by Next.js OAuth callbacks.
+  const client = createBrowserClient(supabaseUrl, supabaseAnonKey, {
     auth: {
-      autoRefreshToken: true,
-      persistSession: true,
-      // Google OAuth uses PKCE. The dedicated callback page performs the
-      // exchange itself so auth-js and React do not consume the same code.
-      // Password recovery URLs keep automatic detection.
-      flowType: "pkce",
-      detectSessionInUrl: (url) => url.pathname !== "/auth/callback",
       lock: supabaseLock,
-      storage: {
-        getItem: (key: string) => {
-          if (typeof window === "undefined") return null
-          try {
-            return localStorage.getItem(key)
-          } catch {
-            return null
-          }
-        },
-        setItem: (key: string, value: string) => {
-          if (typeof window === "undefined") return
-          try {
-            localStorage.setItem(key, value)
-          } catch {}
-        },
-        removeItem: (key: string) => {
-          if (typeof window === "undefined") return
-          try {
-            localStorage.removeItem(key)
-          } catch {}
-        },
-      },
     },
-  })
+  }) as SupabaseClient
 
   g.__vysefit_supabase = client
   return client
