@@ -78,7 +78,7 @@ export function MicronutrientAnalysis({ isLocked = false, onUpgrade, intakeData 
 
   if (isLocked) {
     return (
-      <div className="glass-strong border border-border rounded-2xl p-8 flex flex-col items-center justify-center text-center gap-4">
+      <div className="relative flex flex-col items-center justify-center gap-4 overflow-hidden rounded-[1.5rem] border border-white/[0.09] bg-[#0b100d] p-8 text-center shadow-[0_18px_50px_rgba(0,0,0,0.28)]">
         <div className="w-14 h-14 rounded-2xl bg-brand/10 flex items-center justify-center">
           <Lock className="w-7 h-7 text-brand" />
         </div>
@@ -94,9 +94,9 @@ export function MicronutrientAnalysis({ isLocked = false, onUpgrade, intakeData 
   }
 
   return (
-    <div className="glass-strong border border-border rounded-2xl p-4 md:p-6 space-y-5">
+    <div className="relative overflow-hidden rounded-[1.5rem] border border-white/[0.09] bg-[#0b100d] p-4 shadow-[0_18px_50px_rgba(0,0,0,0.28)] md:p-6 space-y-5">
       <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-xl bg-brand/10 flex items-center justify-center">
+        <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-brand/15 bg-brand/[0.08]">
           <Pill className="w-5 h-5 text-brand" />
         </div>
         <div>
@@ -106,7 +106,7 @@ export function MicronutrientAnalysis({ isLocked = false, onUpgrade, intakeData 
       </div>
 
       {(deficient.length > 0 || low.length > 0) && (
-        <div className="bg-muted/30 border border-border rounded-xl p-3 space-y-2">
+        <div className="space-y-2 rounded-xl border border-amber-400/15 bg-amber-400/[0.045] p-3">
           {deficient.length > 0 && (
             <div className="flex items-start gap-2">
               <AlertCircle className="w-4 h-4 text-red-500 mt-0.5 shrink-0" />
@@ -140,18 +140,18 @@ export function MicronutrientAnalysis({ isLocked = false, onUpgrade, intakeData 
               initial={{ opacity: 0, y: 6 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.03 }}
-              className="border border-border rounded-xl overflow-hidden"
+              className="overflow-hidden rounded-xl border border-white/[0.08] bg-white/[0.02]"
             >
               <button
                 onClick={() => setExpanded(isExpanded ? null : nutrient.id)}
-                className="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-muted/50 transition-colors"
+                className="flex w-full items-center gap-3 px-3 py-2.5 transition-colors hover:bg-white/[0.045]"
               >
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
                     <span className="text-xs font-medium text-foreground">{nutrient.name}</span>
                     <span className={cn("text-[10px] font-medium", status.color)}>{status.label}</span>
                   </div>
-                  <div className="mt-1.5 h-1.5 bg-muted rounded-full overflow-hidden">
+                  <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-white/[0.07]">
                     <motion.div
                       initial={{ width: 0 }}
                       animate={{ width: `${Math.min(ratio * 100, 100)}%` }}
@@ -181,7 +181,7 @@ export function MicronutrientAnalysis({ isLocked = false, onUpgrade, intakeData 
                   animate={{ opacity: 1 }}
                   className="px-3 pb-3"
                 >
-                  <div className="bg-muted/30 rounded-lg p-3 space-y-2">
+                  <div className="space-y-2 rounded-lg border border-white/[0.06] bg-white/[0.025] p-3">
                     <p className="text-[11px] font-medium text-foreground">Food Sources</p>
                     <div className="flex flex-wrap gap-1.5">
                       {nutrient.foodSources.map((food) => (
@@ -202,7 +202,7 @@ export function MicronutrientAnalysis({ isLocked = false, onUpgrade, intakeData 
         onClick={runAiAnalysis}
         disabled={isAnalyzing}
         variant="outline"
-        className="w-full border-border"
+        className="w-full border-white/[0.1] bg-white/[0.025] hover:bg-white/[0.06]"
       >
         {isAnalyzing ? (
           <Loader2 className="w-4 h-4 mr-2 animate-spin" />

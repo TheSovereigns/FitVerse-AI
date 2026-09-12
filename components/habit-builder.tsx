@@ -136,7 +136,7 @@ export function HabitBuilder({}: HabitBuilderProps) {
   const totalXp = completedToday.length * 10;
 
   return (
-    <div className="glass-strong border border-border rounded-2xl p-6">
+    <div className="relative overflow-hidden rounded-[1.5rem] border border-white/[0.09] bg-[#0b100d] p-6 shadow-[0_18px_50px_rgba(0,0,0,0.28)]">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-lg font-semibold text-foreground">{t("hb_title")}</h2>
         <div className="flex items-center gap-1 text-sm border-brand/20 bg-brand-muted px-2 py-0.5 rounded-lg">
@@ -145,12 +145,12 @@ export function HabitBuilder({}: HabitBuilderProps) {
         </div>
       </div>
 
-      <div className="mb-6">
+      <div className="mb-6 rounded-xl border border-brand/15 bg-brand/[0.045] p-3">
         <div className="flex items-center justify-between mb-2">
           <span className="text-sm text-muted-foreground">{t("hb_daily_progress")}</span>
           <span className="text-sm font-medium text-foreground">{dailyPercent}%</span>
         </div>
-        <div className="w-full h-2 bg-muted rounded-full overflow-hidden">
+        <div className="h-2 w-full overflow-hidden rounded-full bg-white/[0.07]">
           <motion.div
             className="h-full bg-foreground rounded-full"
             initial={{ width: 0 }}
@@ -168,14 +168,14 @@ export function HabitBuilder({}: HabitBuilderProps) {
             <motion.div
               key={habit.id}
               whileTap={{ scale: 0.98 }}
-              className="flex items-center gap-3 p-3 rounded-xl border border-border bg-card"
+              className="flex items-center gap-3 rounded-xl border border-white/[0.08] bg-white/[0.025] p-3"
             >
               <button
                 onClick={() => toggleHabit(habit.id)}
                 className={`w-6 h-6 rounded-lg border flex items-center justify-center transition-colors ${
                   done
                     ? "bg-foreground border-foreground text-background"
-                    : "border-border bg-card"
+                    : "border-white/[0.12] bg-white/[0.025]"
                 }`}
               >
                 {done && <Check className="w-4 h-4" />}
@@ -231,7 +231,7 @@ export function HabitBuilder({}: HabitBuilderProps) {
                 value={newHabitName}
                 onChange={(e) => setNewHabitName(e.target.value)}
                 placeholder={t("hb_new_habit_placeholder")}
-                className="flex-1 px-3 py-2 rounded-xl border border-border bg-card text-foreground text-sm focus:outline-none focus:ring-1 focus:ring-ring"
+                className="flex-1 rounded-xl border border-white/[0.09] bg-white/[0.035] px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-brand/30"
                 onKeyDown={(e) => e.key === "Enter" && addCustomHabit()}
               />
               <button
@@ -246,7 +246,7 @@ export function HabitBuilder({}: HabitBuilderProps) {
           <motion.button
             whileTap={{ scale: 0.98 }}
             onClick={() => setShowAdd(true)}
-            className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-xl border border-border text-sm text-muted-foreground hover:bg-muted transition-colors"
+            className="flex w-full items-center justify-center gap-2 rounded-xl border border-white/[0.09] bg-white/[0.025] px-4 py-2 text-sm text-muted-foreground transition-colors hover:border-brand/20 hover:bg-brand/[0.045]"
           >
             <Plus className="w-4 h-4" />
             {t("hb_add_custom")}

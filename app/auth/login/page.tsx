@@ -92,47 +92,47 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="product-experience auth-experience min-h-screen flex">
+    <div className="product-experience auth-experience min-h-screen flex bg-[#070A08] text-[#F5F7F4]">
       <AuthVisual />
-      {/* Right side - Form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-6 md:p-12">
+      <div className="relative w-full lg:w-1/2 flex items-center justify-center overflow-hidden bg-[#070A08] p-6 md:p-12">
+        <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_88%_12%,rgba(110,255,141,0.12),transparent_30%),linear-gradient(135deg,rgba(255,255,255,0.045)_1px,transparent_1px)] [background-size:auto,26px_26px] opacity-70" />
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="w-full max-w-md"
+          transition={{ duration: 0.45, ease: "easeOut" }}
+          className="relative z-10 w-full max-w-md"
         >
           {/* Logo */}
           <div className="text-center mb-8">
             <Link href="/" className="inline-flex items-center gap-2">
-              <div className="w-10 h-10 rounded-xl bg-primary/20 border border-primary/30 flex items-center justify-center overflow-hidden">
+              <div className="w-10 h-10 rounded-2xl bg-[#101713] border border-[#6BFF8E]/30 flex items-center justify-center overflow-hidden shadow-[0_0_32px_rgba(107,255,142,0.13)]">
                 <img src="/icon.svg" alt="VyseFit" className="w-6 h-6" />
               </div>
-              <span className="text-2xl font-black text-foreground">VyseFit AI</span>
+              <span className="text-2xl font-semibold tracking-[-0.06em] text-foreground">VyseFit AI</span>
             </Link>
           </div>
 
           {/* Form Card */}
-          <div className="glass-strong border border-border rounded-3xl p-6 md:p-8">
+          <div className="rounded-[2rem] border border-white/[0.12] bg-[#0E1411]/95 p-6 shadow-[inset_0_1px_0_rgba(255,255,255,0.10),0_28px_90px_rgba(0,0,0,0.48)] backdrop-blur-2xl md:p-8">
             <div className="text-center mb-6">
-              <h1 className="text-2xl font-black text-foreground mb-2">
+              <h1 className="text-3xl font-semibold tracking-[-0.055em] text-foreground mb-2">
                 {locale === "en-US" ? "Sign In" : "Entrar"}
               </h1>
-              <p className="text-sm text-foreground/40">
+              <p className="text-sm leading-6 text-[#B9C3BA]">
                 {locale === "en-US" ? "Welcome back! Enter your credentials." : "Bem-vindo de volta! Entre com suas credenciais."}
               </p>
             </div>
 
             {/* Error Message */}
             {error && (
-              <div className="mb-4 p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
+              <div role="alert" aria-live="assertive" className="mb-4 rounded-2xl border border-red-400/25 bg-red-500/10 p-3 text-sm text-red-100">
                 {error}
               </div>
             )}
 
             <form onSubmit={handleSubmit} className="space-y-5">
               <div>
-                <Label htmlFor="email" className="text-foreground/70 text-sm font-medium mb-2 block">
+                <Label htmlFor="email" className="mb-2 block text-sm font-medium text-[#DEE5DF]">
                   {locale === "en-US" ? "Email" : "Email"}
                 </Label>
                 <Input
@@ -142,16 +142,16 @@ export default function LoginPage() {
                   onChange={(e) => setEmail(e.target.value)}
                   onBlur={() => setFieldErrors(prev => ({ ...prev, ...validate({ email, password }) }))}
                   placeholder={locale === "en-US" ? "you@example.com" : "seu@email.com"}
-                  className={cn("h-12 bg-muted/50 border-border text-foreground placeholder:text-foreground/30 focus:border-brand/30 focus:ring-brand/20 rounded-xl", fieldErrors.email && "border-red-500 focus:border-red-500 focus:ring-red-500/20")}
+                  className={cn("h-12 rounded-2xl border-white/[0.12] bg-black/45 text-foreground placeholder:text-white/35 focus-visible:border-brand/70 focus-visible:ring-2 focus-visible:ring-brand/25", fieldErrors.email && "border-red-400 focus-visible:border-red-400 focus-visible:ring-red-400/25")}
                   aria-invalid={!!fieldErrors.email}
                 />
                 {fieldErrors.email && (
-                  <p className="text-red-400 text-xs mt-1.5">{fieldErrors.email}</p>
+                  <p className="mt-1.5 text-xs text-red-200" role="alert">{fieldErrors.email}</p>
                 )}
               </div>
 
               <div>
-                <Label htmlFor="password" className="text-foreground/70 text-sm font-medium mb-2 block">
+                <Label htmlFor="password" className="mb-2 block text-sm font-medium text-[#DEE5DF]">
                   {locale === "en-US" ? "Password" : "Senha"}
                 </Label>
                 <div className="relative">
@@ -162,7 +162,7 @@ export default function LoginPage() {
                     onChange={(e) => setPassword(e.target.value)}
                     onBlur={() => setFieldErrors(prev => ({ ...prev, ...validate({ email, password }) }))}
                     placeholder="••••••••"
-                    className={cn("h-12 bg-muted/50 border-border text-foreground placeholder:text-foreground/30 focus:border-brand/30 focus:ring-brand/20 rounded-xl pr-12", fieldErrors.password && "border-red-500 focus:border-red-500 focus:ring-red-500/20")}
+                    className={cn("h-12 rounded-2xl border-white/[0.12] bg-black/45 pr-12 text-foreground placeholder:text-white/35 focus-visible:border-brand/70 focus-visible:ring-2 focus-visible:ring-brand/25", fieldErrors.password && "border-red-400 focus-visible:border-red-400 focus-visible:ring-red-400/25")}
                     aria-invalid={!!fieldErrors.password}
                   />
                   <Button
@@ -170,20 +170,21 @@ export default function LoginPage() {
                     variant="ghost"
                     size="sm"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-0 top-0 h-full px-3 text-foreground/40 hover:text-foreground"
+                    aria-label={showPassword ? (locale === "en-US" ? "Hide password" : "Ocultar senha") : (locale === "en-US" ? "Show password" : "Mostrar senha")}
+                    className="absolute right-0 top-0 h-full px-3 text-white/50 hover:text-white focus-visible:ring-2 focus-visible:ring-brand/50"
                   >
                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </Button>
                 </div>
                 {fieldErrors.password && (
-                  <p className="text-red-400 text-xs mt-1.5">{fieldErrors.password}</p>
+                  <p className="mt-1.5 text-xs text-red-200" role="alert">{fieldErrors.password}</p>
                 )}
               </div>
 
               <div className="flex items-center justify-end">
                 <Link
                   href="/auth/forgot-password"
-                  className="text-xs text-primary hover:underline"
+                  className="text-xs font-medium text-brand hover:text-brand/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/50"
                 >
                   {locale === "en-US" ? "Forgot password?" : "Esqueceu a senha?"}
                 </Link>
@@ -192,7 +193,7 @@ export default function LoginPage() {
               <Button
                 type="submit"
                 disabled={isLoading}
-                className="w-full h-12 text-base font-black bg-brand text-brand-foreground rounded-xl hover:bg-brand/90 transition-all shadow-lg shadow-brand/25 hover:shadow-[0_10px_30px_rgba(52,211,153,0.3)] hover:scale-[1.02] active:scale-[0.98]"
+                className="h-12 w-full rounded-2xl bg-brand text-base font-semibold text-brand-foreground shadow-[0_12px_34px_rgba(52,211,153,0.22)] transition-colors hover:bg-brand/90 focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-[#0E1411]"
               >
                 {isLoading ? (
                   <>
@@ -210,10 +211,10 @@ export default function LoginPage() {
             {/* Divider */}
             <div className="relative my-6">
               <div className="absolute inset-0 flex items-center">
-                <span className="w-full border-t border-border" />
+                <span className="w-full border-t border-white/[0.12]" />
               </div>
               <div className="relative flex justify-center text-xs">
-                <span className="bg-background px-4 text-foreground/30">
+                <span className="bg-[#0E1411] px-4 text-white/45">
                   {locale === "en-US" ? "or continue with" : "ou continue com"}
                 </span>
               </div>
@@ -224,7 +225,7 @@ export default function LoginPage() {
               type="button"
               onClick={handleGoogleLogin}
               disabled={isLoading}
-              className="w-full h-12 bg-card border border-border text-foreground hover:bg-muted rounded-xl transition-all"
+              className="h-12 w-full rounded-2xl border border-white/[0.14] bg-white/[0.045] text-foreground transition-colors hover:bg-white/[0.09] focus-visible:ring-2 focus-visible:ring-brand/50"
             >
               {isLoading ? <Loader2 className="w-5 h-5 mr-2 animate-spin" /> : <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
                 <path
@@ -251,9 +252,9 @@ export default function LoginPage() {
 
             {/* Sign Up Link */}
             <div className="mt-6 text-center">
-              <p className="text-sm text-foreground/40">
+              <p className="text-sm text-[#B9C3BA]">
                 {locale === "en-US" ? "No account?" : "Não tem conta?"}{" "}
-                <Link href="/auth/signup" className="text-primary hover:underline font-medium">
+                <Link href="/auth/signup" className="font-medium text-brand hover:text-brand/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/50">
                   {locale === "en-US" ? "Create for free" : "Criar grátis"}
                 </Link>
               </p>

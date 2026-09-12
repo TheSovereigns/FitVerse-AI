@@ -290,15 +290,15 @@ export default function SubscriptionPage() {
   }
 
   return (
-    <div className="product-experience subscription-experience min-h-screen bg-background text-foreground relative overflow-hidden">
-      <div className="absolute inset-0 pointer-events-none bg-[linear-gradient(115deg,rgba(255,255,255,0.04)_0%,transparent_32%,rgba(255,255,255,0.03)_62%,transparent_100%)]" />
-      <div className="absolute inset-0 pointer-events-none opacity-[0.16] [background-image:linear-gradient(rgba(255,255,255,0.06)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.06)_1px,transparent_1px)] [background-size:72px_72px]" />
-      <div className="absolute inset-x-0 top-0 h-48 pointer-events-none bg-gradient-to-b from-white/10 to-transparent" />
+    <div className="product-experience subscription-experience relative min-h-screen overflow-hidden bg-[#070A08] text-foreground">
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_84%_10%,rgba(110,255,141,0.13),transparent_25%),linear-gradient(115deg,rgba(255,255,255,0.04)_0%,transparent_32%,rgba(255,255,255,0.03)_62%,transparent_100%)]" />
+      <div className="pointer-events-none absolute inset-0 opacity-[0.12] [background-image:linear-gradient(rgba(255,255,255,0.06)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.06)_1px,transparent_1px)] [background-size:72px_72px]" />
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-48 bg-gradient-to-b from-white/[0.08] to-transparent" />
 
       {/* Header */}
-      <header className="relative z-10 border-b border-border bg-black/50 backdrop-blur-2xl">
+      <header className="relative z-10 border-b border-white/[0.10] bg-[#070A08]/88 backdrop-blur-2xl">
         <div className="max-w-7xl mx-auto px-4 md:px-6 py-4 flex items-center justify-between gap-3">
-          <Button variant="ghost" size="icon" onClick={() => router.push("/")} className="rounded-2xl border border-border bg-muted/30 hover:bg-muted/30">
+          <Button variant="ghost" size="icon" onClick={() => router.push("/")} className="rounded-2xl border border-white/[0.12] bg-white/[0.045] hover:bg-white/[0.09] focus-visible:ring-2 focus-visible:ring-brand/50">
             <ArrowLeft className="w-5 h-5" />
           </Button>
           <div className="text-center min-w-0 flex items-center gap-2 justify-center">
@@ -308,8 +308,8 @@ export default function SubscriptionPage() {
               {isEnglish ? "Subscription Plans" : "Planos de Assinatura"}
             </h1>
           </div>
-          <div className="h-10 px-3 rounded-2xl border border-border bg-muted/30 flex items-center gap-2">
-            <span className="hidden sm:inline text-[10px] uppercase tracking-widest text-foreground/50">{isEnglish ? "Current" : "Atual"}</span>
+          <div className="flex h-10 items-center gap-2 rounded-2xl border border-white/[0.12] bg-white/[0.045] px-3">
+            <span className="hidden text-[10px] font-medium tracking-[0.14em] text-white/50 sm:inline">{isEnglish ? "Current" : "Atual"}</span>
             <span className="text-xs font-black text-foreground">{currentPlan.toUpperCase()}</span>
           </div>
         </div>
@@ -318,22 +318,24 @@ export default function SubscriptionPage() {
       <main className="relative z-10 max-w-7xl mx-auto px-4 md:px-6 py-5 md:py-7">
 
         {/* Hero */}
-        <section className="relative overflow-hidden rounded-2xl border border-border bg-black/55 backdrop-blur-2xl shadow-[inset_0_1px_0_rgba(255,255,255,0.10),0_30px_120px_rgba(0,0,0,0.32)] p-5 md:p-6 mb-5 ">
-          <div className="absolute left-0 top-0 bottom-0 w-2 bg-gradient-to-b from-white/20 via-white/10 to-white/5" />
+        <section className="relative mb-5 overflow-hidden rounded-[2rem] border border-white/[0.12] bg-[#0D120F]/94 p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.10),0_30px_120px_rgba(0,0,0,0.42)] backdrop-blur-2xl md:p-7">
+          <img src="/images/landing/recovery.webp" alt="" aria-hidden="true" className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-[0.13] grayscale" />
+          <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,rgba(13,18,15,0.97),rgba(13,18,15,0.82),rgba(13,18,15,0.98))]" />
+          <div className="absolute bottom-0 left-0 top-0 w-1.5 bg-brand shadow-[0_0_22px_rgba(52,211,153,0.65)]" />
           <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
           <div className="absolute inset-0 pointer-events-none bg-[linear-gradient(135deg,rgba(255,255,255,0.04),transparent_34%,rgba(255,255,255,0.03)_64%,rgba(255,255,255,0.03))]" />
           <div className="relative grid lg:grid-cols-[1fr_auto] gap-5 items-end">
             <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }}>
-              <div className="inline-flex items-center gap-2 rounded-full border border-border bg-muted/30 px-3 py-2 mb-3">
+              <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-white/[0.12] bg-black/30 px-3 py-2">
                 <Lock className="w-4 h-4 text-foreground/60" />
-                <span className="text-xs font-black uppercase tracking-widest text-foreground/60">
+                <span className="text-xs font-medium tracking-[0.14em] text-white/65">
                   {isEnglish ? "Stripe checkout protected" : "Checkout protegido pela Stripe"}
                 </span>
               </div>
- <h2 className="max-w-3xl text-4xl md:text-6xl tracking-tight leading-[1.02] text-cta">
+ <h2 className="max-w-3xl text-4xl font-semibold leading-[0.96] tracking-[-0.065em] text-cta md:text-6xl">
                 {isEnglish ? "VyseFit Black Plans." : "Planos VyseFit Black."}
               </h2>
-              <p className="mt-3 max-w-2xl text-sm md:text-base text-foreground/50 leading-relaxed">
+              <p className="mt-4 max-w-2xl text-sm leading-6 text-[#B9C3BA] md:text-base md:leading-7">
                 {isEnglish
                   ? "More scans, richer analysis, workouts and recipes with a smooth ad-free VyseFit experience."
                   : "Mais scans, analises melhores, treinos e receitas em uma experiencia VyseFit mais limpa e sem anuncios."}
@@ -347,9 +349,9 @@ export default function SubscriptionPage() {
                 { label: isEnglish ? "Workouts" : "Treinos", value: planSummary.workouts },
                 { label: isEnglish ? "Recipes" : "Receitas", value: planSummary.recipes },
               ].map((item) => (
-                <div key={item.label} className="rounded-2xl border border-border bg-muted/30 backdrop-blur-xl p-3">
-                  <p className="text-[10px] uppercase tracking-widest text-foreground/50">{item.label}</p>
-                  <p className="mt-2 text-lg md:text-2xl font-bold text-white">{item.value}</p>
+                <div key={item.label} className="rounded-2xl border border-white/[0.12] bg-black/35 p-3 backdrop-blur-xl">
+                  <p className="text-[10px] font-medium tracking-[0.14em] text-white/50">{item.label}</p>
+                  <p className="mt-2 text-lg font-semibold tracking-[-0.04em] text-white md:text-2xl">{item.value}</p>
                 </div>
               ))}
             </motion.div>
@@ -358,16 +360,16 @@ export default function SubscriptionPage() {
 
         {/* Billing Toggle */}
         <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} className="flex items-center justify-center gap-3 mb-6">
-          <div className="flex gap-1 p-1 rounded-full bg-muted">
+          <div className="flex gap-1 rounded-full border border-white/[0.10] bg-black/40 p-1">
             <button
               onClick={() => setIsAnnual(false)}
-              className={cn("flex-1 py-2 px-4 rounded-full text-sm font-medium transition-colors", !isAnnual ? "bg-brand text-brand-foreground shadow" : "text-muted-foreground")}
+              className={cn("flex-1 rounded-full px-4 py-2 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/50", !isAnnual ? "bg-brand text-brand-foreground shadow-[0_0_24px_rgba(52,211,153,0.2)]" : "text-white/60 hover:text-white")}
             >
               {isEnglish ? "Monthly" : "Mensal"}
             </button>
             <button
               onClick={() => setIsAnnual(true)}
-              className={cn("flex-1 py-2 px-4 rounded-full text-sm font-medium transition-colors", isAnnual ? "bg-brand text-brand-foreground shadow" : "text-muted-foreground")}
+              className={cn("flex-1 rounded-full px-4 py-2 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/50", isAnnual ? "bg-brand text-brand-foreground shadow-[0_0_24px_rgba(52,211,153,0.2)]" : "text-white/60 hover:text-white")}
             >
               {isEnglish ? "Annual" : "Anual"}
             </button>

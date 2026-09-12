@@ -201,7 +201,7 @@ export function MealPlanner({ isLocked = false, onUpgrade, macros }: MealPlanner
 
   if (isLocked) {
     return (
-      <div className="glass-strong border border-border rounded-2xl p-8 flex flex-col items-center justify-center text-center gap-4">
+      <div className="relative flex flex-col items-center justify-center gap-4 overflow-hidden rounded-[1.5rem] border border-white/[0.09] bg-[#0b100d] p-8 text-center shadow-[0_18px_50px_rgba(0,0,0,0.28)]">
         <div className="w-14 h-14 rounded-2xl bg-brand/10 flex items-center justify-center">
           <Lock className="w-7 h-7 text-brand" />
         </div>
@@ -217,9 +217,9 @@ export function MealPlanner({ isLocked = false, onUpgrade, macros }: MealPlanner
   }
 
   return (
-    <div className="glass-strong border border-border rounded-2xl p-4 md:p-6 space-y-5">
+    <div className="relative overflow-hidden rounded-[1.5rem] border border-white/[0.09] bg-[#0b100d] p-4 shadow-[0_18px_50px_rgba(0,0,0,0.28)] md:p-6 space-y-5">
       <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-xl bg-brand/10 flex items-center justify-center">
+        <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-brand/15 bg-brand/[0.08]">
           <Calendar className="w-5 h-5 text-brand" />
         </div>
         <div>
@@ -240,7 +240,7 @@ export function MealPlanner({ isLocked = false, onUpgrade, macros }: MealPlanner
                   "px-3 py-1.5 text-xs font-medium rounded-lg border transition-colors capitalize",
                   budgetLevel === level
                     ? "bg-brand text-white border-brand"
-                    : "bg-transparent text-muted-foreground border-border hover:bg-muted"
+                    : "border-white/[0.09] bg-white/[0.025] text-muted-foreground hover:border-brand/25 hover:bg-brand/[0.045]"
                 )}
               >
                 {level}
@@ -254,7 +254,7 @@ export function MealPlanner({ isLocked = false, onUpgrade, macros }: MealPlanner
         <Button
           onClick={generatePlan}
           disabled={isGenerating}
-          className="w-full h-11"
+          className="h-11 w-full rounded-xl bg-brand font-semibold text-[#071009] shadow-[0_10px_28px_rgba(52,211,153,0.22)] hover:bg-brand/90"
         >
           {isGenerating ? (
             <>
@@ -292,11 +292,11 @@ export function MealPlanner({ isLocked = false, onUpgrade, macros }: MealPlanner
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: dayIdx * 0.04 }}
-                className="border border-border rounded-xl overflow-hidden"
+                className="overflow-hidden rounded-xl border border-white/[0.08] bg-white/[0.02]"
               >
                 <button
                   onClick={() => setExpandedDay(expandedDay === day.day ? null : day.day)}
-                  className="w-full flex items-center justify-between px-4 py-3 hover:bg-muted/50 transition-colors"
+                  className="flex w-full items-center justify-between px-4 py-3 transition-colors hover:bg-white/[0.045]"
                 >
                   <span className="text-sm font-medium text-foreground">{day.day}</span>
                   <div className="flex items-center gap-2">
@@ -326,7 +326,7 @@ export function MealPlanner({ isLocked = false, onUpgrade, macros }: MealPlanner
                           return (
                             <div
                               key={mealType}
-                              className="bg-muted/30 rounded-xl p-3 space-y-1"
+                              className="space-y-1 rounded-xl border border-white/[0.06] bg-white/[0.025] p-3"
                             >
                               <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-1.5">
@@ -378,10 +378,10 @@ export function MealPlanner({ isLocked = false, onUpgrade, macros }: MealPlanner
                 if (!items.length) return null
                 const isOpen = expandedCategory === key
                 return (
-                  <div key={key} className="border border-border rounded-xl overflow-hidden">
+                  <div key={key} className="overflow-hidden rounded-xl border border-white/[0.08] bg-white/[0.02]">
                     <button
                       onClick={() => setExpandedCategory(isOpen ? null : key)}
-                      className="w-full flex items-center justify-between px-3 py-2 hover:bg-muted/50 transition-colors"
+                      className="flex w-full items-center justify-between px-3 py-2 transition-colors hover:bg-white/[0.045]"
                     >
                       <div className="flex items-center gap-2">
                         <Icon className="w-3.5 h-3.5 text-muted-foreground" />

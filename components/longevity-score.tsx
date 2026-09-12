@@ -224,11 +224,11 @@ export function LongevityScore() {
     <motion.div
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
-      className="rounded-2xl border border-border glass-strong p-5"
+      className="relative overflow-hidden rounded-[1.5rem] border border-white/[0.09] bg-[#0b100d] p-5 shadow-[0_18px_50px_rgba(0,0,0,0.28)]"
     >
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2.5">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-muted">
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl border border-brand/15 bg-brand/[0.08]">
             <Heart className="h-4 w-4 text-brand" />
           </div>
           <div>
@@ -240,7 +240,7 @@ export function LongevityScore() {
             </p>
           </div>
         </div>
-        <Button onClick={handleShare} variant="ghost" size="icon" className="h-8 w-8 rounded-xl border border-border">
+        <Button onClick={handleShare} variant="ghost" size="icon" className="h-8 w-8 rounded-xl border border-white/[0.1] bg-white/[0.025] hover:bg-white/[0.06]">
           <Share2 className="h-4 w-4" />
         </Button>
       </div>
@@ -297,7 +297,7 @@ export function LongevityScore() {
           >
             <div className="space-y-3">
               {calculatedFactors.map((factor) => (
-                <div key={factor.id} className="rounded-xl border border-border p-3">
+                <div key={factor.id} className="rounded-xl border border-white/[0.08] bg-white/[0.02] p-3">
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-2">
                       <div className="text-muted-foreground">{factor.icon}</div>
@@ -327,9 +327,9 @@ export function LongevityScore() {
                     step={factor.id === "bmi" ? 0.1 : 1}
                     value={factor.value}
                     onChange={(e) => updateFactor(factor.id, parseFloat(e.target.value))}
-                    className="w-full h-1.5 bg-muted rounded-full appearance-none cursor-pointer accent-brand"
+                    className="h-1.5 w-full cursor-pointer appearance-none rounded-full bg-white/[0.07] accent-brand"
                   />
-                  <div className="h-1 mt-1 bg-muted rounded-full overflow-hidden">
+                  <div className="mt-1 h-1 overflow-hidden rounded-full bg-white/[0.07]">
                     <motion.div
                       className={cn("h-full rounded-full", getFactorColor(factor.scored))}
                       animate={{ width: `${factor.scored}%` }}
@@ -403,7 +403,7 @@ export function LongevityScore() {
                     const prev = history[i + 1]
                     const diff = prev ? entry.score - prev.score : 0
                     return (
-                      <div key={entry.date} className="flex items-center justify-between rounded-xl border border-border p-2.5">
+                      <div key={entry.date} className="flex items-center justify-between rounded-xl border border-white/[0.08] bg-white/[0.02] p-2.5">
                         <div className="flex items-center gap-2">
                           <span className={cn("w-2 h-2 rounded-full", getScoreBg(entry.score))} />
                           <span className="text-xs text-foreground">

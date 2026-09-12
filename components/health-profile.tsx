@@ -339,12 +339,12 @@ export function HealthProfile({ scanHistory, onNavigateToSettings, onNavigateToS
     : []
 
   return (
-    <div className="relative mx-auto w-full max-w-2xl space-y-4 pb-safe-nav md:space-y-5">
+    <div className="relative mx-auto w-full max-w-2xl space-y-4 pb-safe-nav text-[#F5F7F4] md:space-y-5">
       {isOnboardingSkipped && (
         <motion.div
           initial={{ opacity: 0, y: -8 }}
           animate={{ opacity: 1, y: 0 }}
-          className="rounded-2xl border border-amber-500/20 bg-amber-500/10 p-4 flex items-center justify-between gap-3"
+          className="flex items-center justify-between gap-3 rounded-[1.5rem] border border-amber-400/25 bg-[#15120A]/95 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]"
         >
           <div>
             <p className="text-sm font-semibold text-foreground">{t("onboard_incomplete_title")}</p>
@@ -369,7 +369,7 @@ export function HealthProfile({ scanHistory, onNavigateToSettings, onNavigateToS
       <motion.section
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
-        className="relative overflow-hidden rounded-2xl glass-strong"
+        className="relative overflow-hidden rounded-[1.75rem] border border-white/[0.10] bg-[#0D120F]/94 shadow-[inset_0_1px_0_rgba(255,255,255,0.09),0_18px_56px_rgba(0,0,0,0.22)] backdrop-blur-xl"
       >
         {/* Top gradient accent */}
         <div className={cn(
@@ -386,7 +386,7 @@ export function HealthProfile({ scanHistory, onNavigateToSettings, onNavigateToS
             <motion.div
               whileHover={{ scale: 1.04 }}
               className={cn(
-                "relative flex h-18 w-18 shrink-0 items-center justify-center overflow-hidden rounded-2xl shadow-xl md:h-20 md:w-20",
+                "relative flex h-[4.5rem] w-[4.5rem] shrink-0 items-center justify-center overflow-hidden rounded-2xl shadow-xl md:h-20 md:w-20",
                 userSubscription === "premium"
                   ? "bg-gradient-to-br from-amber-500/20 to-amber-600/10 ring-2 ring-amber-500/30"
                   : userSubscription === "pro"
@@ -432,10 +432,10 @@ export function HealthProfile({ scanHistory, onNavigateToSettings, onNavigateToS
               ) : (
                 <>
                   <div className="flex min-w-0 items-center gap-2.5">
-                    <h1 className="truncate text-2xl font-bold text-foreground md:text-3xl">{displayName}</h1>
+                    <h1 className="truncate text-3xl font-semibold tracking-[-0.055em] text-foreground md:text-4xl">{displayName}</h1>
                     <button
                       onClick={() => { setEditName(displayName); setIsEditing(true) }}
-                      className="shrink-0 rounded-lg p-1.5 text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+                      className="shrink-0 rounded-lg p-1.5 text-white/55 hover:bg-white/[0.08] hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/50"
                     >
                       <Pencil className="h-3.5 w-3.5" />
                     </button>
@@ -475,10 +475,10 @@ export function HealthProfile({ scanHistory, onNavigateToSettings, onNavigateToS
 
             {/* Actions */}
             <div className="flex items-center gap-1">
-              <Button variant="ghost" size="icon" onClick={onNavigateToSettings} className="h-10 w-10 rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted">
+              <Button variant="ghost" size="icon" onClick={onNavigateToSettings} className="h-10 w-10 rounded-xl border border-white/[0.10] bg-white/[0.035] text-white/60 hover:bg-white/[0.08] hover:text-white focus-visible:ring-2 focus-visible:ring-brand/50">
                 <Settings className="h-4 w-4" />
               </Button>
-              <Button variant="ghost" size="icon" onClick={signOut} className="h-10 w-10 rounded-xl text-destructive/70 hover:text-destructive hover:bg-destructive/10">
+              <Button variant="ghost" size="icon" onClick={signOut} className="h-10 w-10 rounded-xl border border-red-400/15 bg-red-500/[0.05] text-red-200/70 hover:bg-red-500/10 hover:text-red-100 focus-visible:ring-2 focus-visible:ring-red-400/50">
                 <LogOut className="h-4 w-4" />
               </Button>
             </div>
@@ -514,7 +514,7 @@ export function HealthProfile({ scanHistory, onNavigateToSettings, onNavigateToS
         className="grid grid-cols-3 gap-3"
       >
         {/* Score ring */}
-        <div className="rounded-2xl glass-strong p-4 flex flex-col items-center">
+        <div className="flex flex-col items-center rounded-[1.25rem] border border-white/[0.10] bg-[#0D120F]/92 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]">
           <div className="relative h-16 w-16 md:h-20 md:w-20">
             <svg className="h-full w-full -rotate-90">
               <circle cx="50%" cy="50%" r="42%" fill="none" stroke="currentColor" strokeWidth="5" className="text-border" />
@@ -536,7 +536,7 @@ export function HealthProfile({ scanHistory, onNavigateToSettings, onNavigateToS
         </div>
 
         {/* Streak */}
-        <div className="rounded-2xl glass-strong p-4 flex flex-col items-center">
+        <div className="flex flex-col items-center rounded-[1.25rem] border border-white/[0.10] bg-[#0D120F]/92 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]">
           <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-orange-500/10">
             <Flame className="h-5 w-5 text-orange-400 animate-fire-glow" />
           </div>
@@ -545,7 +545,7 @@ export function HealthProfile({ scanHistory, onNavigateToSettings, onNavigateToS
         </div>
 
         {/* Total scans */}
-        <div className="rounded-2xl glass-strong p-4 flex flex-col items-center">
+        <div className="flex flex-col items-center rounded-[1.25rem] border border-white/[0.10] bg-[#0D120F]/92 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]">
           <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-brand/10">
             <ScanLine className="h-5 w-5 text-brand" />
           </div>
@@ -559,7 +559,7 @@ export function HealthProfile({ scanHistory, onNavigateToSettings, onNavigateToS
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.08 }}
-        className="rounded-2xl glass-strong p-5"
+        className="rounded-[1.5rem] border border-white/[0.10] bg-[#0D120F]/92 p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-xl"
       >
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-sm font-semibold text-foreground">{locale === "en-US" ? "Quality Distribution" : "Distribuicao de Qualidade"}</h3>
@@ -612,7 +612,7 @@ export function HealthProfile({ scanHistory, onNavigateToSettings, onNavigateToS
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
-        className={cn("rounded-2xl border p-5", pStyle.border, pStyle.bg, pStyle.glow && `shadow-lg ${pStyle.glow}`)}
+        className={cn("rounded-[1.5rem] border p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]", pStyle.border, pStyle.bg, pStyle.glow && `shadow-lg ${pStyle.glow}`)}
       >
         <div className="flex items-start justify-between mb-4">
           <div className="flex items-center gap-3">
@@ -689,7 +689,7 @@ export function HealthProfile({ scanHistory, onNavigateToSettings, onNavigateToS
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.12 }}
-        className="rounded-2xl glass-strong p-5"
+        className="rounded-[1.5rem] border border-white/[0.10] bg-[#0D120F]/92 p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-xl"
       >
         <div className="mb-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -804,7 +804,7 @@ export function HealthProfile({ scanHistory, onNavigateToSettings, onNavigateToS
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.15 }}
-        className="rounded-2xl glass-strong p-5 md:p-6"
+        className="rounded-[1.5rem] border border-white/[0.10] bg-[#0D120F]/92 p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-xl md:p-6"
       >
         <div className="mb-4 flex items-center justify-between">
           <div>
@@ -824,7 +824,7 @@ export function HealthProfile({ scanHistory, onNavigateToSettings, onNavigateToS
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.18 }}
-        className="rounded-2xl glass-strong p-5 md:p-6"
+        className="rounded-[1.5rem] border border-white/[0.10] bg-[#0D120F]/92 p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-xl md:p-6"
       >
         <div className="mb-4 flex items-center gap-3">
           <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand/10 text-brand">

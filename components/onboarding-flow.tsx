@@ -308,45 +308,50 @@ export function OnboardingFlow({ onComplete }: { onComplete: () => void }) {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="onboarding-experience fixed inset-0 z-[200] bg-background flex flex-col"
+        className="onboarding-experience fixed inset-0 z-[200] flex flex-col overflow-y-auto bg-[#070A08] text-[#F5F7F4]"
       >
-        <div className="flex items-center justify-between p-4">
-          <span className="text-xs text-muted-foreground">
+        <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
+          <img src="/images/landing/training.webp" alt="" className="h-full w-full object-cover opacity-[0.16] grayscale" />
+          <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(7,10,8,0.97),rgba(7,10,8,0.82),rgba(7,10,8,0.98)),radial-gradient(circle_at_78%_18%,rgba(110,255,141,0.16),transparent_28%)]" />
+        </div>
+        <div className="relative z-10 mx-auto flex w-full max-w-2xl items-center justify-between border-b border-white/[0.10] px-6 py-5">
+          <span className="text-xs font-medium tracking-[0.14em] text-white/55">
             {step + 1}/{totalSteps}
           </span>
-          <button onClick={handleSkip} className="text-xs text-muted-foreground hover:text-foreground">
+          <button onClick={handleSkip} className="text-xs font-medium text-white/55 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/50">
             {l("Pular", "Skip")}
           </button>
         </div>
 
-        <div className="px-6">
-          <div className="h-1 bg-muted rounded-full overflow-hidden mb-6">
+        <div className="relative z-10 mx-auto w-full max-w-2xl px-6 pt-7">
+          <div className="mb-6 h-1 overflow-hidden rounded-full bg-white/10">
             <motion.div
-              className="h-full bg-primary rounded-full"
+              className="h-full rounded-full bg-brand shadow-[0_0_16px_rgba(52,211,153,0.72)]"
               animate={{ width: `${progress}%` }}
               transition={{ duration: 0.3 }}
             />
           </div>
         </div>
 
-        <div className="flex-1 overflow-y-auto px-6">
+        <div className="relative z-10 mx-auto w-full max-w-2xl flex-1 overflow-y-auto px-6">
           <AnimatePresence mode="wait">
             <motion.div
               key={step}
               initial={{ opacity: 0, x: 30 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -30 }}
+              className="w-full rounded-[2rem] border border-white/[0.12] bg-[#0D120F]/92 p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.09),0_24px_76px_rgba(0,0,0,0.40)] backdrop-blur-2xl sm:p-7"
             >
               {step === 0 && (
                 <div className="space-y-6">
                   <div className="text-center mb-8">
-                    <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
+                    <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl border border-brand/25 bg-brand/10 shadow-[0_0_30px_rgba(52,211,153,0.12)]">
                       <Scale className="h-8 w-8 text-primary" />
                     </div>
-                    <h2 className="text-2xl font-bold text-foreground">
+                    <h2 className="text-3xl font-semibold tracking-[-0.055em] text-foreground">
                       {t("onboard_step_bio_title")}
                     </h2>
-                    <p className="text-sm text-muted-foreground mt-2">
+                    <p className="mt-2 text-sm leading-6 text-[#B9C3BA]">
                       {t("onboard_step_bio_desc")}
                     </p>
                   </div>
@@ -358,7 +363,7 @@ export function OnboardingFlow({ onComplete }: { onComplete: () => void }) {
                         type="number" value={data.age}
                         onChange={(e) => update("age", e.target.value)}
                         placeholder="25" min={10} max={120}
-                        className="h-12 rounded-xl border-border bg-card text-foreground"
+                        className="h-12 rounded-2xl border-white/[0.12] bg-black/40 text-foreground focus-visible:border-brand/70 focus-visible:ring-2 focus-visible:ring-brand/25"
                       />
                     </div>
                     <div className="space-y-2">
@@ -367,7 +372,7 @@ export function OnboardingFlow({ onComplete }: { onComplete: () => void }) {
                         type="number" value={data.weight}
                         onChange={(e) => update("weight", e.target.value)}
                         placeholder="70" min={20} max={300} step={0.1}
-                        className="h-12 rounded-xl border-border bg-card text-foreground"
+                        className="h-12 rounded-2xl border-white/[0.12] bg-black/40 text-foreground focus-visible:border-brand/70 focus-visible:ring-2 focus-visible:ring-brand/25"
                       />
                     </div>
                     <div className="space-y-2">
@@ -376,7 +381,7 @@ export function OnboardingFlow({ onComplete }: { onComplete: () => void }) {
                         type="number" value={data.height}
                         onChange={(e) => update("height", e.target.value)}
                         placeholder="175" min={100} max={250} step={0.1}
-                        className="h-12 rounded-xl border-border bg-card text-foreground"
+                        className="h-12 rounded-2xl border-white/[0.12] bg-black/40 text-foreground focus-visible:border-brand/70 focus-visible:ring-2 focus-visible:ring-brand/25"
                       />
                     </div>
                     <div className="space-y-2">
@@ -390,10 +395,10 @@ export function OnboardingFlow({ onComplete }: { onComplete: () => void }) {
                             key={g.value}
                             onClick={() => update("gender", g.value)}
                             className={cn(
-                              "h-12 rounded-xl border text-xs font-semibold transition-all",
+                              "h-12 rounded-2xl border border-white/[0.12] bg-black/35 text-xs font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/50",
                               data.gender === g.value
-                                ? "border-primary bg-primary/10 text-primary"
-                                : "border-border bg-card text-muted-foreground hover:bg-accent"
+                                ? "border-brand bg-brand/10 text-brand"
+                                : "text-white/60 hover:bg-white/[0.06]"
                             )}
                           >
                             {g.label}
@@ -571,11 +576,11 @@ export function OnboardingFlow({ onComplete }: { onComplete: () => void }) {
           </AnimatePresence>
         </div>
 
-        <div className="p-6 flex flex-col gap-3">
+        <div className="relative z-10 mx-auto flex w-full max-w-2xl flex-col gap-3 px-6 pb-6 pt-7">
           <Button
             onClick={handleNext}
             disabled={!canProceed() || isGenerating}
-            className="h-14 rounded-2xl bg-primary text-base font-semibold text-primary-foreground hover:bg-primary/90"
+            className="h-14 rounded-2xl bg-brand text-base font-semibold text-brand-foreground shadow-[0_12px_34px_rgba(52,211,153,0.22)] hover:bg-brand/90 focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-[#070A08]"
           >
             {isGenerating ? (
               <><Loader2 className="h-5 w-5 animate-spin mr-2" /> {l("Gerando plano...", "Generating plan...")}</>
@@ -594,7 +599,7 @@ export function OnboardingFlow({ onComplete }: { onComplete: () => void }) {
                 localStorage.setItem("vysefit-onboarding-step", String(prev))
               }}
               variant="ghost"
-              className="h-12 rounded-2xl border border-border text-muted-foreground hover:bg-accent"
+              className="h-12 rounded-2xl border border-white/[0.12] bg-white/[0.045] text-white/65 hover:bg-white/[0.09] hover:text-white focus-visible:ring-2 focus-visible:ring-brand/50"
             >
               <ChevronLeft className="h-4 w-4 mr-2" />
               {l("Voltar", "Back")}
@@ -602,13 +607,13 @@ export function OnboardingFlow({ onComplete }: { onComplete: () => void }) {
           )}
         </div>
 
-        <div className="flex justify-center gap-2 pb-4">
+        <div className="relative z-10 flex justify-center gap-2 pb-6">
           {Array.from({ length: totalSteps }).map((_, i) => (
             <div
               key={i}
               className={cn(
                 "h-1 rounded-full transition-all",
-                i === step ? "w-6 bg-primary" : i < step ? "w-1.5 bg-primary/40" : "w-1.5 bg-muted"
+                i === step ? "w-6 bg-brand shadow-[0_0_12px_rgba(52,211,153,0.65)]" : i < step ? "w-1.5 bg-brand/50" : "w-1.5 bg-white/15"
               )}
             />
           ))}

@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect, useCallback, useRef } from "react"
+import Image from "next/image"
 import { motion, AnimatePresence } from "framer-motion"
 import {
   Play,
@@ -295,7 +296,7 @@ export function MobilityRoutines({
       <motion.div
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
-        className="rounded-2xl border border-border glass-strong p-6"
+        className="relative overflow-hidden rounded-[1.5rem] border border-white/[0.09] bg-[#0b100d] p-6 shadow-[0_18px_50px_rgba(0,0,0,0.28)]"
       >
         <div className="flex flex-col items-center text-center py-8 space-y-4">
           <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-brand/10">
@@ -324,7 +325,7 @@ export function MobilityRoutines({
     <motion.div
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
-      className="rounded-2xl border border-border glass-strong p-5"
+      className="relative overflow-hidden rounded-[1.5rem] border border-white/[0.09] bg-[#0b100d] p-5 shadow-[0_18px_50px_rgba(0,0,0,0.28)]"
     >
       {/* Header */}
       <div className="flex items-center justify-between mb-5">
@@ -362,7 +363,7 @@ export function MobilityRoutines({
                   {activeExercise + 1}/{filteredExercises.length}
                 </span>
               </div>
-              <div className="h-1.5 bg-muted rounded-full overflow-hidden">
+              <div className="h-1.5 overflow-hidden rounded-full bg-white/[0.07]">
                 <motion.div
                   className="h-full bg-brand rounded-full"
                   animate={{ width: `${getProgress()}%` }}
@@ -395,7 +396,7 @@ export function MobilityRoutines({
             </div>
 
             {/* Instructions */}
-            <div className="p-3 rounded-xl border border-border bg-muted/50">
+            <div className="rounded-xl border border-brand/15 bg-brand/[0.045] p-3">
               <p className="text-xs text-muted-foreground">
                 {currentExercise.instructions}
               </p>
@@ -407,7 +408,7 @@ export function MobilityRoutines({
             {/* Video Placeholder */}
             <button
               onClick={() => setShowVideo(!showVideo)}
-              className="w-full p-3 rounded-xl border border-border bg-card flex items-center gap-3 hover:border-primary/30 transition-colors"
+              className="flex w-full items-center gap-3 rounded-xl border border-white/[0.08] bg-white/[0.025] p-3 transition-colors hover:border-brand/25 hover:bg-brand/[0.045]"
             >
               <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted">
                 <PlayCircle className="h-5 w-5 text-muted-foreground" />
@@ -430,12 +431,13 @@ export function MobilityRoutines({
                   exit={{ height: 0, opacity: 0 }}
                   className="overflow-hidden"
                 >
-                  <div className="h-32 rounded-xl bg-muted flex items-center justify-center">
-                    <div className="text-center">
-                      <Play className="h-8 w-8 text-muted-foreground mx-auto mb-1" />
-                      <p className="text-[10px] text-muted-foreground">
-                        Video coming soon
-                      </p>
+                  <div className="relative flex h-32 items-center justify-center overflow-hidden rounded-xl border border-white/[0.08] bg-[#071009]">
+                    <Image src="/images/landing/recovery.webp" alt="" fill sizes="(max-width: 640px) 100vw, 420px" className="object-cover opacity-35" />
+                    <div className="relative text-center">
+                      <div className="mx-auto mb-1 flex h-9 w-9 items-center justify-center rounded-full border border-white/20 bg-black/35 backdrop-blur-sm">
+                        <Play className="h-4 w-4 text-white" />
+                      </div>
+                      <p className="text-[10px] font-medium text-white/85">{t("mr_visual_demo")}</p>
                     </div>
                   </div>
                 </motion.div>
@@ -446,13 +448,13 @@ export function MobilityRoutines({
             <div className="flex items-center justify-center gap-3">
               <button
                 onClick={resetTimer}
-                className="h-10 w-10 rounded-xl border border-border bg-card flex items-center justify-center hover:bg-muted transition-colors"
+                className="flex h-10 w-10 items-center justify-center rounded-xl border border-white/[0.09] bg-white/[0.025] transition-colors hover:bg-white/[0.06]"
               >
                 <RotateCcw className="h-4 w-4 text-muted-foreground" />
               </button>
               <button
                 onClick={toggleTimer}
-                  className="h-12 w-12 rounded-xl bg-brand flex items-center justify-center hover:bg-brand/90 transition-colors"
+                  className="flex h-12 w-12 items-center justify-center rounded-xl bg-brand shadow-[0_10px_28px_rgba(52,211,153,0.22)] transition-colors hover:bg-brand/90"
               >
                 {isRunning ? (
                   <Pause className="h-5 w-5 text-white" />
@@ -462,7 +464,7 @@ export function MobilityRoutines({
               </button>
               <button
                 onClick={handleExerciseComplete}
-                className="h-10 px-4 rounded-xl border border-border bg-card flex items-center justify-center hover:bg-muted transition-colors"
+                className="flex h-10 items-center justify-center rounded-xl border border-white/[0.09] bg-white/[0.025] px-4 transition-colors hover:bg-white/[0.06]"
               >
                 <span className="text-xs font-medium text-muted-foreground">{t("mr_skip")}</span>
               </button>
@@ -487,7 +489,7 @@ export function MobilityRoutines({
                   className={`px-2.5 py-1.5 rounded-lg text-[11px] font-medium transition-all border ${
                     selectedArea === null
                       ? "bg-brand text-white border-brand"
-                      : "bg-card text-muted-foreground border-border hover:border-brand/30"
+                      : "border-white/[0.09] bg-white/[0.025] text-muted-foreground hover:border-brand/30"
                   }`}
                 >
                   All
@@ -501,7 +503,7 @@ export function MobilityRoutines({
                     className={`px-2.5 py-1.5 rounded-lg text-[11px] font-medium transition-all border ${
                       selectedArea === area.id
                         ? "bg-brand text-white border-brand"
-                        : "bg-card text-muted-foreground border-border hover:border-brand/30"
+                        : "border-white/[0.09] bg-white/[0.025] text-muted-foreground hover:border-brand/30"
                     }`}
                   >
                     {t(area.labelKey)}
@@ -528,10 +530,10 @@ export function MobilityRoutines({
                   key={routine.id}
                   initial={{ opacity: 0, x: -8 }}
                   animate={{ opacity: 1, x: 0 }}
-                  className="p-3 rounded-xl border border-border bg-card"
+                  className="rounded-xl border border-white/[0.08] bg-white/[0.025] p-3"
                 >
                   <div className="flex items-start gap-3">
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-muted">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-white/[0.06] bg-white/[0.045]">
                       {(() => {
                         const Icon = typeIcon
                         return <Icon className="h-4 w-4 text-muted-foreground" />
@@ -553,7 +555,7 @@ export function MobilityRoutines({
                         {routine.exercises.slice(0, 3).map((ex) => (
                           <span
                             key={ex.id}
-                            className="px-1.5 py-0.5 rounded bg-muted text-[10px] text-muted-foreground"
+                            className="rounded border border-white/[0.05] bg-white/[0.04] px-1.5 py-0.5 text-[10px] text-muted-foreground"
                           >
                             {ex.name}
                           </span>

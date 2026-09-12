@@ -1,6 +1,7 @@
 "use client"
 
 import { useMemo, useState, useEffect } from "react"
+import Image from "next/image"
 import { logger } from "@/lib/logger"
 import { motion, AnimatePresence } from "framer-motion"
 import { Button } from "@/components/ui/button"
@@ -204,18 +205,23 @@ export function RecipesTab({ metabolicPlan }: RecipesTabProps) {
         <motion.section
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          className="pt-2"
+          className="relative overflow-hidden rounded-[1.75rem] border border-white/[0.09] bg-[#0a0f0c] p-5 shadow-[0_22px_60px_rgba(0,0,0,0.32)] md:p-7"
         >
+          <div aria-hidden="true" className="pointer-events-none absolute inset-0 opacity-[0.15]">
+            <Image src="/images/landing/nutrition.webp" alt="" fill sizes="(max-width: 1024px) 100vw, 960px" className="object-cover object-center" />
+          </div>
+          <div className="relative">
           <div className="flex items-center gap-2 mb-1">
             <ChefHat className="h-4 w-4 text-brand" />
-            <span className="text-xs font-medium text-brand">{isEnglish ? "AI Chef" : "IA Chef"}</span>
+            <span className="text-xs font-semibold tracking-[0.14em] text-brand">{isEnglish ? "AI CHEF" : "IA CHEF"}</span>
           </div>
-          <h1 className="text-3xl font-bold tracking-tight text-foreground md:text-4xl">
+          <h1 className="max-w-xl text-3xl font-bold tracking-[-0.045em] text-foreground md:text-4xl">
             {isEnglish ? "Your recipe collection" : "Seu caderno de receitas"}
           </h1>
-          <p className="mt-1 text-sm text-muted-foreground">
+          <p className="mt-2 max-w-lg text-sm leading-relaxed text-muted-foreground">
             {isEnglish ? "Ideas that fit your taste and your routine." : "Ideias que combinam com seu gosto e sua rotina."}
           </p>
+          </div>
         </motion.section>
 
         {/* Stats */}
@@ -230,7 +236,7 @@ export function RecipesTab({ metabolicPlan }: RecipesTabProps) {
               { label: "kcal", value: totalCalories || "-" },
               { label: isEnglish ? "Mode" : "Modo", value: "AI" },
             ].map((item) => (
-              <div key={item.label} className="rounded-xl glass-strong p-3 text-center">
+              <div key={item.label} className="rounded-xl border border-white/[0.08] bg-[#101610] p-3 text-center shadow-[0_10px_28px_rgba(0,0,0,0.18)]">
                 <p className="text-[10px] text-muted-foreground">{item.label}</p>
                 <p className="text-lg font-bold text-foreground">{item.value}</p>
               </div>
@@ -249,9 +255,9 @@ export function RecipesTab({ metabolicPlan }: RecipesTabProps) {
             handleGenerateRecipes()
           }}
         >
-          <div className="rounded-2xl glass-strong p-3">
+          <div className="rounded-2xl border border-white/[0.09] bg-[#101610] p-3 shadow-[0_16px_45px_rgba(0,0,0,0.22)]">
             <div className="flex gap-2">
-              <div className="flex h-11 flex-1 items-center gap-3 rounded-xl bg-muted/50 px-3">
+              <div className="flex h-11 flex-1 items-center gap-3 rounded-xl border border-white/[0.06] bg-white/[0.035] px-3">
                 <Search className="h-4 w-4 shrink-0 text-muted-foreground" />
                 <Input
                   placeholder={t("recipes_placeholder")}
@@ -264,7 +270,7 @@ export function RecipesTab({ metabolicPlan }: RecipesTabProps) {
                 type="submit"
                 disabled={isGenerating || !ingredient.trim()}
                 aria-label={isGenerating ? "Generating" : t("recipes_generate_btn")}
-                className="h-11 rounded-xl bg-brand px-5 text-sm font-semibold text-white shadow-lg shadow-brand/25 hover:bg-brand/90 disabled:opacity-40"
+                className="h-11 rounded-xl bg-brand px-5 text-sm font-semibold text-[#071009] shadow-[0_10px_28px_rgba(52,211,153,0.22)] hover:bg-brand/90 disabled:opacity-40"
               >
                 {isGenerating ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
@@ -282,7 +288,7 @@ export function RecipesTab({ metabolicPlan }: RecipesTabProps) {
                   onClick={() => handleGenerateRecipes(item)}
                   disabled={isGenerating}
                   aria-label={`Generate recipes with ${item}`}
-                  className="shrink-0 rounded-full bg-muted/50 px-3 py-1.5 text-xs font-medium text-muted-foreground transition hover:bg-muted disabled:opacity-40"
+                  className="shrink-0 rounded-full border border-white/[0.07] bg-white/[0.035] px-3 py-1.5 text-xs font-medium text-muted-foreground transition hover:border-brand/20 hover:bg-brand/[0.06] disabled:opacity-40"
                 >
                   {item}
                 </button>
@@ -329,7 +335,7 @@ export function RecipesTab({ metabolicPlan }: RecipesTabProps) {
               className="grid grid-cols-1 gap-4 sm:grid-cols-2"
             >
               {[0, 1, 2].map((item) => (
-                <div key={item} className="h-64 rounded-2xl glass-strong p-5">
+                <div key={item} className="h-64 rounded-2xl border border-white/[0.08] bg-[#101610] p-5">
                   <div className="space-y-4">
                     <div className="h-6 w-20 animate-pulse rounded-full bg-muted" />
                     <div className="space-y-2">
@@ -381,7 +387,7 @@ export function RecipesTab({ metabolicPlan }: RecipesTabProps) {
               exit={{ opacity: 0, y: -12 }}
               className="grid gap-4 lg:grid-cols-[1fr_0.82fr]"
             >
-              <div className="rounded-2xl glass-strong p-6">
+              <div className="rounded-2xl border border-white/[0.09] bg-[#101610] p-6 shadow-[0_16px_45px_rgba(0,0,0,0.24)]">
                 <h2 className="text-xl font-bold tracking-tight text-foreground">
                   {isEnglish ? "Turn one ingredient into a complete menu." : "Transforme um ingrediente em um menu completo."}
                 </h2>
@@ -396,7 +402,7 @@ export function RecipesTab({ metabolicPlan }: RecipesTabProps) {
                     { label: isEnglish ? "Carbs" : "Carbos", value: "C" },
                     { label: isEnglish ? "Fat" : "Gordura", value: "G" },
                   ].map((item) => (
-                    <div key={item.label} className="rounded-xl bg-muted/50 p-3 text-center">
+                    <div key={item.label} className="rounded-xl border border-white/[0.06] bg-white/[0.035] p-3 text-center">
                       <p className="text-[10px] text-muted-foreground">{item.label}</p>
                       <p className="text-lg font-bold text-foreground">{item.value}</p>
                     </div>
@@ -404,7 +410,7 @@ export function RecipesTab({ metabolicPlan }: RecipesTabProps) {
                 </div>
               </div>
 
-              <div className="rounded-2xl glass-strong p-5">
+              <div className="rounded-2xl border border-white/[0.09] bg-[#101610] p-5 shadow-[0_16px_45px_rgba(0,0,0,0.24)]">
                 <p className="text-xs font-medium text-muted-foreground">
                   {isEnglish ? "Quick picks" : "Escolhas rapidas"}
                 </p>
@@ -415,7 +421,7 @@ export function RecipesTab({ metabolicPlan }: RecipesTabProps) {
                       type="button"
                       onClick={() => handleGenerateRecipes(item)}
                       aria-label={`Generate recipes with ${item}`}
-                      className="flex items-center justify-between rounded-xl bg-muted/50 px-4 py-3 text-left text-sm font-medium text-foreground transition hover:bg-muted"
+                      className="flex items-center justify-between rounded-xl border border-white/[0.06] bg-white/[0.035] px-4 py-3 text-left text-sm font-medium text-foreground transition hover:border-brand/20 hover:bg-brand/[0.06]"
                     >
                       <span>{item}</span>
                       <ArrowRight className="h-4 w-4 text-muted-foreground" />
@@ -448,7 +454,7 @@ export function RecipesTab({ metabolicPlan }: RecipesTabProps) {
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.95 }}
-                    className="group relative rounded-xl glass-strong p-4"
+                    className="group relative rounded-xl border border-white/[0.08] bg-[#101610] p-4 shadow-[0_10px_28px_rgba(0,0,0,0.18)]"
                   >
                     <div className="flex items-start justify-between gap-2">
                       <div className="min-w-0 flex-1">
@@ -531,10 +537,10 @@ function RecipeCard({
       whileTap={{ scale: 0.98 }}
       onClick={onOpen}
       aria-label={`View ${recipe.name}`}
-      className="group relative overflow-hidden rounded-2xl glass-strong p-5 text-left transition-all duration-200 hover:bg-brand/5"
+      className="group relative overflow-hidden rounded-[1.45rem] border border-white/[0.09] bg-[#0d120f] p-5 text-left shadow-[0_16px_45px_rgba(0,0,0,0.24)] transition-all duration-200 hover:border-brand/25 hover:bg-brand/[0.045]"
     >
       <div className="flex items-start justify-between gap-3">
-        <span className="rounded-full bg-muted px-2.5 py-1 text-[10px] font-medium text-muted-foreground">
+        <span className="rounded-full border border-white/[0.08] bg-white/[0.04] px-2.5 py-1 text-[10px] font-medium text-muted-foreground">
           {recipe.difficulty}
         </span>
         <div className="flex items-center gap-1">
@@ -567,18 +573,18 @@ function RecipeCard({
       </div>
 
       <div className="mt-4 flex flex-wrap gap-2 text-xs text-muted-foreground">
-        <span className="flex items-center gap-1 rounded-full bg-muted/50 px-2 py-1">
+        <span className="flex items-center gap-1 rounded-full border border-white/[0.06] bg-white/[0.035] px-2 py-1">
           <Clock className="h-3 w-3" />
           {recipe.prepTime}
         </span>
-        <span className="flex items-center gap-1 rounded-full bg-muted/50 px-2 py-1">
+        <span className="flex items-center gap-1 rounded-full border border-white/[0.06] bg-white/[0.035] px-2 py-1">
           <Flame className="h-3 w-3" />
           {Math.round((recipe.macros?.calories || 0) * (portions / (recipe.servings || 1)))} kcal
         </span>
       </div>
 
       {/* Portion Adjuster */}
-      <div className="mt-3 flex items-center gap-2 rounded-xl bg-muted/50 px-3 py-2" onClick={(e) => e.stopPropagation()}>
+      <div className="mt-3 flex items-center gap-2 rounded-xl border border-white/[0.06] bg-white/[0.035] px-3 py-2" onClick={(e) => e.stopPropagation()}>
         <span className="text-[10px] font-medium text-muted-foreground">{t("recipes_portions")}</span>
         <div className="ml-auto flex items-center gap-1">
           <motion.button
@@ -606,7 +612,7 @@ function RecipeCard({
 
       <div className="mt-3 grid grid-cols-3 gap-2">
         {macros.map((macro) => (
-          <div key={macro.label} className="rounded-lg bg-muted/50 p-2 text-center">
+          <div key={macro.label} className="rounded-lg border border-white/[0.06] bg-white/[0.035] p-2 text-center">
             <p className="text-[10px] text-muted-foreground">{macro.label}</p>
             <p className={cn("text-sm font-bold", macro.color)}>
               {Math.round(macro.value * (portions / (recipe.servings || 1)))}g

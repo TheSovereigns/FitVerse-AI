@@ -73,7 +73,7 @@ export function SmartSubstitutions({ isLocked = false, onUpgrade }: SmartSubstit
 
   if (isLocked) {
     return (
-      <div className="glass-strong border border-border rounded-2xl p-8 flex flex-col items-center justify-center text-center gap-4">
+      <div className="relative flex flex-col items-center justify-center gap-4 overflow-hidden rounded-[1.5rem] border border-white/[0.09] bg-[#0b100d] p-8 text-center shadow-[0_18px_50px_rgba(0,0,0,0.28)]">
         <div className="w-14 h-14 rounded-2xl bg-brand/10 flex items-center justify-center">
           <Lock className="w-7 h-7 text-brand" />
         </div>
@@ -89,9 +89,9 @@ export function SmartSubstitutions({ isLocked = false, onUpgrade }: SmartSubstit
   }
 
   return (
-    <div className="glass-strong border border-border rounded-2xl p-4 md:p-6 space-y-5">
+    <div className="relative overflow-hidden rounded-[1.5rem] border border-white/[0.09] bg-[#0b100d] p-4 shadow-[0_18px_50px_rgba(0,0,0,0.28)] md:p-6 space-y-5">
       <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-xl bg-brand/10 flex items-center justify-center">
+        <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-brand/15 bg-brand/[0.08]">
           <ArrowLeftRight className="w-5 h-5 text-brand" />
         </div>
         <div>
@@ -106,12 +106,12 @@ export function SmartSubstitutions({ isLocked = false, onUpgrade }: SmartSubstit
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Food you don't have or can't eat..."
           onKeyDown={(e) => e.key === "Enter" && findSubstitutions()}
-          className="flex-1 h-10 text-sm bg-muted/30 border-border"
+          className="h-10 flex-1 border-white/[0.09] bg-white/[0.035] text-sm focus-visible:ring-brand/30"
         />
         <Button
           onClick={findSubstitutions}
           disabled={isSearching || !query.trim()}
-          className="h-10 px-4"
+          className="h-10 rounded-xl bg-brand px-4 text-[#071009] shadow-[0_10px_28px_rgba(52,211,153,0.22)] hover:bg-brand/90"
         >
           {isSearching ? (
             <Loader2 className="w-4 h-4 animate-spin" />
@@ -148,7 +148,7 @@ export function SmartSubstitutions({ isLocked = false, onUpgrade }: SmartSubstit
             </div>
 
             {originalMacros && (
-              <div className="bg-muted/30 border border-border rounded-xl p-3">
+              <div className="rounded-xl border border-white/[0.08] bg-white/[0.025] p-3">
                 <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1.5">
                   Original Macros (per 100g)
                 </p>
@@ -186,7 +186,7 @@ export function SmartSubstitutions({ isLocked = false, onUpgrade }: SmartSubstit
                       "border rounded-xl p-3 transition-colors cursor-pointer",
                       isSelected
                         ? "bg-brand/10 border-brand/30"
-                        : "bg-muted/30 border-border hover:bg-muted/50"
+                        : "border-white/[0.08] bg-white/[0.025] hover:border-brand/25 hover:bg-brand/[0.045]"
                     )}
                     onClick={() => selectSubstitution(sub)}
                   >
@@ -239,7 +239,7 @@ export function SmartSubstitutions({ isLocked = false, onUpgrade }: SmartSubstit
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="text-center py-8 text-muted-foreground text-sm"
+            className="rounded-xl border border-dashed border-white/[0.11] bg-white/[0.02] py-8 text-center text-sm text-muted-foreground"
           >
             No substitutions found. Try a different food.
           </motion.div>
@@ -247,7 +247,7 @@ export function SmartSubstitutions({ isLocked = false, onUpgrade }: SmartSubstit
       </AnimatePresence>
 
       {substitutions.length === 0 && !isSearching && !query.trim() && (
-        <div className="text-center py-6 space-y-2">
+        <div className="space-y-2 rounded-xl border border-dashed border-white/[0.11] bg-white/[0.02] py-6 text-center">
           <Sparkles className="w-8 h-8 text-muted-foreground/50 mx-auto" />
           <p className="text-xs text-muted-foreground">
             Enter a food item to find smart alternatives

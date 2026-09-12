@@ -242,7 +242,7 @@ export function FastingTracker({ isLocked = false }: { isLocked?: boolean }) {
       <motion.div
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
-        className="rounded-2xl border border-border glass-strong p-5 relative overflow-hidden"
+        className="relative overflow-hidden rounded-[1.5rem] border border-white/[0.09] bg-[#0b100d] p-5 shadow-[0_18px_50px_rgba(0,0,0,0.28)]"
       >
         {isLoading && (
           <div className="space-y-4 animate-fade-in">
@@ -281,7 +281,7 @@ export function FastingTracker({ isLocked = false }: { isLocked?: boolean }) {
     <motion.div
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
-      className="rounded-2xl border border-border glass-strong p-5"
+      className="relative overflow-hidden rounded-[1.5rem] border border-white/[0.09] bg-[#0b100d] p-5 shadow-[0_18px_50px_rgba(0,0,0,0.28)]"
     >
       {isLoading && (
         <div className="space-y-4 animate-fade-in">
@@ -298,7 +298,7 @@ export function FastingTracker({ isLocked = false }: { isLocked?: boolean }) {
         <>
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2.5">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-muted">
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl border border-brand/15 bg-brand/[0.08]">
             <Timer className="h-4 w-4 text-brand" />
           </div>
           <div>
@@ -328,7 +328,7 @@ export function FastingTracker({ isLocked = false }: { isLocked?: boolean }) {
               "flex-shrink-0 snap-center px-3 py-1.5 rounded-full text-xs font-semibold transition-all border",
               state.protocol === p.id
                 ? "bg-brand text-brand-foreground border-brand"
-                : "border-border text-muted-foreground hover:text-foreground",
+                : "border-white/[0.1] bg-white/[0.025] text-muted-foreground hover:border-brand/25 hover:text-foreground",
               isFasting && "opacity-50 cursor-not-allowed"
             )}
           >
@@ -384,7 +384,7 @@ export function FastingTracker({ isLocked = false }: { isLocked?: boolean }) {
       </div>
 
       <div className="mb-4">
-        <div className="h-1.5 bg-muted rounded-full overflow-hidden">
+        <div className="h-1.5 overflow-hidden rounded-full bg-white/[0.07]">
           <motion.div
             className={cn("h-full rounded-full", isCompleted ? "bg-emerald-500" : "bg-brand")}
             animate={{ width: `${progress}%` }}
@@ -462,8 +462,8 @@ export function FastingTracker({ isLocked = false }: { isLocked?: boolean }) {
             exit={{ height: 0, opacity: 0 }}
             className="overflow-hidden mb-4"
           >
-            <div className="relative rounded-xl border border-border p-3">
-              <div className="absolute left-6 top-3 bottom-3 w-0.5 bg-border" />
+            <div className="relative rounded-xl border border-white/[0.08] bg-white/[0.02] p-3">
+              <div className="absolute bottom-3 left-6 top-3 w-0.5 bg-white/[0.08]" />
               <div className="space-y-3 relative">
                 {FASTING_STAGES.map((stage, i) => {
                   const isActive = currentStage!.id === stage.id
@@ -565,7 +565,7 @@ export function FastingTracker({ isLocked = false }: { isLocked?: boolean }) {
         </>
       )}
 
-      <div className="rounded-xl border border-border p-3">
+      <div className="rounded-xl border border-brand/15 bg-brand/[0.045] p-3">
         <div className="flex items-center gap-2 mb-1">
           <Info className="h-3.5 w-3.5 text-brand" />
           <span className="text-xs font-semibold text-foreground">{t(`ft_${currentStage!.id}_name`)}</span>

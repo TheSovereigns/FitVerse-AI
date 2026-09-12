@@ -191,10 +191,10 @@ export function DietaryRestrictions({ onRestrictionsChange }: DietaryRestriction
   }
 
   return (
-    <div className="glass-strong border border-border rounded-2xl p-4 md:p-6 space-y-5">
+    <div className="relative overflow-hidden rounded-[1.5rem] border border-white/[0.09] bg-[#0b100d] p-4 shadow-[0_18px_50px_rgba(0,0,0,0.28)] md:p-6 space-y-5">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-brand/10 flex items-center justify-center">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-brand/15 bg-brand/[0.08]">
             <ShieldCheck className="w-5 h-5 text-brand" />
           </div>
           <div>
@@ -220,7 +220,7 @@ export function DietaryRestrictions({ onRestrictionsChange }: DietaryRestriction
                 "relative flex flex-col items-start p-3 rounded-xl border text-left transition-colors",
                 isSelected
                   ? "bg-brand/10 border-brand/30"
-                  : "bg-muted/30 border-border hover:bg-muted/50"
+                  : "border-white/[0.08] bg-white/[0.025] hover:border-brand/20 hover:bg-brand/[0.045]"
               )}
             >
               {isSelected && (
@@ -253,7 +253,7 @@ export function DietaryRestrictions({ onRestrictionsChange }: DietaryRestriction
             exit={{ opacity: 0, height: 0 }}
             className="overflow-hidden"
           >
-            <div className="bg-muted/30 border border-border rounded-xl p-3 space-y-2">
+            <div className="space-y-2 rounded-xl border border-brand/15 bg-brand/[0.045] p-3">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-medium text-foreground">
                   {t(RESTRICTIONS.find((r) => r.id === showInfo)?.label ?? "")}
@@ -283,9 +283,9 @@ export function DietaryRestrictions({ onRestrictionsChange }: DietaryRestriction
             onChange={(e) => setNewAllergy(e.target.value)}
             placeholder="e.g. Shellfish, Eggs, Sesame..."
             onKeyDown={(e) => e.key === "Enter" && addCustomAllergy()}
-            className="flex-1 h-9 text-xs bg-muted/30 border-border"
+            className="h-9 flex-1 border-white/[0.09] bg-white/[0.035] text-xs focus-visible:ring-brand/30"
           />
-          <Button variant="outline" size="sm" onClick={addCustomAllergy} className="h-9 border-border">
+          <Button variant="outline" size="sm" onClick={addCustomAllergy} className="h-9 border-white/[0.1] bg-white/[0.025] hover:bg-white/[0.06]">
             <Plus className="w-3.5 h-3.5" />
           </Button>
         </div>
@@ -294,7 +294,7 @@ export function DietaryRestrictions({ onRestrictionsChange }: DietaryRestriction
             {customAllergies.map((allergy) => (
               <span
                 key={allergy}
-                className="inline-flex items-center gap-1 px-2 py-1 text-[11px] font-medium bg-muted border border-border rounded-lg text-foreground"
+                className="inline-flex items-center gap-1 rounded-lg border border-white/[0.08] bg-white/[0.035] px-2 py-1 text-[11px] font-medium text-foreground"
               >
                 {allergy}
                 <button onClick={() => removeCustomAllergy(allergy)}>
@@ -307,7 +307,7 @@ export function DietaryRestrictions({ onRestrictionsChange }: DietaryRestriction
       </div>
 
       {selected.length > 0 && (
-        <div className="bg-muted/30 border border-border rounded-xl p-3">
+        <div className="rounded-xl border border-amber-400/15 bg-amber-400/[0.045] p-3">
           <div className="flex items-start gap-2">
             <AlertTriangle className="w-4 h-4 text-amber-500 mt-0.5 shrink-0" />
             <div className="space-y-1">

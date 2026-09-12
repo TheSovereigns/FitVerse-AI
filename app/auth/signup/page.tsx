@@ -248,10 +248,10 @@ export default function SignupPage() {
                   key={opt.value}
                   onClick={() => setGender(opt.value)}
                   className={cn(
-                    "flex flex-col items-center gap-2 rounded-2xl border p-5 transition-all",
+                    "flex flex-col items-center gap-2 rounded-2xl border border-white/[0.12] bg-black/30 p-5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/60",
                     gender === opt.value
-                      ? "border-primary bg-primary/10 text-foreground"
-                      : "border-border bg-muted/50 text-foreground/50 hover:bg-muted"
+                      ? "border-brand bg-brand/10 text-foreground shadow-[0_0_32px_rgba(52,211,153,0.12)]"
+                      : "text-foreground/65 hover:bg-white/[0.06]"
                   )}
                 >
                   <span className="text-3xl">{opt.icon}</span>
@@ -269,14 +269,14 @@ export default function SignupPage() {
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ type: "spring", stiffness: 200, damping: 15, delay: 0.1 }}
-              className="w-20 h-20 rounded-3xl bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center mx-auto mb-6"
+              className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-3xl border border-brand/30 bg-brand/15 shadow-[0_0_42px_rgba(52,211,153,0.16)]"
             >
               <Calendar className="h-10 w-10 text-white" />
             </motion.div>
-            <h2 className="text-2xl font-black text-foreground mb-2">
+            <h2 className="mb-2 text-3xl font-semibold tracking-[-0.055em] text-foreground">
               {isEnglish ? "How old are you?" : "Quantos anos você tem?"}
             </h2>
-            <p className="text-sm text-foreground/40 mb-8">
+            <p className="mb-8 text-sm text-[#B9C3BA]">
               {isEnglish ? "For accurate caloric calculations" : "Para cálculos calóricos precisos"}
             </p>
             <Input
@@ -285,7 +285,7 @@ export default function SignupPage() {
               onChange={(e) => setAge(e.target.value)}
               min="10"
               max="120"
-              className="h-16 text-center text-3xl font-black bg-muted/50 border-border text-foreground rounded-2xl focus:border-brand/30"
+              className="h-16 rounded-2xl border-white/[0.12] bg-black/45 text-center text-3xl font-semibold tracking-[-0.05em] text-foreground focus-visible:border-brand/70 focus-visible:ring-2 focus-visible:ring-brand/25"
             />
           </div>
         )
@@ -297,14 +297,14 @@ export default function SignupPage() {
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ type: "spring", stiffness: 200, damping: 15, delay: 0.1 }}
-              className="w-20 h-20 rounded-3xl bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center mx-auto mb-6"
+              className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-3xl border border-brand/30 bg-brand/15 shadow-[0_0_42px_rgba(52,211,153,0.16)]"
             >
               <Scale className="h-10 w-10 text-white" />
             </motion.div>
-            <h2 className="text-2xl font-black text-foreground mb-2">
+            <h2 className="mb-2 text-3xl font-semibold tracking-[-0.055em] text-foreground">
               {isEnglish ? "What's your weight?" : "Qual seu peso?"}
             </h2>
-            <p className="text-sm text-foreground/40 mb-8">
+            <p className="mb-8 text-sm text-[#B9C3BA]">
               {isEnglish ? "In kilograms" : "Em quilogramas"}
             </p>
             <Input
@@ -314,7 +314,7 @@ export default function SignupPage() {
               min="30"
               max="300"
               step="0.1"
-              className="h-16 text-center text-3xl font-black bg-muted/50 border-border text-foreground rounded-2xl focus:border-brand/30"
+              className="h-16 rounded-2xl border-white/[0.12] bg-black/45 text-center text-3xl font-semibold tracking-[-0.05em] text-foreground focus-visible:border-brand/70 focus-visible:ring-2 focus-visible:ring-brand/25"
             />
           </div>
         )
@@ -326,14 +326,14 @@ export default function SignupPage() {
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ type: "spring", stiffness: 200, damping: 15, delay: 0.1 }}
-              className="w-20 h-20 rounded-3xl bg-gradient-to-br from-brand to-emerald-600 flex items-center justify-center mx-auto mb-6"
+              className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-3xl border border-brand/30 bg-brand/15 shadow-[0_0_42px_rgba(52,211,153,0.16)]"
             >
               <Ruler className="h-10 w-10 text-white" />
             </motion.div>
-            <h2 className="text-2xl font-black text-foreground mb-2">
+            <h2 className="mb-2 text-3xl font-semibold tracking-[-0.055em] text-foreground">
               {isEnglish ? "What's your height?" : "Qual sua altura?"}
             </h2>
-            <p className="text-sm text-foreground/40 mb-8">
+            <p className="mb-8 text-sm text-[#B9C3BA]">
               {isEnglish ? "In centimeters" : "Em centímetros"}
             </p>
             <Input
@@ -343,7 +343,7 @@ export default function SignupPage() {
               min="100"
               max="250"
               step="0.1"
-              className="h-16 text-center text-3xl font-black bg-muted/50 border-border text-foreground rounded-2xl focus:border-brand/30"
+              className="h-16 rounded-2xl border-white/[0.12] bg-black/45 text-center text-3xl font-semibold tracking-[-0.05em] text-foreground focus-visible:border-brand/70 focus-visible:ring-2 focus-visible:ring-brand/25"
             />
           </div>
         )
@@ -355,14 +355,14 @@ export default function SignupPage() {
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ type: "spring", stiffness: 200, damping: 15, delay: 0.1 }}
-              className="w-20 h-20 rounded-3xl bg-gradient-to-br from-primary to-yellow-500 flex items-center justify-center mx-auto mb-6"
+              className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-3xl border border-brand/30 bg-brand/15 shadow-[0_0_42px_rgba(52,211,153,0.16)]"
             >
               <Target className="h-10 w-10 text-white" />
             </motion.div>
-            <h2 className="text-2xl font-black text-foreground mb-2">
+            <h2 className="mb-2 text-3xl font-semibold tracking-[-0.055em] text-foreground">
               {isEnglish ? "What's your goal?" : "Qual seu objetivo?"}
             </h2>
-            <p className="text-sm text-foreground/40 mb-8">
+            <p className="mb-8 text-sm text-[#B9C3BA]">
               {isEnglish ? "We'll build your plan around this" : "Vamos construir seu plano com base nisso"}
             </p>
             <div className="grid grid-cols-2 gap-3">
@@ -373,15 +373,15 @@ export default function SignupPage() {
                     key={opt.value}
                     onClick={() => setGoal(opt.value)}
                     className={cn(
-                      "flex flex-col items-center gap-2 rounded-2xl border p-4 transition-all",
+                      "flex flex-col items-center gap-2 rounded-2xl border border-white/[0.12] bg-black/30 p-4 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/60",
                       goal === opt.value
-                        ? "border-primary bg-primary/10 text-foreground"
-                        : "border-border bg-muted/50 text-foreground/50 hover:bg-muted"
+                        ? "border-brand bg-brand/10 text-foreground shadow-[0_0_32px_rgba(52,211,153,0.12)]"
+                        : "text-foreground/65 hover:bg-white/[0.06]"
                     )}
                   >
                     <Icon className="w-6 h-6" />
                     <span className="text-sm font-bold">{opt.label}</span>
-                    <span className="text-[10px] text-foreground/30">{opt.desc}</span>
+                    <span className="text-[10px] text-[#B9C3BA]">{opt.desc}</span>
                   </button>
                 )
               })}
@@ -392,51 +392,51 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="product-experience auth-experience min-h-screen flex">
+    <div className="product-experience auth-experience min-h-screen flex bg-[#070A08] text-[#F5F7F4]">
       <AuthVisual signup />
-      {/* Right side - Form / Profile / Generating */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-6 md:p-12">
+      <div className="relative w-full lg:w-1/2 flex items-center justify-center overflow-hidden bg-[#070A08] p-6 md:p-12">
+        <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_88%_12%,rgba(110,255,141,0.12),transparent_30%),linear-gradient(135deg,rgba(255,255,255,0.045)_1px,transparent_1px)] [background-size:auto,26px_26px] opacity-70" />
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="w-full max-w-md"
+          transition={{ duration: 0.45, ease: "easeOut" }}
+          className="relative z-10 w-full max-w-md"
         >
           {/* Logo */}
           <div className="text-center mb-8">
             <Link href="/" className="inline-flex items-center gap-2">
-              <div className="w-10 h-10 rounded-xl bg-primary/20 border border-primary/30 flex items-center justify-center overflow-hidden">
+              <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-2xl border border-[#6BFF8E]/30 bg-[#101713] shadow-[0_0_32px_rgba(107,255,142,0.13)]">
                 <img src="/icon.svg" alt="VyseFit" className="w-6 h-6" />
               </div>
-              <span className="text-2xl font-black text-foreground">VyseFit AI</span>
+              <span className="text-2xl font-semibold tracking-[-0.06em] text-foreground">VyseFit AI</span>
             </Link>
           </div>
 
           {/* Card */}
-          <div className="glass-strong border border-border rounded-3xl p-6 md:p-8">
+          <div className="rounded-[2rem] border border-white/[0.12] bg-[#0E1411]/95 p-6 shadow-[inset_0_1px_0_rgba(255,255,255,0.10),0_28px_90px_rgba(0,0,0,0.48)] backdrop-blur-2xl md:p-8">
             <AnimatePresence mode="wait">
 
               {/* ═══════ PHASE: SIGNUP FORM ═══════ */}
               {phase === "form" && (
                 <motion.div key="form" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, x: -30 }}>
                   <div className="text-center mb-6">
-                    <h1 className="text-2xl font-black text-foreground mb-2">
+                    <h1 className="mb-2 text-3xl font-semibold tracking-[-0.055em] text-foreground">
                       {isEnglish ? "Create Account" : "Criar Conta"}
                     </h1>
-                    <p className="text-sm text-foreground/40">
+                    <p className="text-sm leading-6 text-[#B9C3BA]">
                       {isEnglish ? "Start your free account today" : "Comece sua conta grátis hoje"}
                     </p>
                   </div>
 
                   {error && (
-                    <div className="mb-4 p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
+                    <div role="alert" aria-live="assertive" className="mb-4 rounded-2xl border border-red-400/25 bg-red-500/10 p-3 text-sm text-red-100">
                       {error}
                     </div>
                   )}
 
                   <form onSubmit={handleSubmit} className="space-y-4">
                     <div>
-                      <Label className="text-foreground/70 text-sm font-medium mb-2 block">
+                      <Label className="mb-2 block text-sm font-medium text-[#DEE5DF]">
                         {isEnglish ? "Full Name" : "Nome Completo"}
                       </Label>
                       <Input
@@ -445,30 +445,30 @@ export default function SignupPage() {
                         onChange={(e) => setName(e.target.value)}
                         onBlur={() => setFieldErrors(prev => ({ ...prev, ...validate({ name, email, password, confirmPassword }) }))}
                         placeholder={isEnglish ? "John Doe" : "João Silva"}
-                        className={cn("h-12 bg-muted/50 border-border text-foreground placeholder:text-foreground/30 focus:border-brand/30 focus:ring-brand/20 rounded-xl", fieldErrors.name && "border-red-500 focus:border-red-500 focus:ring-red-500/20")}
+                        className={cn("h-12 rounded-2xl border-white/[0.12] bg-black/45 text-foreground placeholder:text-white/35 focus-visible:border-brand/70 focus-visible:ring-2 focus-visible:ring-brand/25", fieldErrors.name && "border-red-400 focus-visible:border-red-400 focus-visible:ring-red-400/25")}
                         aria-invalid={!!fieldErrors.name}
                       />
                       {fieldErrors.name && (
-                        <p className="text-red-400 text-xs mt-1.5">{fieldErrors.name}</p>
+                        <p className="mt-1.5 text-xs text-red-200" role="alert">{fieldErrors.name}</p>
                       )}
                     </div>
                     <div>
-                      <Label className="text-foreground/70 text-sm font-medium mb-2 block">Email</Label>
+                      <Label className="mb-2 block text-sm font-medium text-[#DEE5DF]">Email</Label>
                       <Input
                         type="email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         onBlur={() => setFieldErrors(prev => ({ ...prev, ...validate({ name, email, password, confirmPassword }) }))}
                         placeholder={isEnglish ? "you@example.com" : "seu@email.com"}
-                        className={cn("h-12 bg-muted/50 border-border text-foreground placeholder:text-foreground/30 focus:border-brand/30 focus:ring-brand/20 rounded-xl", fieldErrors.email && "border-red-500 focus:border-red-500 focus:ring-red-500/20")}
+                        className={cn("h-12 rounded-2xl border-white/[0.12] bg-black/45 text-foreground placeholder:text-white/35 focus-visible:border-brand/70 focus-visible:ring-2 focus-visible:ring-brand/25", fieldErrors.email && "border-red-400 focus-visible:border-red-400 focus-visible:ring-red-400/25")}
                         aria-invalid={!!fieldErrors.email}
                       />
                       {fieldErrors.email && (
-                        <p className="text-red-400 text-xs mt-1.5">{fieldErrors.email}</p>
+                        <p className="mt-1.5 text-xs text-red-200" role="alert">{fieldErrors.email}</p>
                       )}
                     </div>
                     <div>
-                      <Label className="text-foreground/70 text-sm font-medium mb-2 block">
+                      <Label className="mb-2 block text-sm font-medium text-[#DEE5DF]">
                         {isEnglish ? "Password" : "Senha"}
                       </Label>
                       <div className="relative">
@@ -478,7 +478,7 @@ export default function SignupPage() {
                           onChange={(e) => setPassword(e.target.value)}
                           onBlur={() => setFieldErrors(prev => ({ ...prev, ...validate({ name, email, password, confirmPassword }) }))}
                           placeholder="••••••••"
-                          className={cn("h-12 bg-muted/50 border-border text-foreground placeholder:text-foreground/30 focus:border-brand/30 focus:ring-brand/20 rounded-xl pr-12", fieldErrors.password && "border-red-500 focus:border-red-500 focus:ring-red-500/20")}
+                          className={cn("h-12 rounded-2xl border-white/[0.12] bg-black/45 pr-12 text-foreground placeholder:text-white/35 focus-visible:border-brand/70 focus-visible:ring-2 focus-visible:ring-brand/25", fieldErrors.password && "border-red-400 focus-visible:border-red-400 focus-visible:ring-red-400/25")}
                           aria-invalid={!!fieldErrors.password}
                         />
                         <Button
@@ -486,17 +486,18 @@ export default function SignupPage() {
                           variant="ghost"
                           size="sm"
                           onClick={() => setShowPassword(!showPassword)}
-                          className="absolute right-0 top-0 h-full px-3 text-foreground/40 hover:text-foreground"
+                          aria-label={showPassword ? (isEnglish ? "Hide password" : "Ocultar senha") : (isEnglish ? "Show password" : "Mostrar senha")}
+                          className="absolute right-0 top-0 h-full px-3 text-white/50 hover:text-white focus-visible:ring-2 focus-visible:ring-brand/50"
                         >
                           {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                         </Button>
                       </div>
                       {fieldErrors.password && (
-                        <p className="text-red-400 text-xs mt-1.5">{fieldErrors.password}</p>
+                        <p className="mt-1.5 text-xs text-red-200" role="alert">{fieldErrors.password}</p>
                       )}
                     </div>
                     <div>
-                      <Label className="text-foreground/70 text-sm font-medium mb-2 block">
+                      <Label className="mb-2 block text-sm font-medium text-[#DEE5DF]">
                         {isEnglish ? "Confirm Password" : "Confirmar Senha"}
                       </Label>
                       <Input
@@ -505,11 +506,11 @@ export default function SignupPage() {
                         onChange={(e) => setConfirmPassword(e.target.value)}
                         onBlur={() => setFieldErrors(prev => ({ ...prev, ...validate({ name, email, password, confirmPassword }) }))}
                         placeholder="••••••••"
-                        className={cn("h-12 bg-muted/50 border-border text-foreground placeholder:text-foreground/30 focus:border-brand/30 focus:ring-brand/20 rounded-xl", fieldErrors.confirmPassword && "border-red-500 focus:border-red-500 focus:ring-red-500/20")}
+                        className={cn("h-12 rounded-2xl border-white/[0.12] bg-black/45 text-foreground placeholder:text-white/35 focus-visible:border-brand/70 focus-visible:ring-2 focus-visible:ring-brand/25", fieldErrors.confirmPassword && "border-red-400 focus-visible:border-red-400 focus-visible:ring-red-400/25")}
                         aria-invalid={!!fieldErrors.confirmPassword}
                       />
                       {fieldErrors.confirmPassword && (
-                        <p className="text-red-400 text-xs mt-1.5">{fieldErrors.confirmPassword}</p>
+                        <p className="mt-1.5 text-xs text-red-200" role="alert">{fieldErrors.confirmPassword}</p>
                       )}
                     </div>
                     <div className="flex items-start gap-3">
@@ -517,11 +518,11 @@ export default function SignupPage() {
                         type="checkbox"
                         checked={acceptTerms}
                         onChange={(e) => setAcceptTerms(e.target.checked)}
-                        className="mt-1 w-4 h-4 rounded border-border bg-muted/50 text-primary focus:ring-primary/20"
+                        className="mt-1 h-4 w-4 rounded border-white/20 bg-black/45 text-brand focus:ring-brand/30"
                       />
-                      <label className="text-xs text-foreground/50">
+                      <label className="text-xs leading-5 text-[#B9C3BA]">
                         {isEnglish ? (
-                          <>I agree to the <a href="#" className="text-primary hover:underline">Terms of Use</a> and <a href="#" className="text-primary hover:underline">Privacy Policy</a></>
+                          <>I agree to the <a href="#" className="text-brand hover:text-brand/80 focus-visible:ring-2 focus-visible:ring-brand/50">Terms of Use</a> and <a href="#" className="text-brand hover:text-brand/80 focus-visible:ring-2 focus-visible:ring-brand/50">Privacy Policy</a></>
                         ) : (
                           <>Eu aceito os <a href="#" className="text-primary hover:underline">Termos de Uso</a> e a <a href="#" className="text-primary hover:underline">Política de Privacidade</a></>
                         )}
@@ -530,7 +531,7 @@ export default function SignupPage() {
                     <Button
                       type="submit"
                       disabled={isLoading}
-                      className="w-full h-12 text-base font-black bg-brand text-brand-foreground rounded-xl hover:bg-brand/90 transition-all shadow-lg shadow-brand/25 hover:shadow-[0_10px_30px_rgba(52,211,153,0.3)] hover:scale-[1.02] active:scale-[0.98]"
+                      className="h-12 w-full rounded-2xl bg-brand text-base font-semibold text-brand-foreground shadow-[0_12px_34px_rgba(52,211,153,0.22)] hover:bg-brand/90 focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-[#0E1411]"
                     >
                       {isLoading ? (
                         <><Loader2 className="w-5 h-5 mr-2 animate-spin" />{isEnglish ? "Creating account..." : "Criando conta..."}</>
@@ -542,17 +543,17 @@ export default function SignupPage() {
 
                   <div className="relative my-6">
                     <div className="absolute inset-0 flex items-center">
-                      <span className="w-full border-t border-border" />
+                      <span className="w-full border-t border-white/[0.12]" />
                     </div>
                     <div className="relative flex justify-center text-xs">
-                      <span className="bg-background px-4 text-foreground/30">{isEnglish ? "or continue with" : "ou continue com"}</span>
+                      <span className="bg-[#0E1411] px-4 text-white/45">{isEnglish ? "or continue with" : "ou continue com"}</span>
                     </div>
                   </div>
 
                   <Button
                     type="button"
                     onClick={handleGoogleSignup}
-                    className="w-full h-12 bg-card border border-border text-foreground hover:bg-muted rounded-xl transition-all"
+                    className="h-12 w-full rounded-2xl border border-white/[0.14] bg-white/[0.045] text-foreground hover:bg-white/[0.09] focus-visible:ring-2 focus-visible:ring-brand/50"
                   >
                     <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
                       <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
@@ -564,9 +565,9 @@ export default function SignupPage() {
                   </Button>
 
                   <div className="mt-6 text-center">
-                    <p className="text-sm text-foreground/40">
+                    <p className="text-sm text-[#B9C3BA]">
                       {isEnglish ? "Already have an account?" : "Já tem conta?"}{" "}
-                      <Link href="/auth/login" className="text-primary hover:underline font-medium">
+                      <Link href="/auth/login" className="font-medium text-brand hover:text-brand/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/50">
                         {isEnglish ? "Sign In" : "Entrar"}
                       </Link>
                     </p>
@@ -579,19 +580,19 @@ export default function SignupPage() {
                 <motion.div key="profile" initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0 }}>
                   {/* Progress bar */}
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-[10px] font-black uppercase tracking-widest text-foreground/30">
+                    <span className="text-[10px] font-semibold tracking-[0.18em] text-white/45">
                       {profileIndex + 1}/{profileSteps.length}
                     </span>
                     <button
                       onClick={() => { saveProfileAndGeneratePlan() }}
-                      className="text-[10px] font-black uppercase tracking-widest text-foreground/30 hover:text-foreground/50"
+                      className="text-[10px] font-semibold tracking-[0.18em] text-white/45 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/50"
                     >
                       {isEnglish ? "Skip" : "Pular"}
                     </button>
                   </div>
-                  <div className="h-1 bg-muted rounded-full overflow-hidden mb-8">
+                  <div className="mb-8 h-1 overflow-hidden rounded-full bg-white/10">
                     <motion.div
-                      className="h-full bg-gradient-to-r from-primary to-primary/70 rounded-full"
+                      className="h-full rounded-full bg-brand shadow-[0_0_16px_rgba(52,211,153,0.7)]"
                       animate={{ width: `${profileProgress}%` }}
                       transition={{ duration: 0.3 }}
                     />
@@ -617,7 +618,7 @@ export default function SignupPage() {
                         type="button"
                         onClick={handleProfileBack}
                         variant="outline"
-                        className="flex-1 h-12 border-border bg-muted/50 text-foreground hover:bg-muted rounded-xl"
+                        className="h-12 flex-1 rounded-2xl border border-white/[0.12] bg-white/[0.045] text-foreground hover:bg-white/[0.09] focus-visible:ring-2 focus-visible:ring-brand/50"
                       >
                         <ChevronLeft className="w-4 h-4 mr-1" />
                         {isEnglish ? "Back" : "Voltar"}
@@ -627,7 +628,7 @@ export default function SignupPage() {
                       type="button"
                       onClick={handleProfileNext}
                       disabled={!canProceedProfile() || isSavingProfile}
-                      className="flex-1 h-12 font-bold bg-brand text-brand-foreground rounded-xl hover:bg-brand/90 transition-all shadow-lg shadow-brand/25 hover:shadow-[0_10px_30px_rgba(52,211,153,0.3)] disabled:opacity-40"
+                      className="h-12 flex-1 rounded-2xl bg-brand font-semibold text-brand-foreground shadow-[0_12px_34px_rgba(52,211,153,0.22)] hover:bg-brand/90 focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-[#0E1411] disabled:opacity-40"
                     >
                       {profileIndex === profileSteps.length - 1 ? (
                         isSavingProfile ? (
@@ -650,21 +651,21 @@ export default function SignupPage() {
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
                     transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
-                    className="w-20 h-20 rounded-full bg-primary/20 border border-primary/30 flex items-center justify-center mx-auto mb-6"
+                    className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-3xl border border-brand/30 bg-brand/15 shadow-[0_0_42px_rgba(52,211,153,0.16)]"
                   >
                     <Loader2 className="w-10 h-10 text-primary animate-spin" />
                   </motion.div>
-                  <h2 className="text-2xl font-black text-foreground mb-3">
+                  <h2 className="mb-3 text-3xl font-semibold tracking-[-0.055em] text-foreground">
                     {isEnglish ? "Generating Your Plan..." : "Gerando Seu Plano..."}
                   </h2>
-                  <p className="text-sm text-foreground/70 mb-6">
+                  <p className="mb-6 text-sm leading-6 text-[#B9C3BA]">
                     {isEnglish
                       ? "Our AI is building your personalized workout and nutrition plan"
                       : "Nossa IA está construindo seu plano personalizado de treino e nutrição"}
                   </p>
                   <div className="flex items-center justify-center gap-2">
                     <Loader2 className="w-4 h-4 text-primary animate-spin" />
-                    <span className="text-xs text-foreground/40 uppercase tracking-wider">
+                    <span className="text-xs tracking-[0.12em] text-white/45">
                       {isEnglish ? "This may take a moment" : "Isso pode levar um momento"}
                     </span>
                   </div>
@@ -678,21 +679,21 @@ export default function SignupPage() {
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
                     transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
-                    className="w-20 h-20 rounded-full bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center mx-auto mb-6"
+                    className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-3xl border border-brand/30 bg-brand/15 shadow-[0_0_42px_rgba(52,211,153,0.16)]"
                   >
-                    <Check className="w-10 h-10 text-emerald-400" />
+                    <Check className="h-10 w-10 text-brand" />
                   </motion.div>
-                  <h2 className="text-2xl font-black text-foreground mb-3">
+                  <h2 className="mb-3 text-3xl font-semibold tracking-[-0.055em] text-foreground">
                     {isEnglish ? "You're All Set!" : "Tudo Pronto!"}
                   </h2>
-                  <p className="text-sm text-foreground/70 mb-6">
+                  <p className="mb-6 text-sm leading-6 text-[#B9C3BA]">
                     {isEnglish
                       ? "Redirecting you to your dashboard..."
                       : "Redirecionando para seu painel..."}
                   </p>
                   <div className="flex items-center justify-center gap-2">
                     <Loader2 className="w-4 h-4 text-primary animate-spin" />
-                    <span className="text-xs text-foreground/40 uppercase tracking-wider">
+                    <span className="text-xs tracking-[0.12em] text-white/45">
                       {isEnglish ? "Loading your dashboard" : "Carregando seu painel"}
                     </span>
                   </div>

@@ -64,7 +64,7 @@ export default function RootLayout({
         <link rel="icon" href="/icon.svg?v=2" type="image/svg+xml" />
         <link rel="apple-touch-icon" href="/apple-icon.png?v=2" />
         <link rel="manifest" href="/manifest.json" />
-        <meta name="theme-color" content="#34D399" />
+        <meta name="theme-color" content="#070908" />
         <link rel="preconnect" href="https://*.supabase.co" />
         <link rel="dns-prefetch" href="https://*.supabase.co" />
         <script dangerouslySetInnerHTML={{ __html: `

@@ -115,7 +115,7 @@ export function StressTracker({ isLocked = false }: { isLocked?: boolean }) {
       <motion.div
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
-        className="rounded-2xl border border-border glass-strong p-5"
+        className="relative overflow-hidden rounded-[1.5rem] border border-white/[0.09] bg-[#0b100d] p-5 shadow-[0_18px_50px_rgba(0,0,0,0.28)]"
       >
         <div className="flex items-center gap-2.5 mb-3">
           <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-muted">
@@ -139,7 +139,7 @@ export function StressTracker({ isLocked = false }: { isLocked?: boolean }) {
     <motion.div
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
-      className="rounded-2xl border border-border glass-strong p-5"
+      className="relative overflow-hidden rounded-[1.5rem] border border-white/[0.09] bg-[#0b100d] p-5 shadow-[0_18px_50px_rgba(0,0,0,0.28)]"
     >
       <div className="flex items-center gap-2.5 mb-4">
         <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-muted">
@@ -179,7 +179,7 @@ export function StressTracker({ isLocked = false }: { isLocked?: boolean }) {
               onClick={() => setMood(m.emoji)}
               className={cn(
                 "flex-1 flex flex-col items-center gap-0.5 p-2 rounded-xl border transition-all",
-                mood === m.emoji ? "border-purple-500 bg-purple-500/10" : "border-border bg-muted/50"
+                mood === m.emoji ? "border-purple-400 bg-purple-500/10" : "border-white/[0.08] bg-white/[0.025] hover:border-purple-300/30"
               )}
             >
               <span className="text-lg">{m.emoji}</span>
@@ -194,7 +194,7 @@ export function StressTracker({ isLocked = false }: { isLocked?: boolean }) {
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
           placeholder={isEnglish ? "Optional notes..." : "Notas opcionais..."}
-          className="w-full h-16 text-xs bg-muted border border-border rounded-xl px-3 py-2 text-foreground placeholder:text-muted-foreground resize-none"
+          className="h-16 w-full resize-none rounded-xl border border-white/[0.09] bg-white/[0.035] px-3 py-2 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-purple-400/30"
         />
       </div>
 
@@ -242,7 +242,7 @@ export function StressTracker({ isLocked = false }: { isLocked?: boolean }) {
         </div>
       </div>
 
-      <div className="mt-4 flex items-start gap-2 p-3 rounded-xl bg-brand-muted">
+      <div className="mt-4 flex items-start gap-2 rounded-xl border border-brand/15 bg-brand/[0.045] p-3">
         <Lightbulb className="h-4 w-4 text-yellow-500 mt-0.5 shrink-0" />
         <div>
           <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider mb-0.5">

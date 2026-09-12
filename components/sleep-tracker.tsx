@@ -121,7 +121,7 @@ export function SleepTracker({ isLocked = false }: { isLocked?: boolean }) {
       <motion.div
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
-        className="rounded-2xl border border-border glass-strong p-5"
+        className="relative overflow-hidden rounded-[1.5rem] border border-white/[0.09] bg-[#0b100d] p-5 shadow-[0_18px_50px_rgba(0,0,0,0.28)]"
       >
         {isLoading && (
           <div className="space-y-4 animate-fade-in">
@@ -156,7 +156,7 @@ export function SleepTracker({ isLocked = false }: { isLocked?: boolean }) {
     <motion.div
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
-      className="rounded-2xl border border-border glass-strong p-5"
+      className="relative overflow-hidden rounded-[1.5rem] border border-white/[0.09] bg-[#0b100d] p-5 shadow-[0_18px_50px_rgba(0,0,0,0.28)]"
     >
       {isLoading && (
         <div className="space-y-4 animate-fade-in">
@@ -192,15 +192,15 @@ export function SleepTracker({ isLocked = false }: { isLocked?: boolean }) {
       </div>
 
       <div className="grid grid-cols-3 gap-2 mb-4">
-        <div className="text-center p-2 rounded-xl bg-brand-muted card-hover">
+        <div className="text-center rounded-xl border border-white/[0.07] bg-white/[0.03] p-2">
           <p className="text-lg font-bold text-foreground">{todayEntry?.duration || duration}h</p>
           <p className="text-[10px] text-muted-foreground">{isEnglish ? "Duration" : "Duracao"}</p>
         </div>
-        <div className="text-center p-2 rounded-xl bg-brand-muted card-hover">
+        <div className="text-center rounded-xl border border-white/[0.07] bg-white/[0.03] p-2">
           <p className="text-lg font-bold text-foreground">{score}</p>
           <p className="text-[10px] text-muted-foreground">{isEnglish ? "Sleep Score" : "Score Sono"}</p>
         </div>
-        <div className="text-center p-2 rounded-xl bg-brand-muted card-hover">
+        <div className="text-center rounded-xl border border-white/[0.07] bg-white/[0.03] p-2">
           <p className={cn("text-lg font-bold", sleepDebt > 0 ? "text-red-500" : "text-brand")}>
             {sleepDebt > 0 ? `-${sleepDebt}h` : "0h"}
           </p>
@@ -217,7 +217,7 @@ export function SleepTracker({ isLocked = false }: { isLocked?: boolean }) {
               type="time"
               value={bedtime}
               onChange={(e) => setBedtime(e.target.value)}
-              className="h-9 pl-9 pr-3 rounded-xl bg-muted/50 border border-border text-sm font-medium text-foreground focus:outline-none focus:ring-1 focus:ring-border"
+              className="h-9 rounded-xl border border-white/[0.09] bg-white/[0.035] pl-9 pr-3 text-sm font-medium text-foreground focus:outline-none focus:ring-1 focus:ring-brand/30"
             />
           </div>
         </div>
@@ -229,7 +229,7 @@ export function SleepTracker({ isLocked = false }: { isLocked?: boolean }) {
               type="time"
               value={wakeTime}
               onChange={(e) => setWakeTime(e.target.value)}
-              className="h-9 pl-9 pr-3 rounded-xl bg-muted/50 border border-border text-sm font-medium text-foreground focus:outline-none focus:ring-1 focus:ring-border"
+              className="h-9 rounded-xl border border-white/[0.09] bg-white/[0.035] pl-9 pr-3 text-sm font-medium text-foreground focus:outline-none focus:ring-1 focus:ring-brand/30"
             />
           </div>
         </div>
@@ -267,7 +267,7 @@ export function SleepTracker({ isLocked = false }: { isLocked?: boolean }) {
         </div>
       </div>
 
-      <div className="flex items-start gap-2 p-3 rounded-xl bg-brand-muted card-hover">
+      <div className="flex items-start gap-2 rounded-xl border border-brand/15 bg-brand/[0.045] p-3">
         <Lightbulb className="h-4 w-4 text-yellow-500 mt-0.5 shrink-0" />
         <div>
           <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider mb-0.5">
@@ -280,7 +280,7 @@ export function SleepTracker({ isLocked = false }: { isLocked?: boolean }) {
       {entries.length > 0 && (
         <div className="mt-4 space-y-2 max-h-40 overflow-y-auto">
           {entries.slice(-5).reverse().map((entry) => (
-            <div key={entry.date} className="flex items-center justify-between rounded-xl border border-border p-3 card-hover">
+            <div key={entry.date} className="flex items-center justify-between rounded-xl border border-white/[0.08] bg-white/[0.02] p-3">
               <div>
                 <p className="text-xs font-medium text-foreground">{new Date(entry.date).toLocaleDateString(isEnglish ? "en-US" : "pt-BR", { month: "short", day: "numeric" })} • {entry.duration}h</p>
                 <p className="text-[10px] text-muted-foreground">{entry.bedtime} — {entry.wakeTime}</p>

@@ -49,26 +49,27 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   }
 
   return (
-    <div className="product-experience admin-experience min-h-screen bg-background">
+    <div className="product-experience admin-experience relative min-h-screen overflow-x-hidden bg-[#070A08] text-[#F5F7F4]">
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_84%_8%,rgba(110,255,141,0.12),transparent_25%),linear-gradient(135deg,rgba(255,255,255,0.03)_1px,transparent_1px)] [background-size:auto,30px_30px]" />
       {/* Mobile Header */}
-      <header className="md:hidden fixed top-0 left-0 right-0 h-14 bg-background/95 backdrop-blur-xl border-b border-border z-50 flex items-center justify-between px-4">
+      <header className="fixed left-0 right-0 top-0 z-50 flex h-14 items-center justify-between border-b border-white/[0.10] bg-[#070A08]/94 px-4 backdrop-blur-2xl md:hidden">
         <button
           onClick={() => setSidebarOpen(true)}
-          className="p-2 hover:bg-muted rounded-lg transition-colors"
+          className="rounded-lg p-2 text-white/70 transition-colors hover:bg-white/[0.08] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/50"
         >
           <Menu className="w-6 h-6 text-foreground" />
         </button>
         
         <Link href="/" className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-brand/10 border border-brand/20 flex items-center justify-center overflow-hidden">
+          <div className="flex h-8 w-8 items-center justify-center overflow-hidden rounded-xl border border-brand/25 bg-brand/10 shadow-[0_0_22px_rgba(52,211,153,0.12)]">
             <img src="/icon.svg" alt="VyseFit" className="w-5 h-5" />
           </div>
-          <span className="text-lg font-bold text-foreground">VyseFit</span>
+          <span className="text-lg font-semibold tracking-[-0.05em] text-foreground">VyseFit</span>
         </Link>
 
         <button
           onClick={signOut}
-          className="p-2 hover:bg-muted rounded-lg transition-colors"
+          className="rounded-lg p-2 text-white/70 transition-colors hover:bg-white/[0.08] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/50"
         >
           <LogOut className="w-5 h-5 text-muted-foreground" />
         </button>
@@ -82,7 +83,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="md:hidden fixed inset-0 bg-black/50 z-50"
+              className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm md:hidden"
               onClick={() => setSidebarOpen(false)}
             />
             <motion.aside
@@ -90,22 +91,22 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               animate={{ x: 0 }}
               exit={{ x: "-100%" }}
               transition={{ type: "spring", damping: 25, stiffness: 200 }}
-              className="md:hidden fixed left-0 top-0 h-full w-72 bg-background/95 backdrop-blur-xl border-r border-border flex flex-col z-50"
+              className="fixed left-0 top-0 z-50 flex h-full w-72 flex-col border-r border-white/[0.10] bg-[#0B100D]/98 shadow-[24px_0_80px_rgba(0,0,0,0.48)] backdrop-blur-2xl md:hidden"
             >
               {/* Logo */}
-              <div className="p-4 border-b border-border flex items-center justify-between">
+              <div className="flex items-center justify-between border-b border-white/[0.10] p-4">
                 <Link href="/" className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-brand/10 border border-brand/20 flex items-center justify-center overflow-hidden">
+                  <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-2xl border border-brand/25 bg-brand/10 shadow-[0_0_22px_rgba(52,211,153,0.12)]">
                     <img src="/icon.svg" alt="VyseFit" className="w-6 h-6" />
                   </div>
                   <div>
-                    <span className="text-lg font-bold text-foreground">VyseFit</span>
+                    <span className="text-lg font-semibold tracking-[-0.05em] text-foreground">VyseFit</span>
                     <span className="text-xs text-brand ml-1">AI</span>
                   </div>
                 </Link>
                 <button
                   onClick={() => setSidebarOpen(false)}
-                  className="p-2 hover:bg-muted rounded-lg"
+                  className="rounded-lg p-2 text-white/65 hover:bg-white/[0.08] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/50"
                 >
                   <X className="w-5 h-5 text-muted-foreground" />
                 </button>
@@ -121,10 +122,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                       href={item.href}
                       onClick={() => setSidebarOpen(false)}
                       className={cn(
-                        "flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200",
+                        "flex items-center gap-3 rounded-xl px-4 py-3 transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/50",
                         isActive
-                          ? "bg-brand/10 text-brand border border-brand/20"
-                          : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                          ? "border border-brand/25 bg-brand/10 text-brand shadow-[0_0_22px_rgba(52,211,153,0.08)]"
+                          : "text-white/60 hover:bg-white/[0.06] hover:text-white"
                       )}
                     >
                       <item.icon className="w-5 h-5" />
@@ -140,7 +141,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               </nav>
 
               {/* User Info */}
-              <div className="p-4 border-t border-border">
+              <div className="border-t border-white/[0.10] p-4">
                 <div className="flex items-center gap-3 mb-3">
                   <div className="w-10 h-10 rounded-full bg-brand/10 flex items-center justify-center text-brand font-black">
                     {user?.email?.charAt(0).toUpperCase() || "A"}
@@ -149,7 +150,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                     <p className="text-sm font-medium text-foreground truncate">
                       {user?.email?.split("@")[0] || "Admin"}
                     </p>
-                    <span className="text-xs text-brand bg-brand-muted px-1.5 py-0.5 rounded">
+                    <span className="rounded-full border border-brand/20 bg-brand/10 px-2 py-0.5 text-xs text-brand">
                       ADMIN
                     </span>
                   </div>
@@ -161,15 +162,15 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       </AnimatePresence>
 
       {/* Desktop Sidebar */}
-      <aside className="hidden md:flex fixed left-0 top-0 h-screen w-64 border-r border-border bg-card/80 backdrop-blur-xl flex flex-col z-50">
+      <aside className="fixed left-0 top-0 z-50 hidden h-screen w-64 flex-col border-r border-white/[0.10] bg-[#0B100D]/94 shadow-[18px_0_70px_rgba(0,0,0,0.25)] backdrop-blur-2xl md:flex">
         {/* Logo */}
-        <div className="p-6 border-b border-border">
+        <div className="border-b border-white/[0.10] p-6">
           <Link href="/" className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-brand/10 border border-brand/20 flex items-center justify-center overflow-hidden">
+            <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-2xl border border-brand/25 bg-brand/10 shadow-[0_0_22px_rgba(52,211,153,0.12)]">
               <img src="/icon.svg" alt="VyseFit" className="w-6 h-6" />
             </div>
             <div>
-              <span className="text-lg font-bold text-foreground">VyseFit</span>
+              <span className="text-lg font-semibold tracking-[-0.05em] text-foreground">VyseFit</span>
               <span className="text-xs text-brand ml-1">AI</span>
             </div>
           </Link>
@@ -184,10 +185,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  "flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200",
+                  "flex items-center gap-3 rounded-xl px-4 py-3 transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/50",
                   isActive
-                    ? "bg-brand/10 text-brand border border-brand/20"
-                    : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                    ? "border border-brand/25 bg-brand/10 text-brand shadow-[0_0_22px_rgba(52,211,153,0.08)]"
+                    : "text-white/60 hover:bg-white/[0.06] hover:text-white"
                 )}
               >
                 <item.icon className="w-5 h-5" />
@@ -203,7 +204,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </nav>
 
         {/* User Info */}
-        <div className="p-4 border-t border-border">
+        <div className="border-t border-white/[0.10] p-4">
           <div className="flex items-center gap-3 mb-4">
             <div className="w-10 h-10 rounded-full bg-brand/10 flex items-center justify-center text-brand font-black">
               {user?.email?.charAt(0).toUpperCase() || "A"}
@@ -213,7 +214,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 {user?.email?.split("@")[0] || "Admin"}
               </p>
               <div className="flex items-center gap-1">
-                <span className="text-xs text-brand bg-brand-muted px-1.5 py-0.5 rounded">
+                <span className="rounded-full border border-brand/20 bg-brand/10 px-2 py-0.5 text-xs text-brand">
                   ADMIN
                 </span>
               </div>
@@ -221,7 +222,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           </div>
           <button
             onClick={signOut}
-            className="flex items-center gap-2 w-full px-4 py-2 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+            className="flex w-full items-center gap-2 rounded-lg px-4 py-2 text-sm text-white/60 transition-colors hover:bg-white/[0.06] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/50"
           >
             <LogOut className="w-4 h-4" />
             {locale === "en-US" ? "Sign Out" : "Sair"}
@@ -230,27 +231,27 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       </aside>
 
       {/* Main Content */}
-      <main className="md:ml-64 p-4 md:p-8 pt-16 md:pt-8">
+      <main className="relative z-10 p-4 pt-16 md:ml-64 md:p-8 md:pt-8">
         {/* Desktop Header */}
         <div className="hidden md:flex items-center justify-between mb-8">
           <div className="flex items-center gap-4">
             <Link 
               href="/"
-              className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
+              className="flex items-center gap-2 text-white/60 transition-colors hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/50"
             >
               <ArrowLeft className="w-4 h-4" />
               <span className="text-sm">{locale === "en-US" ? "Back to App" : "Voltar ao App"}</span>
             </Link>
-            <div className="h-4 w-px bg-border" />
-            <span className="text-sm text-muted-foreground">
+            <div className="h-4 w-px bg-white/[0.12]" />
+            <span className="text-sm text-white/55">
               {getPageTitle()}
             </span>
           </div>
           
           <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2 px-3 py-1.5 bg-success/10 border border-success/20 rounded-full">
-              <span className="w-2 h-2 rounded-full bg-success animate-pulse" />
-              <span className="text-xs text-success font-medium">AO VIVO</span>
+            <div className="flex items-center gap-2 rounded-full border border-brand/20 bg-brand/10 px-3 py-1.5">
+              <span className="h-2 w-2 rounded-full bg-brand animate-pulse" />
+              <span className="text-xs font-medium text-brand">AO VIVO</span>
             </div>
             <div className="w-8 h-8 rounded-full bg-brand/20 flex items-center justify-center text-brand font-bold text-sm">
               {user?.email?.charAt(0).toUpperCase() || "A"}

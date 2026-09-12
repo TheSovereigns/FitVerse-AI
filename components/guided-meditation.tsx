@@ -148,7 +148,7 @@ export function GuidedMeditation({ isLocked = false }: GuidedMeditationProps) {
 
   if (isLocked) {
     return (
-      <div className="glass-strong border border-border rounded-2xl p-6 relative overflow-hidden">
+      <div className="relative overflow-hidden rounded-[1.5rem] border border-white/[0.09] bg-[#0b100d] p-6 shadow-[0_18px_50px_rgba(0,0,0,0.28)]">
         <div className="absolute inset-0 bg-muted/50 backdrop-blur-sm flex items-center justify-center z-10">
           <div className="text-center">
             <Lock className="w-10 h-10 mx-auto mb-2 text-muted-foreground" />
@@ -171,7 +171,7 @@ export function GuidedMeditation({ isLocked = false }: GuidedMeditationProps) {
   }
 
   return (
-    <div className="glass-strong border border-border rounded-2xl p-6">
+    <div className="relative overflow-hidden rounded-[1.5rem] border border-white/[0.09] bg-[#0b100d] p-6 shadow-[0_18px_50px_rgba(0,0,0,0.28)]">
       <h2 className="text-lg font-semibold text-foreground mb-4">Guided Meditation</h2>
 
       {!isActive && !selectedExercise && (
@@ -181,7 +181,7 @@ export function GuidedMeditation({ isLocked = false }: GuidedMeditationProps) {
               key={ex.id}
               whileTap={{ scale: 0.98 }}
               onClick={() => setSelectedExercise(ex)}
-              className="w-full p-4 rounded-xl border border-border bg-card text-left hover:bg-muted transition-colors"
+              className="w-full rounded-xl border border-white/[0.08] bg-white/[0.025] p-4 text-left transition-colors hover:border-brand/25 hover:bg-brand/[0.045]"
             >
               <div className="flex items-center gap-3 mb-2">
                 <Wind className="w-5 h-5 text-muted-foreground" />
@@ -190,7 +190,7 @@ export function GuidedMeditation({ isLocked = false }: GuidedMeditationProps) {
               <p className="text-sm text-muted-foreground mb-2">{ex.description}</p>
               <div className="flex gap-2">
                 {ex.benefits.map((b, i) => (
-                  <span key={i} className="text-xs px-2 py-1 rounded-lg bg-muted text-muted-foreground">
+                  <span key={i} className="rounded-lg border border-white/[0.06] bg-white/[0.035] px-2 py-1 text-xs text-muted-foreground">
                     {b}
                   </span>
                 ))}
@@ -223,14 +223,14 @@ export function GuidedMeditation({ isLocked = false }: GuidedMeditationProps) {
           <div className="flex gap-2 justify-center">
             <button
               onClick={startExercise}
-              className="px-6 py-2 rounded-xl bg-brand text-white text-sm font-medium"
+              className="rounded-xl bg-brand px-6 py-2 text-sm font-medium text-[#071009] shadow-[0_10px_28px_rgba(52,211,153,0.22)]"
             >
               <Play className="w-4 h-4 inline mr-1" />
               Start
             </button>
             <button
               onClick={() => setSelectedExercise(null)}
-              className="px-4 py-2 rounded-xl border border-border text-sm text-muted-foreground"
+              className="rounded-xl border border-white/[0.1] bg-white/[0.025] px-4 py-2 text-sm text-muted-foreground hover:bg-white/[0.06]"
             >
               Back
             </button>
@@ -242,7 +242,7 @@ export function GuidedMeditation({ isLocked = false }: GuidedMeditationProps) {
         <div className="text-center">
           <div className="relative w-48 h-48 mx-auto mb-6">
             <motion.div
-              className="absolute inset-0 rounded-full border-2 border-foreground"
+              className="absolute inset-0 rounded-full border-2 border-brand/70 shadow-[0_0_45px_rgba(52,211,153,0.18)]"
               animate={{ scale: circleScale }}
               transition={{ duration: 0.5 }}
             />
@@ -263,7 +263,7 @@ export function GuidedMeditation({ isLocked = false }: GuidedMeditationProps) {
           <div className="flex gap-2 justify-center">
             <button
               onClick={stopExercise}
-              className="px-6 py-2 rounded-xl border border-border text-sm text-foreground"
+              className="rounded-xl border border-white/[0.1] bg-white/[0.025] px-6 py-2 text-sm text-foreground hover:bg-white/[0.06]"
             >
               <Pause className="w-4 h-4 inline mr-1" />
               Stop

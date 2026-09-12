@@ -112,7 +112,7 @@ export function MoodTracker({ isLocked = false }: MoodTrackerProps) {
 
   if (isLocked) {
     return (
-      <div className="glass-strong border border-border rounded-2xl p-6 relative overflow-hidden">
+      <div className="relative overflow-hidden rounded-[1.5rem] border border-white/[0.09] bg-[#0b100d] p-6 shadow-[0_18px_50px_rgba(0,0,0,0.28)]">
         {isLoading && (
           <div className="space-y-4 animate-fade-in">
             <div className="h-6 w-32 skeleton" />
@@ -135,7 +135,7 @@ export function MoodTracker({ isLocked = false }: MoodTrackerProps) {
   }
 
   return (
-    <div className="glass-strong border border-border rounded-2xl p-6">
+    <div className="relative overflow-hidden rounded-[1.5rem] border border-white/[0.09] bg-[#0b100d] p-6 shadow-[0_18px_50px_rgba(0,0,0,0.28)]">
       {isLoading && (
         <div className="space-y-4 animate-fade-in">
           <div className="flex gap-2">
@@ -161,7 +161,7 @@ export function MoodTracker({ isLocked = false }: MoodTrackerProps) {
               className={`w-14 h-14 flex items-center justify-center rounded-xl border transition-all ${
                 selectedMood === m.value
                   ? "bg-brand/15 border-brand/30 scale-105 shadow-lg shadow-brand/15"
-                  : "bg-muted/40 border-transparent hover:bg-muted"
+                  : "border-white/[0.08] bg-white/[0.025] hover:border-brand/20 hover:bg-brand/[0.045]"
               }`}
             >
               <span className="text-2xl">{m.emoji}</span>
@@ -183,11 +183,11 @@ export function MoodTracker({ isLocked = false }: MoodTrackerProps) {
               value={note}
               onChange={(e) => setNote(e.target.value)}
               placeholder={t("mt_add_note")}
-              className="w-full px-3 py-2 rounded-xl border border-border bg-card text-foreground text-sm focus:outline-none focus:ring-1 focus:ring-ring"
+              className="w-full rounded-xl border border-white/[0.09] bg-white/[0.035] px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-brand/30"
             />
             <button
               onClick={addEntry}
-              className="mt-2 px-4 py-2 rounded-xl bg-brand text-white text-sm font-medium hover:bg-brand/90 transition-opacity"
+              className="mt-2 rounded-xl bg-brand px-4 py-2 text-sm font-medium text-[#071009] shadow-[0_10px_28px_rgba(52,211,153,0.22)] transition-opacity hover:bg-brand/90"
             >
               {t("mt_save")}
             </button>
@@ -228,7 +228,7 @@ export function MoodTracker({ isLocked = false }: MoodTrackerProps) {
           <motion.button
             whileTap={{ scale: 0.98 }}
             onClick={() => setShowInsight(!showInsight)}
-            className="w-full px-4 py-3 rounded-xl border border-border bg-card text-sm text-muted-foreground hover:bg-muted transition-colors text-left"
+            className="w-full rounded-xl border border-brand/15 bg-brand/[0.045] px-4 py-3 text-left text-sm text-muted-foreground transition-colors hover:bg-brand/[0.08]"
           >
             <span className="font-medium text-foreground">{t("mt_ai_insight")}</span> {getInsight()}
           </motion.button>

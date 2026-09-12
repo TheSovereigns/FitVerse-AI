@@ -94,16 +94,16 @@ export function ScanDashboard({ onScan, onBarcodeProduct, isScanning = false }: 
       <motion.section
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
-        className="pt-2"
+        className="rounded-[1.75rem] border border-white/[0.09] bg-[#0a0f0c] p-5 shadow-[0_22px_60px_rgba(0,0,0,0.32)] md:p-7"
       >
         <div className="flex items-center gap-2 mb-1">
           <Sparkles className="h-4 w-4 text-brand" />
-          <span className="text-xs font-medium text-brand">AI Vision</span>
+          <span className="text-xs font-semibold tracking-[0.14em] text-brand">AI VISION</span>
         </div>
-        <h1 className="text-3xl font-bold tracking-tight text-foreground md:text-4xl">
+        <h1 className="text-3xl font-bold tracking-[-0.045em] text-foreground md:text-4xl">
           {t("scan_ready")}
         </h1>
-        <p className="mt-1 text-sm text-muted-foreground">
+        <p className="mt-2 max-w-lg text-sm leading-relaxed text-muted-foreground">
           {t("scan_instruction")}
         </p>
       </motion.section>
@@ -121,7 +121,7 @@ export function ScanDashboard({ onScan, onBarcodeProduct, isScanning = false }: 
           placeholder={t("scan_search_placeholder")}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full rounded-2xl border border-border bg-card py-3 pl-11 pr-10 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-brand/30"
+          className="w-full rounded-2xl border border-white/[0.09] bg-[#101610] py-3 pl-11 pr-10 text-sm text-foreground placeholder:text-muted-foreground shadow-[0_14px_36px_rgba(0,0,0,0.2)] focus:outline-none focus:ring-2 focus:ring-brand/30"
         />
         {searchQuery && (
           <button onClick={() => setSearchQuery("")} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
@@ -139,7 +139,7 @@ export function ScanDashboard({ onScan, onBarcodeProduct, isScanning = false }: 
           "scan-studio relative min-h-[400px] overflow-hidden rounded-3xl border-2 transition-all duration-300 md:min-h-[460px]",
           isDragging
             ? "border-brand/40 bg-brand/5"
-            : "border-border glass-strong hover:border-brand/20",
+            : "border-white/[0.11] bg-[#0a0f0c] shadow-[0_20px_60px_rgba(0,0,0,0.32)] hover:border-brand/30",
           isScanning && "ring-4 ring-brand/20 border-brand/30"
         )}
         onDragOver={(e) => {
@@ -199,7 +199,7 @@ export function ScanDashboard({ onScan, onBarcodeProduct, isScanning = false }: 
                 className="flex w-full max-w-sm flex-col items-center gap-6"
               >
                 <button type="button" onClick={() => fileInputRef.current?.click()} className="group relative">
-                  <div className="flex h-28 w-28 items-center justify-center rounded-3xl glass-strong transition group-hover:bg-brand/5 md:h-32 md:w-32">
+                  <div className="flex h-28 w-28 items-center justify-center rounded-3xl border border-white/[0.12] bg-[#0b100d]/85 shadow-[0_16px_40px_rgba(0,0,0,0.28)] transition group-hover:border-brand/30 group-hover:bg-brand/[0.08] md:h-32 md:w-32">
                     <Scan className="h-14 w-14 text-brand md:h-16 md:w-16" />
                   </div>
                   <div className="absolute -bottom-1 -right-1 flex h-10 w-10 items-center justify-center rounded-xl bg-brand text-white shadow-lg shadow-brand/25">
@@ -214,7 +214,7 @@ export function ScanDashboard({ onScan, onBarcodeProduct, isScanning = false }: 
 
                 <div className="grid w-full grid-cols-3 gap-3">
                   <Button
-                    className="h-14 rounded-xl bg-brand text-sm font-semibold text-white shadow-lg shadow-brand/25 hover:bg-brand/90"
+                    className="h-14 rounded-xl bg-brand text-sm font-semibold text-[#071009] shadow-[0_12px_30px_rgba(52,211,153,0.24)] hover:bg-brand/90"
                     onClick={() => cameraInputRef.current?.click()}
                   >
                     <Camera className="mr-2 h-4 w-4" />
@@ -222,7 +222,7 @@ export function ScanDashboard({ onScan, onBarcodeProduct, isScanning = false }: 
                   </Button>
                   <Button
                     variant="outline"
-                    className="h-14 rounded-xl border-border bg-transparent text-sm font-medium text-foreground hover:bg-muted/50"
+                    className="h-14 rounded-xl border-white/[0.1] bg-[#0d130f]/85 text-sm font-medium text-foreground hover:bg-white/[0.06]"
                      onClick={() => fileInputRef.current?.click()}
                   >
                     <Upload className="mr-2 h-4 w-4" />
@@ -230,7 +230,7 @@ export function ScanDashboard({ onScan, onBarcodeProduct, isScanning = false }: 
                   </Button>
                   <Button
                     variant="outline"
-                    className="h-14 rounded-xl border-border bg-transparent text-sm font-medium text-foreground hover:bg-muted/50"
+                    className="h-14 rounded-xl border-white/[0.1] bg-[#0d130f]/85 text-sm font-medium text-foreground hover:bg-white/[0.06]"
                     onClick={() => setShowBarcodeScanner(true)}
                   >
                     <Barcode className="mr-2 h-4 w-4" />
@@ -251,7 +251,7 @@ export function ScanDashboard({ onScan, onBarcodeProduct, isScanning = false }: 
         <motion.section
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          className="rounded-2xl glass-strong p-5"
+          className="rounded-2xl border border-white/[0.09] bg-[#101610] p-5 shadow-[0_16px_45px_rgba(0,0,0,0.24)]"
         >
           <h2 className="text-base font-semibold text-foreground mb-4">
             {filteredScans.length} {t("scan_search_placeholder")}
@@ -261,7 +261,7 @@ export function ScanDashboard({ onScan, onBarcodeProduct, isScanning = false }: 
               <p className="text-sm text-muted-foreground text-center py-4">{t("scan_no_results")}</p>
             )}
             {filteredScans.slice(0, filteredLimit).map((scan, index) => (
-              <div key={scan.id || index} className="flex items-center gap-3 rounded-xl bg-muted/50 p-3">
+              <div key={scan.id || index} className="flex items-center gap-3 rounded-xl border border-white/[0.06] bg-white/[0.025] p-3">
                 {scan.image ? (
                   <Image src={scan.image} alt={scan.name || "Product"} width={48} height={48} loading="lazy" decoding="async" unoptimized className="h-12 w-12 rounded-xl object-cover" />
                 ) : (
@@ -298,7 +298,7 @@ export function ScanDashboard({ onScan, onBarcodeProduct, isScanning = false }: 
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="rounded-2xl glass-strong p-5"
+          className="rounded-2xl border border-white/[0.09] bg-[#101610] p-5 shadow-[0_16px_45px_rgba(0,0,0,0.24)]"
         >
           <div className="mb-4 flex items-center justify-between">
             <h2 className="text-base font-semibold text-foreground flex items-center gap-2">
@@ -308,7 +308,7 @@ export function ScanDashboard({ onScan, onBarcodeProduct, isScanning = false }: 
           </div>
           <div className="space-y-3">
             {favoriteScans.slice(0, favoritesLimit).map((scan, index) => (
-              <div key={scan.id || index} className="flex items-center gap-3 rounded-xl bg-muted/50 p-3">
+              <div key={scan.id || index} className="flex items-center gap-3 rounded-xl border border-white/[0.06] bg-white/[0.025] p-3">
                 {scan.image ? (
                   <Image src={scan.image} alt={scan.name || "Product"} width={48} height={48} loading="lazy" decoding="async" unoptimized className="h-12 w-12 rounded-xl object-cover" />
                 ) : (
@@ -343,7 +343,7 @@ export function ScanDashboard({ onScan, onBarcodeProduct, isScanning = false }: 
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.15 }}
-          className="rounded-2xl glass-strong p-5"
+          className="rounded-2xl border border-white/[0.09] bg-[#101610] p-5 shadow-[0_16px_45px_rgba(0,0,0,0.24)]"
         >
           <div className="mb-4 flex items-center justify-between">
             <h2 className="text-base font-semibold text-foreground">{t("scan_recent")}</h2>
@@ -354,7 +354,7 @@ export function ScanDashboard({ onScan, onBarcodeProduct, isScanning = false }: 
               <p className="text-sm text-muted-foreground text-center py-4">{t("scan_no_results")}</p>
             )}
             {recentScans.map((scan, index) => (
-              <div key={scan.id || index} className="flex items-center gap-3 rounded-xl bg-muted/50 p-3">
+              <div key={scan.id || index} className="flex items-center gap-3 rounded-xl border border-white/[0.06] bg-white/[0.025] p-3">
                 {scan.image ? (
                   <Image src={scan.image} alt={scan.name || "Product"} width={48} height={48} loading="lazy" decoding="async" unoptimized className="h-12 w-12 rounded-xl object-cover" />
                 ) : (

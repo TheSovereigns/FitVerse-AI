@@ -269,27 +269,27 @@ export function TrainingTab({ userGoal }: TrainingTabProps) {
   })
 
   return (
-    <div className="training-experience relative max-w-5xl mx-auto space-y-6 pb-safe-nav">
+    <div className="training-experience relative mx-auto max-w-5xl space-y-6 pb-safe-nav">
       {/* Header */}
       <motion.section
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
-        className="pt-2"
+        className="relative overflow-hidden rounded-[1.75rem] border border-white/[0.09] bg-[#0a0f0c] p-5 shadow-[0_22px_60px_rgba(0,0,0,0.32)] md:p-7"
       >
         <div className="flex items-center gap-2 mb-1">
           <Dumbbell className="h-4 w-4 text-brand" />
-          <span className="text-xs font-medium text-brand">AI Training</span>
+          <span className="text-xs font-semibold tracking-[0.14em] text-brand">AI TRAINING</span>
         </div>
         <div className="flex items-end justify-between">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight text-foreground md:text-4xl">
+            <h1 className="max-w-xl text-3xl font-bold tracking-[-0.045em] text-foreground md:text-4xl">
             {locale === "en-US" ? "Your workout library" : "Sua biblioteca de treinos"}
             </h1>
-            <p className="mt-1 text-sm text-muted-foreground">
+            <p className="mt-2 max-w-lg text-sm leading-relaxed text-muted-foreground">
               {locale === "en-US" ? "Choose a workout or create a plan for your routine." : "Escolha um treino ou crie um plano para sua rotina."}
             </p>
           </div>
-          <Button onClick={() => setShowGeneratorModal(true)} aria-label={t("training_new_workout")} className="h-11 rounded-xl bg-brand px-5 text-sm font-semibold text-white shadow-lg shadow-brand/25 hover:bg-brand/90">
+          <Button onClick={() => setShowGeneratorModal(true)} aria-label={t("training_new_workout")} className="h-11 rounded-xl bg-brand px-5 text-sm font-semibold text-[#071009] shadow-[0_10px_28px_rgba(52,211,153,0.22)] hover:bg-brand/90">
             <Zap className="mr-2 h-4 w-4" />
             {t("training_new_workout")}
           </Button>
@@ -297,7 +297,7 @@ export function TrainingTab({ userGoal }: TrainingTabProps) {
       </motion.section>
 
       {/* Sub-tabs */}
-      <div className="flex gap-1 rounded-xl bg-muted/50 p-1">
+      <div className="flex gap-1 rounded-2xl border border-white/[0.08] bg-[#101610] p-1.5 shadow-[0_14px_35px_rgba(0,0,0,0.18)]">
         {[
           { id: "generated" as const, label: t("training_new_workout").replace("+ ", ""), icon: Zap },
           { id: "saved" as const, label: t("training_tab_saved"), icon: Bookmark },
@@ -314,7 +314,7 @@ export function TrainingTab({ userGoal }: TrainingTabProps) {
               className={cn(
                 "flex flex-1 items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-xs font-medium transition-all",
                 isActive
-                  ? "bg-background text-foreground shadow-sm"
+                  ? "bg-white/[0.08] text-foreground shadow-sm"
                   : "text-muted-foreground hover:text-foreground"
               )}
             >
@@ -340,8 +340,8 @@ export function TrainingTab({ userGoal }: TrainingTabProps) {
                 className={cn(
                   "flex shrink-0 items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-medium transition-all",
                   isActive
-                    ? "bg-brand/10 text-brand"
-                    : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                    ? "border border-brand/20 bg-brand/10 text-brand"
+                    : "border border-transparent text-muted-foreground hover:border-white/[0.08] hover:bg-white/[0.04] hover:text-foreground"
                 )}
               >
                 <Icon className="h-3.5 w-3.5" />
@@ -561,11 +561,11 @@ function WorkoutCard({ workout, index, onStart, onStartLive, onExerciseClick, on
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.05 }}
-      className="flex flex-col overflow-hidden rounded-2xl glass-strong"
+      className="flex flex-col overflow-hidden rounded-[1.45rem] border border-white/[0.09] bg-[#0d120f] shadow-[0_18px_50px_rgba(0,0,0,0.28)]"
     >
       {/* Card header with icon */}
       <div className="workout-cover"><Image src={`/images/landing/${workout.category.toLowerCase().includes("cardio") ? "hero" : "training"}.webp`} alt="" fill sizes="(max-width: 767px) 100vw, 450px" style={{ objectPosition: index % 2 ? "center 30%" : "center 52%" }} /></div>
-      <div className="flex items-center justify-between border-b border-border p-5">
+      <div className="flex items-center justify-between border-b border-white/[0.08] bg-[#0b100d]/95 p-5">
         <div className="flex items-center gap-3">
           <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-brand/10">
             <Dumbbell className="h-5 w-5 text-brand" />
@@ -575,7 +575,7 @@ function WorkoutCard({ workout, index, onStart, onStartLive, onExerciseClick, on
             <span className="text-xs text-muted-foreground">{workout.category}</span>
           </div>
         </div>
-        <span className="rounded-full bg-muted px-2.5 py-1 text-[10px] font-medium text-muted-foreground">
+        <span className="rounded-full border border-white/[0.08] bg-white/[0.04] px-2.5 py-1 text-[10px] font-medium text-muted-foreground">
           {workout.difficulty}
         </span>
       </div>
@@ -583,18 +583,18 @@ function WorkoutCard({ workout, index, onStart, onStartLive, onExerciseClick, on
       <div className="flex flex-1 flex-col p-5">
         {/* Stats */}
         <div className="mb-4 flex gap-3">
-          <span className="flex items-center gap-1 rounded-lg bg-muted/50 px-2.5 py-1.5 text-xs text-muted-foreground">
+          <span className="flex items-center gap-1 rounded-lg border border-white/[0.06] bg-white/[0.035] px-2.5 py-1.5 text-xs text-muted-foreground">
             <Clock className="h-3 w-3" />
             {workout.duration}
           </span>
-          <span className="flex items-center gap-1 rounded-lg bg-muted/50 px-2.5 py-1.5 text-xs text-muted-foreground">
+          <span className="flex items-center gap-1 rounded-lg border border-white/[0.06] bg-white/[0.035] px-2.5 py-1.5 text-xs text-muted-foreground">
             <Flame className="h-3 w-3" />
             {workout.calories}
           </span>
         </div>
 
         {/* AI Verdict */}
-        <p className="mb-4 rounded-xl bg-muted/30 p-3 text-xs italic text-muted-foreground">
+        <p className="mb-4 border-l-2 border-brand/70 bg-brand/[0.045] p-3 text-xs italic leading-relaxed text-muted-foreground">
           &ldquo;{workout.aiVerdict}&rdquo;
         </p>
 
@@ -606,10 +606,10 @@ function WorkoutCard({ workout, index, onStart, onStartLive, onExerciseClick, on
               type="button"
               onClick={() => onExerciseClick(exercise)}
               aria-label={`View ${exercise.name}`}
-              className="flex w-full items-center justify-between rounded-xl bg-muted/30 p-3 text-left transition hover:bg-muted/50"
+              className="flex w-full items-center justify-between rounded-xl border border-white/[0.06] bg-white/[0.025] p-3 text-left transition hover:border-brand/20 hover:bg-brand/[0.045]"
             >
               <div className="flex min-w-0 items-center gap-3">
-                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-muted text-[10px] font-bold text-foreground">{exerciseIndex + 1}</span>
+                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-white/[0.07] text-[10px] font-bold text-foreground">{exerciseIndex + 1}</span>
                 <div className="min-w-0">
                   <p className="truncate text-sm font-medium text-foreground">{exercise.name}</p>
                   <p className="text-[10px] text-muted-foreground">{exercise.sets}x{exercise.reps} - {exercise.rest}</p>
@@ -657,9 +657,9 @@ function SavedWorkoutCard({ saved, index, onUnsave, onStart, onStartLive, onExer
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.05 }}
-      className="flex flex-col overflow-hidden rounded-2xl glass-strong"
+      className="flex flex-col overflow-hidden rounded-[1.45rem] border border-white/[0.09] bg-[#0d120f] shadow-[0_18px_50px_rgba(0,0,0,0.28)]"
     >
-      <div className="flex items-center justify-between border-b border-border p-5">
+      <div className="flex items-center justify-between border-b border-white/[0.08] bg-[#0b100d]/95 p-5">
         <div className="flex items-center gap-3">
           <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-brand/10">
             <Star className="h-5 w-5 text-brand fill-brand" />
@@ -676,18 +676,18 @@ function SavedWorkoutCard({ saved, index, onUnsave, onStart, onStartLive, onExer
 
       <div className="flex flex-1 flex-col p-5">
         <div className="mb-4 flex gap-3">
-          <span className="flex items-center gap-1 rounded-lg bg-muted/50 px-2.5 py-1.5 text-xs text-muted-foreground">
+          <span className="flex items-center gap-1 rounded-lg border border-white/[0.06] bg-white/[0.035] px-2.5 py-1.5 text-xs text-muted-foreground">
             <Clock className="h-3 w-3" />
             {workout.duration}
           </span>
-          <span className="flex items-center gap-1 rounded-lg bg-muted/50 px-2.5 py-1.5 text-xs text-muted-foreground">
+          <span className="flex items-center gap-1 rounded-lg border border-white/[0.06] bg-white/[0.035] px-2.5 py-1.5 text-xs text-muted-foreground">
             <Flame className="h-3 w-3" />
             {workout.calories}
           </span>
         </div>
 
         {hasProgression && (
-          <div className="mb-4 rounded-xl bg-muted/30 p-3">
+          <div className="mb-4 rounded-xl border border-brand/15 bg-brand/[0.045] p-3">
             <div className="flex items-center gap-1.5 mb-2">
               <TrendingUp className="h-3.5 w-3.5 text-brand" />
               <span className="text-xs font-medium text-foreground">{t("training_progression_title")}</span>
@@ -697,7 +697,7 @@ function SavedWorkoutCard({ saved, index, onUnsave, onStart, onStartLive, onExer
         )}
 
         {lastSession && (
-          <div className="mb-4 rounded-xl bg-muted/30 p-3">
+          <div className="mb-4 rounded-xl border border-white/[0.06] bg-white/[0.025] p-3">
             <p className="text-[10px] text-muted-foreground mb-1">{t("training_history_date")}: {new Date(lastSession.date).toLocaleDateString(locale === "en-US" ? "en-US" : "pt-BR")}</p>
             <div className="space-y-1">
               {lastSession.exercises.slice(0, 3).map((e, i) => (
@@ -719,10 +719,10 @@ function SavedWorkoutCard({ saved, index, onUnsave, onStart, onStartLive, onExer
               type="button"
               onClick={() => onExerciseClick(exercise)}
               aria-label={`View ${exercise.name}`}
-              className="flex w-full items-center justify-between rounded-xl bg-muted/30 p-3 text-left transition hover:bg-muted/50"
+              className="flex w-full items-center justify-between rounded-xl border border-white/[0.06] bg-white/[0.025] p-3 text-left transition hover:border-brand/20 hover:bg-brand/[0.045]"
             >
               <div className="flex min-w-0 items-center gap-3">
-                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-muted text-[10px] font-bold text-foreground">{exerciseIndex + 1}</span>
+                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-white/[0.07] text-[10px] font-bold text-foreground">{exerciseIndex + 1}</span>
                 <div className="min-w-0">
                   <p className="truncate text-sm font-medium text-foreground">{exercise.name}</p>
                   <p className="text-[10px] text-muted-foreground">{exercise.sets}x{exercise.reps} - {exercise.rest}</p>
@@ -823,7 +823,7 @@ function HistoryEntry({ entry, index }: { entry: WorkoutHistoryEntry; index: num
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.03 }}
-      className="flex items-center gap-4 rounded-xl glass-strong p-4"
+      className="flex items-center gap-4 rounded-xl border border-white/[0.08] bg-[#101610] p-4 shadow-[0_10px_28px_rgba(0,0,0,0.18)]"
     >
       <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand/10">
         <Dumbbell className="h-5 w-5 text-brand" />

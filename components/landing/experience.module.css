@@ -69,7 +69,9 @@
 .skip:focus {
   transform: translateY(0);
 }
+.skip { background:var(--mint); color:#07100b; }
 .header {
+  color:var(--ink);
   height: 88px;
   display: flex;
   align-items: center;
@@ -1616,3 +1618,88 @@
 @keyframes hero-arrival { from {opacity:0;transform:translateY(18px)} to {opacity:1;transform:translateY(0)} }
 @media(max-width:480px) { .heroIntro h1 {font-size:clamp(56px,16vw,76px)} }
 @media(prefers-reduced-motion:reduce) { .heroIntro {animation:none} }
+
+/* The public site shares the app's night training-room palette. */
+.site {
+  --forest: #070908;
+  --paper: #070908;
+  --mineral: #0d1410;
+  --mint: #a9e9cb;
+  --ink: #f2f6f1;
+  --muted: #a1b0a5;
+  background:
+    radial-gradient(ellipse 55rem 28rem at 105% 2%, #1e664b30, transparent 68%),
+    var(--paper);
+}
+.header {
+  color:var(--ink);
+  background:linear-gradient(180deg, #070908d9, #07090845 78%, transparent);
+  border-bottom-color:#ffffff1a;
+  backdrop-filter:blur(12px);
+}
+.navCta { color:#07100b; background:var(--mint); }
+.navCta:hover,.button:hover { background:#c4f3dd; }
+.buttonLight { background:#f2f6f1; color:#07100b; }
+.buttonOutline { border-color:#ffffff35; color:var(--ink); }
+.buttonOutline:hover { background:#ffffff10; }
+.cinema,.disciplines,.manifesto { background:#070908; color:var(--ink); }
+.heroScrim {
+  background:
+    linear-gradient(90deg, #020403e8, #0204038a 52%, #02040310 84%),
+    linear-gradient(0deg, #020403d9, transparent 45%, #0204032e);
+}
+.disciplines { border-top:1px solid #ffffff14; border-bottom:1px solid #ffffff14; }
+.disciplines > i { background:#ffffff25; }
+.experience,.features,.pricing,.faq { background:#0a0e0c; }
+.features { border-top:1px solid #ffffff12; }
+.sectionLabel,.sectionHeading > p:last-child,.featureHeading p { color:var(--muted); }
+.tabs { border-bottom-color:#ffffff24; }
+.tab { color:#acb9af; }
+.tab[data-state="active"] { background:#1a2820; color:var(--mint); }
+.lineMotif { background:var(--mint); }
+.smallNote { color:#bdc9bf; }
+.demoStage { background:#101812; border:1px solid #ffffff15; }
+.stageTrack {
+  border-color:#335244;
+  box-shadow:0 0 0 24px #101812,0 0 0 25px #335244,0 0 0 49px #101812,0 0 0 50px #335244;
+}
+.demo { background:#090d0b; color:var(--ink); border:1px solid #ffffff15; box-shadow:none; }
+.demoHeader,.exercise { border-bottom-color:#ffffff15; }
+.example,.demoBadge { background:#ffffff0d; color:#b8c6ba; }
+.demoGreeting > span,.demoWorkout div > span,.demoWorkout p,.exercise b,.demoDisclaimer,.nutritionSummary > div > span,.macros span,.demoBottom { color:var(--muted); }
+.week > div { color:var(--muted); }
+.week b { color:var(--mint); }
+.week .today { background:#20352a; color:#cde6d4; }
+.week .today b { color:var(--mint); }
+.dayDone { background:#214c37; color:var(--mint); }
+.demoWorkout { background:#101812; border-color:#ffffff16; }
+.demoIcon { background:#1c3126; color:var(--mint); }
+.macros i { background:#ffffff13; }
+.macros em { background:var(--mint); }
+.sleepBars i { background:#557d69; }
+.sleepBars i:nth-child(3n) { background:var(--mint); }
+.foodFeature { background:#111712; border:1px solid #ffffff16; }
+.foodCopy p { color:var(--muted); }
+.featureIcon,.foodCopy li svg { color:var(--mint); }
+.photoChip { background:#07100be8; border:1px solid #ffffff24; }
+.photoFeature { border:1px solid #ffffff18; background:#0e1511; color:var(--ink); }
+.photoFeature:after { background:linear-gradient(0deg, #020403f2, #02040382 48%, transparent 84%); }
+.featurePill { background:#07100bd9; border-color:#a9e9cb55; }
+.plan { background:#101612; border-color:#ffffff1a; }
+.planName > span { background:#a9e9cb; color:#07100b; }
+.plan > p,.pricePeriod { color:var(--muted); }
+.plan li svg { color:var(--mint); }
+.planFeatured { background:linear-gradient(145deg, #15251c, #0d1410 74%); border-color:#a9e9cb66; box-shadow:none; color:var(--ink); }
+.planFeatured > p,.planFeatured .pricePeriod { color:#c4d2c6; }
+.faqList details { border-bottom-color:#ffffff1e; }
+.faqList details > p { color:var(--muted); }
+.finalCta { background:#101812; border-top:1px solid #ffffff16; }
+.finalIcon { border-color:#a9e9cb66; color:var(--mint); }
+.finalCta .button { background:var(--mint); color:#07100b; }
+.footer { background:#070908; border-top-color:#ffffff16; }
+.footer span,.footer a { color:#aab8ad; }
+@media (max-width:800px) {
+  .header { background:#070908e6; }
+  .mobileNav { background:#101612; border:1px solid #ffffff16; }
+  .foodFeature,.photoFeature,.plan { border-radius:10px; }
+}
