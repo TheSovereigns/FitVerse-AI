@@ -33,11 +33,16 @@ export default function LoginPage() {
   const [fieldErrors, setFieldErrors] = useState<LoginErrors>({})
 
   useEffect(() => {
-    if (new URLSearchParams(window.location.search).get("error") !== "session_missing") return
+    const reason = new URLSearchParams(window.location.search).get("error")
+    if (reason !== "session_missing" && reason !== "oauth_callback_failed") return
     const timer = window.setTimeout(() => {
       setError(locale === "en-US"
-        ? "Your Google session was not saved. Please try again."
-        : "A sessão do Google não foi salva. Tente entrar novamente.")
+        ? reason === "oauth_callback_failed"
+          ? "Google could not complete the session. Start the login again in this same browser."
+          : "Your Google session was not saved. Please try again."
+        : reason === "oauth_callback_failed"
+          ? "O Google não conseguiu concluir a sessão. Inicie o login novamente neste mesmo navegador."
+          : "A sessão do Google não foi salva. Tente entrar novamente.")
     }, 0)
     return () => window.clearTimeout(timer)
   }, [locale])

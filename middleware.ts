@@ -192,6 +192,34 @@ export async function middleware(request: NextRequest) {
   )
 
   // 3b. Landing → App redirect for authed users (optimized: lightweight cookie check, no getSession for anon)
+  // Complete PKCE on the server before the callback page is rendered. The
+  // verifier is stored in the browser cookie by createBrowserClient and is
+  // available on this request, so hydration timing cannot consume the code.
+  if (path === "/auth/callback" && request.nextUrl.searchParams.has("code")) {
+    try {
+      const { createClient: createSSRClient } = await import("@/lib/supabase/middleware")
+      const ssrClient = await createSSRClient(request, response)
+      const code = request.nextUrl.searchParams.get("code")
+      const exchange = ssrClient && code
+        ? await ssrClient.auth.exchangeCodeForSession(code)
+        : { error: new Error("Supabase SSR client is unavailable") }
+
+      const destination = new URL(exchange.error ? "/auth/login" : "/app", request.url)
+      if (exchange.error) {
+        destination.searchParams.set("error", "oauth_callback_failed")
+      }
+      const redirectRes = NextResponse.redirect(destination)
+      copyCookies(response, redirectRes)
+      return redirectRes
+    } catch {
+      const destination = new URL("/auth/login", request.url)
+      destination.searchParams.set("error", "oauth_callback_failed")
+      const redirectRes = NextResponse.redirect(destination)
+      copyCookies(response, redirectRes)
+      return redirectRes
+    }
+  }
+
   if (path === "/") {
     // Fast-path: if no auth cookie/header, assume anon — skip getSession entirely (saves 150-300ms)
     const hasAuthCookie =
