@@ -16,6 +16,7 @@ import { isViewLocked } from "@/lib/plan-limits"
 import { useAppStore } from "@/stores/app-store"
 import { recordAction } from "@/lib/gamification"
 import { DesktopSidebar } from "@/components/desktop-sidebar"
+import { AppSectionIntro } from "@/components/app-experience"
 import { MobileBottomNav } from "@/components/mobile-bottom-nav"
 import { MobileMoreSheet } from "@/components/mobile-more-sheet"
 import { FeatureErrorBoundary } from "@/components/FeatureErrorBoundary"
@@ -211,7 +212,7 @@ export default function DashboardPage() {
   const getViewTitle = () => {
     const titles: Record<string, string> = {
       home: t("view_home"), dashboard: t("view_bioscan"), recipes: t("view_recipes"),
-      training: t("view_training"), profile: t("view_profile"), planner: t("view_planner"),
+      training: t("nav_workouts"), profile: t("view_profile"), planner: t("view_planner"),
       settings: t("view_settings"), chatbot: t("view_chatbot"), clans: t("nav_clans"),
       sleep: t("nav_sleep"), stress: t("nav_stress"),
       "health-checkin": t("nav_health_checkin"),
@@ -236,6 +237,9 @@ export default function DashboardPage() {
       "smart-reminders": t("misc_reminders"),
       "monthly-report": t("mr_monthly_report"),
       "corrida": t("misc_corrida"),
+      "food-diary": t("misc_food_diary"),
+      "body": t("common_body"),
+      "health-integrations": t("hi_title"),
     }
     return titles[currentView] || t("view_vysefit")
   }
@@ -417,7 +421,7 @@ export default function DashboardPage() {
   if (!user) return null
 
   return (
-    <div className="min-h-screen bg-background text-foreground font-sans selection:bg-brand/10">
+    <div className="product-experience min-h-screen text-foreground font-sans selection:bg-brand/10">
       <OnboardingFlow onComplete={() => {}} />
 
 
@@ -425,8 +429,8 @@ export default function DashboardPage() {
       <DesktopSidebar currentView={currentView} onNavigate={setCurrentView} isFeatureLocked={isFeatureLocked} />
 
       {/* Main */}
-      <div className="md:ml-[88px] flex flex-col min-h-screen transition-all duration-300 max-w-[1200px] mx-auto w-full">
-        <header className="sticky top-0 z-40 flex h-14 items-center justify-between px-4 bg-background/80 backdrop-blur-xl border-b border-border md:border-none md:bg-transparent md:backdrop-blur-none">
+      <div className="product-main flex flex-col min-h-screen">
+        <header className="product-topbar sticky top-0 z-40 flex h-14 items-center justify-between px-4">
           <div className="md:hidden flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-xl bg-brand flex items-center justify-center">
               <ScanLine className="w-4 h-4 text-white" />
@@ -436,7 +440,7 @@ export default function DashboardPage() {
               <span className="block text-[10px] text-muted-foreground">{getViewTitle()}</span>
             </div>
           </div>
-          <div className="hidden md:block" />
+          <div className="product-breadcrumb"><span>VyseFit</span><span>/</span><strong>{getViewTitle()}</strong></div>
           <div className="flex items-center gap-1.5">
             {(isAdmin || user?.user_metadata?.is_admin) && (
             <button onClick={() => router.push("/admin-dashboard")} aria-label="Admin" className="w-9 h-9 rounded-xl flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-all">
@@ -449,7 +453,8 @@ export default function DashboardPage() {
           </div>
         </header>
 
-        <main className="flex-1 overflow-y-auto px-4 pb-nav pt-4 md:px-8 md:pb-8 lg:px-12 lg:pb-8">
+        <main id="app-content" className="product-content flex-1 px-4 pb-nav pt-6 md:px-8 md:pb-12 lg:px-10">
+            <AppSectionIntro key={currentView} view={currentView} title={getViewTitle()} />
             {/* Core views — per-view Suspense prevents waterfall & isolates fallback; heavy charts/map use dynamic ssr:false (see top) */}
             {currentView === "home" && <FeatureErrorBoundary featureName="HomeDashboard"><HomeDashboard userMetabolicPlan={userMetabolicPlan} dailyActivity={dailyActivity} onNavigate={setCurrentView} /></FeatureErrorBoundary>}
             {currentView === "dashboard" && <Suspense fallback={<ViewLoader />}><FeatureErrorBoundary featureName="ScanDashboard"><ScanDashboard onScan={handleScan} onBarcodeProduct={(product) => { const analysis: ProductAnalysis = { productName: product.productName, image: product.image, longevityScore: product.longevityScore, macros: product.macros, healthBenefits: product.healthBenefits, healthRisks: product.healthRisks, }; setAnalysisResult(analysis); setCurrentView("result"); addScannedProduct(analysis); const scanId = `local-${Date.now()}`; addScanHistory({ id: scanId, name: analysis.productName, scannedAt: new Date().toISOString(), score: analysis.longevityScore, image: product.image || "" }); incrementScans(); toast.success(t("page_product_found")); }} isScanning={isAnalyzing} /></FeatureErrorBoundary></Suspense>}
@@ -510,7 +515,7 @@ export default function DashboardPage() {
       <input type="file" ref={bottomNavInputRef} className="hidden" accept="image/*" capture="environment" onChange={handleBottomNavFileChange} />
 
       {/* FAB - Scan - hidden during GPS tracker */}
-      {currentView !== "corrida" && (
+      {currentView !== "corrida" && currentView !== "dashboard" && currentView !== "result" && (
         <button onClick={handleNavScan}
           className="mobile-fab-safe fixed right-4 z-50 h-14 w-14 rounded-xl bg-brand text-white shadow-lg shadow-brand/20 flex items-center justify-center transition-all duration-200 hover:scale-105 active:scale-95 md:bottom-6 md:right-8"
           aria-label={t("home_scan_product")}
