@@ -2,7 +2,7 @@
 
 export const dynamic = 'force-dynamic'
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { motion } from "framer-motion"
 import Link from "next/link"
 import { Eye, EyeOff, Loader2 } from "lucide-react"
@@ -31,6 +31,16 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [fieldErrors, setFieldErrors] = useState<LoginErrors>({})
+
+  useEffect(() => {
+    if (new URLSearchParams(window.location.search).get("error") !== "session_missing") return
+    const timer = window.setTimeout(() => {
+      setError(locale === "en-US"
+        ? "Your Google session was not saved. Please try again."
+        : "A sessão do Google não foi salva. Tente entrar novamente.")
+    }, 0)
+    return () => window.clearTimeout(timer)
+  }, [locale])
 
   const validate = (values: { email: string; password: string }): LoginErrors => {
     const result = loginSchema.safeParse(values)
@@ -67,9 +77,11 @@ export default function LoginPage() {
 
   const handleGoogleLogin = async () => {
     setError(null)
+    setIsLoading(true)
     const { error } = await signInWithGoogle()
     if (error) {
       setError(locale === "en-US" ? "Failed to sign in with Google" : "Falha ao entrar com Google")
+      setIsLoading(false)
     }
   }
 
@@ -233,9 +245,10 @@ export default function LoginPage() {
             <Button
               type="button"
               onClick={handleGoogleLogin}
+              disabled={isLoading}
               className="w-full h-12 bg-card border border-border text-foreground hover:bg-muted rounded-xl transition-all"
             >
-              <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
+              {isLoading ? <Loader2 className="w-5 h-5 mr-2 animate-spin" /> : <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
                 <path
                   fill="currentColor"
                   d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -252,8 +265,10 @@ export default function LoginPage() {
                   fill="currentColor"
                   d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
                 />
-              </svg>
-              {locale === "en-US" ? "Continue with Google" : "Continuar com Google"}
+              </svg>}
+              {isLoading
+                ? (locale === "en-US" ? "Opening Google..." : "Abrindo Google...")
+                : (locale === "en-US" ? "Continue with Google" : "Continuar com Google")}
             </Button>
 
             {/* Sign Up Link */}

@@ -129,7 +129,23 @@ export default function DashboardPage() {
   }, [])
 
   useEffect(() => {
-    if ((!authLoading || authTimedOut) && !user) router.push("/auth/login")
+    if ((authLoading && !authTimedOut) || user) return
+    // Provider state can lag behind storage right after OAuth (SIGNED_IN
+    // event still loading the profile): verify storage directly once
+    // before bouncing to login.
+    let cancelled = false
+    const verifyPersistedSession = async () => {
+      for (let attempt = 0; attempt < 3 && !cancelled; attempt++) {
+        try {
+          const { data: { session } } = await supabase.auth.getSession()
+          if (session) return
+        } catch {}
+        await new Promise((resolve) => setTimeout(resolve, 300))
+      }
+      if (!cancelled) router.replace("/auth/login?error=session_missing")
+    }
+    void verifyPersistedSession()
+    return () => { cancelled = true }
   }, [user, authLoading, authTimedOut, router])
 
   useEffect(() => {

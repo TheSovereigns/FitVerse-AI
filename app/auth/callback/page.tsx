@@ -1,129 +1,112 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
 import { Loader2 } from "lucide-react"
+import type { Session } from "@supabase/supabase-js"
+import Link from "next/link"
 import { supabase } from "@/lib/supabase"
 
 async function ensureProfileExists(userId: string, email: string) {
   const { data: existing } = await supabase
-    .from('profiles')
-    .select('id')
-    .eq('id', userId)
+    .from("profiles")
+    .select("id")
+    .eq("id", userId)
     .maybeSingle()
 
   if (existing) return
 
   if (email) {
     const { data: existingByEmail } = await supabase
-      .from('profiles')
-      .select('id')
-      .eq('email', email)
+      .from("profiles")
+      .select("id")
+      .eq("email", email)
       .maybeSingle()
 
     if (existingByEmail) return
   }
 
-  await supabase.from('profiles').insert({
+  await supabase.from("profiles").insert({
     id: userId,
-    email: email,
+    email,
     name: null,
-    plan: 'free',
+    plan: "free",
     is_admin: false,
-    country: navigator.language.startsWith('en') ? 'US' : 'BR',
+    country: navigator.language.startsWith("en") ? "US" : "BR",
   })
 }
 
 export default function AuthCallbackPage() {
-  const router = useRouter()
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     let cancelled = false
 
-    const goApp = async (userId: string, email: string) => {
+    const completeOAuth = async () => {
       try {
-        await ensureProfileExists(userId, email)
-      } catch {}
-      if (!cancelled) router.replace("/app")
-    }
+        const query = new URLSearchParams(window.location.search)
+        const providerError = query.get("error_description") || query.get("error")
+        if (providerError) throw new Error(providerError)
 
-    // Covers BOTH OAuth flows:
-    // - PKCE (?code=): explicit exchange, regardless of client flowType
-    // - Implicit (#access_token): getSession() detects the hash
-    // Exchange errors are RECORDED (not shown yet): the client's own
-    // auto-detect may win the race and create the session anyway.
-    let oauthNote = ""
-    const finishOAuth = async (): Promise<boolean> => {
-      try {
-        const params = new URLSearchParams(window.location.search)
-        const oauthError = params.get("error_description") || params.get("error")
-        if (oauthError) {
-          oauthNote = `Login recusado pelo provedor: ${oauthError}`
-          return false
-        }
-        const code = params.get("code")
-        if (!code) return false
-        const { data, error } = await supabase.auth.exchangeCodeForSession(code)
-        if (error) {
-          oauthNote = `Falha na troca do código OAuth: ${error.message}`
-          return false
-        }
-        if (data.session) {
-          await goApp(data.session.user.id, data.session.user.email || '')
-          return true
-        }
-      } catch (e) {
-        const msg = e instanceof Error ? e.message : String(e ?? "")
-        oauthNote = `Erro no callback OAuth: ${msg}`
-      }
-      return false
-    }
+        const code = query.get("code")
+        let session: Session | null = null
 
-    // Single robust flow: poll for the session (covers slow OAuth code
-    // exchange + lock waits) instead of 3 racing getSession() calls.
-    const waitForSession = async () => {
-      if (await finishOAuth()) return
-      for (let i = 0; i < 16 && !cancelled; i++) {
-        try {
-          const { data: { session } } = await supabase.auth.getSession()
-          if (session) {
-            await goApp(session.user.id, session.user.email || '')
-            return
+        if (code) {
+          // This page is the only owner of the one-time PKCE exchange.
+          const result = await supabase.auth.exchangeCodeForSession(code)
+          if (result.error) throw result.error
+          session = result.data.session
+        } else {
+          // Supports a login started by an older deployed implicit-flow build.
+          const hash = new URLSearchParams(window.location.hash.slice(1))
+          const accessToken = hash.get("access_token")
+          const refreshToken = hash.get("refresh_token")
+          if (accessToken && refreshToken) {
+            const result = await supabase.auth.setSession({
+              access_token: accessToken,
+              refresh_token: refreshToken,
+            })
+            if (result.error) throw result.error
+            session = result.data.session
           }
-        } catch {
-          // lock contention / transient - just retry
         }
-        await new Promise((r) => setTimeout(r, 500))
-      }
-      if (!cancelled) {
-        if (oauthNote) {
-          setError(oauthNote)
-          return
+
+        if (!session) {
+          const result = await supabase.auth.getSession()
+          if (result.error) throw result.error
+          session = result.data.session
         }
-        const hasHash = typeof window !== "undefined" && window.location.hash.includes("access_token")
-        const hasCode = typeof window !== "undefined" && window.location.search.includes("code=")
-        setError(
-          hasHash || hasCode
-            ? "Sessão não foi criada a partir do retorno OAuth. Verifique as Redirect URLs no Supabase (Authentication → URL Configuration)."
-            : "Nenhuma sessão encontrada no retorno do login. Tente novamente ou use email/senha."
-        )
+
+        if (!session?.user) {
+          throw new Error("O Google não retornou uma sessão válida. Tente entrar novamente.")
+        }
+
+        // Profile setup is useful, but a slow database request must not prevent
+        // an authenticated user from reaching the application.
+        try {
+          await Promise.race([
+            ensureProfileExists(session.user.id, session.user.email || ""),
+            new Promise((resolve) => setTimeout(resolve, 2500)),
+          ])
+        } catch {}
+
+        if (!cancelled) {
+          // A full navigation makes the application rehydrate from the session
+          // that exchangeCodeForSession has already persisted in localStorage.
+          window.location.replace("/app")
+        }
+      } catch (cause) {
+        if (!cancelled) {
+          const message = cause instanceof Error ? cause.message : String(cause ?? "")
+          setError(`Não foi possível concluir o login com Google: ${message}`)
+        }
       }
     }
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event: string, session: { user: { id: string; email?: string } } | null) => {
-      if ((event === "SIGNED_IN" || event === "INITIAL_SESSION") && session && !cancelled) {
-        goApp(session.user.id, session.user.email || '')
-      }
-    })
-
-    waitForSession()
-
+    void completeOAuth()
     return () => {
       cancelled = true
-      subscription.unsubscribe()
     }
-  }, [router])
+  }, [])
 
   if (error) {
     return (
@@ -132,15 +115,15 @@ export default function AuthCallbackPage() {
           <h2 className="text-2xl font-black text-white mb-4">Erro na autenticação</h2>
           <p className="text-white/60 mb-6">{error}</p>
           <div className="flex flex-col gap-2">
-            <button
-              onClick={() => window.location.reload()}
-              className="h-11 rounded-xl bg-brand text-brand-foreground text-sm font-bold hover:bg-brand/90"
+            <Link
+              href="/auth/login"
+              className="h-11 rounded-xl bg-brand text-brand-foreground text-sm font-bold hover:bg-brand/90 flex items-center justify-center"
             >
               Tentar novamente
-            </button>
-            <a href="/auth/login" className="text-primary hover:underline text-sm">
-              Voltar ao login
-            </a>
+            </Link>
+            <Link href="/" className="text-primary hover:underline text-sm">
+              Voltar ao início
+            </Link>
           </div>
         </div>
       </div>

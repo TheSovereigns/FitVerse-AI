@@ -219,13 +219,16 @@ export async function middleware(request: NextRequest) {
   }
 
   // 4. Check authentication for protected routes
-  const isAppRoute = path === "/app" || path.startsWith("/app/")
+  // NOTE: /app pages are NOT enforced here on purpose. The browser session
+  // lives in localStorage (supabase-js) and no sb-access-token cookie is
+  // set, so server-side enforcement would bounce every legit user to login.
+  // The client guard in app/app/page.tsx owns the /app redirect.
   const isProtectedRoute = protectedRoutes.some((route) =>
     matchesRoute(path, route)
   )
   const isAdminRoute = adminRoutes.some((route) => matchesRoute(path, route))
 
-  if (isAppRoute || isProtectedRoute || isAdminRoute) {
+  if (isProtectedRoute || isAdminRoute) {
     const user = await getSession(request, response)
 
     // Not authenticated

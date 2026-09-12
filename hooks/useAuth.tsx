@@ -73,6 +73,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     let mounted = true
+    let profileTimer: ReturnType<typeof setTimeout> | null = null
 
     const initializeAuth = async () => {
       try {
@@ -105,26 +106,31 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     void initializeAuth()
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (_event, session) => {
+      (_event, session) => {
         if (!mounted) return
 
         setUser(session?.user || null)
         syncSessionToCookie(session?.access_token)
+        setIsLoading(false)
 
         if (session?.user) {
-          await loadProfile(session.user.id)
+          // Supabase awaits this callback while holding its auth lock. Defer
+          // queries that may read the session so OAuth cannot deadlock here.
+          if (profileTimer) clearTimeout(profileTimer)
+          profileTimer = setTimeout(() => {
+            if (mounted) void loadProfile(session.user.id)
+          }, 0)
         } else {
           setProfile(null)
           setIsAdmin(false)
           hasRedirectedRef.current = false
         }
-
-        setIsLoading(false)
       }
     )
 
     return () => {
       mounted = false
+      if (profileTimer) clearTimeout(profileTimer)
       subscription.unsubscribe()
     }
   }, [])

@@ -57,7 +57,11 @@ export function getSupabaseClient(): SupabaseClient {
     auth: {
       autoRefreshToken: true,
       persistSession: true,
-      detectSessionInUrl: true,
+      // Google OAuth uses PKCE. The dedicated callback page performs the
+      // exchange itself so auth-js and React do not consume the same code.
+      // Password recovery URLs keep automatic detection.
+      flowType: "pkce",
+      detectSessionInUrl: (url) => url.pathname !== "/auth/callback",
       lock: supabaseLock,
       storage: {
         getItem: (key: string) => {
