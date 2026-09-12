@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { cn } from "@/lib/utils"
 import { useTranslation } from "@/lib/i18n"
@@ -44,6 +44,12 @@ export function DesktopSidebar({ currentView, onNavigate, isFeatureLocked }: Sid
   const isEnglish = locale === "en-US"
   const [expandedGroup, setExpandedGroup] = useState<string | null>(null)
   const [isCollapsed, setIsCollapsed] = useState(false)
+  const [query, setQuery] = useState("")
+  useEffect(() => {
+    const close = (event: KeyboardEvent) => { if (event.key === "Escape") setExpandedGroup(null) }
+    window.addEventListener("keydown", close)
+    return () => window.removeEventListener("keydown", close)
+  }, [])
 
   const toggle = (key: string) => setExpandedGroup(prev => prev === key ? null : key)
 
@@ -141,8 +147,9 @@ export function DesktopSidebar({ currentView, onNavigate, isFeatureLocked }: Sid
         onClick={() => onNavigate(item.view)}
         title={item.label}
         aria-label={item.label}
+        aria-current={active ? "page" : undefined}
         className={cn(
-          "relative flex flex-col items-center gap-1.5 w-full rounded-xl py-3 transition-all duration-200 border-l-2",
+          "sidebar-nav-item relative flex flex-col items-center gap-1.5 w-full rounded-xl py-3 transition-all duration-200 border-l-2",
           active
             ? "bg-brand/10 text-brand border-brand"
             : "text-muted-foreground hover:text-foreground hover:bg-muted/50 border-transparent"
@@ -169,8 +176,9 @@ export function DesktopSidebar({ currentView, onNavigate, isFeatureLocked }: Sid
           onClick={() => toggle(group.key)}
           title={group.label}
           aria-label={group.label}
+          aria-expanded={isOpen}
           className={cn(
-            "relative flex flex-col items-center gap-1.5 w-full rounded-xl py-3 transition-all duration-200 border-l-2",
+            "sidebar-nav-item relative flex flex-col items-center gap-1.5 w-full rounded-xl py-3 transition-all duration-200 border-l-2",
             groupActive && !isOpen
               ? "bg-brand/10 text-brand border-brand"
               : "text-muted-foreground hover:text-foreground hover:bg-muted/50 border-transparent"
@@ -194,25 +202,28 @@ export function DesktopSidebar({ currentView, onNavigate, isFeatureLocked }: Sid
   return (
     <>
       <aside
-        className="hidden md:flex flex-col fixed top-0 left-0 h-full z-50 w-[88px] transition-all duration-300"
+        data-collapsed={isCollapsed}
+        className="product-sidebar hidden md:flex flex-col fixed top-0 left-0 h-full z-50 w-[88px] transition-all duration-300"
       >
         {/* Background */}
         <div className="absolute inset-0 bg-card/80 backdrop-blur-2xl border-r border-border/50" />
 
         <div className="relative flex flex-col h-full">
           {/* Logo */}
-          <div className="flex flex-col items-center shrink-0 py-3 border-b border-border/30">
+          <div className="sidebar-logo flex flex-col items-center shrink-0 py-3 border-b border-border/30">
             <div className="relative">
               <div className="w-10 h-10 rounded-xl bg-card border border-border flex items-center justify-center shadow-sm overflow-hidden text-foreground">
                 <img src="/vf.svg" alt="VyseFit" className="w-6 h-6" />
               </div>
               <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-green-400 border-2 border-card" />
             </div>
+            <a href="/landing" className="sidebar-wordmark">VyseFit<small>AI</small></a>
           </div>
 
           {/* Main nav - scrollable */}
-          <nav className="flex-1 px-1.5 py-2 space-y-0.5 overflow-y-auto scrollbar-thin">
-            {singleItems.map((item, i) => (
+          <nav aria-label={isEnglish ? "Main navigation" : "Navegação principal"} className="sidebar-group-nav flex-1 px-1.5 py-2 space-y-0.5 overflow-y-auto scrollbar-thin">
+            {!isCollapsed && <input className="sidebar-search" aria-label={isEnglish ? "Find a feature" : "Buscar recurso"} placeholder={isEnglish ? "Find a feature..." : "Buscar recurso..."} value={query} onChange={event => setQuery(event.target.value)} />}
+            {(query ? [...singleItems, ...groups.flatMap(group => group.items), ...bottomItems].filter(item => item.label.toLocaleLowerCase().includes(query.toLocaleLowerCase())) : singleItems).map((item, i) => (
               <NavButton key={item.view} item={item} index={i} />
             ))}
 
@@ -220,13 +231,13 @@ export function DesktopSidebar({ currentView, onNavigate, isFeatureLocked }: Sid
               <div className="h-px bg-border/40" />
             </div>
 
-            {groups.map((g, i) => (
+            {!query && groups.map((g, i) => (
               <GroupButton key={g.key} group={g} index={i} />
             ))}
           </nav>
 
           {/* Bottom section */}
-          <div className="shrink-0 border-t border-border/30 px-1.5 py-2 space-y-0.5">
+          <div className="sidebar-footer shrink-0 border-t border-border/30 px-1.5 py-2 space-y-0.5">
             {bottomItems.map((item, i) => (
               <NavButton key={item.view} item={item} index={singleItems.length + groups.length + i} />
             ))}
@@ -261,7 +272,7 @@ export function DesktopSidebar({ currentView, onNavigate, isFeatureLocked }: Sid
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -8 }}
             transition={{ duration: 0.15 }}
-            className="hidden md:flex fixed top-0 h-full z-40 w-[240px] flex-col left-[88px]"
+            className="product-sidebar-flyout hidden md:flex fixed top-0 h-full z-40 w-[240px] flex-col left-[88px]"
           >
             <div className="absolute inset-0 bg-popover/95 backdrop-blur-2xl border-r border-border/50" />
             <div className="relative flex flex-col h-full">

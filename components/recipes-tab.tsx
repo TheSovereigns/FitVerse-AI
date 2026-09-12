@@ -198,7 +198,7 @@ export function RecipesTab({ metabolicPlan }: RecipesTabProps) {
   }
 
   return (
-    <div className="relative pb-safe-nav max-w-2xl mx-auto">
+    <div className="relative pb-safe-nav max-w-5xl mx-auto">
       <div className="relative space-y-6">
         {/* Header */}
         <motion.section
@@ -211,10 +211,10 @@ export function RecipesTab({ metabolicPlan }: RecipesTabProps) {
             <span className="text-xs font-medium text-brand">{isEnglish ? "AI Chef" : "IA Chef"}</span>
           </div>
           <h1 className="text-3xl font-bold tracking-tight text-foreground md:text-4xl">
-            {t("recipes_title")}
+            {isEnglish ? "Your recipe collection" : "Seu caderno de receitas"}
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            {t("recipes_subtitle")}
+            {isEnglish ? "Ideas that fit your taste and your routine." : "Ideias que combinam com seu gosto e sua rotina."}
           </p>
         </motion.section>
 

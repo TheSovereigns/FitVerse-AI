@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from "react"
 import { logger } from "@/lib/logger"
+import { productCopy } from "@/lib/product-copy"
 
 export type Locale = "pt-BR" | "en-US"
 
@@ -1949,7 +1950,7 @@ export function I18nProvider({ children }: { children: React.ReactNode }) {
 
   const t = useCallback(
     (key: string): string =>
-      (translations[locale] as any)[key] ?? (translations["pt-BR"] as any)[key] ?? key,
+      (translations[locale] as any)[key] ?? productCopy[key]?.[locale === "en-US" ? 1 : 0] ?? (translations["pt-BR"] as any)[key] ?? key,
     [locale]
   )
 

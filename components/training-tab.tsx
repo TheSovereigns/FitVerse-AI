@@ -1,4 +1,5 @@
 "use client"
+import Image from "next/image"
 
 import { useEffect, useState, useCallback } from "react"
 import { motion, AnimatePresence } from "framer-motion"
@@ -268,7 +269,7 @@ export function TrainingTab({ userGoal }: TrainingTabProps) {
   })
 
   return (
-    <div className="relative max-w-2xl mx-auto space-y-6 pb-safe-nav">
+    <div className="training-experience relative max-w-5xl mx-auto space-y-6 pb-safe-nav">
       {/* Header */}
       <motion.section
         initial={{ opacity: 0, y: 12 }}
@@ -282,10 +283,10 @@ export function TrainingTab({ userGoal }: TrainingTabProps) {
         <div className="flex items-end justify-between">
           <div>
             <h1 className="text-3xl font-bold tracking-tight text-foreground md:text-4xl">
-              {t("training_title")}
+            {locale === "en-US" ? "Your workout library" : "Sua biblioteca de treinos"}
             </h1>
             <p className="mt-1 text-sm text-muted-foreground">
-              {t("training_subtitle")}
+              {locale === "en-US" ? "Choose a workout or create a plan for your routine." : "Escolha um treino ou crie um plano para sua rotina."}
             </p>
           </div>
           <Button onClick={() => setShowGeneratorModal(true)} aria-label={t("training_new_workout")} className="h-11 rounded-xl bg-brand px-5 text-sm font-semibold text-white shadow-lg shadow-brand/25 hover:bg-brand/90">
@@ -563,6 +564,7 @@ function WorkoutCard({ workout, index, onStart, onStartLive, onExerciseClick, on
       className="flex flex-col overflow-hidden rounded-2xl glass-strong"
     >
       {/* Card header with icon */}
+      <div className="workout-cover"><Image src={`/images/landing/${workout.category.toLowerCase().includes("cardio") ? "hero" : "training"}.webp`} alt="" fill sizes="(max-width: 767px) 100vw, 450px" style={{ objectPosition: index % 2 ? "center 30%" : "center 52%" }} /></div>
       <div className="flex items-center justify-between border-b border-border p-5">
         <div className="flex items-center gap-3">
           <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-brand/10">

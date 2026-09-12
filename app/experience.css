@@ -1,0 +1,171 @@
+/* VyseFit product system: the same forest, mineral and mint as the cinematic site. */
+:root {
+  --vf-forest: #123c35;
+  --vf-paper: #f0f4ee;
+  --vf-mint: #a9e9cb;
+  --brand: #237452;
+  --brand-foreground: #ffffff;
+  --brand-muted: #23745212;
+  --brand-hover: #23745220;
+  --ring: #237452;
+  --background: var(--vf-paper);
+  --foreground: #163c34;
+  --card: #fbfdf9;
+  --card-foreground: #163c34;
+  --popover: #fbfdf9;
+  --popover-foreground: #163c34;
+  --primary: var(--vf-forest);
+  --primary-foreground: #f0f4ee;
+  --secondary: #e3ebe3;
+  --secondary-foreground: #163c34;
+  --muted: #e3ebe3;
+  --muted-foreground: #52695e;
+  --border: #cddbd0;
+  --input: #e5ede5;
+  --sidebar: #e6eee6;
+  --sidebar-foreground: #163c34;
+  --radius: .75rem;
+}
+.dark {
+  --brand: #a9e9cb;
+  --brand-foreground: #123c35;
+  --brand-muted: #a9e9cb15;
+  --brand-hover: #a9e9cb25;
+  --ring: #a9e9cb;
+  --background: #10221e;
+  --foreground: #edf4ed;
+  --card: #192e27;
+  --card-foreground: #edf4ed;
+  --popover: #20372e;
+  --popover-foreground: #edf4ed;
+  --primary: #a9e9cb;
+  --primary-foreground: #123c35;
+  --secondary: #243d32;
+  --secondary-foreground: #edf4ed;
+  --muted: #243d32;
+  --muted-foreground: #a7bcb0;
+  --border: #345044;
+  --input: #243d32;
+  --sidebar: #142820;
+  --sidebar-foreground: #edf4ed;
+}
+body { background: var(--background); }
+:is(button,a,input,select,textarea,[role="tab"]):focus-visible { outline: 2px solid var(--ring); outline-offset: 4px; }
+.product-experience { background: var(--background); min-height: 100dvh; }
+.product-experience { font-family:var(--font-inter),sans-serif; }
+.product-experience .bg-brand { color:var(--brand-foreground); }
+.product-experience h1 { font-weight:700; }
+.product-experience .paywall-card { background:var(--card); }
+.home-overview { display:flex; flex-direction:column; gap:24px; }
+.home-overview > * { margin-block:0; order:4; }
+.home-overview > .home-heading { order:0; }
+.home-overview > .daily-journeys { order:1; }
+.home-overview > .nutrition-overview { order:2; }
+.home-overview > .grid { align-items:start; }
+.product-experience :is(.glass-strong,.glass-card,[data-slot="card"]) {
+  background: var(--card); border: 1px solid var(--border); box-shadow: 0 3px 14px #09271906; backdrop-filter: none;
+}
+.product-experience h3 { text-transform: none; letter-spacing: -.015em; color: var(--foreground); }
+.product-experience [data-slot="card-title"] { font-family: var(--font-barlow),sans-serif; font-size: 1.5rem; }
+.product-experience :is([data-slot="input"],[data-slot="select-trigger"]) { min-height: 44px; border-radius: 8px; }
+.product-experience [data-slot="tabs-list"] { padding: 5px; min-height: 46px; background: var(--muted); border-radius: 10px; }
+.product-experience [data-slot="tabs-trigger"] { min-height: 36px; border-radius: 7px; }
+.product-experience [data-slot="table-head"] { color: var(--muted-foreground); height: 48px; }
+.product-experience [data-slot="table-cell"] { padding-block: 18px; }
+.product-main { min-width: 0; }
+.product-topbar { border-bottom: 1px solid var(--border); background: var(--background); }
+.product-breadcrumb { display:flex; align-items:center; gap:14px; font-size:12px; color:var(--muted-foreground); }
+.product-breadcrumb strong { color:var(--foreground); font-weight:500; }
+.product-content { max-width: 1240px; margin-inline:auto; width:100%; }
+.product-content > :is(div,section) { width:100%; }
+.product-sidebar { background: var(--sidebar); border-right:1px solid var(--border); }
+.product-sidebar nav button { min-height:44px; }
+.sidebar-search { width:100%; min-height:42px; padding:10px 12px; border:1px solid var(--border); border-radius:8px; background:var(--background); font-size:12px; margin-bottom:16px; }
+.workout-cover { position:relative; height:170px; background:var(--vf-forest); }
+.workout-cover img { object-fit:cover; }
+.training-experience > section > div:last-child { flex-wrap:wrap; gap:16px; }
+.scan-studio-photo { display:none; }
+.onboarding-experience > div { width:100%; max-width:680px; margin-inline:auto; }
+.onboarding-experience { padding-block:24px; }
+.onboarding-experience:before { content:""; position:absolute; inset:0; background:linear-gradient(90deg,var(--background) 55%,transparent),url('/images/landing/recovery.webp') right center/auto 100% no-repeat; opacity:.12; pointer-events:none; }
+.onboarding-experience > div { position:relative; }
+.coach-experience { border:1px solid var(--border); border-radius:18px; background:var(--card); overflow:hidden; }
+.coach-experience > div:first-child { background:linear-gradient(160deg,var(--card),var(--background)); }
+.product-mobile-nav button { min-height:48px; }
+.scan-studio > div.relative { padding:24px 16px; }
+.sidebar-wordmark { font-size:25px; font-weight:700; letter-spacing:-1.5px; }
+.sidebar-wordmark small { font-size:10px; letter-spacing:0; vertical-align:top; margin-left:4px; }
+.app-section-intro { display:flex; min-height:196px; overflow:hidden; position:relative; border-radius:16px; background:var(--vf-forest); margin:0 auto 28px; color:var(--vf-paper); max-width:1024px; }
+.app-section-intro { animation:section-arrival .3s ease-out both; }
+@keyframes section-arrival { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
+.app-section-copy { padding:30px 36px; width:70%; position:relative; z-index:1; }
+.app-section-copy > span { font-size:12px; color:var(--vf-mint); }
+.app-section-copy h1 { font-size:clamp(34px,4vw,52px); color:inherit; margin:12px 0; line-height:1; }
+.app-section-copy p { font-size:13px; line-height:1.6; max-width:43ch; color:#d0e1d5; }
+.app-section-photo { position:absolute; inset:0 0 0 65%; }
+.app-section-photo img { object-fit:cover; object-position:center 40%; }
+.app-section-photo:after { content:""; position:absolute; inset:0; background:linear-gradient(90deg,#123c35,transparent 70%); }
+.daily-journeys { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:16px; }
+.journey-card { position:relative; height:230px; border-radius:14px; overflow:hidden; text-align:left; color:#fff; background:#123c35; }
+.journey-card > img { object-fit:cover; object-position:center 45%; transition:transform .5s ease; }
+.journey-card:after { content:""; position:absolute; inset:0; background:linear-gradient(180deg,#09251a20 20%,#09251aeb); }
+.journey-card:hover > img { transform:scale(1.045); }
+.journey-icon { position:absolute; top:16px; left:16px; z-index:1; border:1px solid #ffffff50; border-radius:50%; padding:10px; background:#123c3530; }
+.journey-copy { position:absolute; bottom:23px; left:20px; right:32px; z-index:1; }
+.journey-copy small { font-size:11px; color:#e1ece2; }
+.journey-copy strong { display:block; font-family:var(--font-barlow),sans-serif; font-weight:600; font-size:29px; line-height:1.1; margin-top:6px; }
+.journey-arrow { position:absolute; bottom:26px; right:15px; z-index:1; }
+.auth-experience .auth-visual { display:none; position:relative; width:50%; min-height:100dvh; overflow:hidden; color:#f0f4ee; background:#123c35; }
+.auth-visual > img { object-fit:cover; }
+.auth-visual:after { content:""; position:absolute; inset:0; background:linear-gradient(180deg,#102c3560,transparent 25%,#102c35d9 100%); }
+.auth-visual-brand { position:absolute; top:42px; left:48px; font-size:30px; letter-spacing:-1px; font-weight:700; z-index:1; }
+.auth-visual-brand span { font-size:11px; vertical-align:top; letter-spacing:0; }
+.auth-visual-copy { position:absolute; inset:auto 48px 110px; z-index:1; }
+.auth-visual-copy p { font-size:13px; margin-bottom:18px; }
+.auth-visual-copy h2 { color:inherit; font-size:clamp(56px,6vw,88px); line-height:.98; font-weight:600; white-space:pre-line; margin-bottom:24px; }
+.auth-visual-copy > span { display:block; max-width:34ch; font-size:14px; line-height:1.7; color:#d7e4d9; }
+.auth-visual-footer { position:absolute; bottom:34px; left:48px; right:48px; z-index:1; display:flex; justify-content:space-between; font-size:10px; border-top:1px solid #f0f4ee50; padding-top:20px; }
+.auth-experience .glass-strong { box-shadow:none; border:0; background:transparent; padding-inline:0; }
+.auth-experience h1 { font-size:44px; }
+.auth-experience .text-foreground\/40 { color:var(--muted-foreground); }
+.auth-experience .text-foreground\/30 { color:var(--muted-foreground); }
+.subscription-experience { background:var(--background); }
+.subscription-experience:before { content:""; position:absolute; inset:0 0 auto; height:350px; background:linear-gradient(0deg,var(--background),#123c3530),url('/images/landing/hero.webp') center 45%/cover; opacity:.15; pointer-events:none; }
+@media(min-width:768px) {
+  .product-sidebar[data-collapsed="true"] { width:88px; }
+  .product-experience:has(.product-sidebar[data-collapsed="true"]) .product-main { margin-left:88px; width:calc(100% - 88px); }
+  .product-sidebar[data-collapsed="true"] .sidebar-wordmark { display:none; }
+  .product-sidebar[data-collapsed="true"] .sidebar-nav-item { justify-content:center; }
+  .product-experience:has(.product-sidebar[data-collapsed="true"]) .product-sidebar-flyout { left:88px; }
+  .scan-studio { padding-right:28%; }
+  .scan-studio-photo { display:block; position:absolute; inset:0 0 0 70%; }
+  .scan-studio-photo img { object-fit:cover; }
+  .scan-studio-photo:after { content:""; position:absolute; inset:0; background:linear-gradient(90deg,var(--card),transparent); }
+  .product-main { margin-left:232px; width:calc(100% - 232px); }
+  .product-topbar { height:72px; padding-inline:32px; }
+  .product-sidebar { width:232px; }
+  .product-sidebar .sidebar-nav-item { flex-direction:row; gap:12px; padding:10px 14px; border-left:0; border-radius:8px; }
+  .product-sidebar .sidebar-nav-item span { text-align:left; font-size:13px; line-height:1.35; padding:0; }
+  .product-sidebar .sidebar-nav-item svg { flex-shrink:0; }
+  .product-sidebar .sidebar-nav-item[aria-current="page"] { background:var(--primary); color:var(--primary-foreground); }
+  .product-sidebar .sidebar-logo { flex-direction:row; justify-content:flex-start; gap:10px; padding:24px 20px; }
+  .product-sidebar .sidebar-group-nav { padding:14px 12px; }
+  .product-sidebar .sidebar-footer { padding:12px; }
+  .product-sidebar-flyout { left:232px; }
+}
+@media(min-width:1024px) { .auth-experience .auth-visual { display:block; } }
+@media(max-width:767px) {
+  .product-breadcrumb { display:none; }
+  .app-section-intro { min-height:160px; margin-bottom:20px; border-radius:12px; }
+  .app-section-copy { padding:22px; width:78%; }
+  .app-section-copy h1 { font-size:34px; }
+  .app-section-copy p { font-size:12px; max-width:25ch; }
+  .daily-journeys { gap:10px; overflow-x:auto; grid-template-columns:repeat(3,minmax(190px,1fr)); scroll-snap-type:x mandatory; padding-bottom:6px; }
+  .journey-card { height:215px; scroll-snap-align:start; }
+  .auth-experience { background:var(--background); }
+  .auth-experience h1 { font-size:38px; }
+}
+@media(prefers-reduced-motion:reduce) {
+  .product-experience *, .auth-experience * { animation-duration:.01ms !important; transition-duration:.01ms !important; scroll-behavior:auto !important; }
+  .journey-card:hover > img { transform:none; }
+}

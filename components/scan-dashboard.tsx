@@ -101,10 +101,10 @@ export function ScanDashboard({ onScan, onBarcodeProduct, isScanning = false }: 
           <span className="text-xs font-medium text-brand">AI Vision</span>
         </div>
         <h1 className="text-3xl font-bold tracking-tight text-foreground md:text-4xl">
-          {t("scan_title")}
+          {t("scan_ready")}
         </h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          {t("scan_subtitle")}
+          {t("scan_instruction")}
         </p>
       </motion.section>
 
@@ -136,7 +136,7 @@ export function ScanDashboard({ onScan, onBarcodeProduct, isScanning = false }: 
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.05 }}
         className={cn(
-          "relative min-h-[400px] overflow-hidden rounded-3xl border-2 transition-all duration-300 md:min-h-[460px]",
+          "scan-studio relative min-h-[400px] overflow-hidden rounded-3xl border-2 transition-all duration-300 md:min-h-[460px]",
           isDragging
             ? "border-brand/40 bg-brand/5"
             : "border-border glass-strong hover:border-brand/20",
@@ -154,6 +154,7 @@ export function ScanDashboard({ onScan, onBarcodeProduct, isScanning = false }: 
         }}
       >
         {/* Scan line animation */}
+        <div className="scan-studio-photo" aria-hidden="true"><Image src="/images/landing/nutrition.webp" alt="" fill sizes="(max-width: 767px) 1px, 320px" /></div>
         {isScanning && (
           <div className="pointer-events-none absolute inset-0 z-20 overflow-hidden">
             <motion.div

@@ -24,7 +24,8 @@ export function MobileBottomNav({ currentView, onNavigate, onOpenMore }: MobileB
 
   return (
     <nav
-      className="md:hidden fixed left-0 right-0 bottom-0 z-40 flex h-[84px] items-center justify-around rounded-t-3xl rounded-b-none border-t bg-card/85 backdrop-blur-2xl px-2 shadow-[0_-8px_30px_rgba(0,0,0,0.06)]"
+      aria-label={isEnglish ? "Main navigation" : "Navegação principal"}
+      className="product-mobile-nav md:hidden fixed left-0 right-0 bottom-0 z-40 flex h-[84px] items-center justify-around border-t bg-card px-2"
       style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
     >
       {items.map((item) => {
@@ -35,6 +36,7 @@ export function MobileBottomNav({ currentView, onNavigate, onOpenMore }: MobileB
               key={item.view}
               onClick={() => onNavigate(item.view)}
               aria-label={item.label}
+              aria-current={isActive ? "page" : undefined}
               className="relative flex flex-col items-center justify-center flex-1 -mt-6"
             >
               <div
@@ -66,6 +68,7 @@ export function MobileBottomNav({ currentView, onNavigate, onOpenMore }: MobileB
             key={item.view}
             onClick={() => onNavigate(item.view)}
             aria-label={item.label}
+            aria-current={isActive ? "page" : undefined}
             className={cn(
               "relative flex flex-col items-center justify-center gap-1 flex-1 py-2 rounded-xl transition-all duration-200",
               isActive ? "text-brand" : "text-muted-foreground hover:text-foreground"
@@ -81,7 +84,7 @@ export function MobileBottomNav({ currentView, onNavigate, onOpenMore }: MobileB
       })}
       <button
         onClick={onOpenMore}
-        aria-label="More options"
+        aria-label={isEnglish ? "More options" : "Mais opções"}
         className="relative flex flex-col items-center justify-center gap-1 flex-1 py-2 rounded-xl transition-all duration-200 text-muted-foreground hover:text-foreground"
       >
         <LayoutGrid className="h-[22px] w-[22px]" />

@@ -214,10 +214,12 @@ export function ChatbotTab() {
     )
   }
 
-  const suggestionChips = ["Create a meal plan", "Analyze my sleep", "What should I eat?"]
+  const suggestionChips = locale === "en-US"
+    ? ["Create a meal plan", "Analyze my sleep", "What should I eat?"]
+    : ["Criar um plano alimentar", "Analisar meu sono", "O que posso comer?"]
 
   return (
-    <div className="mx-auto flex h-[calc(100vh-12rem)] max-w-4xl flex-col">
+    <div className="coach-experience mx-auto flex h-[calc(100vh-12rem)] max-w-4xl flex-col">
       <div className="flex-1 overflow-y-auto px-4 py-6 space-y-4">
         {messages.length === 0 && (
           <div className="flex flex-col items-center justify-center h-full text-center">

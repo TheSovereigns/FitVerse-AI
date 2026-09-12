@@ -1,4 +1,5 @@
 "use client"
+import { AuthVisual } from "@/components/app-experience"
 
 export const dynamic = 'force-dynamic'
 
@@ -391,35 +392,8 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-background flex">
-      {/* Left side - Visual (desktop only) */}
-      <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-brand/18 via-brand/6 to-emerald-600/14" />
-        <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-brand/20 rounded-full blur-[100px]" />
-        <div className="absolute bottom-1/4 right-1/4 w-48 h-48 bg-emerald-500/16 rounded-full blur-[80px]" />
-
-        <div className="relative z-10 flex flex-col items-center justify-center w-full p-12">
-          <motion.div
-            initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ duration: 0.6 }}
-            className="text-center"
-          >
-            <div className="w-24 h-24 rounded-3xl bg-primary/20 border border-primary/30 flex items-center justify-center mb-8 mx-auto shadow-[0_0_60px_rgba(52,211,153,0.3)] overflow-hidden">
-              <img src="/icon.svg" alt="VyseFit" className="w-14 h-14" />
-            </div>
-            <h2 className="text-4xl font-black text-foreground mb-4 tracking-tight">
-              {isEnglish ? "Start Your Journey" : "Comece Sua Jornada"}
-            </h2>
-            <p className="text-lg text-foreground/70 max-w-md">
-              {isEnglish
-                ? "Join thousands of people transforming their lives with VyseFit AI"
-                : "Junte-se a milhares de pessoas transformando suas vidas com VyseFit AI"}
-            </p>
-          </motion.div>
-        </div>
-      </div>
-
+    <div className="product-experience auth-experience min-h-screen flex">
+      <AuthVisual signup />
       {/* Right side - Form / Profile / Generating */}
       <div className="w-full lg:w-1/2 flex items-center justify-center p-6 md:p-12">
         <motion.div

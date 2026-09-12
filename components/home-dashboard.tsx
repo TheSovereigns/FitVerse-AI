@@ -1,4 +1,5 @@
 "use client"
+import { DailyJourneys } from "@/components/app-experience"
 
 import { useEffect, useMemo, useState } from "react"
 import { motion } from "framer-motion"
@@ -162,7 +163,7 @@ export function HomeDashboard({
   }, [locale])
 
   return (
-    <div className="mx-auto w-full max-w-4xl space-y-6 pb-safe-nav">
+    <div className="home-overview mx-auto w-full max-w-5xl pb-safe-nav">
       {isLoading && (
         <div className="space-y-6 animate-fade-in">
           {/* Header skeleton */}
@@ -212,11 +213,12 @@ export function HomeDashboard({
 
       {!isLoading && (
         <>
+      <DailyJourneys onNavigate={onNavigate} />
       {/* Header */}
       <motion.section
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
-        className="pt-2"
+        className="home-heading pt-2"
       >
         <div className="flex items-center justify-between">
           <div>
@@ -262,7 +264,7 @@ export function HomeDashboard({
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.05 }}
-        className="rounded-2xl glass-strong p-8 md:p-8"
+        className="nutrition-overview rounded-2xl glass-strong p-6 md:p-8"
       >
         <div className="flex items-center gap-2 mb-4">
           <Flame className="h-4 w-4 text-brand" />

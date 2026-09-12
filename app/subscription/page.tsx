@@ -290,7 +290,7 @@ export default function SubscriptionPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background text-foreground relative overflow-hidden">
+    <div className="product-experience subscription-experience min-h-screen bg-background text-foreground relative overflow-hidden">
       <div className="absolute inset-0 pointer-events-none bg-[linear-gradient(115deg,rgba(255,255,255,0.04)_0%,transparent_32%,rgba(255,255,255,0.03)_62%,transparent_100%)]" />
       <div className="absolute inset-0 pointer-events-none opacity-[0.16] [background-image:linear-gradient(rgba(255,255,255,0.06)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.06)_1px,transparent_1px)] [background-size:72px_72px]" />
       <div className="absolute inset-x-0 top-0 h-48 pointer-events-none bg-gradient-to-b from-white/10 to-transparent" />

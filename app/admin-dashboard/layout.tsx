@@ -49,7 +49,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="product-experience admin-experience min-h-screen bg-background">
       {/* Mobile Header */}
       <header className="md:hidden fixed top-0 left-0 right-0 h-14 bg-background/95 backdrop-blur-xl border-b border-border z-50 flex items-center justify-between px-4">
         <button

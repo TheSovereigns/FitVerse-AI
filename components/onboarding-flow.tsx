@@ -308,7 +308,7 @@ export function OnboardingFlow({ onComplete }: { onComplete: () => void }) {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 z-[200] bg-background flex flex-col"
+        className="onboarding-experience fixed inset-0 z-[200] bg-background flex flex-col"
       >
         <div className="flex items-center justify-between p-4">
           <span className="text-xs text-muted-foreground">
