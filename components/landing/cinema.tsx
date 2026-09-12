@@ -33,6 +33,7 @@ export function Cinema({ poster, video: source, children }: { poster: string; vi
       target = 0,
       shown = 0,
       lastWritten = -1
+    let scrubInteracted = false
     let busy = false,
       pending: number | null = null
     let seekWatchdog: ReturnType<typeof setTimeout> | undefined
@@ -105,6 +106,10 @@ export function Cinema({ poster, video: source, children }: { poster: string; vi
       if (mode !== "scrub") return
       const rect = host!.getBoundingClientRect()
       target = Math.min(1, Math.max(0, -rect.top / Math.max(1, host!.offsetHeight - window.innerHeight)))
+      if (target > 0.002) {
+        scrubInteracted = true
+        player!.pause()
+      }
       if (!raf && visible && !document.hidden) raf = requestAnimationFrame(tick)
     }
 
@@ -125,7 +130,7 @@ export function Cinema({ poster, video: source, children }: { poster: string; vi
         ? "off"
         : queries.some((query) => query.matches)
           ? "play"
-      : "scrub"
+          : "scrub"
       if (next === mode) {
         if (next === "play" && ready) void player!.play().catch(() => undefined)
         return
@@ -146,6 +151,7 @@ export function Cinema({ poster, video: source, children }: { poster: string; vi
       mode = next
       setScrub(next === "scrub")
       shown = target = 0
+      scrubInteracted = false
       load()
       if (next === "scrub") onScroll()
       else if (ready) void player!.play().catch(() => undefined)
@@ -154,7 +160,9 @@ export function Cinema({ poster, video: source, children }: { poster: string; vi
     function onReady() {
       if (mode !== "off" && !disposed) {
         setReady(true)
-        if (mode === "play") void player!.play().catch(() => undefined)
+        if (mode === "play" || (mode === "scrub" && !scrubInteracted)) {
+          void player!.play().catch(() => undefined)
+        }
         else onScroll()
       }
     }
@@ -217,6 +225,8 @@ export function Cinema({ poster, video: source, children }: { poster: string; vi
             preload="metadata"
             muted
             playsInline
+            autoPlay
+            loop
             aria-hidden="true"
             tabIndex={-1}
           />
