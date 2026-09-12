@@ -1,0 +1,8 @@
+# Vercel upload ignore - keep deployments lean
+.next
+node_modules
+.git
+.design-review
+*.log
+.env*.local
+.vercel
