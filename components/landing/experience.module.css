@@ -1586,7 +1586,7 @@
     min-height: 720px;
   }
   .heroVideo {
-    display: none;
+    display: block;
   }
 }
 @media (prefers-reduced-motion: reduce) {

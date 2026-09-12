@@ -9,7 +9,6 @@ const gates = [
   "(orientation: portrait) and (max-width: 1024px)",
   "(orientation: portrait) and (pointer: coarse)",
   "(orientation: landscape) and (pointer: coarse) and (max-height: 560px)",
-  "(prefers-reduced-motion: reduce)",
 ]
 
 export function Cinema({ poster, video: source, children }: { poster: string; video?: string; children: ReactNode }) {
@@ -25,11 +24,10 @@ export function Cinema({ poster, video: source, children }: { poster: string; vi
     const player = video.current
     if (!host || !player) return
     const queries = gates.map((query) => window.matchMedia(query))
-    let enabled = false,
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)")
+    let mode: "off" | "play" | "scrub" = "off",
       visible = true,
       disposed = false
-    let controller: AbortController | undefined
-    let objectUrl: string | undefined
     let raf = 0,
       last = 0,
       target = 0,
@@ -37,22 +35,18 @@ export function Cinema({ poster, video: source, children }: { poster: string; vi
       lastWritten = -1
     let busy = false,
       pending: number | null = null
-    let watchdog: ReturnType<typeof setTimeout> | undefined
     let seekWatchdog: ReturnType<typeof setTimeout> | undefined
 
     function fail() {
-      controller?.abort()
-      enabled = false
+      mode = "off"
       busy = false
       pending = null
-      clearTimeout(watchdog)
       clearTimeout(seekWatchdog)
       cancelAnimationFrame(raf)
       raf = 0
+      player!.pause()
       player!.removeAttribute("src")
       player!.load()
-      if (objectUrl) URL.revokeObjectURL(objectUrl)
-      objectUrl = undefined
       if (!disposed) {
         setReady(false)
         setScrub(false)
@@ -88,7 +82,7 @@ export function Cinema({ poster, video: source, children }: { poster: string; vi
 
     function tick(now: number) {
       raf = 0
-      if (!enabled || !visible || document.hidden) {
+      if (mode !== "scrub" || !visible || document.hidden) {
         last = 0
         return
       }
@@ -108,49 +102,60 @@ export function Cinema({ poster, video: source, children }: { poster: string; vi
     }
 
     function onScroll() {
-      if (!enabled) return
+      if (mode !== "scrub") return
       const rect = host!.getBoundingClientRect()
       target = Math.min(1, Math.max(0, -rect.top / Math.max(1, host!.offsetHeight - window.innerHeight)))
       if (!raf && visible && !document.hidden) raf = requestAnimationFrame(tick)
     }
 
-    async function load() {
-      const current = new AbortController()
-      controller = current
-      watchdog = setTimeout(() => current.abort(), 20000)
-      try {
-        const response = await fetch(source!, { signal: current.signal })
-        if (!response.ok) throw new Error("Video unavailable")
-        const blob = await response.blob()
-        clearTimeout(watchdog)
-        if (disposed || current.signal.aborted || !enabled) return
-        objectUrl = URL.createObjectURL(blob)
-        player!.src = objectUrl
+    function load() {
+      if (disposed || !source) return
+      // Assign the remote URL directly. Fetching it first as a Blob requires
+      // CORS headers that the media CDN does not expose, which left the poster
+      // visible forever in production. Native media loading supports byte
+      // ranges and works without CORS access to the response body.
+      if (player!.src !== source) {
+        player!.src = source
         player!.load()
-      } catch {
-        if (!disposed && enabled && controller === current) fail()
       }
     }
 
     function applyMode() {
-      const next = !queries.some((query) => query.matches)
-      if (next === enabled) return
-      if (!next) {
-        fail()
-        host!.style.removeProperty("--journey")
+      const next: "off" | "play" | "scrub" = reducedMotion.matches
+        ? "off"
+        : queries.some((query) => query.matches)
+          ? "play"
+      : "scrub"
+      if (next === mode) {
+        if (next === "play" && ready) void player!.play().catch(() => undefined)
         return
       }
-      enabled = true
-      setScrub(true)
+      if (next === "off") {
+        mode = "off"
+        player!.pause()
+        player!.removeAttribute("src")
+        player!.load()
+        cancelAnimationFrame(raf)
+        raf = 0
+        host!.style.removeProperty("--journey")
+        setReady(false)
+        setScrub(false)
+        setChapter(0)
+        return
+      }
+      mode = next
+      setScrub(next === "scrub")
       shown = target = 0
-      void load()
-      onScroll()
+      load()
+      if (next === "scrub") onScroll()
+      else if (ready) void player!.play().catch(() => undefined)
     }
 
     function onReady() {
-      if (enabled && !disposed) {
+      if (mode !== "off" && !disposed) {
         setReady(true)
-        onScroll()
+        if (mode === "play") void player!.play().catch(() => undefined)
+        else onScroll()
       }
     }
     function onVisibility() {
@@ -177,11 +182,13 @@ export function Cinema({ poster, video: source, children }: { poster: string; vi
     window.addEventListener("resize", onScroll)
     document.addEventListener("visibilitychange", onVisibility)
     queries.forEach((query) => query.addEventListener("change", applyMode))
+    reducedMotion.addEventListener("change", applyMode)
     applyMode()
     return () => {
       disposed = true
       observer.disconnect()
       queries.forEach((query) => query.removeEventListener("change", applyMode))
+      reducedMotion.removeEventListener("change", applyMode)
       window.removeEventListener("scroll", onScroll)
       window.removeEventListener("resize", onScroll)
       document.removeEventListener("visibilitychange", onVisibility)
@@ -207,7 +214,7 @@ export function Cinema({ poster, video: source, children }: { poster: string; vi
           <video
             ref={video}
             className={`${s.heroVideo} ${ready ? s.videoReady : ""}`}
-            preload="none"
+            preload="metadata"
             muted
             playsInline
             aria-hidden="true"
