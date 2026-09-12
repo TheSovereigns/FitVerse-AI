@@ -185,6 +185,7 @@ export function Cinema({ poster, video: source, children }: { poster: string; vi
     observer.observe(host)
     player.addEventListener("seeked", onSeeked)
     player.addEventListener("canplay", onReady)
+    player.addEventListener("loadeddata", onReady)
     player.addEventListener("error", fail)
     window.addEventListener("scroll", onScroll, { passive: true })
     window.addEventListener("resize", onScroll)
@@ -202,6 +203,7 @@ export function Cinema({ poster, video: source, children }: { poster: string; vi
       document.removeEventListener("visibilitychange", onVisibility)
       player.removeEventListener("seeked", onSeeked)
       player.removeEventListener("canplay", onReady)
+      player.removeEventListener("loadeddata", onReady)
       player.removeEventListener("error", fail)
       fail()
     }
